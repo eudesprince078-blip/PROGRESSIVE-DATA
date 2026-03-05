@@ -3,102 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progressive Mothers | PMS</title>
+    <title>Progressive Mothers | Registry</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --purple: #4c1d95; --gold: #b45309; --white: #ffffff; }
         body { font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 120px; background: #f8fafc; }
-        header { background: var(--white); padding: 30px 20px; text-align: center; border-bottom: 4px solid var(--purple); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .motto { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 15px; margin-top: 5px; }
-        .container { max-width: 450px; margin: 0 auto; padding: 15px; }
-        
-        /* Admin UI */
-        #adminPanel, .admin-only, #logoutBtn { display: none; }
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 14px; }
-        .btn-main { background: var(--purple); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: 900; cursor: pointer; }
-        
-        /* List UI */
-        .student-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; border: 1px solid #e2e8f0; cursor: pointer; position: relative; }
-        .student-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #f1f5f9; }
-        .student-details { flex: 1; }
-        .student-details b { color: var(--purple); font-size: 15px; }
-        .edit-tools { margin-top: 5px; display: flex; gap: 10px; }
-        .btn-edit { color: #2563eb; font-size: 11px; font-weight: bold; background: none; border: none; cursor: pointer; padding: 0; }
-        .btn-del { color: #dc2626; font-size: 11px; font-weight: bold; background: none; border: none; cursor: pointer; padding: 0; }
+        header { background: white; padding: 25px; text-align: center; border-bottom: 5px solid var(--purple); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .motto { color: var(--gold); font-style: italic; font-size: 14px; margin-top: 5px; font-weight: bold; }
+        .container { max-width: 480px; margin: 0 auto; padding: 15px; }
 
-        /* ID Modal */
-        #idModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; }
-        .id-design { width: 300px; background: white; border-radius: 15px; overflow: hidden; text-align: center; border: 1px solid #ddd; }
-        .id-header { background: var(--purple); color: white; padding: 15px; }
-        .id-photo { width: 90px; height: 90px; border-radius: 50%; border: 4px solid var(--purple); margin-top: -45px; background: white; object-fit: cover; }
+        #adminArea, #logoutBtn { display: none; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #cbd5e1; box-sizing: border-box; }
+        .btn-purple { background: var(--purple); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: 900; cursor: pointer; }
 
-        .footer { text-align: center; padding: 20px; font-size: 10px; color: #64748b; }
+        /* Student Row Fix */
+        .s-card { background: white; padding: 18px; border-radius: 20px; margin-bottom: 15px; border-left: 8px solid var(--purple); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .s-header { display: flex; align-items: center; gap: 15px; }
+        .s-img { width: 70px; height: 70px; border-radius: 15px; object-fit: cover; border: 2px solid #ddd; }
+        .s-info { flex: 1; }
+        .s-info b { font-size: 18px; color: var(--purple); display: block; }
+        
+        .s-details { font-size: 13px; color: #475569; background: #f1f5f9; padding: 10px; border-radius: 10px; margin-top: 5px; line-height: 1.6; }
+        
+        .tool-bar { display: flex; gap: 15px; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
+        .btn-tool { font-size: 12px; font-weight: 900; cursor: pointer; border: none; background: none; padding: 5px 0; }
+        .edit-link { color: #2563eb; }
+        .del-link { color: #dc2626; }
+        .id-link { color: var(--gold); }
+        
+        .call-btn { background: #22c55e; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; position: absolute; right: 30px; }
+
+        #idModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+        .id-card { width: 320px; background: white; border-radius: 20px; overflow: hidden; text-align: center; }
+        .id-head { background: var(--purple); color: white; padding: 15px; }
+
+        .footer { text-align: center; padding: 30px; font-size: 11px; color: #94a3b8; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900; color: var(--purple); font-size: 1.2rem;">PROGRESSIVE MOTHERS</div>
+    <div style="font-weight: 900; color: var(--purple); font-size: 1.4rem;">PROGRESSIVE MOTHERS</div>
     <div class="motto">"With God everything is possible"</div>
-    <button id="logoutBtn" onclick="logout()" style="margin-top:10px; background:#fee2e2; color:#b91c1c; border:none; padding:5px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">LOGOUT</button>
+    <button id="logoutBtn" onclick="logout()" style="margin-top:10px; border:none; background:#fee2e2; color:#b91c1c; padding:8px 20px; border-radius:10px; font-weight:bold; cursor:pointer;">🚪 LOGOUT</button>
 </header>
 
 <div class="container">
-    <div id="loginSection" class="card">
-        <h3 style="text-align:center; color:var(--purple); margin-top:0;">Admin Access</h3>
-        <input type="password" id="adminPass" placeholder="Enter Password">
-        <button class="btn-main" onclick="login()">LOGIN</button>
+    <div id="loginBox" class="card" style="text-align:center;">
+        <h4 style="color:var(--purple);">Admin Login</h4>
+        <input type="password" id="pass" placeholder="Password">
+        <button class="btn-purple" onclick="login()">LOGIN</button>
     </div>
 
-    <div id="adminPanel" class="card">
+    <div id="adminArea" class="card">
         <h3 id="formTitle" style="color:var(--purple); margin-top:0;">Register Student</h3>
-        <input type="file" id="inpFile" accept="image/*">
-        <input type="text" id="inpName" placeholder="Full Name">
-        <input type="text" id="inpPhone" placeholder="Parent Contact">
+        <input type="file" id="fImg">
+        <input type="text" id="fName" placeholder="Full Student Name">
+        <input type="text" id="fPhone" placeholder="Parent Contact">
         <div style="display:flex; gap:10px;">
-            <input type="date" id="inpDOB" onchange="autoAge()">
-            <input type="number" id="inpAge" placeholder="Age" readonly>
+            <input type="date" id="fDOB" onchange="autoAge()">
+            <input type="text" id="fAge" placeholder="Age" readonly style="background:#f1f5f9;">
         </div>
-        <select id="inpClass">
+        <select id="fClass">
             <option>Baby</option><option>Middle</option><option>Top</option>
-            <option>P.1</option><option>P.2</option><option>P.3</option>
-            <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+            <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
-        <input type="text" id="inpLoc" placeholder="Location">
-        <textarea id="inpHealth" placeholder="Health Notes"></textarea>
-        <button class="btn-main" id="btnSave" onclick="saveRecord()">SAVE TO DATABASE</button>
+        <input type="text" id="fLoc" placeholder="Physical Address">
+        <textarea id="fHealth" placeholder="Health Status/Allergies"></textarea>
+        <button class="btn-purple" id="saveBtn" onclick="save()">SAVE RECORD</button>
     </div>
 
-    <input type="text" id="search" placeholder="🔍 Search name or class..." onkeyup="filterList()" style="margin-bottom:15px;">
+    <input type="text" id="search" placeholder="🔍 Search Name or Class..." onkeyup="filter()" style="width:100%; box-sizing:border-box; padding:15px; border-radius:15px; border:2px solid var(--purple); margin:20px 0;">
+
     <div id="studentList">Loading...</div>
 </div>
 
 <div id="idModal" onclick="this.style.display='none'">
-    <div class="id-design" id="idToPrint" onclick="event.stopPropagation()">
-        <div class="id-header">
-            <h4 style="margin:0;">PROGRESSIVE MOTHERS</h4>
-            <small style="font-size:7px;">With God everything is possible</small>
+    <div class="id-card" id="idArea" onclick="event.stopPropagation()">
+        <div class="id-head">
+            <h3 style="margin:0;">PROGRESSIVE MOTHERS</h3>
+            <small>With God everything is possible</small>
         </div>
         <div style="height:50px;"></div>
-        <div style="padding:15px;">
-            <img id="idImg" src="" class="id-photo">
-            <h3 id="idNameDisplay" style="margin:10px 0 5px; color:var(--purple);">Name</h3>
-            <b id="idLinDisplay" style="color:var(--gold); font-size:12px;">LIN: PM-0000</b>
-            <div style="text-align:left; font-size:10px; margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
-                <b>CLASS:</b> <span id="idClassDisplay"></span><br>
-                <b>HEALTH:</b> <span id="idHealthDisplay"></span>
+        <div style="padding:20px;">
+            <img id="idP" src="" style="width:100px; height:100px; border-radius:50%; border:5px solid var(--purple); margin-top:-70px; background:white; object-fit:cover;">
+            <h2 id="idN" style="color:var(--purple); margin:10px 0 5px;">Name</h2>
+            <b id="idL" style="color:var(--gold);">LIN: PM-0000</b>
+            <div style="text-align:left; font-size:11px; margin-top:15px; border-top:1px solid #eee; padding-top:10px;">
+                <b>CLASS:</b> <span id="idC"></span> | <b>AGE:</b> <span id="idA"></span><br>
+                <b>HEALTH:</b> <span id="idH"></span><br>
+                <b>PARENT:</b> <span id="idPh"></span>
             </div>
+            <div style="margin-top:15px; font-size:8px; color:#94a3b8; border-top:1px dashed #ddd; padding-top:10px;">Eudes Media • +256762992440</div>
         </div>
-        <div style="background:#f8fafc; padding:10px; font-size:7px;">Eudes Media Support: +256762992440</div>
     </div>
-    <button class="btn-main" onclick="downloadPDF()" style="width:200px; margin-top:15px; background:#16a34a;">DOWNLOAD PDF</button>
+    <button class="btn-purple" onclick="download()" style="width:200px; margin-top:20px; background:#16a34a;">DOWNLOAD PDF</button>
 </div>
 
 <div class="footer">
-    &copy; 2026 Eudes Media Professional Series
+    Developed by <b>Eudes Media</b> [cite: 2026-01-28]<br>
+    Support: +256762992440 | WhatsApp: +256200930932
 </div>
 
 <script>
@@ -106,127 +113,122 @@
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
     
-    let allStudents = [];
-    let currentEditId = null;
+    let cache = []; let isAuth = false; let editId = null;
 
-    // Persist login state
-    if(localStorage.getItem('isLogged') === 'true') { login(true); }
+    if(localStorage.getItem('admin_session') === 'true') { login(true); }
 
-    function login(reloading = false) {
-        if(reloading || document.getElementById('adminPass').value === "mothers.comit1") {
-            localStorage.setItem('isLogged', 'true');
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
+    function login(reload = false) {
+        if(reload || document.getElementById('pass').value === "mothers.comit1") {
+            isAuth = true; localStorage.setItem('admin_session', 'true');
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('adminArea').style.display = 'block';
             document.getElementById('logoutBtn').style.display = 'inline-block';
-            document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
-            fetchData();
-        } else { alert("Access Denied"); }
+            fetch();
+        } else { alert("Wrong Password"); }
     }
 
     function logout() { localStorage.clear(); location.reload(); }
 
     function autoAge() {
-        const dob = new Date(document.getElementById('inpDOB').value);
-        document.getElementById('inpAge').value = new Date().getFullYear() - dob.getFullYear();
+        const dob = new Date(document.getElementById('fDOB').value);
+        document.getElementById('fAge').value = new Date().getFullYear() - dob.getFullYear() + " Years";
     }
 
-    async function fetchData() {
+    async function fetch() {
         const { data } = await supabaseClient.from('students').select('*').order('name');
-        allStudents = data || [];
-        renderList(allStudents);
+        cache = data || []; render(cache);
     }
 
-    function renderList(list) {
+    function render(list) {
         const container = document.getElementById('studentList');
         container.innerHTML = "";
         list.forEach(s => {
             container.innerHTML += `
-                <div class="student-item" onclick="showID('${s.id}')">
-                    <img src="${s.photo_url || 'https://via.placeholder.com/50'}" class="student-img">
-                    <div class="student-details">
-                        <b>${s.name}</b><br>
-                        <small>${s.class} | ${s.lin}</small>
-                        <div class="edit-tools">
-                            <button class="btn-edit" onclick="startEdit(event, '${s.id}')">Edit</button>
-                            <button class="btn-del" onclick="deleteRecord(event, '${s.id}')">Delete</button>
+                <div class="s-card">
+                    <div class="s-header">
+                        <img src="${s.photo_url || 'https://via.placeholder.com/80'}" class="s-img">
+                        <div class="s-info">
+                            <b>${s.name}</b>
+                            <small>${s.class} | ${s.lin}</small>
                         </div>
+                        <a href="tel:${s.contact}" class="call-btn">📞</a>
+                    </div>
+                    <div class="s-details">
+                        📍 <b>Location:</b> ${s.location}<br>
+                        📞 <b>Parent:</b> ${s.contact}<br>
+                        🎂 <b>Age:</b> ${s.age}<br>
+                        🏥 <b>Health:</b> ${s.health_status || 'Excellent'}
+                    </div>
+                    <div class="tool-bar">
+                        <button class="btn-tool edit-link" onclick="startEdit('${s.id}')">✏️ EDIT DATA</button>
+                        <button class="btn-tool del-link" onclick="deleteRec('${s.id}')">🗑️ DELETE</button>
+                        <button class="btn-tool id-link" onclick="viewID('${s.id}')">🪪 VIEW ID</button>
                     </div>
                 </div>`;
         });
     }
 
-    function startEdit(event, id) {
-        event.stopPropagation(); // Stops the ID card from opening
-        const s = allStudents.find(x => x.id === id);
-        currentEditId = id;
-        document.getElementById('formTitle').innerText = "Editing: " + s.name;
-        document.getElementById('inpName').value = s.name;
-        document.getElementById('inpPhone').value = s.contact;
-        document.getElementById('inpDOB').value = s.dob;
-        document.getElementById('inpAge').value = s.age;
-        document.getElementById('inpClass').value = s.class;
-        document.getElementById('inpLoc').value = s.location;
-        document.getElementById('inpHealth').value = s.health_status;
-        document.getElementById('btnSave').innerText = "UPDATE RECORD";
-        window.scrollTo(0,0);
+    function startEdit(id) {
+        const s = cache.find(x => x.id === id);
+        editId = id;
+        document.getElementById('formTitle').innerText = "Updating: " + s.name;
+        document.getElementById('fName').value = s.name;
+        document.getElementById('fPhone').value = s.contact;
+        document.getElementById('fDOB').value = s.dob;
+        document.getElementById('fAge').value = s.age;
+        document.getElementById('fClass').value = s.class;
+        document.getElementById('fLoc').value = s.location;
+        document.getElementById('fHealth').value = s.health_status;
+        document.getElementById('saveBtn').innerText = "CONFIRM UPDATES";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    async function saveRecord() {
-        const file = document.getElementById('inpFile').files[0];
-        let photoUrl = "";
+    async function save() {
+        const file = document.getElementById('fImg').files[0];
+        let url = "";
         if(file) {
-            const fileName = `img_${Date.now()}`;
-            const { data, error } = await supabaseClient.storage.from('students photos').upload(fileName, file);
-            if(!error) photoUrl = `${SB_URL}/storage/v1/object/public/students%20photos/${fileName}`;
+            const fname = `st_${Date.now()}`;
+            const { data, error } = await supabaseClient.storage.from('students photos').upload(fname, file);
+            if(!error) url = `${SB_URL}/storage/v1/object/public/students%20photos/${fname}`;
         }
 
-        const studentData = {
-            name: document.getElementById('inpName').value,
-            contact: document.getElementById('inpPhone').value,
-            dob: document.getElementById('inpDOB').value,
-            age: document.getElementById('inpAge').value,
-            class: document.getElementById('inpClass').value,
-            location: document.getElementById('inpLoc').value,
-            health_status: document.getElementById('inpHealth').value
+        const data = {
+            name: document.getElementById('fName').value, contact: document.getElementById('fPhone').value,
+            dob: document.getElementById('fDOB').value, age: document.getElementById('fAge').value,
+            class: document.getElementById('fClass').value, location: document.getElementById('fLoc').value,
+            health_status: document.getElementById('fHealth').value
         };
 
-        if(currentEditId) {
-            if(photoUrl) studentData.photo_url = photoUrl;
-            await supabaseClient.from('students').update(studentData).eq('id', currentEditId);
+        if(editId) {
+            if(url) data.photo_url = url;
+            await supabaseClient.from('students').update(data).eq('id', editId);
         } else {
-            studentData.lin = "PM-" + Math.floor(1000 + Math.random() * 9000);
-            studentData.photo_url = photoUrl;
-            await supabaseClient.from('students').insert([studentData]);
+            data.lin = "PM-" + Math.floor(1000 + Math.random() * 9000);
+            data.photo_url = url;
+            await supabaseClient.from('students').insert([data]);
         }
         location.reload();
     }
 
-    async function deleteRecord(event, id) {
-        event.stopPropagation();
-        if(confirm("Permanently delete this student?")) {
-            await supabaseClient.from('students').delete().eq('id', id);
-            location.reload();
-        }
-    }
+    async function deleteRec(id) { if(confirm("Delete student?")) { await supabaseClient.from('students').delete().eq('id', id); location.reload(); } }
 
-    function showID(id) {
-        const s = allStudents.find(x => x.id === id);
-        document.getElementById('idNameDisplay').innerText = s.name;
-        document.getElementById('idLinDisplay').innerText = "LIN: " + s.lin;
-        document.getElementById('idClassDisplay').innerText = s.class;
-        document.getElementById('idHealthDisplay').innerText = s.health_status || "Fit";
-        document.getElementById('idImg').src = s.photo_url || 'https://via.placeholder.com/100';
+    function viewID(id) {
+        const s = cache.find(x => x.id === id);
+        document.getElementById('idN').innerText = s.name;
+        document.getElementById('idL').innerText = "LIN: " + s.lin;
+        document.getElementById('idC').innerText = s.class;
+        document.getElementById('idA').innerText = s.age;
+        document.getElementById('idH').innerText = s.health_status || "Fit";
+        document.getElementById('idPh').innerText = s.contact;
+        document.getElementById('idP').src = s.photo_url || 'https://via.placeholder.com/150';
         document.getElementById('idModal').style.display = 'flex';
     }
 
-    function downloadPDF() { html2pdf().from(document.getElementById('idToPrint')).save('Student_ID.pdf'); }
-    
-    function filterList() {
+    function download() { html2pdf().from(document.getElementById('idArea')).save('Student_ID.pdf'); }
+    function filter() {
         const q = document.getElementById('search').value.toLowerCase();
-        renderList(allStudents.filter(x => x.name.toLowerCase().includes(q) || x.class.toLowerCase().includes(q)));
+        render(cache.filter(x => x.name.toLowerCase().includes(q) || x.class.toLowerCase().includes(q)));
     }
-    
-    fetchData();
 </script>
 </body>
 </html>
