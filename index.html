@@ -6,102 +6,25 @@
     <title>Progressive Mother’s School | Eudes Media</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { 
-            --brand-purple: #673ab7; 
-            --light-bg: #f4f0fa;
-            --white: #ffffff; 
-        }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--light-bg); 
-            margin: 0; 
-            padding: 0; 
-            color: #333;
-        }
-        header { 
-            background: var(--brand-purple); 
-            color: white; 
-            padding: 40px 20px; 
-            text-align: center; 
-            border-bottom: 5px solid #4527a0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        header h1 { margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
-        header p { margin: 10px 0 0; font-style: italic; opacity: 0.9; }
-
-        .container { max-width: 500px; margin: 30px auto; padding: 0 15px; }
+        :root { --brand-purple: #673ab7; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f0fa; margin: 0; padding: 0; }
+        header { background: var(--brand-purple); color: white; padding: 30px; text-align: center; border-bottom: 5px solid #4527a0; }
+        .container { max-width: 600px; margin: 20px auto; padding: 15px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: var(--brand-purple); border-left: 5px solid var(--brand-purple); padding-left: 10px; margin-bottom: 20px; }
         
-        .card { 
-            background: var(--white); 
-            padding: 25px; 
-            border-radius: 15px; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05); 
-            margin-bottom: 25px; 
-        }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        textarea { grid-column: span 2; height: 60px; }
         
-        h2 { 
-            color: var(--brand-purple); 
-            margin-top: 0; 
-            font-size: 1.4rem; 
-            border-left: 5px solid var(--brand-purple); 
-            padding-left: 12px; 
-            margin-bottom: 20px;
-        }
-
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        input { 
-            width: 100%; 
-            padding: 14px; 
-            margin-bottom: 20px; 
-            border: 2px solid #eee; 
-            border-radius: 10px; 
-            box-sizing: border-box; 
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        input:focus { border-color: var(--brand-purple); outline: none; }
-
-        button { 
-            width: 100%; 
-            padding: 16px; 
-            background: var(--brand-purple); 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 1.1rem;
-            transition: background 0.3s, transform 0.2s;
-        }
-        button:hover { background: #5e35b1; }
-        button:active { transform: scale(0.98); }
-        button:disabled { background: #bcaaa4; cursor: not-allowed; }
-
-        .student-item { 
-            padding: 15px; 
-            border-bottom: 1px solid #f0f0f0; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            animation: fadeIn 0.5s ease;
-        }
-        .student-item:last-child { border-bottom: none; }
-        .student-info b { font-size: 1.1rem; display: block; color: #222; }
-        .student-info span { color: var(--brand-purple); font-weight: bold; font-size: 0.9rem; }
-
-        .footer { 
-            text-align: center; 
-            font-size: 0.9rem; 
-            color: #777; 
-            padding: 30px 20px; 
-            line-height: 1.6; 
-        }
+        button { width: 100%; padding: 15px; background: var(--brand-purple); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        button:disabled { background: #ccc; }
+        
+        .student-card { background: #fff; padding: 15px; border-radius: 10px; border-left: 5px solid var(--brand-purple); margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .student-details { font-size: 0.85rem; color: #555; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; }
+        
+        .footer { text-align: center; font-size: 0.9rem; color: #666; padding: 30px; }
         .footer b { color: var(--brand-purple); }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
     </style>
 </head>
 <body>
@@ -113,107 +36,106 @@
 
 <div class="container">
     <div class="card">
-        <h2>Student Registration</h2>
-        <label>Full Name</label>
-        <input type="text" id="stuName" placeholder="Enter student's full name">
-        
-        <label>Class</label>
-        <input type="text" id="stuClass" placeholder="e.g. Primary Seven (P.7)">
-        
-        <button id="saveBtn" onclick="register()">Save to School Cloud</button>
+        <h2>Full Student Registration</h2>
+        <div class="grid">
+            <input type="text" id="stuName" placeholder="Full Name">
+            <input type="text" id="stuContact" placeholder="Contact Number">
+            <input type="text" id="stuClass" placeholder="Class">
+            <input type="number" id="stuAge" placeholder="Age">
+            <input type="date" id="stuDob" placeholder="Date of Birth">
+            <input type="text" id="stuLoc" placeholder="Physical Location">
+            <textarea id="stuHealth" placeholder="Health Status (e.g. Good, Allergies)"></textarea>
+        </div>
+        <button id="saveBtn" onclick="register()">Save Student Record</button>
     </div>
 
     <div class="card">
-        <h2>Recent Admissions</h2>
+        <h2>Registered Students</h2>
         <div id="studentList">Connecting to database...</div>
     </div>
 </div>
 
 <div class="footer">
     System Managed by <b>Eudes Media</b><br>
-    Professional School Data Solutions<br>
     Support: <b>+256762992440</b>
 </div>
 
 <script>
-    // Database Configuration
+    // Your Connection
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co"; 
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     const supabase = libSupabase.createClient(SB_URL, SB_KEY);
 
-    // Function to Save a Student
+    // Auto-generate LIN Number
+    function generateLIN() {
+        return "PMS-" + Math.floor(1000 + Math.random() * 9000);
+    }
+
     async function register() {
-        const nameInput = document.getElementById('stuName');
-        const classInput = document.getElementById('stuClass');
         const btn = document.getElementById('saveBtn');
+        const data = {
+            name: document.getElementById('stuName').value,
+            contact: document.getElementById('stuContact').value,
+            class: document.getElementById('stuClass').value,
+            age: document.getElementById('stuAge').value,
+            dob: document.getElementById('stuDob').value,
+            location: document.getElementById('stuLoc').value,
+            health_status: document.getElementById('stuHealth').value,
+            lin: generateLIN() 
+        };
 
-        const name = nameInput.value.trim();
-        const cls = classInput.value.trim();
-
-        if (!name || !cls) {
-            alert("Please provide both Name and Class.");
-            return;
-        }
+        if (!data.name || !data.class) return alert("Please enter Name and Class");
 
         btn.disabled = true;
-        btn.innerText = "Processing...";
+        btn.innerText = "Saving to School Cloud...";
 
         try {
-            const { error } = await supabase
-                .from('students')
-                .insert([{ name: name, class: cls }]);
-
+            const { error } = await supabase.from('students').insert([data]);
             if (error) throw error;
-
-            alert("Student Record Saved Successfully!");
-            nameInput.value = "";
-            classInput.value = "";
-            load(); // Reload the list to show the new student at the top
+            alert("Registered Successfully! LIN: " + data.lin);
+            location.reload(); 
         } catch (e) {
-            alert("System Error: " + e.message);
+            alert("Database Error: " + e.message);
         } finally {
             btn.disabled = false;
-            btn.innerText = "Save to School Cloud";
+            btn.innerText = "Save Student Record";
         }
     }
 
-    // Function to Load Students
     async function load() {
         const listDiv = document.getElementById('studentList');
-
         try {
-            // This now works because you added the 'created_at' column!
+            // We select ALL columns to match your new table
             const { data, error } = await supabase
                 .from('students')
-                .select('name, class')
+                .select('*')
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
 
             if (!data || data.length === 0) {
-                listDiv.innerHTML = "<p style='text-align:center; color:#999;'>No students registered yet.</p>";
+                listDiv.innerHTML = "No students found in the cloud.";
             } else {
                 listDiv.innerHTML = "";
-                data.forEach(student => {
+                data.forEach(s => {
                     listDiv.innerHTML += `
-                        <div class="student-item">
-                            <div class="student-info">
-                                <b>${student.name}</b>
-                                <span>${student.class}</span>
+                        <div class="student-card">
+                            <b>${s.name} (${s.lin || 'No LIN'})</b>
+                            <div class="student-details">
+                                <span>Class: ${s.class}</span>
+                                <span>Contact: ${s.contact || 'N/A'}</span>
+                                <span>Age: ${s.age || 'N/A'}</span>
+                                <span>Location: ${s.location || 'N/A'}</span>
+                                <span>Health: ${s.health_status || 'N/A'}</span>
                             </div>
-                            <div style="color:#4caf50;">✔ Verified</div>
                         </div>`;
                 });
             }
         } catch (e) {
-            listDiv.innerHTML = "<p style='color:red;'>Failed to load records. Please refresh.</p>";
-            console.error(e);
+            listDiv.innerHTML = "Connection Error. Check your Supabase columns.";
         }
     }
-
-    // Initialize the list on page load
     load();
 </script>
-
 </body>
 </html>
