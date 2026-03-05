@@ -3,46 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Manager | Eudes Media</title>
+    <title>PMS Manager | Eudes Media</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #2563eb; --dark-blue: #1e3a8a; --bg: #f1f5f9; --white: #ffffff; --red: #ef4444; --gold: #b45309; }
+        :root { --blue: #2563eb; --dark-blue: #1e3a8a; --bg: #f1f5f9; --white: #ffffff; --red: #ef4444; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: #1e293b; margin: 0; padding-bottom: 50px; }
-        header { background: var(--dark-blue); color: white; padding: 35px 20px; text-align: center; border-bottom: 5px solid var(--blue); }
+        header { background: var(--dark-blue); color: white; padding: 30px 20px; text-align: center; border-bottom: 5px solid var(--blue); }
         .container { max-width: 800px; margin: -20px auto 0; padding: 0 15px; }
-        .card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
-        /* Stats Dashboard */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat-card { background: var(--blue); color: white; padding: 15px; border-radius: 12px; text-align: center; }
         .stat-card.class-stat { background: #059669; }
-        .stat-card h3 { margin: 0; font-size: 0.7rem; opacity: 0.9; text-transform: uppercase; }
         .stat-card div { font-size: 1.8rem; font-weight: 800; }
+
+        .card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        .photo-picker { grid-column: span 2; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #eff6ff; border: 2px dashed #bfdbfe; padding: 20px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; }
+        #imagePreview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; display: none; margin-bottom: 10px; border: 3px solid var(--blue); }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         input, textarea, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; }
         textarea { grid-column: span 2; height: 60px; }
         .full { grid-column: span 2; }
         
-        /* Photo Upload Styling */
-        .photo-input-container { grid-column: span 2; background: #eff6ff; border: 2px dashed #bfdbfe; padding: 15px; border-radius: 8px; text-align: center; }
-        
-        /* Student Item Styling */
         .student-item { padding: 15px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 15px; }
-        .student-item.left-status { background: #fff1f2; opacity: 0.8; }
-        .stu-photo { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); background: #e2e8f0; }
+        .stu-photo-list { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #e2e8f0; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         
-        .row-num { background: #e2e8f0; color: #475569; min-width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; position: absolute; margin-top: -60px; margin-left: -5px; }
-
-        .badge-group { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px; }
-        .lin-badge { background: #dbeafe; color: var(--blue); padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
-        .pay-badge { background: #fef3c7; color: var(--gold); padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
-        
-        .btn { padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; width: 100%; transition: 0.3s; margin-top: 10px; }
+        .btn { padding: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; width: 100%; transition: 0.3s; margin-top: 10px; }
         .btn-primary { background: var(--blue); color: white; }
+
         .footer { text-align: center; padding: 30px; color: #64748b; font-size: 0.85rem; }
         .support-links { color: var(--blue); font-weight: 700; text-decoration: none; }
         .btn-sm { padding: 5px 12px; font-size: 0.75rem; border-radius: 4px; color: white; border: none; cursor: pointer; margin-right: 5px; }
@@ -57,44 +47,46 @@
 
 <div class="container">
     <div class="stats-grid">
-        <div class="stat-card"><h3>Active Enrolled</h3><div id="totalCount">0</div></div>
-        <div class="stat-card class-stat"><h3 id="classLabel">Class Count</h3><div id="classCount">0</div></div>
+        <div class="stat-card"><h3>Active Students</h3><div id="totalCount">0</div></div>
+        <div class="stat-card class-stat"><h3 id="classLabel">Class Total</h3><div id="classCount">0</div></div>
     </div>
 
     <div class="card">
-        <h2 id="formTitle" style="margin-top:0; color:var(--dark-blue); font-size: 1.2rem;">📝 Register Student</h2>
+        <h2 id="formTitle" style="margin-top:0; color:var(--dark-blue); font-size: 1.1rem;">📝 Full Student Registration</h2>
         <input type="hidden" id="editId">
+        
         <div class="grid">
-            <div class="photo-input-container">
-                <label style="font-size: 0.8rem; font-weight: bold; color: var(--blue);">STUDENT PHOTO</label><br>
-                <input type="file" id="stuPhotoFile" accept="image/*" style="border:none; background:none; padding:5px;">
+            <div class="photo-picker" onclick="document.getElementById('stuPhotoFile').click()">
+                <img id="imagePreview" src="">
+                <span id="uploadText">📷 Click to Take or Select Photo</span>
+                <input type="file" id="stuPhotoFile" accept="image/*" style="display:none" onchange="previewImage(this)">
             </div>
-            <input type="text" id="stuName" placeholder="Full Name" required>
-            <input type="text" id="stuPayCode" placeholder="Payment Code">
+            
+            <input type="text" id="stuName" placeholder="Name" required>
             <input type="text" id="stuContact" placeholder="Contact Number">
             <input type="text" id="stuClass" placeholder="Class">
             <input type="text" id="stuAge" placeholder="Age">
             <input type="date" id="stuDob">
-            <input type="text" id="stuLoc" placeholder="Physical Location">
+            <input type="text" id="stuLoc" placeholder="Physical location where they stay">
             <textarea id="stuHealth" placeholder="Health Status (Allergies, etc.)"></textarea>
             <select id="stuStatus" class="full">
                 <option value="Active">Active Student</option>
                 <option value="Left">Left School</option>
             </select>
         </div>
-        <button class="btn btn-primary" id="saveBtn" onclick="handleSave()">Save Student & Photo</button>
-        <button class="btn" id="cancelBtn" onclick="resetForm()" style="display:none; background:#cbd5e1;">Cancel Edit</button>
+        <button class="btn btn-primary" id="saveBtn" onclick="handleSave()">Save Student Record</button>
+        <button class="btn" id="cancelBtn" onclick="resetForm()" style="display:none; background:#cbd5e1;">Cancel</button>
     </div>
 
     <div class="card">
-        <input type="text" id="searchField" style="border:2px solid var(--blue);" placeholder="🔍 Search Name, Class, or Code..." onkeyup="filterStudents()">
-        <div id="studentList" style="margin-top:20px;">Connecting to Eudes Media...</div>
+        <input type="text" id="searchField" placeholder="🔍 Quick Search..." onkeyup="filterStudents()">
+        <div id="studentList" style="margin-top:20px;">Loading...</div>
     </div>
 </div>
 
 <div class="footer">
-    System by <b>EUDES MEDIA</b><br>
-    WhatsApp: <a href="https://wa.me/256762992440" class="support-links">+256 762 992 440</a>
+    Eudes Media<br>
+    Contact: <a href="tel:+256762992440" class="support-links">+256762992440</a>
 </div>
 
 <script>
@@ -104,81 +96,93 @@
 
     let allStudents = [];
 
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('imagePreview').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('uploadText').style.display = 'none';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     async function handleSave() {
         const id = document.getElementById('editId').value;
-        const name = document.getElementById('stuName').value;
+        const name = document.getElementById('stuName').value.trim();
         const photoFile = document.getElementById('stuPhotoFile').files[0];
         const saveBtn = document.getElementById('saveBtn');
-        
+
         if (!name) return alert("Full Name is required");
+
         saveBtn.disabled = true;
-        saveBtn.innerText = "Uploading Data...";
+        saveBtn.innerText = "Saving...";
 
         let photoUrl = "";
-        
-        // 1. Upload Photo if selected
         if (photoFile) {
-            const fileName = Date.now() + "_" + photoFile.name;
-            const { data, error } = await supabaseClient.storage.from('student-photos').upload(fileName, photoFile);
-            if (!error) {
-                const { data: publicUrl } = supabaseClient.storage.from('student-photos').getPublicUrl(fileName);
-                photoUrl = publicUrl.publicUrl;
+            const fileName = Date.now() + "_" + name.replace(/\s/g, '_');
+            const { data: uploadData, error: uploadError } = await supabaseClient.storage.from('student-photos').upload(fileName, photoFile);
+            if (!uploadError) {
+                const { data: pUrl } = supabaseClient.storage.from('student-photos').getPublicUrl(fileName);
+                photoUrl = pUrl.publicUrl;
             }
         }
 
-        const data = {
+        const studentData = {
             name: name,
-            payment_code: document.getElementById('stuPayCode').value,
             contact: document.getElementById('stuContact').value,
             class: document.getElementById('stuClass').value,
-            age: document.getElementById('stuAge').value,
+            age: parseInt(document.getElementById('stuAge').value) || 0,
             dob: document.getElementById('stuDob').value,
             location: document.getElementById('stuLoc').value,
-            health_status: document.getElementById('stuHealth').value,
+            health_status: document.getElementById('stuHealth').value, // CORRECTED spelling
             status: document.getElementById('stuStatus').value
         };
 
-        if (photoUrl) data.photo_url = photoUrl;
+        if (photoUrl) studentData.photo_url = photoUrl;
 
+        let result;
         if (id) {
-            await supabaseClient.from('students').update(data).eq('id', id);
+            result = await supabaseClient.from('students').update(studentData).eq('id', id);
         } else {
-            data.lin = name.charAt(0).toUpperCase() + "-PMS-" + Math.floor(1000 + Math.random() * 9000);
-            await supabaseClient.from('students').insert([data]);
+            studentData.lin = name.charAt(0).toUpperCase() + "-PMS-" + Math.floor(1000 + Math.random() * 9000);
+            result = await supabaseClient.from('students').insert([studentData]);
         }
 
+        if (result.error) {
+            alert("Error: " + result.error.message);
+        } else {
+            resetForm();
+            loadRecords();
+        }
         saveBtn.disabled = false;
         saveBtn.innerText = "Save Student Record";
-        resetForm();
-        loadRecords();
     }
 
     async function loadRecords() {
         const { data } = await supabaseClient.from('students').select('*').order('created_at', { ascending: false });
-        allStudents = data;
-        const activeCount = allStudents.filter(s => s.status !== 'Left').length;
-        document.getElementById('totalCount').innerText = activeCount;
-        document.getElementById('classCount').innerText = activeCount;
-        display(data);
+        allStudents = data || [];
+        const activeOnly = allStudents.filter(s => s.status !== 'Left');
+        document.getElementById('totalCount').innerText = activeOnly.length;
+        document.getElementById('classCount').innerText = activeOnly.length;
+        display(allStudents);
     }
 
     function display(data) {
         const listDiv = document.getElementById('studentList');
         listDiv.innerHTML = "";
-        data.forEach((s, index) => {
+        data.forEach((s) => {
             const isLeft = s.status === 'Left';
-            const defaultAvatar = "https://ui-avatars.com/api/?name=" + s.name + "&background=random";
+            const initials = s.name.charAt(0);
+            const defaultAvatar = `https://ui-avatars.com/api/?name=${initials}&background=2563eb&color=fff`;
+            
             listDiv.innerHTML += `
-                <div class="student-item ${isLeft ? 'left-status' : ''}">
-                    <div class="row-num">${index + 1}</div>
-                    <img src="${s.photo_url || defaultAvatar}" class="stu-photo">
+                <div class="student-item" style="${isLeft ? 'opacity:0.6; background:#fff1f2;' : ''}">
+                    <img src="${s.photo_url || defaultAvatar}" class="stu-photo-list">
                     <div style="flex:1;">
-                        <div class="badge-group">
-                            <span class="lin-badge">${s.lin}</span>
-                            <span class="pay-badge">💳 ${s.payment_code || 'No Code'}</span>
-                        </div>
-                        <b style="display:block; font-size:1.1rem; color:var(--dark-blue);">${s.name}</b>
-                        <small>Class: ${s.class} | Contact: ${s.contact}</small>
+                        <b style="display:block;">${s.name}</b>
+                        <small>${s.lin} | ${s.class}</small>
                         <div style="margin-top:8px;">
                             <button class="btn-sm" style="background:#f59e0b;" onclick="editStudent('${s.id}')">Edit</button>
                             <button class="btn-sm" style="background:var(--red);" onclick="deleteStudent('${s.id}')">Delete</button>
@@ -188,35 +192,44 @@
         });
     }
 
-    function filterStudents() {
-        const term = document.getElementById('searchField').value.toLowerCase();
-        const results = allStudents.filter(s => s.name.toLowerCase().includes(term) || s.class.toLowerCase().includes(term));
-        document.getElementById('classCount').innerText = results.filter(s => s.status !== 'Left').length;
-        display(results);
-    }
-
     function editStudent(id) {
         const s = allStudents.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
         document.getElementById('stuName').value = s.name;
-        document.getElementById('stuPayCode').value = s.payment_code || "";
+        document.getElementById('stuContact').value = s.contact;
         document.getElementById('stuClass').value = s.class;
-        document.getElementById('formTitle').innerText = "✏️ Editing Record";
+        document.getElementById('stuAge').value = s.age;
+        document.getElementById('stuDob').value = s.dob;
+        document.getElementById('stuLoc').value = s.location;
+        document.getElementById('stuHealth').value = s.health_status; // Corrected
+        document.getElementById('stuStatus').value = s.status || 'Active';
+        document.getElementById('formTitle').innerText = "✏️ Editing " + s.name;
+        document.getElementById('saveBtn').innerText = "Update Record";
+        document.getElementById('cancelBtn').style.display = "block";
         window.scrollTo(0,0);
     }
 
-    async function deleteStudent(id) {
-        if(confirm("Delete student?")) {
-            await supabaseClient.from('students').delete().eq('id', id);
-            loadRecords();
-        }
+    function filterStudents() {
+        const term = document.getElementById('searchField').value.toLowerCase();
+        const results = allStudents.filter(s => s.name.toLowerCase().includes(term) || s.class.toLowerCase().includes(term));
+        display(results);
     }
 
     function resetForm() {
         document.getElementById('editId').value = "";
         document.getElementById('stuName').value = "";
+        document.getElementById('stuContact').value = "";
+        document.getElementById('stuClass').value = "";
+        document.getElementById('stuAge').value = "";
+        document.getElementById('stuDob').value = "";
+        document.getElementById('stuLoc').value = "";
+        document.getElementById('stuHealth').value = "";
         document.getElementById('stuPhotoFile').value = "";
-        document.getElementById('formTitle').innerText = "📝 Register Student";
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('uploadText').style.display = 'block';
+        document.getElementById('formTitle').innerText = "📝 Full Student Registration";
+        document.getElementById('saveBtn').innerText = "Save Student Record";
+        document.getElementById('cancelBtn').style.display = "none";
     }
 
     loadRecords();
