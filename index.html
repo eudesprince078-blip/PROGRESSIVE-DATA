@@ -15,9 +15,7 @@
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         button { width: 100%; padding: 15px; background: var(--brand-purple); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
         .student-item { padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .student-item b { color: #333; font-size: 1.1rem; }
-        .student-item small { color: var(--brand-purple); font-weight: bold; }
-        .footer { text-align: center; font-size: 0.85rem; color: #666; padding: 20px; line-height: 1.5; }
+        .footer { text-align: center; font-size: 0.85rem; color: #666; padding: 20px; }
         .footer b { color: var(--brand-purple); }
     </style>
 </head>
@@ -44,12 +42,10 @@
 
 <div class="footer">
     Developed by <b>Eudes Media</b><br>
-    No TikTok Icons | Professional Data System<br>
     Support: <b>+256762992440</b>
 </div>
 
 <script>
-    // Your Connection
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co"; 
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     const supabase = libSupabase.createClient(SB_URL, SB_KEY);
@@ -65,7 +61,7 @@
         btn.innerText = "Saving...";
 
         try {
-            // Saving ONLY text data
+            // This sends data to your existing columns
             const { error } = await supabase
                 .from('students')
                 .insert([{ name: name, class: cls }]);
@@ -75,7 +71,7 @@
             alert("Student Registered Successfully!");
             document.getElementById('stuName').value = "";
             document.getElementById('stuClass').value = "";
-            load(); // Refresh the list
+            load(); 
         } catch (e) {
             alert("Error: " + e.message);
         } finally {
@@ -85,19 +81,19 @@
     }
 
     async function load() {
+        // We removed the .order() part that was causing the freeze!
         const { data, error } = await supabase
             .from('students')
-            .select('name, class')
-            .order('created_at', { ascending: false });
+            .select('name, class');
 
         const listDiv = document.getElementById('studentList');
         
         if (error) {
-            listDiv.innerHTML = "Error connecting to database.";
+            listDiv.innerHTML = "Connection Error. Check columns.";
             return;
         }
 
-        if (data.length === 0) {
+        if (!data || data.length === 0) {
             listDiv.innerHTML = "No students registered yet.";
         } else {
             listDiv.innerHTML = "";
@@ -105,7 +101,7 @@
                 listDiv.innerHTML += `
                     <div class="student-item">
                         <b>${s.name}</b>
-                        <small>${s.class}</small>
+                        <small style="color:#673ab7; font-weight:bold;">${s.class}</small>
                     </div>`;
             });
         }
