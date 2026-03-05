@@ -3,188 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executive PMS | Eudes Media</title>
+    <title>Progressive Mothers | Auto-ID</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --purple: #4c1d95; --accent: #7c3aed; --glass: rgba(255, 255, 255, 0.9); }
-        
-        /* High-End Liquid Motion Background */
+        :root { --blue: #1e3a8a; --gold: #b45309; --white: #ffffff; }
         body { 
-            font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 90px; color: #1e293b;
-            background: linear-gradient(-45deg, #ffffff, #f5f3ff, #ede9fe, #ffffff);
-            background-size: 400% 400%; animation: liquidBG 18s ease infinite;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding-bottom: 90px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
         }
-        @keyframes liquidBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        header { background: white; padding: 30px; text-align: center; border-radius: 0 0 40px 40px; box-shadow: 0 10px 30px rgba(76, 29, 149, 0.08); border-bottom: 3px solid #ddd6fe; }
+        header { background: var(--blue); padding: 25px; text-align: center; color: white; border-bottom: 5px solid #3b82f6; }
         .container { max-width: 480px; margin: 0 auto; padding: 0 15px; }
 
-        /* Dashboard Stats Box */
-        .premium-stats { background: white; margin-top: -25px; padding: 20px; border-radius: 25px; display: flex; justify-content: space-around; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #ede9fe; }
-        .stat-item b { display: block; font-size: 22px; color: var(--purple); }
-        .stat-item span { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
-
-        /* Luxury Photo Upload */
-        .photo-slot { border: 2px dashed #ddd6fe; border-radius: 25px; padding: 30px; text-align: center; background: #faf5ff; cursor: pointer; transition: 0.3s; margin-bottom: 20px; }
-        .photo-slot:hover { border-color: var(--purple); background: #f3e8ff; }
-        .photo-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; display: none; margin: 0 auto 10px; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-
-        /* Admin Console */
-        #adminArea { display: none; background: var(--glass); backdrop-filter: blur(10px); padding: 30px; border-radius: 35px; border: 2px solid white; margin-top: 20px; }
-        input, select, textarea { width: 100%; padding: 16px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 15px; font-size: 15px; box-sizing: border-box; background: white; }
-        .btn-push { background: var(--purple); color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-weight: 900; letter-spacing: 1px; cursor: pointer; }
-
-        /* Student Record Items */
-        .student-row { background: white; padding: 15px; border-radius: 25px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid #f1f5f9; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .s-img { width: 55px; height: 55px; border-radius: 18px; object-fit: cover; background: #f3e8ff; }
-        .s-info { flex: 1; }
-        .s-info b { font-size: 16px; color: #1e1b4b; display: block; }
-        .s-info span { font-size: 12px; color: #64748b; font-weight: 500; }
+        /* Professional ID Card Design */
+        #idModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; }
         
-        .call-btn { background: #22c55e; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .id-card-design { 
+            width: 350px; background: white; border-radius: 15px; overflow: hidden; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 2px solid #ddd; position: relative;
+        }
+        .id-header { background: var(--blue); color: white; padding: 15px; text-align: center; position: relative; }
+        .id-header h1 { font-size: 14px; margin: 0; letter-spacing: 1px; }
+        .id-header p { font-size: 8px; margin: 2px 0 0; opacity: 0.9; }
         
-        .health-tag { color: #dc2626; font-size: 10px; font-weight: 800; background: #fee2e2; padding: 2px 6px; border-radius: 5px; }
+        .id-body { padding: 20px; text-align: center; background: radial-gradient(circle at center, #fff, #f1f5f9); }
+        .id-photo-frame { width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--blue); margin: -55px auto 10px; background: white; object-fit: cover; }
+        
+        .id-info-table { text-align: left; width: 100%; margin-top: 10px; font-size: 11px; color: #334155; }
+        .id-info-table td { padding: 4px 0; border-bottom: 1px solid #f1f5f9; }
+        .id-label { font-weight: 800; color: var(--blue); width: 80px; }
+        
+        .security-seal { position: absolute; bottom: 60px; right: 20px; width: 50px; opacity: 0.6; }
 
-        .footer { text-align: center; padding: 40px; font-size: 11px; color: #94a3b8; }
+        /* Registry List */
+        .s-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 12px; display: flex; align-items: center; border: 1px solid #e2e8f0; transition: 0.3s; }
+        .s-item:hover { transform: scale(1.02); border-color: var(--blue); }
+        .s-photo-small { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid #f1f5f9; }
+
+        #adminBox { display: none; background: white; padding: 25px; border-radius: 20px; border: 2px solid var(--blue); margin-top: 20px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #cbd5e1; box-sizing: border-box; }
+        .btn-gen { background: var(--blue); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 900; cursor: pointer; }
+        .btn-dl { background: #16a34a; color: white; border: none; padding: 12px 30px; border-radius: 30px; margin-top: 20px; font-weight: bold; cursor: pointer; }
+
+        .footer { text-align: center; padding: 40px; font-size: 11px; color: #64748b; border-top: 1px solid #e2e8f0; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900; color: var(--purple); letter-spacing: 3px; font-size: 1.3rem;">EUDES MEDIA</div>
-    <div style="font-size: 11px; color: #94a3b8; font-weight: bold; margin-top: 5px;">DIAMOND REPOSITORY & REGISTRY</div>
+    <div style="font-weight: 900; font-size: 1.2rem;">PROGRESSIVE MOTHERS</div>
+    <div style="font-size: 11px; opacity: 0.8; margin-top: 5px;">Primary & Nursery Management System</div>
 </header>
 
 <div class="container">
-    <div class="premium-stats">
-        <div class="stat-item"><b id="totalS">0</b><span>Students</span></div>
-        <div class="stat-item"><b id="activeS">0</b><span>Active</span></div>
-        <div class="stat-item"><b style="color:red;" id="healthS">0</b><span>Health Alerts</span></div>
-    </div>
-
-    <div id="adminArea">
-        <div class="photo-slot" onclick="document.getElementById('fileIn').click()">
-            <img id="previewImg" class="photo-preview">
-            <div id="slotTxt"><b>📷 Add Student Photo</b><br><small>Required for Identity</small></div>
-            <input type="file" id="fileIn" hidden onchange="doPreview(this)">
-        </div>
-
-        <input type="text" id="sName" placeholder="Full Student Name">
-        <input type="text" id="sPhone" placeholder="Parent Contact (256...)">
-        
+    <div id="adminBox">
+        <p style="font-weight: 800; color: var(--blue); margin-top: 0;">Add New Student Record</p>
+        <input type="file" id="pic" accept="image/*" style="padding: 5px; border: none; background: #f8fafc;">
+        <input type="text" id="name" placeholder="Full Name">
+        <input type="text" id="phone" placeholder="Parent Phone">
         <div style="display:flex; gap:10px;">
-            <select id="sClass">
-                <option value="Baby">Baby</option><option value="Middle">Middle</option>
-                <option value="Top">Top</option><option value="P.1">P.1</option>
-                <option value="P.2">P.2</option><option value="P.3">P.3</option>
-                <option value="P.4">P.4</option><option value="P.5">P.5</option>
-                <option value="P.6">P.6</option><option value="P.7">P.7</option>
+            <select id="class">
+                <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+                <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+                <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
             </select>
-            <input type="text" id="sAge" placeholder="Age">
+            <input type="text" id="age" placeholder="Age">
         </div>
-
-        <input type="date" id="sDOB" placeholder="Date of Birth">
-        <input type="text" id="sLoc" placeholder="Physical Location">
-        <textarea id="sHealth" placeholder="Health Status (Allergies/Medical)"></textarea>
-
-        <button class="btn-push" onclick="saveRecord()">AUTHENTICATE & SAVE</button>
-        <button onclick="location.reload()" style="width:100%; border:none; background:none; color:gray; margin-top:15px; font-weight:700;">CANCEL</button>
+        <input type="text" id="loc" placeholder="Physical Location">
+        <textarea id="health" placeholder="Health Status (Allergies)"></textarea>
+        <button class="btn-gen" onclick="save()">REGISTER & GENERATE</button>
     </div>
 
-    <input type="text" id="search" placeholder="🔍 Find by name, class, or location..." onkeyup="filter()" 
-           style="width:100%; box-sizing:border-box; padding:18px; border-radius:20px; border:2px solid #ddd6fe; margin:25px 0; background:white; font-weight:bold;">
+    <input type="text" id="search" placeholder="🔍 Search name or class..." onkeyup="filter()" 
+           style="width:100%; box-sizing:border-box; padding:18px; border-radius:18px; border:2px solid #3b82f6; margin:25px 0; font-weight:bold;">
 
-    <div id="list">Synchronizing Vault...</div>
+    <div id="registry">Loading Database...</div>
+</div>
+
+<div id="idModal" onclick="this.style.display='none'">
+    <div class="id-card-design" id="printableID" onclick="event.stopPropagation()">
+        <div class="id-header">
+            <h1>PROGRESSIVE MOTHERS</h1>
+            <p>NURSERY & PRIMARY SCHOOL</p>
+        </div>
+        <div style="height: 60px;"></div>
+        <div class="id-body">
+            <img src="https://via.placeholder.com/150" class="id-photo-frame" id="idPhoto">
+            <h2 id="idName" style="margin: 0; color: var(--blue); font-size: 18px;">John Doe</h2>
+            <p id="idLin" style="margin: 5px 0; color: #b45309; font-weight: 900; font-size: 13px;">LIN: PM-0000</p>
+            
+            <table class="id-info-table">
+                <tr><td class="id-label">CLASS:</td><td id="idClassVal">P.1</td></tr>
+                <tr><td class="id-label">HEALTH:</td><td id="idHealthVal">Excellent</td></tr>
+                <tr><td class="id-label">LOCATION:</td><td id="idLocVal">Seeta</td></tr>
+                <tr><td class="id-label">CONTACT:</td><td id="idContactVal">+256 000 000</td></tr>
+            </table>
+            
+            <div style="margin-top: 15px; font-size: 8px; color: #94a3b8; border-top: 1px solid #eee; padding-top: 8px;">
+                Verified Registry • Eudes Media +256762992440 [cite: 2026-01-28]
+            </div>
+        </div>
+    </div>
+    <button class="btn-dl" onclick="downloadID()">⬇️ DOWNLOAD PDF ID</button>
 </div>
 
 <div class="footer">
-    SYSTEM DEVELOPED BY <b>EUDES MEDIA</b> [cite: 2026-01-28]<br>
+    DEVELOPED BY <b>EUDES MEDIA</b> [cite: 2026-01-28]<br>
     CONTACT: +256762992440 [cite: 2026-01-28]<br><br>
-    <span id="login" style="color:var(--purple); font-weight:900; cursor:pointer;" onclick="auth()">ADMIN LOGIN</span>
+    <span id="login" style="color:var(--blue); font-weight:bold; cursor:pointer;" onclick="auth()">ADMIN LOGIN</span>
 </div>
 
 <script>
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co"; 
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
-    
-    let db = [];
+    let dataCache = [];
 
-    function auth() {
-        if (prompt("Access Key:") === "mothers.comit1") {
-            document.getElementById('adminArea').style.display = 'block';
-            document.getElementById('login').style.display = 'none';
-        }
-    }
+    function auth() { if(prompt("Access:") === "mothers.comit1") document.getElementById('adminBox').style.display='block'; }
 
-    function doPreview(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                document.getElementById('previewImg').src = e.target.result;
-                document.getElementById('previewImg').style.display = 'block';
-                document.getElementById('slotTxt').style.display = 'none';
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    async function saveRecord() {
-        const file = document.getElementById('fileIn').files[0];
+    async function save() {
+        const file = document.getElementById('pic').files[0];
         let pUrl = "";
-
-        if (file) {
-            const fName = `img_${Date.now()}`;
-            const { data, error } = await supabaseClient.storage.from('students photos').upload(fName, file);
-            if (!error) pUrl = `${SB_URL}/storage/v1/object/public/students%20photos/${fName}`;
+        if(file) {
+            const fname = `id_${Date.now()}`;
+            const { data, error } = await supabaseClient.storage.from('students photos').upload(fname, file);
+            if(!error) pUrl = `${SB_URL}/storage/v1/object/public/students%20photos/${fname}`;
         }
-
         const s = {
-            name: document.getElementById('sName').value, contact: document.getElementById('sPhone').value,
-            class: document.getElementById('sClass').value, age: document.getElementById('sAge').value,
-            dob: document.getElementById('sDOB').value, location: document.getElementById('sLoc').value,
-            health_status: document.getElementById('sHealth').value, status: 'Active',
-            lin: "EUDES-"+Math.floor(1000+Math.random()*8999), photo_url: pUrl
+            name: document.getElementById('name').value, contact: document.getElementById('phone').value,
+            class: document.getElementById('class').value, location: document.getElementById('loc').value,
+            health_status: document.getElementById('health').value, lin: "PM-"+Math.floor(1000+Math.random()*9000), 
+            photo_url: pUrl, status: 'Active'
         };
-
         await supabaseClient.from('students').insert([s]);
         location.reload();
     }
 
     async function load() {
         const { data } = await supabaseClient.from('students').select('*').order('name', { ascending: true });
-        db = data || [];
-        updateUI(db);
+        dataCache = data || [];
+        render(dataCache);
     }
 
-    function updateUI(list) {
-        document.getElementById('totalS').innerText = list.length;
-        document.getElementById('activeS').innerText = list.filter(x => x.status === 'Active').length;
-        document.getElementById('healthS').innerText = list.filter(x => x.health_status && x.health_status.length > 2).length;
-        
-        const listDiv = document.getElementById('list');
-        listDiv.innerHTML = "";
+    function render(list) {
+        const div = document.getElementById('registry');
+        div.innerHTML = "";
         list.forEach(s => {
-            const photo = s.photo_url || 'https://via.placeholder.com/100?text=Face';
-            const health = s.health_status && s.health_status.length > 2 ? '<span class="health-tag">ALERT</span>' : '';
-            listDiv.innerHTML += `
-                <div class="student-row">
-                    <img src="${photo}" class="s-img">
-                    <div class="s-info">
-                        <b>${s.name} ${health}</b>
-                        <span>${s.lin} • ${s.class}</span><br>
-                        <span style="font-size:10px;">📍 ${s.location || 'N/A'}</span>
+            div.innerHTML += `
+                <div class="s-item" onclick="viewID('${s.id}')">
+                    <img src="${s.photo_url || 'https://via.placeholder.com/80'}" class="s-photo-small">
+                    <div style="flex:1">
+                        <b style="color:var(--blue); font-size:15px;">${s.name}</b>
+                        <div style="font-size:11px; color:#64748b;">${s.lin} | ${s.class}</div>
                     </div>
-                    <a href="tel:${s.contact}" class="call-btn">📞</a>
+                    <a href="tel:${s.contact}" style="text-decoration:none; background:#22c55e; color:white; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center;">📞</a>
                 </div>`;
         });
     }
 
-    function filter() {
-        const v = document.getElementById('search').value.toLowerCase();
-        updateUI(db.filter(s => s.name.toLowerCase().includes(v) || s.class.toLowerCase().includes(v)));
+    function viewID(id) {
+        const s = dataCache.find(x => x.id === id);
+        document.getElementById('idName').innerText = s.name;
+        document.getElementById('idLin').innerText = "LIN: " + s.lin;
+        document.getElementById('idClassVal').innerText = s.class;
+        document.getElementById('idHealthVal').innerText = s.health_status || "Excellent";
+        document.getElementById('idLocVal').innerText = s.location || "Not Set";
+        document.getElementById('idContactVal').innerText = s.contact;
+        document.getElementById('idPhoto').src = s.photo_url || 'https://via.placeholder.com/150';
+        document.getElementById('idModal').style.display = 'flex';
     }
 
+    function downloadID() {
+        const element = document.getElementById('printableID');
+        html2pdf().from(element).save('ProgressiveMothers_ID.pdf');
+    }
+
+    function filter() {
+        const v = document.getElementById('search').value.toLowerCase();
+        render(dataCache.filter(s => s.name.toLowerCase().includes(v) || s.class.toLowerCase().includes(v)));
+    }
     load();
 </script>
 </body>
