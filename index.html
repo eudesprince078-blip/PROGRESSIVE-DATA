@@ -3,266 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progressive Mothers | Eudes Media</title>
+    <title>Progressive Mothers | PMS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --purple: #4c1d95; --gold: #b45309; --white: #ffffff; }
-        body { 
-            font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 120px;
-            background: linear-gradient(-45deg, #ffffff, #f5f3ff, #ede9fe, #ffffff);
-            background-size: 400% 400%; animation: liquid 15s ease infinite;
-        }
-        @keyframes liquid { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        
-        header { background: var(--white); padding: 30px 20px; text-align: center; border-radius: 0 0 40px 40px; box-shadow: 0 10px 30px rgba(76,29,149,0.1); border-bottom: 4px solid var(--purple); }
+        body { font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 120px; background: #f8fafc; }
+        header { background: var(--white); padding: 30px 20px; text-align: center; border-bottom: 4px solid var(--purple); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .motto { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 15px; margin-top: 5px; }
+        .container { max-width: 450px; margin: 0 auto; padding: 15px; }
         
-        .container { max-width: 480px; margin: 0 auto; padding: 0 15px; }
-
-        /* Dashboard Stats */
-        .stats { display: flex; gap: 10px; margin-top: -20px; justify-content: center; }
-        .stat-item { background: white; padding: 15px; border-radius: 20px; flex: 1; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .stat-item b { font-size: 20px; color: var(--purple); display: block; }
-        .stat-item span { font-size: 9px; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
-
-        /* Admin Logic */
+        /* Admin UI */
         #adminPanel, .admin-only, #logoutBtn { display: none; }
-        .form-card { background: white; padding: 25px; border-radius: 25px; border: 2px solid var(--purple); margin-top: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        input, select, textarea { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #ddd6fe; box-sizing: border-box; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 14px; }
+        .btn-main { background: var(--purple); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: 900; cursor: pointer; }
         
-        .btn-p { background: var(--purple); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: 900; cursor: pointer; }
-        .btn-logout { background: #fee2e2; color: #dc2626; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        /* List UI */
+        .student-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; border: 1px solid #e2e8f0; cursor: pointer; position: relative; }
+        .student-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #f1f5f9; }
+        .student-details { flex: 1; }
+        .student-details b { color: var(--purple); font-size: 15px; }
+        .edit-tools { margin-top: 5px; display: flex; gap: 10px; }
+        .btn-edit { color: #2563eb; font-size: 11px; font-weight: bold; background: none; border: none; cursor: pointer; padding: 0; }
+        .btn-del { color: #dc2626; font-size: 11px; font-weight: bold; background: none; border: none; cursor: pointer; padding: 0; }
 
-        /* Student Listing */
-        .s-row { background: white; padding: 12px; border-radius: 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; border: 1px solid #f1f5f9; cursor: pointer; }
-        .s-img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: #f3e8ff; }
-        .s-name { flex: 1; }
-        .s-name b { color: var(--purple); font-size: 15px; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        /* ID Modal */
+        #idModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; }
+        .id-design { width: 300px; background: white; border-radius: 15px; overflow: hidden; text-align: center; border: 1px solid #ddd; }
+        .id-header { background: var(--purple); color: white; padding: 15px; }
+        .id-photo { width: 90px; height: 90px; border-radius: 50%; border: 4px solid var(--purple); margin-top: -45px; background: white; object-fit: cover; }
 
-        /* ID Styles */
-        #idModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 999; align-items: center; justify-content: center; flex-direction: column; }
-        .id-card-box { width: 320px; background: white; border-radius: 20px; overflow: hidden; text-align: center; border: 1px solid #ddd; }
-        .id-top { background: var(--purple); color: white; padding: 15px; }
-        .id-pic { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--purple); margin-top: -50px; background: white; object-fit: cover; }
-
-        .footer { text-align: center; padding: 30px; font-size: 11px; color: #94a3b8; font-weight: bold; }
+        .footer { text-align: center; padding: 20px; font-size: 10px; color: #64748b; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900; color: var(--purple); font-size: 1.3rem;">PROGRESSIVE MOTHERS</div>
+    <div style="font-weight: 900; color: var(--purple); font-size: 1.2rem;">PROGRESSIVE MOTHERS</div>
     <div class="motto">"With God everything is possible"</div>
-    <button id="logoutBtn" class="btn-logout" onclick="logout()">🚪 LOGOUT ADMIN</button>
+    <button id="logoutBtn" onclick="logout()" style="margin-top:10px; background:#fee2e2; color:#b91c1c; border:none; padding:5px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">LOGOUT</button>
 </header>
 
 <div class="container">
-    <div class="stats">
-        <div class="stat-item"><b id="tS">0</b><span>Students</span></div>
-        <div class="stat-item"><b id="tA" style="color:green;">0</b><span>Active</span></div>
+    <div id="loginSection" class="card">
+        <h3 style="text-align:center; color:var(--purple); margin-top:0;">Admin Access</h3>
+        <input type="password" id="adminPass" placeholder="Enter Password">
+        <button class="btn-main" onclick="login()">LOGIN</button>
     </div>
 
-    <div id="loginBox" class="form-card" style="text-align: center;">
-        <h4 style="margin:0 0 15px; color:var(--purple);">Admin Verification</h4>
-        <div style="position:relative;">
-            <input type="password" id="pass" placeholder="Admin Password">
-            <span onclick="toggleP()" style="position:absolute; right:15px; top:12px; cursor:pointer;">👁️</span>
-        </div>
-        <button class="btn-p" onclick="login()">ACCESS DASHBOARD</button>
-    </div>
-
-    <div id="adminPanel" class="form-card">
-        <h4 id="formTitle" style="color:var(--purple); margin:0 0 15px;">New Registration</h4>
-        <input type="file" id="fPic">
-        <input type="text" id="fName" placeholder="Full Student Name">
-        <input type="text" id="fPhone" placeholder="Parent Contact (256...)">
+    <div id="adminPanel" class="card">
+        <h3 id="formTitle" style="color:var(--purple); margin-top:0;">Register Student</h3>
+        <input type="file" id="inpFile" accept="image/*">
+        <input type="text" id="inpName" placeholder="Full Name">
+        <input type="text" id="inpPhone" placeholder="Parent Contact">
         <div style="display:flex; gap:10px;">
-            <input type="date" id="fDOB" onchange="calcAge()">
-            <input type="text" id="fAge" placeholder="Age (Auto)" readonly>
+            <input type="date" id="inpDOB" onchange="autoAge()">
+            <input type="number" id="inpAge" placeholder="Age" readonly>
         </div>
-        <select id="fClass">
-            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-            <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-            <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+        <select id="inpClass">
+            <option>Baby</option><option>Middle</option><option>Top</option>
+            <option>P.1</option><option>P.2</option><option>P.3</option>
+            <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
-        <input type="text" id="fLoc" placeholder="Physical Location">
-        <textarea id="fHealth" placeholder="Health Status (Allergies/Medical)"></textarea>
-        <select id="fStatus">
-            <option value="Active">Active Student</option>
-            <option value="Left">Left School</option>
-        </select>
-        <button class="btn-p" id="saveBtn" onclick="saveData()">SAVE STUDENT RECORD</button>
-        <button onclick="copySMS()" style="width:100%; border:1px solid var(--purple); background:none; color:var(--purple); padding:10px; border-radius:12px; margin-top:10px; font-weight:bold;">📋 COPY CLASS SMS LIST</button>
+        <input type="text" id="inpLoc" placeholder="Location">
+        <textarea id="inpHealth" placeholder="Health Notes"></textarea>
+        <button class="btn-main" id="btnSave" onclick="saveRecord()">SAVE TO DATABASE</button>
     </div>
 
-    <input type="text" id="search" placeholder="🔍 Search name or class..." onkeyup="search()" 
-           style="width:100%; box-sizing:border-box; padding:18px; border-radius:20px; border:2px solid #ddd6fe; margin:20px 0; background:white; font-weight:bold; color:var(--purple);">
-
-    <div id="list">Loading Database...</div>
+    <input type="text" id="search" placeholder="🔍 Search name or class..." onkeyup="filterList()" style="margin-bottom:15px;">
+    <div id="studentList">Loading...</div>
 </div>
 
 <div id="idModal" onclick="this.style.display='none'">
-    <div class="id-card-box" id="pdfID" onclick="event.stopPropagation()">
-        <div class="id-top">
-            <h3 style="margin:0; font-size:14px;">PROGRESSIVE MOTHERS</h3>
-            <p style="margin:2px 0; font-size:7px; font-style:italic;">With God everything is possible</p>
+    <div class="id-design" id="idToPrint" onclick="event.stopPropagation()">
+        <div class="id-header">
+            <h4 style="margin:0;">PROGRESSIVE MOTHERS</h4>
+            <small style="font-size:7px;">With God everything is possible</small>
         </div>
-        <div style="height:55px;"></div>
-        <div style="padding:20px;">
-            <img id="idP" src="" class="id-pic">
-            <h2 id="idN" style="color:var(--purple); margin:10px 0 5px; font-size:18px;">Name</h2>
-            <b id="idL" style="color:var(--gold); font-size:12px;">LIN: PM-0000</b>
-            <div style="text-align:left; font-size:10px; margin-top:15px; border-top:1px solid #eee; padding-top:10px; line-height:1.6;">
-                <b>CLASS:</b> <span id="idC"></span> | <b>AGE:</b> <span id="idA"></span><br>
-                <b>HEALTH:</b> <span id="idH"></span><br>
-                <div class="admin-only">
-                    <b>LOCATION:</b> <span id="idLoc"></span><br>
-                    <b>PARENT:</b> <span id="idPh"></span>
-                </div>
-            </div>
-            <div style="margin-top:10px; font-size:7px; color:#94a3b8; border-top:1px dashed #ddd; padding-top:8px;">
-                Eudes Media Identity • +256762992440 [cite: 2026-01-28]
+        <div style="height:50px;"></div>
+        <div style="padding:15px;">
+            <img id="idImg" src="" class="id-photo">
+            <h3 id="idNameDisplay" style="margin:10px 0 5px; color:var(--purple);">Name</h3>
+            <b id="idLinDisplay" style="color:var(--gold); font-size:12px;">LIN: PM-0000</b>
+            <div style="text-align:left; font-size:10px; margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
+                <b>CLASS:</b> <span id="idClassDisplay"></span><br>
+                <b>HEALTH:</b> <span id="idHealthDisplay"></span>
             </div>
         </div>
+        <div style="background:#f8fafc; padding:10px; font-size:7px;">Eudes Media Support: +256762992440</div>
     </div>
-    <button class="btn-p" onclick="dlID()" style="width:200px; margin-top:20px; background:#16a34a;">⬇️ DOWNLOAD ID</button>
+    <button class="btn-main" onclick="downloadPDF()" style="width:200px; margin-top:15px; background:#16a34a;">DOWNLOAD PDF</button>
 </div>
 
 <div class="footer">
-    Developed by <b>Eudes Media</b> [cite: 2026-01-28]<br>
-    Support: +256762992440 | WhatsApp: +256200930932
+    &copy; 2026 Eudes Media Professional Series
 </div>
 
 <script>
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co"; 
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
-    let db = []; let isAdm = false; let editId = null;
+    
+    let allStudents = [];
+    let currentEditId = null;
 
-    // Persistent Login Fix
-    if(sessionStorage.getItem('isAdm') === 'true') { login(true); }
+    // Persist login state
+    if(localStorage.getItem('isLogged') === 'true') { login(true); }
 
-    function toggleP() { const p = document.getElementById('pass'); p.type = p.type === 'password' ? 'text' : 'password'; }
-
-    function login(isReload = false) {
-        if(isReload || document.getElementById('pass').value === "mothers.comit1") {
-            isAdm = true;
-            sessionStorage.setItem('isAdm', 'true');
-            document.getElementById('loginBox').style.display = 'none';
+    function login(reloading = false) {
+        if(reloading || document.getElementById('adminPass').value === "mothers.comit1") {
+            localStorage.setItem('isLogged', 'true');
+            document.getElementById('loginSection').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             document.getElementById('logoutBtn').style.display = 'inline-block';
             document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
-            render(db);
-        } else { alert("Wrong Password"); }
+            fetchData();
+        } else { alert("Access Denied"); }
     }
 
-    function logout() {
-        sessionStorage.clear();
-        location.reload();
+    function logout() { localStorage.clear(); location.reload(); }
+
+    function autoAge() {
+        const dob = new Date(document.getElementById('inpDOB').value);
+        document.getElementById('inpAge').value = new Date().getFullYear() - dob.getFullYear();
     }
 
-    function calcAge() {
-        const dob = new Date(document.getElementById('fDOB').value);
-        const age = new Date().getFullYear() - dob.getFullYear();
-        document.getElementById('fAge').value = age;
+    async function fetchData() {
+        const { data } = await supabaseClient.from('students').select('*').order('name');
+        allStudents = data || [];
+        renderList(allStudents);
     }
 
-    async function saveData() {
-        const file = document.getElementById('fPic').files[0];
-        let url = "";
-        if(file) {
-            const fname = `st_${Date.now()}`;
-            const { data, error } = await supabaseClient.storage.from('students photos').upload(fname, file);
-            if(!error) url = `${SB_URL}/storage/v1/object/public/students%20photos/${fname}`;
-        }
-
-        const s = {
-            name: document.getElementById('fName').value, contact: document.getElementById('fPhone').value,
-            class: document.getElementById('fClass').value, age: document.getElementById('fAge').value,
-            dob: document.getElementById('fDOB').value, location: document.getElementById('fLoc').value,
-            health_status: document.getElementById('fHealth').value, status: document.getElementById('fStatus').value
-        };
-
-        if(editId) {
-            if(url) s.photo_url = url;
-            await supabaseClient.from('students').update(s).eq('id', editId);
-        } else {
-            s.lin = "PM-"+Math.floor(1000+Math.random()*9000);
-            s.photo_url = url;
-            await supabaseClient.from('students').insert([s]);
-        }
-        location.reload();
-    }
-
-    async function load() {
-        const { data } = await supabaseClient.from('students').select('*').order('name', { ascending: true });
-        db = data || []; render(db);
-    }
-
-    function render(list) {
-        document.getElementById('tS').innerText = db.length;
-        document.getElementById('tA').innerText = db.filter(x => x.status === 'Active').length;
-        const div = document.getElementById('list'); div.innerHTML = "";
+    function renderList(list) {
+        const container = document.getElementById('studentList');
+        container.innerHTML = "";
         list.forEach(s => {
-            const btns = isAdm ? `<br><button onclick="editRec('${s.id}')" style="color:blue; border:none; background:none; font-size:10px;">Edit</button> | <button onclick="delRec('${s.id}')" style="color:red; border:none; background:none; font-size:10px;">Delete</button>` : '';
-            div.innerHTML += `
-                <div class="s-row" onclick="viewID('${s.id}')">
-                    <img src="${s.photo_url || 'https://via.placeholder.com/80'}" class="s-img">
-                    <div class="s-name">
+            container.innerHTML += `
+                <div class="student-item" onclick="showID('${s.id}')">
+                    <img src="${s.photo_url || 'https://via.placeholder.com/50'}" class="student-img">
+                    <div class="student-details">
                         <b>${s.name}</b><br>
-                        <span style="font-size:10px; color:gray;">${s.class} | ${s.lin}</span>
-                        ${btns}
+                        <small>${s.class} | ${s.lin}</small>
+                        <div class="edit-tools">
+                            <button class="btn-edit" onclick="startEdit(event, '${s.id}')">Edit</button>
+                            <button class="btn-del" onclick="deleteRecord(event, '${s.id}')">Delete</button>
+                        </div>
                     </div>
-                    ${isAdm ? `<a href="tel:${s.contact}" style="background:#22c55e; color:white; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation()">📞</a>` : ''}
                 </div>`;
         });
     }
 
-    function viewID(id) {
-        const s = db.find(x => x.id === id);
-        document.getElementById('idN').innerText = s.name;
-        document.getElementById('idL').innerText = "LIN: " + s.lin;
-        document.getElementById('idC').innerText = s.class;
-        document.getElementById('idA').innerText = s.age;
-        document.getElementById('idH').innerText = s.health_status || "Excellent";
-        if(isAdm) {
-            document.getElementById('idLoc').innerText = s.location || "N/A";
-            document.getElementById('idPh').innerText = s.contact;
-        }
-        document.getElementById('idP').src = s.photo_url || 'https://via.placeholder.com/150';
-        document.getElementById('idModal').style.display = 'flex';
-    }
-
-    function editRec(id) {
-        const s = db.find(x => x.id === id); editId = id;
-        document.getElementById('formTitle').innerText = "Edit Student";
-        document.getElementById('fName').value = s.name;
-        document.getElementById('fPhone').value = s.contact;
-        document.getElementById('fClass').value = s.class;
-        document.getElementById('fAge').value = s.age;
-        document.getElementById('fDOB').value = s.dob;
-        document.getElementById('fLoc').value = s.location;
-        document.getElementById('fHealth').value = s.health_status;
-        document.getElementById('fStatus').value = s.status;
-        document.getElementById('saveBtn').innerText = "UPDATE STUDENT";
+    function startEdit(event, id) {
+        event.stopPropagation(); // Stops the ID card from opening
+        const s = allStudents.find(x => x.id === id);
+        currentEditId = id;
+        document.getElementById('formTitle').innerText = "Editing: " + s.name;
+        document.getElementById('inpName').value = s.name;
+        document.getElementById('inpPhone').value = s.contact;
+        document.getElementById('inpDOB').value = s.dob;
+        document.getElementById('inpAge').value = s.age;
+        document.getElementById('inpClass').value = s.class;
+        document.getElementById('inpLoc').value = s.location;
+        document.getElementById('inpHealth').value = s.health_status;
+        document.getElementById('btnSave').innerText = "UPDATE RECORD";
         window.scrollTo(0,0);
     }
 
-    async function delRec(id) { if(confirm("Delete student?")) { await supabaseClient.from('students').delete().eq('id', id); location.reload(); } }
-    function dlID() { html2pdf().from(document.getElementById('pdfID')).save('ID_Card.pdf'); }
-    function search() {
-        const v = document.getElementById('search').value.toLowerCase();
-        render(db.filter(s => s.name.toLowerCase().includes(v) || s.class.toLowerCase().includes(v)));
+    async function saveRecord() {
+        const file = document.getElementById('inpFile').files[0];
+        let photoUrl = "";
+        if(file) {
+            const fileName = `img_${Date.now()}`;
+            const { data, error } = await supabaseClient.storage.from('students photos').upload(fileName, file);
+            if(!error) photoUrl = `${SB_URL}/storage/v1/object/public/students%20photos/${fileName}`;
+        }
+
+        const studentData = {
+            name: document.getElementById('inpName').value,
+            contact: document.getElementById('inpPhone').value,
+            dob: document.getElementById('inpDOB').value,
+            age: document.getElementById('inpAge').value,
+            class: document.getElementById('inpClass').value,
+            location: document.getElementById('inpLoc').value,
+            health_status: document.getElementById('inpHealth').value
+        };
+
+        if(currentEditId) {
+            if(photoUrl) studentData.photo_url = photoUrl;
+            await supabaseClient.from('students').update(studentData).eq('id', currentEditId);
+        } else {
+            studentData.lin = "PM-" + Math.floor(1000 + Math.random() * 9000);
+            studentData.photo_url = photoUrl;
+            await supabaseClient.from('students').insert([studentData]);
+        }
+        location.reload();
     }
-    function copySMS() {
-        const v = document.getElementById('search').value.toLowerCase();
-        const nums = db.filter(s => s.class.toLowerCase().includes(v)).map(s => s.contact).join(", ");
-        navigator.clipboard.writeText(nums); alert("SMS List Copied!");
+
+    async function deleteRecord(event, id) {
+        event.stopPropagation();
+        if(confirm("Permanently delete this student?")) {
+            await supabaseClient.from('students').delete().eq('id', id);
+            location.reload();
+        }
     }
-    load();
+
+    function showID(id) {
+        const s = allStudents.find(x => x.id === id);
+        document.getElementById('idNameDisplay').innerText = s.name;
+        document.getElementById('idLinDisplay').innerText = "LIN: " + s.lin;
+        document.getElementById('idClassDisplay').innerText = s.class;
+        document.getElementById('idHealthDisplay').innerText = s.health_status || "Fit";
+        document.getElementById('idImg').src = s.photo_url || 'https://via.placeholder.com/100';
+        document.getElementById('idModal').style.display = 'flex';
+    }
+
+    function downloadPDF() { html2pdf().from(document.getElementById('idToPrint')).save('Student_ID.pdf'); }
+    
+    function filterList() {
+        const q = document.getElementById('search').value.toLowerCase();
+        renderList(allStudents.filter(x => x.name.toLowerCase().includes(q) || x.class.toLowerCase().includes(q)));
+    }
+    
+    fetchData();
 </script>
 </body>
 </html>
