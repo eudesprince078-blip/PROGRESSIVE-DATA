@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School System | Eudes Media</title>
+    <title>Progressive Mother’s School | Eudes Media</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --brand-blue: #673ab7; --white: #ffffff; }
+        :root { --brand: #673ab7; }
         body { font-family: 'Segoe UI', sans-serif; background: #f4f0fa; margin: 0; padding: 0; }
-        header { background: var(--brand-blue); color: white; padding: 25px; text-align: center; border-bottom: 5px solid #4527a0; }
-        .container { max-width: 600px; margin: 15px auto; padding: 10px; }
+        header { background: var(--brand); color: white; padding: 25px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .container { max-width: 600px; margin: auto; padding: 15px; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2 { color: var(--brand-blue); font-size: 1.2rem; margin-top: 0; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        textarea { grid-column: span 2; height: 50px; }
-        button { width: 100%; padding: 12px; background: var(--brand-blue); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .student-card { background: #fff; padding: 12px; border-radius: 8px; border-left: 5px solid var(--brand-blue); margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        textarea { grid-column: span 2; height: 60px; }
+        button { width: 100%; padding: 15px; background: var(--brand); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        .student-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
         .footer { text-align: center; font-size: 0.8rem; color: #666; padding: 20px; }
     </style>
 </head>
@@ -29,28 +28,26 @@
 
 <div class="container">
     <div class="card">
-        <h2>Student Registration</h2>
+        <h2 style="color:var(--brand); margin-top:0;">Student Registration</h2>
         <div class="grid">
             <input type="text" id="stuName" placeholder="Full Name">
             <input type="text" id="stuContact" placeholder="Contact Number">
             <input type="text" id="stuClass" placeholder="Class">
             <input type="text" id="stuAge" placeholder="Age">
-            <input type="date" id="stuDob" placeholder="DOB">
+            <input type="date" id="stuDob">
             <input type="text" id="stuLoc" placeholder="Physical Location">
-            <textarea id="stuHealth" placeholder="Health Status"></textarea>
+            <textarea id="stuHealth" placeholder="Health Status (Allergies, etc.)"></textarea>
         </div>
         <button id="saveBtn" onclick="register()">Save Record</button>
     </div>
 
     <div class="card">
-        <h2>School Records</h2>
-        <div id="studentList">Checking database...</div>
+        <h2 style="color:var(--brand); margin-top:0;">School Records</h2>
+        <div id="studentList">Connecting...</div>
     </div>
 </div>
 
-<div class="footer">
-    System by <b>Eudes Media</b> | Support: <b>+256762992440</b>
-</div>
+<div class="footer">Developed by <b>Eudes Media</b> | Support: <b>+256762992440</b></div>
 
 <script>
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co"; 
@@ -59,7 +56,7 @@
 
     async function register() {
         const btn = document.getElementById('saveBtn');
-        const studentData = {
+        const data = {
             name: document.getElementById('stuName').value,
             contact: document.getElementById('stuContact').value,
             class: document.getElementById('stuClass').value,
@@ -70,14 +67,14 @@
             lin: "PMS-" + Math.floor(1000 + Math.random() * 9000)
         };
 
-        if (!studentData.name) return alert("Please enter a name");
+        if (!data.name) return alert("Please enter a name");
         btn.disabled = true; btn.innerText = "Saving...";
 
-        const { error } = await supabase.from('students').insert([studentData]);
+        const { error } = await supabase.from('students').insert([data]);
         if (error) {
             alert("Error: " + error.message);
         } else {
-            alert("Success! LIN: " + studentData.lin);
+            alert("Saved Successfully! LIN: " + data.lin);
             location.reload();
         }
         btn.disabled = false;
@@ -85,20 +82,24 @@
 
     async function load() {
         const listDiv = document.getElementById('studentList');
-        // We select everything to match your new table structure
-        const { data, error } = await supabase.from('students').select('*').order('created_at', { ascending: false });
+        // I removed the 'order' part temporarily so it loads instantly even if 'created_at' is still updating
+        const { data, error } = await supabase.from('students').select('*');
         
-        if (error) { listDiv.innerHTML = "Database Error. Refresh page."; return; }
-        if (data.length === 0) { listDiv.innerHTML = "No students registered yet."; return; }
-
-        listDiv.innerHTML = "";
-        data.forEach(s => {
-            listDiv.innerHTML += `
-                <div class="student-card">
-                    <b>${s.name} (${s.lin})</b><br>
-                    <small>Class: ${s.class} | Location: ${s.location}</small>
+        if (error) { 
+            listDiv.innerHTML = "Database Error. Click Enable Realtime in Supabase."; 
+            return; 
+        }
+        if (!data || data.length === 0) {
+            listDiv.innerHTML = "No students registered yet.";
+        } else {
+            listDiv.innerHTML = "";
+            data.forEach(s => {
+                listDiv.innerHTML += `<div class="student-item">
+                    <div><b>${s.name}</b><br><small>ID: ${s.lin || 'N/A'}</small></div>
+                    <div style="color:var(--brand)">${s.class}</div>
                 </div>`;
-        });
+            });
+        }
     }
     load();
 </script>
