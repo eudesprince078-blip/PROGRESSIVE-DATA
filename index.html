@@ -3,261 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progressive Mothers | Executive PMS</title>
+    <title>Progressive Mothers | Eudes Media</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --purple: #4c1d95; --gold: #b45309; --white: #ffffff; }
         body { 
-            font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 100px;
+            font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 120px;
             background: linear-gradient(-45deg, #ffffff, #f5f3ff, #ede9fe, #ffffff);
             background-size: 400% 400%; animation: liquid 15s ease infinite;
         }
         @keyframes liquid { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         
-        header { background: var(--white); padding: 40px 20px; text-align: center; border-radius: 0 0 50px 50px; box-shadow: 0 10px 40px rgba(76,29,149,0.15); border-bottom: 4px solid var(--purple); }
-        .motto { font-family: 'Playfair Display', serif; color: var(--gold); font-style: italic; font-size: 16px; margin-top: 5px; font-weight: bold; }
+        header { background: var(--white); padding: 30px 20px; text-align: center; border-radius: 0 0 40px 40px; box-shadow: 0 10px 30px rgba(76,29,149,0.1); border-bottom: 4px solid var(--purple); }
+        .motto { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 15px; margin-top: 5px; }
         
-        .container { max-width: 500px; margin: 0 auto; padding: 0 15px; }
+        .container { max-width: 480px; margin: 0 auto; padding: 0 15px; }
 
-        /* Dashboard & Stats */
-        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: -30px; }
-        .stat-card { background: var(--white); padding: 20px; border-radius: 25px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); border: 1px solid #f3e8ff; }
-        .stat-card b { font-size: 24px; color: var(--purple); display: block; }
-        .stat-card span { font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
+        /* Dashboard Stats */
+        .stats { display: flex; gap: 10px; margin-top: -20px; justify-content: center; }
+        .stat-item { background: white; padding: 15px; border-radius: 20px; flex: 1; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .stat-item b { font-size: 20px; color: var(--purple); display: block; }
+        .stat-item span { font-size: 9px; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
 
-        /* Admin Forms */
-        #adminPanel, .admin-only { display: none; }
-        .form-box { background: rgba(255,255,255,0.95); padding: 30px; border-radius: 30px; border: 2px solid var(--purple); margin-top: 25px; }
-        input, select, textarea { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 15px; border: 1px solid #ddd6fe; box-sizing: border-box; }
-        .btn-action { background: var(--purple); color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-weight: 900; cursor: pointer; transition: 0.3s; }
-
-        /* Student List */
-        .student-row { background: var(--white); padding: 15px; border-radius: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid #f1f5f9; box-shadow: 0 5px 10px rgba(0,0,0,0.02); }
-        .student-photo { width: 65px; height: 65px; border-radius: 15px; object-fit: cover; background: #f3e8ff; border: 2px solid #ddd6fe; }
-        .student-info { flex: 1; }
-        .student-info h4 { margin: 0; color: var(--purple); font-size: 17px; }
-        .badge { font-size: 9px; padding: 3px 8px; border-radius: 8px; font-weight: 800; text-transform: uppercase; }
-        .bg-active { background: #dcfce7; color: #166534; }
-        .bg-left { background: #fee2e2; color: #991b1b; }
-
-        /* ID Modal */
-        #idModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
-        .id-front { width: 340px; background: white; border-radius: 20px; overflow: hidden; position: relative; border: 1px solid #ccc; text-align: center; }
-        .id-banner { background: var(--purple); color: white; padding: 20px; }
-        .id-face { width: 110px; height: 110px; border-radius: 50%; border: 5px solid var(--purple); margin-top: -55px; background: white; object-fit: cover; }
+        /* Admin Logic */
+        #adminPanel, .admin-only, #logoutBtn { display: none; }
+        .form-card { background: white; padding: 25px; border-radius: 25px; border: 2px solid var(--purple); margin-top: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        input, select, textarea { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #ddd6fe; box-sizing: border-box; }
         
-        /* Footer */
-        .footer { text-align: center; padding: 40px 20px; font-size: 11px; color: #64748b; font-weight: bold; line-height: 1.8; }
-        .whatsapp-link { color: #25d366; font-weight: 900; }
-        .pass-container { position: relative; width: 100%; }
-        .toggle-pass { position: absolute; right: 15px; top: 12px; cursor: pointer; font-size: 18px; }
+        .btn-p { background: var(--purple); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: 900; cursor: pointer; }
+        .btn-logout { background: #fee2e2; color: #dc2626; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        /* Student Listing */
+        .s-row { background: white; padding: 12px; border-radius: 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; border: 1px solid #f1f5f9; cursor: pointer; }
+        .s-img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: #f3e8ff; }
+        .s-name { flex: 1; }
+        .s-name b { color: var(--purple); font-size: 15px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+
+        /* ID Styles */
+        #idModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 999; align-items: center; justify-content: center; flex-direction: column; }
+        .id-card-box { width: 320px; background: white; border-radius: 20px; overflow: hidden; text-align: center; border: 1px solid #ddd; }
+        .id-top { background: var(--purple); color: white; padding: 15px; }
+        .id-pic { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--purple); margin-top: -50px; background: white; object-fit: cover; }
+
+        .footer { text-align: center; padding: 30px; font-size: 11px; color: #94a3b8; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900; color: var(--purple); letter-spacing: 2px; font-size: 1.4rem;">PROGRESSIVE MOTHERS</div>
+    <div style="font-weight: 900; color: var(--purple); font-size: 1.3rem;">PROGRESSIVE MOTHERS</div>
     <div class="motto">"With God everything is possible"</div>
+    <button id="logoutBtn" class="btn-logout" onclick="logout()">🚪 LOGOUT ADMIN</button>
 </header>
 
 <div class="container">
-    <div class="dash-grid">
-        <div class="stat-card"><b id="countTotal">0</b><span>Students</span></div>
-        <div class="stat-card"><b id="countActive" style="color:#22c55e;">0</b><span>Active Now</span></div>
+    <div class="stats">
+        <div class="stat-item"><b id="tS">0</b><span>Students</span></div>
+        <div class="stat-item"><b id="tA" style="color:green;">0</b><span>Active</span></div>
     </div>
 
-    <div id="loginBox" class="form-box" style="margin-top:20px; text-align:center;">
-        <h3 style="margin-top:0; color:var(--purple);">Admin Dashboard Login</h3>
-        <div class="pass-container">
-            <input type="password" id="adminPass" placeholder="Enter Admin Password">
-            <span class="toggle-pass" onclick="togglePass()">👁️</span>
+    <div id="loginBox" class="form-card" style="text-align: center;">
+        <h4 style="margin:0 0 15px; color:var(--purple);">Admin Verification</h4>
+        <div style="position:relative;">
+            <input type="password" id="pass" placeholder="Admin Password">
+            <span onclick="toggleP()" style="position:absolute; right:15px; top:12px; cursor:pointer;">👁️</span>
         </div>
-        <button class="btn-action" onclick="checkAuth()">ENTER DASHBOARD</button>
+        <button class="btn-p" onclick="login()">ACCESS DASHBOARD</button>
     </div>
 
-    <div id="adminPanel" class="form-box">
-        <h3 id="formTitle" style="color:var(--purple); margin-top:0;">Register New Student</h3>
-        <input type="file" id="inpFile" accept="image/*">
-        <input type="text" id="inpName" placeholder="Full Student Name">
-        <input type="text" id="inpPhone" placeholder="Parent Contact (256...)">
+    <div id="adminPanel" class="form-card">
+        <h4 id="formTitle" style="color:var(--purple); margin:0 0 15px;">New Registration</h4>
+        <input type="file" id="fPic">
+        <input type="text" id="fName" placeholder="Full Student Name">
+        <input type="text" id="fPhone" placeholder="Parent Contact (256...)">
         <div style="display:flex; gap:10px;">
-            <select id="inpClass">
-                <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-                <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-                <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-            </select>
-            <input type="text" id="inpAge" placeholder="Age">
+            <input type="date" id="fDOB" onchange="calcAge()">
+            <input type="text" id="fAge" placeholder="Age (Auto)" readonly>
         </div>
-        <input type="date" id="inpDOB">
-        <input type="text" id="inpLoc" placeholder="Physical Location">
-        <textarea id="inpHealth" placeholder="Health Status / Allergies"></textarea>
-        <select id="inpStatus">
+        <select id="fClass">
+            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+            <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+            <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+        </select>
+        <input type="text" id="fLoc" placeholder="Physical Location">
+        <textarea id="fHealth" placeholder="Health Status (Allergies/Medical)"></textarea>
+        <select id="fStatus">
             <option value="Active">Active Student</option>
             <option value="Left">Left School</option>
         </select>
-        <button class="btn-action" id="saveBtn" onclick="processSave()">SAVE TO DATABASE</button>
-        <button onclick="copySMS()" style="width:100%; border:2px solid var(--purple); background:none; color:var(--purple); padding:10px; border-radius:15px; margin-top:10px; font-weight:bold;">📋 COPY CONTACTS FOR SMS</button>
+        <button class="btn-p" id="saveBtn" onclick="saveData()">SAVE STUDENT RECORD</button>
+        <button onclick="copySMS()" style="width:100%; border:1px solid var(--purple); background:none; color:var(--purple); padding:10px; border-radius:12px; margin-top:10px; font-weight:bold;">📋 COPY CLASS SMS LIST</button>
     </div>
 
-    <input type="text" id="search" placeholder="🔍 Search student name or class..." onkeyup="doSearch()" 
-           style="width:100%; box-sizing:border-box; padding:20px; border-radius:25px; border:2px solid #ddd6fe; margin:25px 0; background:white; font-weight:900; color:var(--purple);">
+    <input type="text" id="search" placeholder="🔍 Search name or class..." onkeyup="search()" 
+           style="width:100%; box-sizing:border-box; padding:18px; border-radius:20px; border:2px solid #ddd6fe; margin:20px 0; background:white; font-weight:bold; color:var(--purple);">
 
-    <div id="studentList">Loading Academic Records...</div>
+    <div id="list">Loading Database...</div>
 </div>
 
 <div id="idModal" onclick="this.style.display='none'">
-    <div class="id-front" id="idCapture" onclick="event.stopPropagation()">
-        <div class="id-banner">
-            <h2 style="margin:0; font-size:16px;">PROGRESSIVE MOTHERS</h2>
-            <div style="font-size:8px; font-style:italic;">With God everything is possible</div>
+    <div class="id-card-box" id="pdfID" onclick="event.stopPropagation()">
+        <div class="id-top">
+            <h3 style="margin:0; font-size:14px;">PROGRESSIVE MOTHERS</h3>
+            <p style="margin:2px 0; font-size:7px; font-style:italic;">With God everything is possible</p>
         </div>
-        <div style="height:60px;"></div>
-        <div style="padding:25px;">
-            <img id="idPhoto" src="" class="id-face">
-            <h2 id="idSName" style="color:var(--purple); margin:10px 0 5px;">Student Name</h2>
-            <b id="idSLin" style="color:var(--gold); letter-spacing:1px;">LIN: PM-0000</b>
-            <div style="text-align:left; font-size:11px; margin-top:15px; border-top:1px solid #eee; padding-top:10px; line-height:1.6;">
-                <b>CLASS:</b> <span id="idSClass"></span><br>
-                <b>HEALTH:</b> <span id="idSHealth"></span><br>
+        <div style="height:55px;"></div>
+        <div style="padding:20px;">
+            <img id="idP" src="" class="id-pic">
+            <h2 id="idN" style="color:var(--purple); margin:10px 0 5px; font-size:18px;">Name</h2>
+            <b id="idL" style="color:var(--gold); font-size:12px;">LIN: PM-0000</b>
+            <div style="text-align:left; font-size:10px; margin-top:15px; border-top:1px solid #eee; padding-top:10px; line-height:1.6;">
+                <b>CLASS:</b> <span id="idC"></span> | <b>AGE:</b> <span id="idA"></span><br>
+                <b>HEALTH:</b> <span id="idH"></span><br>
                 <div class="admin-only">
-                    <b>LOCATION:</b> <span id="idSLoc"></span><br>
-                    <b>CONTACT:</b> <span id="idSPh"></span>
+                    <b>LOCATION:</b> <span id="idLoc"></span><br>
+                    <b>PARENT:</b> <span id="idPh"></span>
                 </div>
             </div>
-            <div style="margin-top:15px; font-size:8px; color:#94a3b8; border-top:1px dashed #ddd; padding-top:10px;">
-                Eudes Media Official ID • +256762992440 [cite: 2026-01-28]
+            <div style="margin-top:10px; font-size:7px; color:#94a3b8; border-top:1px dashed #ddd; padding-top:8px;">
+                Eudes Media Identity • +256762992440 [cite: 2026-01-28]
             </div>
         </div>
     </div>
-    <button class="btn-action" onclick="downloadID()" style="width:200px; margin-top:25px; background:#16a34a;">⬇️ DOWNLOAD PDF</button>
+    <button class="btn-p" onclick="dlID()" style="width:200px; margin-top:20px; background:#16a34a;">⬇️ DOWNLOAD ID</button>
 </div>
 
 <div class="footer">
     Developed by <b>Eudes Media</b> [cite: 2026-01-28]<br>
-    Contact Support: <b>+256762992440</b><br>
-    WhatsApp Support: <span class="whatsapp-link">+256200930932</span>
+    Support: +256762992440 | WhatsApp: +256200930932
 </div>
 
 <script>
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co"; 
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
-    let cache = []; let isAuth = false; let currentEditId = null;
+    let db = []; let isAdm = false; let editId = null;
 
-    function togglePass() {
-        const p = document.getElementById('adminPass');
-        p.type = p.type === "password" ? "text" : "password";
-    }
+    // Persistent Login Fix
+    if(sessionStorage.getItem('isAdm') === 'true') { login(true); }
 
-    function checkAuth() {
-        if(document.getElementById('adminPass').value === "mothers.comit1") {
-            isAuth = true;
+    function toggleP() { const p = document.getElementById('pass'); p.type = p.type === 'password' ? 'text' : 'password'; }
+
+    function login(isReload = false) {
+        if(isReload || document.getElementById('pass').value === "mothers.comit1") {
+            isAdm = true;
+            sessionStorage.setItem('isAdm', 'true');
             document.getElementById('loginBox').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'inline-block';
             document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
-            render(cache);
-        } else { alert("Incorrect Admin Password."); }
+            render(db);
+        } else { alert("Wrong Password"); }
     }
 
-    async function processSave() {
-        const file = document.getElementById('inpFile').files[0];
-        let photoUrl = "";
+    function logout() {
+        sessionStorage.clear();
+        location.reload();
+    }
+
+    function calcAge() {
+        const dob = new Date(document.getElementById('fDOB').value);
+        const age = new Date().getFullYear() - dob.getFullYear();
+        document.getElementById('fAge').value = age;
+    }
+
+    async function saveData() {
+        const file = document.getElementById('fPic').files[0];
+        let url = "";
         if(file) {
             const fname = `st_${Date.now()}`;
             const { data, error } = await supabaseClient.storage.from('students photos').upload(fname, file);
-            if(!error) photoUrl = `${SB_URL}/storage/v1/object/public/students%20photos/${fname}`;
+            if(!error) url = `${SB_URL}/storage/v1/object/public/students%20photos/${fname}`;
         }
 
-        const payload = {
-            name: document.getElementById('inpName').value, contact: document.getElementById('inpPhone').value,
-            class: document.getElementById('inpClass').value, age: document.getElementById('inpAge').value,
-            dob: document.getElementById('inpDOB').value, location: document.getElementById('inpLoc').value,
-            health_status: document.getElementById('inpHealth').value, status: document.getElementById('inpStatus').value
+        const s = {
+            name: document.getElementById('fName').value, contact: document.getElementById('fPhone').value,
+            class: document.getElementById('fClass').value, age: document.getElementById('fAge').value,
+            dob: document.getElementById('fDOB').value, location: document.getElementById('fLoc').value,
+            health_status: document.getElementById('fHealth').value, status: document.getElementById('fStatus').value
         };
 
-        if(currentEditId) {
-            if(photoUrl) payload.photo_url = photoUrl;
-            await supabaseClient.from('students').update(payload).eq('id', currentEditId);
+        if(editId) {
+            if(url) s.photo_url = url;
+            await supabaseClient.from('students').update(s).eq('id', editId);
         } else {
-            payload.lin = "PM-"+Math.floor(1000+Math.random()*9000);
-            payload.photo_url = photoUrl;
-            await supabaseClient.from('students').insert([payload]);
+            s.lin = "PM-"+Math.floor(1000+Math.random()*9000);
+            s.photo_url = url;
+            await supabaseClient.from('students').insert([s]);
         }
         location.reload();
     }
 
-    async function loadData() {
+    async function load() {
         const { data } = await supabaseClient.from('students').select('*').order('name', { ascending: true });
-        cache = data || []; render(cache);
+        db = data || []; render(db);
     }
 
     function render(list) {
-        document.getElementById('countTotal').innerText = cache.length;
-        document.getElementById('countActive').innerText = cache.filter(x => x.status === 'Active').length;
-        
-        const div = document.getElementById('studentList'); div.innerHTML = "";
+        document.getElementById('tS').innerText = db.length;
+        document.getElementById('tA').innerText = db.filter(x => x.status === 'Active').length;
+        const div = document.getElementById('list'); div.innerHTML = "";
         list.forEach(s => {
-            const adminTools = isAuth ? `<br><button onclick="editRec('${s.id}')" style="color:blue; border:none; background:none; cursor:pointer; font-weight:bold;">Edit</button> | <button onclick="delRec('${s.id}')" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">Delete</button>` : '';
-            const callBtn = isAuth ? `<a href="tel:${s.contact}" class="btn-action" style="width:40px; height:40px; border-radius:50%; background:#22c55e; display:flex; align-items:center; justify-content:center; padding:0;" onclick="event.stopPropagation()">📞</a>` : '';
-            
+            const btns = isAdm ? `<br><button onclick="editRec('${s.id}')" style="color:blue; border:none; background:none; font-size:10px;">Edit</button> | <button onclick="delRec('${s.id}')" style="color:red; border:none; background:none; font-size:10px;">Delete</button>` : '';
             div.innerHTML += `
-                <div class="student-row" onclick="popID('${s.id}')">
-                    <img src="${s.photo_url || 'https://via.placeholder.com/100'}" class="student-photo">
-                    <div class="student-info">
-                        <h4>${s.name}</h4>
-                        <span style="font-size:11px; color:#64748b;">${s.class} | ${s.lin}</span> <span class="badge ${s.status === 'Active' ? 'bg-active' : 'bg-left'}">${s.status}</span>
-                        <div style="font-size:10px; color:red; font-weight:bold;">${s.health_status ? '⚠️ ' + s.health_status : ''}</div>
-                        ${adminTools}
+                <div class="s-row" onclick="viewID('${s.id}')">
+                    <img src="${s.photo_url || 'https://via.placeholder.com/80'}" class="s-img">
+                    <div class="s-name">
+                        <b>${s.name}</b><br>
+                        <span style="font-size:10px; color:gray;">${s.class} | ${s.lin}</span>
+                        ${btns}
                     </div>
-                    ${callBtn}
+                    ${isAdm ? `<a href="tel:${s.contact}" style="background:#22c55e; color:white; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation()">📞</a>` : ''}
                 </div>`;
         });
     }
 
-    function editRec(id) {
-        const s = cache.find(x => x.id === id); currentEditId = id;
-        document.getElementById('formTitle').innerText = "Editing: " + s.name;
-        document.getElementById('inpName').value = s.name;
-        document.getElementById('inpPhone').value = s.contact;
-        document.getElementById('inpClass').value = s.class;
-        document.getElementById('inpAge').value = s.age;
-        document.getElementById('inpDOB').value = s.dob;
-        document.getElementById('inpLoc').value = s.location;
-        document.getElementById('inpHealth').value = s.health_status;
-        document.getElementById('inpStatus').value = s.status;
-        document.getElementById('saveBtn').innerText = "UPDATE STUDENT RECORD";
-        window.scrollTo(0,0);
-    }
-
-    async function delRec(id) { if(confirm("Confirm permanent deletion?")) { await supabaseClient.from('students').delete().eq('id', id); location.reload(); } }
-
-    function popID(id) {
-        const s = cache.find(x => x.id === id);
-        document.getElementById('idSName').innerText = s.name;
-        document.getElementById('idSLin').innerText = "LIN: " + s.lin;
-        document.getElementById('idSClass').innerText = s.class;
-        document.getElementById('idSHealth').innerText = s.health_status || "Good";
-        if(isAuth) {
-            document.getElementById('idSLoc').innerText = s.location || "N/A";
-            document.getElementById('idSPh').innerText = s.contact;
+    function viewID(id) {
+        const s = db.find(x => x.id === id);
+        document.getElementById('idN').innerText = s.name;
+        document.getElementById('idL').innerText = "LIN: " + s.lin;
+        document.getElementById('idC').innerText = s.class;
+        document.getElementById('idA').innerText = s.age;
+        document.getElementById('idH').innerText = s.health_status || "Excellent";
+        if(isAdm) {
+            document.getElementById('idLoc').innerText = s.location || "N/A";
+            document.getElementById('idPh').innerText = s.contact;
         }
-        document.getElementById('idPhoto').src = s.photo_url || 'https://via.placeholder.com/150';
+        document.getElementById('idP').src = s.photo_url || 'https://via.placeholder.com/150';
         document.getElementById('idModal').style.display = 'flex';
     }
 
-    function downloadID() { html2pdf().from(document.getElementById('idCapture')).save('Student_ID_Card.pdf'); }
-    function doSearch() {
+    function editRec(id) {
+        const s = db.find(x => x.id === id); editId = id;
+        document.getElementById('formTitle').innerText = "Edit Student";
+        document.getElementById('fName').value = s.name;
+        document.getElementById('fPhone').value = s.contact;
+        document.getElementById('fClass').value = s.class;
+        document.getElementById('fAge').value = s.age;
+        document.getElementById('fDOB').value = s.dob;
+        document.getElementById('fLoc').value = s.location;
+        document.getElementById('fHealth').value = s.health_status;
+        document.getElementById('fStatus').value = s.status;
+        document.getElementById('saveBtn').innerText = "UPDATE STUDENT";
+        window.scrollTo(0,0);
+    }
+
+    async function delRec(id) { if(confirm("Delete student?")) { await supabaseClient.from('students').delete().eq('id', id); location.reload(); } }
+    function dlID() { html2pdf().from(document.getElementById('pdfID')).save('ID_Card.pdf'); }
+    function search() {
         const v = document.getElementById('search').value.toLowerCase();
-        render(cache.filter(s => s.name.toLowerCase().includes(v) || s.class.toLowerCase().includes(v)));
+        render(db.filter(s => s.name.toLowerCase().includes(v) || s.class.toLowerCase().includes(v)));
     }
     function copySMS() {
         const v = document.getElementById('search').value.toLowerCase();
-        const nums = cache.filter(s => s.class.toLowerCase().includes(v)).map(s => s.contact).join(", ");
-        navigator.clipboard.writeText(nums); alert("Contacts copied for SMS!");
+        const nums = db.filter(s => s.class.toLowerCase().includes(v)).map(s => s.contact).join(", ");
+        navigator.clipboard.writeText(nums); alert("SMS List Copied!");
     }
-    loadData();
+    load();
 </script>
 </body>
 </html>
