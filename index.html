@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progressive Mothers | Dashboard</title>
+    <title>Progressive Mothers | Registry</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --pms-red: #e11d48; --pms-blue: #1e40af; --bg: #fdf2f8; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); padding-bottom: 60px; }
         header { background: var(--pms-red); color: white; padding: 12px; text-align: center; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
         
-        /* DASHBOARD SECTION */
-        .dash-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; margin-top: -30px; }
-        .stat-card { background: white; padding: 15px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-bottom: 4px solid var(--pms-red); }
+        .dash-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; margin-top: -30px; }
+        .stat-card { background: white; padding: 15px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--pms-red); }
         .stat-num { display: block; font-size: 26px; font-weight: 900; color: var(--pms-blue); }
         .stat-label { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; }
 
@@ -24,18 +23,19 @@
         .btn-save { background: var(--pms-blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         
         .s-box { background: white; padding: 18px; border-radius: 20px; margin-bottom: 12px; border-left: 8px solid var(--pms-red); position: relative; }
-        .status-left { border-left-color: #94a3b8; opacity: 0.6; filter: grayscale(1); }
+        .status-left { border-left-color: #94a3b8; filter: grayscale(1); opacity: 0.6; }
         .pay-badge { background: #e0f2fe; color: #0369a1; padding: 5px 10px; border-radius: 8px; font-weight: 800; font-size: 12px; display: inline-block; margin-top: 5px; }
-        .lin-tag { position: absolute; top: 10px; right: 10px; font-size: 10px; background: #f1f5f9; padding: 2px 6px; border-radius: 5px; font-weight: bold; color: var(--pms-blue); }
+        .lin-tag { position: absolute; top: 10px; right: 10px; font-size: 10px; background: #f1f5f9; padding: 2px 6px; border-radius: 5px; font-weight: bold; }
         
         #adminArea { display: none; }
+        .footer { text-align: center; padding: 20px; font-size: 11px; color: #64748b; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
     <div style="width:40px"></div>
-    <span style="font-weight: 900; letter-spacing: 1px;">SCHOOL REGISTRY</span>
+    <span style="font-weight: 900;">SCHOOL REGISTRY</span>
     <div onclick="openAdmin()" style="cursor:pointer; font-size:24px; padding-right:10px;">⚙️</div>
 </header>
 
@@ -44,22 +44,23 @@
     <div style="font-style:italic; font-size:12px; opacity:0.8;">"With God everything is possible"</div>
 </div>
 
-<div class="dash-container">
+<div class="dash-row">
     <div class="stat-card">
-        <span class="stat-num" id="totalActive">0</span>
+        <span class="stat-num" id="activeTotal">0</span>
         <span class="stat-label">Active Students</span>
     </div>
     <div class="stat-card">
-        <span class="stat-num" id="classCount">0</span>
-        <span class="stat-label" id="classLabel">Total Shown</span>
+        <span class="stat-num" id="filterCount">0</span>
+        <span class="stat-label" id="filterLabel">Total Shown</span>
     </div>
 </div>
 
 <div class="container">
     <div id="adminArea" class="card">
-        <h3 style="margin-top:0; color:var(--pms-blue)">New Student Entry</h3>
+        <h3 style="margin-top:0; color:var(--pms-blue)">Register Student</h3>
         <input type="text" id="fName" placeholder="Full Student Name">
-        <input type="text" id="fPhone" placeholder="Parent Contact">
+        <input type="text" id="fPhone" placeholder="Parent Contact Number">
+        <input type="text" id="fLoc" placeholder="Physical Location">
         
         <label style="font-size:11px; font-weight:bold; color:var(--pms-blue)">Class & Status</label>
         <select id="fClass">
@@ -67,21 +68,21 @@
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
             <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
-
+        
         <select id="fStatus">
-            <option value="Active">Currently in School (Active)</option>
-            <option value="Left">Has Left School (Inactive)</option>
+            <option value="Active">Active Student</option>
+            <option value="Left">Student Has Left School</option>
         </select>
         
-        <input type="text" id="fPayCode" placeholder="Enter Payment Code">
-        <button class="btn-save" onclick="saveRecord()">SAVE STUDENT</button>
+        <input type="text" id="fPayCode" placeholder="Enter Payment/Receipt Code">
+        <button class="btn-save" onclick="saveRecord()">SAVE TO DATABASE</button>
         <p id="msg" style="text-align:center; font-weight:bold; font-size:12px; margin-top:10px; color: red;"></p>
     </div>
 
     <div class="card" style="padding: 10px; border: 2px solid var(--pms-blue);">
-        <input type="text" id="search" placeholder="🔍 Search name or payment code..." onkeyup="runFilters()" style="margin-bottom:10px;">
-        <select id="filterClass" onchange="runFilters()" style="margin-bottom:0; background: #f8fafc; font-weight: bold; color: var(--pms-blue);">
-            <option value="All">All Classes (Show Everything)</option>
+        <input type="text" id="search" placeholder="🔍 Search name or payment code..." onkeyup="applyFilters()" style="margin-bottom:10px;">
+        <select id="classFilter" onchange="applyFilters()" style="margin-bottom:0; background: #f8fafc; font-weight: bold; color: var(--pms-blue);">
+            <option value="All">All Classes (View All)</option>
             <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
             <option>P.5</option><option>P.6</option><option>P.7</option>
@@ -91,10 +92,15 @@
     <div id="mainList"></div>
 </div>
 
+<div class="footer">
+    Developed by <b>Eudes Media</b><br>
+    Contact: +256762992440 | WhatsApp: +256762992440
+</div>
+
 <script>
-    // CRITICAL: You must ensure these two strings are 100% correct from Supabase
-    const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co"; 
-    const SB_KEY = "PASTE_THE_LONG_EY_STRING_HERE"; 
+    // Your Project Details
+    const SB_URL = "https://cpfttwvonuptqdpskobx.supabase.co"; 
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwdGZ0d3ZvbnVwdHFkcHNrb2J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MjAxNDUsImV4cCI6MjA4ODA5NjE0NX0.gnl0g0NKUv_zfyaJufSKSRO54drR6nGjIKgioj8Tcxc"; 
 
     const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
     let studentDB = [];
@@ -106,9 +112,9 @@
         const { data, error } = await supabaseClient.from('students').select('*').order('name');
         if(!error) { 
             studentDB = data || []; 
-            runFilters(); // This will update dashboard and list
+            applyFilters();
         } else {
-            alert("Error: " + error.message);
+            document.getElementById('msg').innerText = "API Error: " + error.message;
         }
     }
 
@@ -117,28 +123,26 @@
         if(p === "mothers.comit1") {
             isAdmin = true;
             document.getElementById('adminArea').style.display = 'block';
-            runFilters();
+            applyFilters();
         }
     }
 
-    function runFilters() {
-        const searchQ = document.getElementById('search').value.toLowerCase();
-        const classQ = document.getElementById('filterClass').value;
+    function applyFilters() {
+        const searchVal = document.getElementById('search').value.toLowerCase();
+        const classVal = document.getElementById('classFilter').value;
 
-        // 1. Update the Dashboard Total (Only Active students)
-        const activeTotal = studentDB.filter(s => s.status !== 'Left').length;
-        document.getElementById('totalActive').innerText = activeTotal;
+        // Count only Active students for Dashboard
+        const activeCount = studentDB.filter(s => s.status !== 'Left').length;
+        document.getElementById('activeTotal').innerText = activeCount;
 
-        // 2. Filter the List for display
         let filtered = studentDB.filter(s => {
-            const matchesSearch = s.name.toLowerCase().includes(searchQ) || (s.payment_code && s.payment_code.toLowerCase().includes(searchQ));
-            const matchesClass = (classQ === "All") || (s.class === classQ);
+            const matchesSearch = s.name.toLowerCase().includes(searchVal) || (s.payment_code && s.payment_code.toLowerCase().includes(searchVal));
+            const matchesClass = (classVal === "All") || (s.class === classVal);
             return matchesSearch && matchesClass;
         });
 
-        // 3. Update "Filtered Total" label
-        document.getElementById('classCount').innerText = filtered.length;
-        document.getElementById('classLabel').innerText = classQ === "All" ? "Total Shown" : classQ + " Total";
+        document.getElementById('filterCount').innerText = filtered.length;
+        document.getElementById('filterLabel').innerText = classVal === "All" ? "Total Shown" : classVal + " Total";
 
         display(filtered);
     }
@@ -146,7 +150,6 @@
     function display(list) {
         const box = document.getElementById('mainList');
         box.innerHTML = "";
-        
         list.forEach(s => {
             const isLeft = s.status === 'Left';
             box.innerHTML += `
@@ -161,21 +164,22 @@
     }
 
     async function saveRecord() {
-        const nameInput = document.getElementById('fName').value;
-        if(!nameInput) return alert("Enter student name");
+        const n = document.getElementById('fName').value;
+        if(!n) return alert("Enter Student Name");
 
-        // LIN LOGIC: First letter + Random 4-digit number
-        const firstLetter = nameInput.trim().charAt(0).toUpperCase();
+        // LIN LOGIC: First letter + Random 4 digits
+        const firstChar = n.trim().charAt(0).toUpperCase();
         const randNum = Math.floor(1000 + Math.random() * 9000);
-        const newLin = firstLetter + "-" + randNum;
+        const generatedLin = firstChar + "-" + randNum;
 
         const info = {
-            name: nameInput,
+            name: n,
             contact: document.getElementById('fPhone').value,
+            location: document.getElementById('fLoc').value,
             class: document.getElementById('fClass').value,
             status: document.getElementById('fStatus').value,
             payment_code: document.getElementById('fPayCode').value,
-            lin: newLin
+            lin: generatedLin
         };
 
         const { error } = await supabaseClient.from('students').insert([info]);
@@ -183,7 +187,7 @@
     }
 
     async function deleteItem(id) {
-        if(confirm("Delete this record?")) {
+        if(confirm("Delete student?")) {
             await supabaseClient.from('students').delete().eq('id', id);
             location.reload();
         }
