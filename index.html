@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMS Registry | Final Fix</title>
+    <title>PMS Registry | Mobile Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #1e40af; --red: #e11d48; }
@@ -38,7 +38,7 @@
 </div>
 
 <div class="container">
-    <div id="connStatus" style="text-align:center; font-size:10px; color:red; margin-bottom:10px;">Checking Database Connection...</div>
+    <div id="connStatus" style="text-align:center; font-size:11px; font-weight:bold; margin-bottom:10px;">Checking Database...</div>
     
     <div class="card" id="formBox" style="display:none; border: 2px solid var(--red);">
         <h3 style="margin-top:0; color:var(--red)">Register Student</h3>
@@ -55,7 +55,7 @@
         <select id="status"><option value="Active">Active</option><option value="Left">Left</option></select>
         <textarea id="health" placeholder="Health Status"></textarea>
         <input type="text" id="pay" placeholder="Payment Code">
-        <button class="btn-main" id="saveBtn" onclick="saveData()">SAVE STUDENT DATA</button>
+        <button class="btn-main" onclick="saveData()">SAVE STUDENT DATA</button>
     </div>
 
     <div class="card" style="border: 2px solid var(--blue);">
@@ -69,21 +69,26 @@
 </div>
 
 <script>
-    // These must be 100% clean with no extra spaces
     const S_URL = "https://cpfttwvonuptqdpskobx.supabase.co";
     const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwdGZ0d3ZvbnVwdHFkcHNrb2J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MjAxNDUsImV4cCI6MjA4ODA5NjE0NX0.gnl0g0NKUv_zfyaJufSKSRO54drR6nGjIKgioj8Tcxc";
     
-    const sb = supabase.createClient(S_URL, S_KEY);
+    // Updated connection method for mobile stability
+    const sb = supabase.createClient(S_URL, S_KEY, {
+      auth: { persistSession: false }
+    });
+    
     let students = [];
 
     async function load() {
-        const { data, error } = await sb.from('students').select('*').order('name');
-        if(error) {
-            document.getElementById('connStatus').innerText = "❌ Connection Error: Check Supabase Settings";
-        } else {
-            document.getElementById('connStatus').innerText = "✅ Database Connected";
+        try {
+            const { data, error } = await sb.from('students').select('*').order('name');
+            if(error) throw error;
+            document.getElementById('connStatus').innerHTML = "<span style='color:green'>✅ Database Connected</span>";
             students = data || []; 
             drawList();
+        } catch (e) {
+            document.getElementById('connStatus').innerHTML = "<span style='color:red'>❌ Connection Error: Retry in 5s</span>";
+            setTimeout(load, 5000);
         }
     }
 
@@ -105,14 +110,10 @@
     }
 
     async function saveData() {
-        const btn = document.getElementById('saveBtn');
-        btn.innerText = "SAVING...";
-        btn.disabled = true;
-
         const n = document.getElementById('name').value;
+        if(!n) return alert("Enter Name");
         const lin = n.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
 
-        // Matching full column names from your database
         const { error } = await sb.from('students').insert([{
             name: n, age: document.getElementById('age').value,
             dob: document.getElementById('dob').value, contacts: document.getElementById('contacts').value,
@@ -121,14 +122,8 @@
             payment_code: document.getElementById('pay').value, lin: lin
         }]);
 
-        if(error) {
-            alert("Database Error: " + error.message);
-            btn.innerText = "SAVE STUDENT DATA";
-            btn.disabled = false;
-        } else {
-            alert("Student Registered Successfully!");
-            location.reload();
-        }
+        if(error) alert("Save Failed: " + error.message);
+        else { alert("Success!"); location.reload(); }
     }
     window.onload = load;
 </script>
