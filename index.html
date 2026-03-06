@@ -41,9 +41,7 @@ width:100%; padding:12px; margin-bottom:8px; border-radius:8px; border:1px solid
 button{
 padding:10px; border:none; border-radius:8px; cursor:pointer; margin-top:4px;
 }
-.btn{
-background:var(--blue); color:white; width:100%;
-}
+.btn{ background:var(--blue); color:white; width:100%; }
 .delete{ background:red; color:white; }
 .promote{ background:green; color:white; }
 </style>
@@ -73,7 +71,7 @@ PROGRESSIVE MOTHERS SCHOOL DASHBOARD
 <span id="graduated">0</span><br>FINISHED P.7
 </div>
 <div class="stat">
-<span id="classesP">0</span><br>P.1 STUDENTS
+<span id="p1">0</span><br>P.1 STUDENTS
 </div>
 </div>
 
@@ -108,38 +106,40 @@ PROGRESSIVE MOTHERS SCHOOL DASHBOARD
 </div>
 
 <script>
-// Supabase
+// Supabase setup
 const URL="https://cpfttwvonuptqdpskobx.supabase.co";
-const KEY="sb_publishable_uu88mKaDL9v7-RjzDkH4PQ_oJ3nMkNl"; 
+const KEY="sb_publishable_uu88mKaDL9v7-RjzDkH4PQ_oJ3nMkNl";
 const client = supabase.createClient(URL,KEY);
 
 let students = [];
 let editing = null;
 
+// Initialize
 async function init(){
-  const {data} = await client.from("students").select("*").order("names");
+  const { data } = await client.from("students").select("*").order("names");
   students = data || [];
   render();
   updateDashboard();
 }
 
+// Show admin form
 function admin(){
-  if(prompt("Password")=="mothers.comit1"){
+  if(prompt("Admin Password:")=="mothers.comit1"){
     document.getElementById("form").style.display="block";
   }
 }
 
+// Render list
 function render(){
   const q = document.getElementById("search").value.toLowerCase();
-  let filtered = students.filter(s=>s.names.toLowerCase().includes(q));
-
+  const filtered = students.filter(s=>s.names.toLowerCase().includes(q));
   const box = document.getElementById("list");
-  box.innerHTML="";
+  box.innerHTML = "";
   filtered.forEach((s,i)=>{
     box.innerHTML+=`
     <div class="card">
       <b>${i+1}. ${s.names}</b><br>
-      <small>Class: ${s.class}<br>LIN: ${s.lin}</small><br>
+      <small>Class: ${s.class} | LIN: ${s.lin}</small><br>
       <button onclick="idCard('${s.names}','${s.class}','${s.lin}')">ID Card</button>
       <button onclick="edit('${s.id}')">Edit</button>
       <button class="delete" onclick="del('${s.id}')">Delete</button>
@@ -149,14 +149,15 @@ function render(){
   });
 }
 
-// Dashboard Update
+// Update Dashboard
 function updateDashboard(){
   document.getElementById("total").innerText = students.length;
   document.getElementById("active").innerText = students.filter(s=>s.status=="Active").length;
   document.getElementById("graduated").innerText = students.filter(s=>s.class=="P.7").length;
-  document.getElementById("classesP").innerText = students.filter(s=>s.class=="P.1").length;
+  document.getElementById("p1").innerText = students.filter(s=>s.class=="P.1").length;
 }
 
+// Save student
 async function save(){
   const names = document.getElementById("names").value;
   const age = document.getElementById("age").value;
@@ -182,6 +183,7 @@ async function save(){
     await client.from("students").insert([payload]);
   }
 
+  // Clear form
   document.getElementById("names").value="";
   document.getElementById("age").value="";
   document.getElementById("contacts").value="";
@@ -194,6 +196,7 @@ async function save(){
   init();
 }
 
+// Edit
 function edit(id){
   const s = students.find(x=>x.id==id);
   document.getElementById("names").value = s.names;
@@ -208,12 +211,14 @@ function edit(id){
   document.getElementById("form").style.display="block";
 }
 
+// Delete
 async function del(id){
   if(!confirm("Delete student?")) return;
   await client.from("students").delete().eq("id",id);
   init();
 }
 
+// Promote
 async function promote(id,current){
   const classes=["P.1","P.2","P.3","P.4","P.5","P.6","P.7"];
   let i = classes.indexOf(current);
@@ -223,6 +228,7 @@ async function promote(id,current){
   init();
 }
 
+// ID Card
 function idCard(names,cls,lin){
   let w=window.open("");
   w.document.write(`
