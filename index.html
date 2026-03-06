@@ -3,86 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMS Student Registry</title>
+    <title>PMS Registry | Live</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #1e40af; --white: #ffffff; --red: #e11d48; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f8fafc; color: #1e293b; padding-bottom: 50px; }
-        header { background: var(--red); color: white; padding: 15px; text-align: center; font-weight: 900; display: flex; justify-content: space-between; align-items: center; }
-        .hero { background: var(--blue); color: white; padding: 30px 20px 50px; text-align: center; border-radius: 0 0 40px 40px; }
+        :root { --pms-blue: #1e40af; --white: #ffffff; --pms-red: #e11d48; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f9ff; padding-bottom: 60px; }
+        header { background: var(--pms-red); color: white; padding: 15px; text-align: center; font-weight: 900; letter-spacing: 1px; }
+        .hero { background: var(--pms-blue); color: white; padding: 30px 20px 50px; text-align: center; border-radius: 0 0 40px 40px; }
         
-        .dash { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 15px; margin-top: -30px; }
-        .stat { background: white; padding: 15px; border-radius: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom: 4px solid var(--red); }
-        .num { display: block; font-size: 26px; font-weight: 900; color: var(--blue); }
-        .lab { font-size: 10px; font-weight: bold; color: #64748b; text-transform: uppercase; }
+        /* Dashboard Stats */
+        .dash-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; margin-top: -30px; }
+        .stat-card { background: white; padding: 15px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--pms-red); }
+        .stat-num { display: block; font-size: 26px; font-weight: 900; color: var(--pms-blue); }
+        .stat-label { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; }
 
-        .container { max-width: 450px; margin: 15px auto; padding: 0 15px; }
-        .card { background: white; padding: 20px; border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .container { max-width: 450px; margin: 0 auto; padding: 10px; }
+        .card { background: white; padding: 22px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 15px; }
         
-        input, select, textarea { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 15px; box-sizing: border-box; }
-        .btn-save { background: var(--blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        input, select, textarea { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 15px; box-sizing: border-box; }
+        .btn-save { background: var(--pms-blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; }
         
-        .student-item { background: white; padding: 15px; border-radius: 18px; margin-bottom: 10px; border-left: 6px solid var(--red); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        #adminForm { display: none; }
+        .s-box { background: white; padding: 18px; border-radius: 22px; margin-bottom: 12px; border-left: 8px solid var(--pms-red); position: relative; }
+        #adminArea { display: none; }
         .footer { text-align: center; padding: 20px; font-size: 12px; color: #64748b; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<header>
-    <div style="width:40px"></div>
-    <span>STUDENT MANAGEMENT</span>
-    <div onclick="toggleAdmin()" style="cursor:pointer; font-size:22px;">⚙️</div>
-</header>
+<header onclick="openAdmin()">PROGRESSIVE MOTHERS REGISTRY</header>
 
 <div class="hero">
-    <h2 style="margin:0;">PROGRESSIVE MOTHERS</h2>
-    <div style="font-size:12px; opacity:0.8;">"With God everything is possible"</div>
+    <h2 style="margin:0; font-size: 22px;">SCHOOL DATA CENTER</h2>
+    <div style="font-style:italic; font-size:12px; opacity:0.9; margin-top:5px;">"With God everything is possible"</div>
 </div>
 
-<div class="dash">
-    <div class="stat">
-        <span class="num" id="activeCount">0</span>
-        <span class="lab">Active Students</span>
+<div class="dash-row">
+    <div class="stat-card">
+        <span class="stat-num" id="activeTotal">0</span>
+        <span class="stat-label">Active Students</span>
     </div>
-    <div class="stat">
-        <span class="num" id="shownCount">0</span>
-        <span class="lab">Total Found</span>
+    <div class="stat-card">
+        <span class="stat-num" id="filterCount">0</span>
+        <span class="stat-label">Total Shown</span>
     </div>
 </div>
 
 <div class="container">
-    <div id="adminForm" class="card">
-        <h3 style="margin:0 0 15px 0; color:var(--blue);">New Student Entry</h3>
-        <input type="text" id="name" placeholder="Student Name">
-        <input type="number" id="age" placeholder="Age">
-        <input type="text" id="phone" placeholder="Contact (+256...)">
-        <input type="text" id="loc" placeholder="Location (Where they stay)">
-        <select id="class">
+    <div id="adminArea" class="card">
+        <h3 style="margin-top:0; color:var(--pms-blue)">New Student Entry</h3>
+        <input type="text" id="fName" placeholder="Full Name">
+        <input type="number" id="fAge" placeholder="Age">
+        <input type="text" id="fPhone" placeholder="Contact (+256...)">
+        <input type="text" id="fLoc" placeholder="Physical Location (Where they stay)">
+        <select id="fClass">
             <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
             <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
-        <select id="status">
-            <option value="Active">Currently in School</option>
-            <option value="Left">Left School</option>
+        <select id="fStatus">
+            <option value="Active">Active / Still in School</option>
+            <option value="Left">Inactive / Left School</option>
         </select>
-        <textarea id="health" placeholder="Health Status (Allergies/Conditions)"></textarea>
-        <input type="text" id="receipt" placeholder="Receipt/Payment Code">
-        <button class="btn-save" onclick="saveToSupabase()">SAVE STUDENT DATA</button>
+        <textarea id="fHealth" placeholder="Health Status (e.g., Normal, Allergies)"></textarea>
+        <input type="text" id="fPayCode" placeholder="Receipt/Payment Code">
+        <button class="btn-save" onclick="saveRecord()">SAVE TO DATABASE</button>
     </div>
 
-    <div class="card" style="border: 2px solid var(--blue); padding: 12px;">
-        <input type="text" id="search" placeholder="🔍 Search name or location..." onkeyup="filterData()" style="margin-bottom:8px;">
-        <select id="classFilter" onchange="filterData()" style="margin-bottom:0; font-weight:bold; color:var(--blue);">
-            <option value="All">All Classes (Show All)</option>
+    <div class="card" style="border: 2px solid var(--pms-blue);">
+        <input type="text" id="search" placeholder="🔍 Search name or location..." onkeyup="applyFilters()" style="margin-bottom:10px;">
+        <select id="classFilter" onchange="applyFilters()" style="margin-bottom:0; font-weight: bold; color: var(--pms-blue);">
+            <option value="All">All Classes (View All)</option>
             <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
             <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
     </div>
 
-    <div id="list"></div>
+    <div id="mainList"></div>
 </div>
 
 <div class="footer">
@@ -91,70 +88,71 @@
 </div>
 
 <script>
-    const S_URL = "https://cpfttwvonuptqdpskobx.supabase.co";
-    const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwdGZ0d3ZvbnVwdHFkcHNrb2J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MjAxNDUsImV4cCI6MjA4ODA5NjE0NX0.gnl0g0NKUv_zfyaJufSKSRO54drR6nGjIKgioj8Tcxc";
-    
-    const sb = supabase.createClient(S_URL, S_KEY);
-    let allData = [];
+    const SB_URL = "https://cpfttwvonuptqdpskobx.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwdGZ0d3ZvbnVwdHFkcHNrb2J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MjAxNDUsImV4cCI6MjA4ODA5NjE0NX0.gnl0g0NKUv_zfyaJufSKSRO54drR6nGjIKgioj8Tcxc";
+
+    const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+    let studentDB = [];
 
     async function loadData() {
-        const { data, error } = await sb.from('students').select('*').order('name');
-        if(!error) { allData = data; filterData(); }
+        const { data, error } = await supabaseClient.from('students').select('*').order('name');
+        if(!error) { 
+            studentDB = data || []; 
+            applyFilters();
+        }
     }
 
-    function toggleAdmin() {
-        const p = prompt("Enter Admin Password:");
-        if(p === "mothers.comit1") document.getElementById('adminForm').style.display = 'block';
+    function openAdmin() {
+        let p = prompt("Admin Pass:");
+        if(p === "mothers.comit1") {
+            document.getElementById('adminArea').style.display = 'block';
+        }
     }
 
-    function filterData() {
-        const s = document.getElementById('search').value.toLowerCase();
-        const c = document.getElementById('classFilter').value;
-        
-        // Dashboard Stats
-        document.getElementById('activeCount').innerText = allData.filter(x => x.status !== 'Left').length;
+    function applyFilters() {
+        const searchVal = document.getElementById('search').value.toLowerCase();
+        const classVal = document.getElementById('classFilter').value;
 
-        const filtered = allData.filter(x => {
-            const matchS = x.name.toLowerCase().includes(s) || (x.location && x.location.toLowerCase().includes(s));
-            const matchC = (c === "All" || x.class === c);
-            return matchS && matchC;
+        // Dashboard: Only count Active students
+        document.getElementById('activeTotal').innerText = studentDB.filter(s => s.status !== 'Left').length;
+
+        let filtered = studentDB.filter(s => {
+            const matchesSearch = s.name.toLowerCase().includes(searchVal) || (s.location && s.location.toLowerCase().includes(searchVal));
+            const matchesClass = (classVal === "All") || (s.class === classVal);
+            return matchesSearch && matchesClass;
         });
 
-        document.getElementById('shownCount').innerText = filtered.length;
-        const box = document.getElementById('list');
+        document.getElementById('filterCount').innerText = filtered.length;
+        const box = document.getElementById('mainList');
         box.innerHTML = "";
-        filtered.forEach(item => {
+        filtered.forEach(s => {
             box.innerHTML += `
-                <div class="student-item">
-                    <div style="font-weight:900; color:var(--blue); font-size:17px;">${item.name}</div>
-                    <div style="font-size:13px; color:#64748b;">📍 ${item.location || 'No Loc'} | 📚 ${item.class}</div>
-                    <div style="margin-top:5px; font-size:11px; font-weight:bold; color:var(--red);">ID: ${item.lin}</div>
+                <div class="s-box" style="${s.status === 'Left' ? 'opacity:0.6;' : ''}">
+                    <span style="font-weight: 800; color: var(--pms-blue); font-size: 18px;">${s.name}</span><br>
+                    <span style="font-size: 13px; color: #64748b;">📍 ${s.location || 'Unknown'} | 📚 ${s.class}</span><br>
+                    <span style="font-size: 11px; font-weight: bold; color: var(--pms-red);">LIN: ${s.lin}</span>
                 </div>`;
         });
     }
 
-    async function saveToSupabase() {
-        const n = document.getElementById('name').value;
-        if(!n) return alert("Please enter a name");
+    async function saveRecord() {
+        const n = document.getElementById('fName').value;
+        if(!n) return alert("Please enter a student name.");
 
-        // Professional LIN generation: First letter + 4 digits
-        const lin = n.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+        // Generate LIN: First letter + 4 digits
+        const lin = n.trim().charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
 
-        const payload = {
-            name: n, age: document.getElementById('age').value,
-            contact: document.getElementById('phone').value, location: document.getElementById('loc').value,
-            class: document.getElementById('class').value, status: document.getElementById('status').value,
-            health_status: document.getElementById('health').value, payment_code: document.getElementById('receipt').value,
+        const info = {
+            name: n, age: document.getElementById('fAge').value,
+            contact: document.getElementById('fPhone').value, location: document.getElementById('fLoc').value,
+            class: document.getElementById('fClass').value, status: document.getElementById('fStatus').value,
+            health_status: document.getElementById('fHealth').value, payment_code: document.getElementById('fPayCode').value,
             lin: lin
         };
 
-        const { error } = await sb.from('students').insert([payload]);
-        if(error) {
-            alert("Connection Error: " + error.message);
-        } else {
-            alert("Student Saved Successfully!");
-            location.reload();
-        }
+        const { error } = await supabaseClient.from('students').insert([info]);
+        if(error) alert("Save Error: " + error.message); 
+        else location.reload();
     }
 
     window.onload = loadData;
