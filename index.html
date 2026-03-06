@@ -14,7 +14,7 @@
         .card { background: white; padding: 20px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
         input, select, textarea { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 12px; border: 1.5px solid #e2e8f0; box-sizing: border-box; font-size: 15px; }
         .btn-save { background: var(--pms-blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .s-box { background: white; padding: 18px; border-radius: 20px; margin-bottom: 15px; border-left: 6px solid var(--pms-red); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .s-box { background: white; padding: 18px; border-radius: 20px; margin-bottom: 15px; border-left: 6px solid var(--pms-red); box-shadow: 0 4px 10px rgba(0,0,0,0.03); position: relative; }
         .s-id { color: var(--pms-red); font-weight: bold; font-size: 12px; }
         .s-name { font-size: 19px; color: var(--pms-blue); font-weight: 800; display: block; margin: 4px 0; text-transform: uppercase; }
         .s-info { font-size: 13px; color: #475569; line-height: 1.6; }
@@ -28,7 +28,7 @@
 <header>
     <div style="width:40px"></div>
     <span style="font-weight: 900;">SCHOOL DATA</span>
-    <div onclick="promptAdmin()" style="cursor:pointer; font-size:20px;">⚙️</div>
+    <div onclick="promptAdmin()" style="cursor:pointer; font-size:20px; padding-right:10px;">⚙️</div>
 </header>
 
 <div class="hero">
@@ -42,7 +42,7 @@
         <h3 id="formTitle" style="margin-top:0; color:var(--pms-blue)">New Entry</h3>
         <input type="text" id="fName" placeholder="Student Name">
         <input type="text" id="fPhone" placeholder="Parent Contact Number">
-        <input type="text" id="fLoc" placeholder="Stay Location / Village">
+        <input type="text" id="fLoc" placeholder="Location (e.g. Kabale)">
         <select id="fClass">
             <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
@@ -54,7 +54,7 @@
     </div>
 
     <div class="card" style="padding: 10px; border: 2px solid var(--pms-blue);">
-        <input type="text" id="search" placeholder="🔍 Search by name or location..." onkeyup="filterList()" style="margin-bottom:0; border:none;">
+        <input type="text" id="search" placeholder="🔍 Search by name or location..." onkeyup="filterList()" style="margin-bottom:0; border:none; outline:none;">
     </div>
 
     <div id="mainList"></div>
@@ -66,51 +66,55 @@
 </div>
 
 <script>
+    // CONNECTION - Please ensure these match your Supabase Dashboard
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co"; 
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk2NjY0MDAsImV4cCI6MjA1MTI0MjQwMH0.m1PetUo8klWCLfupRq52CVg_Y_YYrzcO"; 
+    
     const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
     
     let studentDB = [];
     let editID = null;
     let isAdmin = false;
 
-    // Check if admin was already logged in
-    if(localStorage.getItem('pms_admin') === 'true') { loginSuccess(); }
+    // Check session
+    if(localStorage.getItem('pms_admin_auth') === 'true') { unlockAdmin(); }
 
     loadData();
-
-    function promptAdmin() {
-        const p = prompt("Enter Admin Password:");
-        if(p === "mothers.comit1") { loginSuccess(); }
-        else if(p !== null) { alert("Wrong password"); }
-    }
-
-    function loginSuccess() {
-        isAdmin = true;
-        localStorage.setItem('pms_admin', 'true');
-        document.getElementById('adminArea').style.display = 'block';
-        document.getElementById('logoutBtn').style.display = 'inline-block';
-        display(studentDB); 
-    }
-
-    function logout() {
-        localStorage.removeItem('pms_admin');
-        location.reload();
-    }
 
     async function loadData() {
         const { data, error } = await supabaseClient.from('students').select('*').order('name');
         if(!error) { 
             studentDB = data || []; 
             display(studentDB); 
+        } else {
+            document.getElementById('mainList').innerHTML = `<p style="color:red; text-align:center;">Connection Error: ${error.message}</p>`;
         }
+    }
+
+    function promptAdmin() {
+        const p = prompt("Enter Admin Password to Edit/Add:");
+        if(p === "mothers.comit1") { unlockAdmin(); }
+        else if(p !== null) { alert("Access Denied"); }
+    }
+
+    function unlockAdmin() {
+        isAdmin = true;
+        localStorage.setItem('pms_admin_auth', 'true');
+        document.getElementById('adminArea').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        display(studentDB); 
+    }
+
+    function logout() {
+        localStorage.removeItem('pms_admin_auth');
+        location.reload();
     }
 
     function display(list) {
         const box = document.getElementById('mainList');
         box.innerHTML = "";
         list.forEach(s => {
-            const toolStyle = isAdmin ? "display:flex" : "display:none";
+            const showTools = isAdmin ? "display:flex" : "display:none";
             box.innerHTML += `
                 <div class="s-box">
                     <span class="s-id">ID: ${s.lin}</span>
@@ -120,7 +124,7 @@
                         📚 <b>Class:</b> ${s.class} | 📞 <b>Parent:</b> ${s.contact}<br>
                         🏥 <b>Health:</b> ${s.health_status || 'Good'}
                     </div>
-                    <div class="s-tools" style="${toolStyle}">
+                    <div class="s-tools" style="${showTools}">
                         <span style="color:#2563eb; cursor:pointer;" onclick="triggerEdit('${s.id}')">✏️ EDIT RECORD</span>
                         <span style="color:#dc2626; cursor:pointer;" onclick="triggerDelete('${s.id}')">🗑️ REMOVE</span>
                     </div>
@@ -129,9 +133,9 @@
     }
 
     async function saveRecord() {
-        if(!isAdmin) return;
         const msg = document.getElementById('msg');
-        msg.innerText = "⏳ Processing...";
+        msg.innerText = "⏳ Saving to Database...";
+        msg.style.color = "blue";
         
         const info = {
             name: document.getElementById('fName').value,
@@ -141,41 +145,45 @@
             health_status: document.getElementById('fHealth').value
         };
 
-        let result;
+        let response;
         if(editID) {
-            result = await supabaseClient.from('students').update(info).eq('id', editID);
+            // Update existing record
+            response = await supabaseClient.from('students').update(info).eq('id', editID);
         } else {
+            // Insert new record
             info.lin = "PM-" + Math.floor(1000 + Math.random() * 9000);
-            result = await supabaseClient.from('students').insert([info]);
+            response = await supabaseClient.from('students').insert([info]);
         }
 
-        if(result.error) {
-            msg.innerText = "❌ Error: " + result.error.message;
+        if(response.error) {
+            msg.innerText = "❌ Error: " + response.error.message;
             msg.style.color = "red";
         } else {
-            msg.innerText = "✅ Successfully Updated!";
+            msg.innerText = "✅ Success! Record Synced.";
             msg.style.color = "green";
-            setTimeout(() => location.reload(), 1200);
+            setTimeout(() => location.reload(), 1000);
         }
     }
 
     function triggerEdit(id) {
         const s = studentDB.find(x => x.id === id);
+        if(!s) return;
         editID = id;
-        document.getElementById('formTitle').innerText = "Edit: " + s.name;
+        document.getElementById('formTitle').innerText = "Updating: " + s.name;
         document.getElementById('fName').value = s.name;
         document.getElementById('fPhone').value = s.contact;
         document.getElementById('fLoc').value = s.location;
         document.getElementById('fClass').value = s.class;
         document.getElementById('fHealth').value = s.health_status;
-        document.getElementById('btnSave').innerText = "UPDATE RECORD";
+        document.getElementById('btnSave').innerText = "UPDATE STUDENT RECORD";
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     async function triggerDelete(id) {
-        if(confirm("Permanently delete this student?")) {
-            await supabaseClient.from('students').delete().eq('id', id);
-            location.reload();
+        if(confirm("Are you sure you want to permanently delete this student?")) {
+            const { error } = await supabaseClient.from('students').delete().eq('id', id);
+            if(error) alert("Delete failed: " + error.message);
+            else location.reload();
         }
     }
 
