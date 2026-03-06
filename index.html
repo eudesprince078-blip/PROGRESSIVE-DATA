@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMS Data Center</title>
+    <title>PMS Registry | Eudes Media</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #1e40af; --red: #e11d48; }
+        :root { --blue: #1e40af; --red: #e11d48; --white: #ffffff; }
         body { font-family: sans-serif; margin: 0; background: #f8fafc; padding-bottom: 80px; }
         header { background: var(--red); color: white; padding: 20px; text-align: center; font-weight: bold; position: relative; }
         .hero { background: var(--blue); color: white; padding: 30px; text-align: center; border-radius: 0 0 30px 30px; }
@@ -16,8 +16,9 @@
         .container { max-width: 450px; margin: 15px auto; padding: 0 15px; }
         .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
         input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; }
-        .btn-main { background: var(--blue); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-main { background: var(--blue); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
         .admin-trigger { background: rgba(255,255,255,0.2); color: white; border: 1px solid white; padding: 5px 10px; border-radius: 5px; font-size: 10px; position: absolute; right: 10px; top: 15px; cursor: pointer; }
+        .footer { text-align: center; padding: 20px; font-size: 11px; font-weight: bold; color: #666; }
     </style>
 </head>
 <body>
@@ -39,7 +40,7 @@
 
 <div class="container">
     <div class="card" id="formBox" style="display:none; border: 2px solid var(--red);">
-        <h3 style="margin-top:0; color:var(--red)">Register Student</h3>
+        <h3 style="margin-top:0; color:var(--red)">New Student Registration</h3>
         <input type="text" id="name" placeholder="Full Name">
         <input type="number" id="age" placeholder="Age">
         <input type="date" id="dob" placeholder="Date of Birth">
@@ -54,7 +55,6 @@
         <textarea id="health" placeholder="Health Status (Allergies)"></textarea>
         <input type="text" id="pay" placeholder="Payment Code">
         <button class="btn-main" onclick="saveData()">SAVE STUDENT DATA</button>
-        <button class="btn-main" style="background:#666;" onclick="document.getElementById('formBox').style.display='none'">CANCEL</button>
     </div>
 
     <div class="card" style="border: 2px solid var(--blue);">
@@ -63,7 +63,7 @@
     <div id="studentList"></div>
 </div>
 
-<div style="text-align: center; padding: 20px; font-size: 11px; font-weight: bold; color: #666;">
+<div class="footer">
     Eudes Media | +256762992440
 </div>
 
@@ -83,51 +83,45 @@
         if(p === "mothers.comit1") {
             document.getElementById('formBox').style.display = 'block';
             window.scrollTo(0,0);
-        } else { alert("Wrong password"); }
+        }
     }
 
     function drawList() {
         const s = document.getElementById('search').value.toLowerCase();
         document.getElementById('activeCount').innerText = students.filter(x => x.status === 'Active').length;
-        const filtered = students.filter(x => x.name.toLowerCase().includes(s) || (x.location && x.location.toLowerCase().includes(s)));
+        const filtered = students.filter(x => x.name.toLowerCase().includes(s));
         document.getElementById('totalCount').innerText = filtered.length;
-        
         const box = document.getElementById('studentList');
         box.innerHTML = "";
         filtered.forEach(i => {
             box.innerHTML += `<div class="card">
                 <b>${i.name}</b><br>
-                <small>${i.class} | LIN: ${i.lin || 'N/A'}</small><br>
-                <small style="color:var(--blue)">Loc: ${i.location || 'Unknown'}</small>
+                <small>${i.class} | LIN: ${i.lin || 'N/A'}</small>
             </div>`;
         });
     }
 
     async function saveData() {
-        const nameVal = document.getElementById('name').value;
-        if(!nameVal) return alert("Name is required");
-        
-        const lin = nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+        const n = document.getElementById('name').value;
+        if(!n) return alert("Name is required");
+        const lin = n.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
 
+        // Using FULL names as you confirmed they are complete in Supabase
         const { error } = await sb.from('students').insert([{
-            name: nameVal,
+            name: n,
             age: document.getElementById('age').value,
             dob: document.getElementById('dob').value,
             contacts: document.getElementById('contacts').value,
             location: document.getElementById('location').value,
             class: document.getElementById('class').value,
             status: document.getElementById('status').value,
-            health_sta: document.getElementById('health').value,
-            payment_: document.getElementById('pay').value,
+            health_status: document.getElementById('health').value,
+            payment_code: document.getElementById('pay').value,
             lin: lin
         }]);
 
-        if(error) {
-            alert("Database Error: " + error.message);
-        } else {
-            alert("Student Saved Successfully!");
-            location.reload();
-        }
+        if(error) alert("Database Error: " + error.message);
+        else { alert("Success!"); location.reload(); }
     }
     window.onload = load;
 </script>
