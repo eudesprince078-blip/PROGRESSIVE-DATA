@@ -71,12 +71,11 @@
     async function init() {
         try {
             const { data, error } = await client.from('students').select('*').order('name');
-            if(error) throw error;
-            students = data || [];
-            render();
-        } catch (err) {
-            console.error(err);
-        }
+            if(!error) {
+                students = data || [];
+                render();
+            }
+        } catch (err) { console.log(err); }
     }
 
     function openAdmin() {
@@ -105,28 +104,27 @@
 
         const lin = nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
 
-        // This object matches exactly what your table expects
-        const payload = {
+        // This ensures data is sent to the exact columns in your 'students' table
+        const { error } = await client.from('students').insert([{
             name: nameVal,
             age: document.getElementById('age').value,
             dob: document.getElementById('dob').value,
-            contacts: document.getElementById('ph').value, // Matches Screenshot column name
+            contacts: document.getElementById('ph').value, 
             location: document.getElementById('loc').value,
             class: document.getElementById('cl').value,
             status: document.getElementById('st').value,
             health_status: document.getElementById('hs').value,
             payment_: document.getElementById('pay').value,
             lin: lin
-        };
-
-        const { error } = await client.from('students').insert([payload]);
+        }]);
 
         if(error) {
-            alert("Database Error: " + error.message);
+            // This will tell us exactly which column is causing the error
+            alert("Save Failed: " + error.message);
             btn.innerText = "SAVE TO DATABASE";
             btn.disabled = false;
         } else {
-            alert("Mugisha Alex saved successfully!");
+            alert("Success! " + nameVal + " has been registered.");
             location.reload();
         }
     }
