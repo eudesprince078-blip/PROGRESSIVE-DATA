@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMS Registry | Eudes Media</title>
+    <title>PMS Registry | Final</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #1e40af; --red: #e11d48; }
@@ -37,7 +37,7 @@
 </div>
 
 <div class="container">
-    <div id="status" style="text-align:center; font-size:11px; font-weight:bold; margin-bottom:10px; color:orange;">Searching for Students Table...</div>
+    <div id="status" style="text-align:center; font-size:11px; font-weight:bold; margin-bottom:10px; color:orange;">Connecting...</div>
 
     <div id="fArea" class="card" style="display:none; border: 2px solid var(--red);">
         <input type="text" id="n" placeholder="Student Name">
@@ -53,7 +53,7 @@
     </div>
 
     <div class="card" style="border: 2px solid var(--blue);">
-        <input type="text" id="search" placeholder="🔍 Search names..." onkeyup="draw()">
+        <input type="text" id="search" placeholder="🔍 Search name or location..." onkeyup="draw()">
     </div>
     <div id="list"></div>
 </div>
@@ -64,30 +64,21 @@
 
 <script>
     const URL = "https://cpfttwvonuptqdpskobx.supabase.co";
-    const KEY = "sb_secret_rGJk_KqJGPlBfQ-g9INXzQ_wD4os2FE"; // Your Secret Master Key
+    const KEY = "sb_secret_rGJk_KqJGPlBfQ-g9INXzQ_wD4os2FE"; 
     
     const sb = supabase.createClient(URL, KEY);
     let students = [];
-    let activeTable = 'students';
 
-    async function connect() {
+    async function load() {
+        // Forcing connection to the 'students' table confirmed in dashboard
+        const { data, error } = await sb.from('students').select('*').order('name');
         const msg = document.getElementById('status');
         
-        // Try 'students' lowercase first
-        let res = await sb.from('students').select('*').limit(1);
-        
-        if (res.error) {
-            // If that fails, try 'Students' uppercase
-            res = await sb.from('Students').select('*').limit(1);
-            if (!res.error) activeTable = 'Students';
-        }
-
-        if (res.error) {
-            msg.innerHTML = "<span style='color:red'>❌ Table Not Found. Ensure table is named 'students' in Supabase.</span>";
+        if(error) {
+            msg.innerHTML = "<span style='color:red'>❌ Connection Error: " + error.message + "</span>";
         } else {
             msg.innerHTML = "<span style='color:green'>✅ Database Live</span>";
-            const finalLoad = await sb.from(activeTable).select('*').order('name');
-            students = finalLoad.data || [];
+            students = data || [];
             draw();
         }
     }
@@ -99,12 +90,12 @@
     function draw() {
         const q = document.getElementById('search').value.toLowerCase();
         document.getElementById('aC').innerText = students.filter(x => x.status === 'Active').length;
-        const filtered = students.filter(x => x.name.toLowerCase().includes(q));
+        const filtered = students.filter(x => x.name.toLowerCase().includes(q) || (x.location && x.location.toLowerCase().includes(q)));
         document.getElementById('tC').innerText = filtered.length;
         const box = document.getElementById('list');
         box.innerHTML = "";
         filtered.forEach(s => {
-            box.innerHTML += `<div class="card"><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin || 'N/A'}</small></div>`;
+            box.innerHTML += `<div class="card"><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin || 'N/A'}</small><br><small style="color:gray">${s.location || ''}</small></div>`;
         });
     }
 
@@ -113,8 +104,7 @@
         if(!n) return alert("Name required");
         const lin = n.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
         
-        // Match columns exactly
-        const { error } = await sb.from(activeTable).insert([{
+        const { error } = await sb.from('students').insert([{
             name: n, age: document.getElementById('age').value, dob: document.getElementById('dob').value,
             contacts: document.getElementById('ph').value, location: document.getElementById('loc').value,
             class: document.getElementById('cl').value, status: document.getElementById('st').value,
@@ -125,7 +115,7 @@
         if(error) alert("Error: " + error.message);
         else { alert("Student Saved!"); location.reload(); }
     }
-    window.onload = connect;
+    window.onload = load;
 </script>
 </body>
 </html>
