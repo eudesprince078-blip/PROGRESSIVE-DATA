@@ -14,16 +14,16 @@
         .stat { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .container { max-width: 450px; margin: 0 auto; padding: 15px; }
         .card { background: white; padding: 15px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 12px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
         .btn { background: var(--blue); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        .admin-link { position: absolute; right: 10px; top: 12px; border: 1px solid white; padding: 4px 8px; border-radius: 5px; font-size: 10px; cursor: pointer; }
+        .admin-btn { position: absolute; right: 10px; top: 12px; border: 1px solid white; padding: 5px; border-radius: 5px; font-size: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <header>
     PROGRESSIVE MOTHERS REGISTRY
-    <div class="admin-link" onclick="openAdmin()">ADMIN LOGIN</div>
+    <div class="admin-btn" onclick="openAdmin()">ADMIN LOGIN</div>
 </header>
 
 <div class="hero">
@@ -37,10 +37,10 @@
 </div>
 
 <div class="container">
-    <div id="status" style="text-align:center; font-size:12px; font-weight:bold; margin-bottom:10px; color:green;">✅ Loading Unrestricted Table...</div>
+    <div id="status" style="text-align:center; font-size:12px; font-weight:bold; margin-bottom:10px; color:green;">✅ Database Online</div>
 
     <div id="regForm" class="card" style="display:none; border: 2px solid var(--red);">
-        <input type="text" id="n" placeholder="Full Student Name">
+        <input type="text" id="n" placeholder="Student Name">
         <input type="number" id="age" placeholder="Age">
         <input type="date" id="dob">
         <input type="text" id="ph" placeholder="Contact Number">
@@ -49,7 +49,7 @@
         <select id="st"><option value="Active">Active</option><option value="Left">Left</option></select>
         <textarea id="hs" placeholder="Health Status (Conditions/Allergies)"></textarea>
         <input type="text" id="pay" placeholder="Payment Code">
-        <button class="btn" onclick="saveData()">SAVE TO DATABASE</button>
+        <button class="btn" id="saveBtn" onclick="saveData()">SAVE TO DATABASE</button>
     </div>
 
     <div class="card" style="border: 2px solid var(--blue);">
@@ -69,13 +69,13 @@
     let students = [];
 
     async function init() {
-        const { data, error } = await client.from('students').select('*').order('name');
-        if(error) {
-            document.getElementById('status').innerHTML = "<span style='color:red'>❌ Error: " + error.message + "</span>";
-        } else {
-            document.getElementById('status').innerHTML = "<span style='color:green'>✅ Database Connected</span>";
+        try {
+            const { data, error } = await client.from('students').select('*').order('name');
+            if(error) throw error;
             students = data || [];
             render();
+        } catch (err) {
+            console.error(err);
         }
     }
 
@@ -96,25 +96,39 @@
     }
 
     async function saveData() {
-        const nVal = document.getElementById('n').value;
-        if(!nVal) return alert("Please enter a name");
-        const lin = nVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+        const btn = document.getElementById('saveBtn');
+        const nameVal = document.getElementById('n').value;
+        if(!nameVal) return alert("Please enter a name");
+        
+        btn.innerText = "SAVING...";
+        btn.disabled = true;
 
-        const { error } = await client.from('students').insert([{
-            name: nVal,
+        const lin = nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+
+        // This object matches exactly what your table expects
+        const payload = {
+            name: nameVal,
             age: document.getElementById('age').value,
             dob: document.getElementById('dob').value,
-            contacts: document.getElementById('ph').value,
+            contacts: document.getElementById('ph').value, // Matches Screenshot column name
             location: document.getElementById('loc').value,
             class: document.getElementById('cl').value,
             status: document.getElementById('st').value,
             health_status: document.getElementById('hs').value,
             payment_: document.getElementById('pay').value,
             lin: lin
-        }]);
+        };
 
-        if(error) alert("Error: " + error.message);
-        else { alert("Student Successfully Saved!"); location.reload(); }
+        const { error } = await client.from('students').insert([payload]);
+
+        if(error) {
+            alert("Database Error: " + error.message);
+            btn.innerText = "SAVE TO DATABASE";
+            btn.disabled = false;
+        } else {
+            alert("Mugisha Alex saved successfully!");
+            location.reload();
+        }
     }
     window.onload = init;
 </script>
