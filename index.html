@@ -9,7 +9,7 @@
         :root { --blue: #1e40af; --red: #e11d48; }
         body { font-family: sans-serif; margin: 0; background: #f0f9ff; padding-bottom: 60px; }
         header { background: var(--red); color: white; padding: 15px; text-align: center; font-weight: bold; position: relative; }
-        .hero { background: var(--blue); color: white; padding: 20px; text-align: center; border-radius: 0 0 30px 30px; }
+        .hero { background: var(--blue); color: white; padding: 25px; text-align: center; border-radius: 0 0 30px 30px; }
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 15px; margin-top: -20px; }
         .stat { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .container { max-width: 450px; margin: 0 auto; padding: 15px; }
@@ -43,7 +43,7 @@
         <h3 style="margin-top:0; color:var(--red); font-size:16px;">New Student Registration</h3>
         <input type="text" id="n" placeholder="Student Name">
         <input type="number" id="age" placeholder="Age">
-        <input type="date" id="dob" placeholder="Date of Birth">
+        <input type="date" id="dob">
         <input type="text" id="ph" placeholder="Contact Number">
         <input type="text" id="loc" placeholder="Physical Location">
         <select id="cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
@@ -72,13 +72,18 @@
 
     async function init() {
         try {
+            // Force fetch from 'students' table confirmed in dashboard
             const { data, error } = await client.from('students').select('*').order('name');
-            if(error) throw error;
-            document.getElementById('status').innerHTML = "<span style='color:green'>✅ Database Online</span>";
-            students = data || [];
-            render();
+            
+            if(error) {
+                document.getElementById('status').innerHTML = `<span style='color:red'>❌ Error: ${error.message}</span>`;
+            } else {
+                document.getElementById('status').innerHTML = "<span style='color:green'>✅ Database Online</span>";
+                students = data || [];
+                render();
+            }
         } catch (err) {
-            document.getElementById('status').innerHTML = "<span style='color:red'>❌ Connection Error: " + err.message + "</span>";
+            document.getElementById('status').innerHTML = "<span style='color:red'>❌ Failed to reach Server</span>";
         }
     }
 
@@ -101,7 +106,7 @@
                 <div class="card">
                     <div style="display:flex; justify-content:space-between;">
                         <b>${s.name}</b>
-                        <span style="color:var(--blue); font-size:12px;">${s.lin || 'No LIN'}</span>
+                        <span style="color:var(--blue); font-size:12px; font-weight:bold;">${s.lin || 'No ID'}</span>
                     </div>
                     <div style="font-size:12px; color:#666; margin-top:5px;">
                         Class: ${s.class} | Contact: ${s.contacts || 'N/A'}<br>
@@ -115,7 +120,6 @@
         const nameVal = document.getElementById('n').value;
         if(!nameVal) return alert("Name is required");
         
-        // Automatic LIN generation
         const lin = nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
 
         const { error } = await client.from('students').insert([{
@@ -132,7 +136,7 @@
         }]);
 
         if(error) {
-            alert("Error: " + error.message);
+            alert("Save Failed: " + error.message);
         } else {
             alert("Student Registered Successfully!");
             location.reload();
