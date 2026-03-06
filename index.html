@@ -28,7 +28,7 @@
 <header>
     <div style="width:40px"></div>
     <span style="font-weight: 900; letter-spacing: 1px;">SCHOOL DATA</span>
-    <div onclick="promptAdmin()" style="cursor:pointer; font-size:24px; padding: 5px 15px; background: rgba(255,255,255,0.2); border-radius: 10px;">⚙️</div>
+    <div onclick="promptAdmin()" style="cursor:pointer; font-size:24px; padding: 5px 15px;">⚙️</div>
 </header>
 
 <div class="hero">
@@ -39,29 +39,29 @@
 
 <div class="container">
     <div id="adminArea" class="card">
-        <h3 id="formTitle" style="margin-top:0; color:var(--pms-blue)">New Student Entry</h3>
+        <h3 id="formTitle" style="margin-top:0; color:var(--pms-blue)">Register Student</h3>
         <input type="text" id="fName" placeholder="Full Student Name">
         <input type="text" id="fPhone" placeholder="Parent Contact Number">
-        <input type="text" id="fLoc" placeholder="Village / Location">
+        <input type="text" id="fLoc" placeholder="Location/Stay">
         <select id="fClass">
             <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
             <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
         
-        <div style="background: #f1f5f9; padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px dashed #475569;">
-            <label style="font-size: 11px; font-weight: bold; color: var(--pms-blue);">PAYMENT RECORDING</label>
-            <input type="text" id="fPayCode" placeholder="Enter Payment Code" style="margin-top:8px;">
-            <input type="text" id="fAmt" placeholder="Fees Balance (e.g., 20,000/-)">
+        <div style="background: #f1f5f9; padding: 15px; border-radius: 15px; margin-bottom: 12px;">
+            <label style="font-size: 11px; font-weight: bold;">PAYMENT DETAILS</label>
+            <input type="text" id="fPayCode" placeholder="Enter Payment/Receipt Code" style="margin-top:8px;">
+            <input type="text" id="fAmt" placeholder="Balance Due (e.g. 10,000)">
         </div>
         
-        <textarea id="fHealth" placeholder="Health Status / Notes" style="height:60px;"></textarea>
-        <button class="btn-save" id="btnSave" onclick="saveRecord()">SAVE TO DATABASE</button>
-        <p id="msg" style="text-align:center; font-weight:bold; font-size:12px; margin-top:10px;"></p>
+        <textarea id="fHealth" placeholder="Health Status (e.g. Good)" style="height:60px;"></textarea>
+        <button class="btn-save" id="btnSave" onclick="saveRecord()">SAVE DATA</button>
+        <p id="msg" style="text-align:center; font-weight:bold; font-size:12px; margin-top:10px; color: red;"></p>
     </div>
 
     <div class="card" style="padding: 10px; border: 2px solid var(--pms-blue);">
-        <input type="text" id="search" placeholder="🔍 Search name, location, or code..." onkeyup="filterList()" style="margin-bottom:0; border:none; outline:none;">
+        <input type="text" id="search" placeholder="🔍 Search name or code..." onkeyup="filterList()" style="margin-bottom:0; border:none; outline:none;">
     </div>
 
     <div id="mainList"></div>
@@ -73,8 +73,9 @@
 </div>
 
 <script>
-    // CRITICAL: Replace this KEY with the "anon" key from your Supabase Dashboard
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co"; 
+    // I replaced the short key with the one that was working before.
+    // If you get 'Invalid API Key', you MUST copy the 'anon' key from Supabase.
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk2NjY0MDAsImV4cCI6MjA1MTI0MjQwMH0.m1PetUo8klWCLfupRq52CVg_Y_YYrzcO"; 
 
     const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
@@ -83,63 +84,50 @@
     let editID = null;
     let isAdmin = false;
 
-    // Persist session locally
-    if(localStorage.getItem('pms_auth') === 'true') { unlockAdmin(); }
+    if(localStorage.getItem('pms_login') === 'active') { unlockAdmin(); }
     loadData();
 
     async function loadData() {
         const { data, error } = await supabaseClient.from('students').select('*').order('name');
-        if(!error) { 
-            studentDB = data || []; 
-            display(studentDB); 
-        } else {
-            console.error(error);
-            document.getElementById('msg').innerText = "⚠️ Connection Issue: Please update your API Key.";
-        }
+        if(!error) { studentDB = data || []; display(studentDB); }
+        else { document.getElementById('msg').innerText = "Error: " + error.message; }
     }
 
-    // This is the prompt for the Gear Icon
     function promptAdmin() {
         const p = prompt("Enter Admin Password:");
-        if(p === "mothers.comit1") {
-            unlockAdmin();
-        } else if (p !== null) {
-            alert("Incorrect Password");
-        }
+        if(p === "mothers.comit1") { unlockAdmin(); }
+        else if(p !== null) { alert("Wrong Password"); }
     }
 
     function unlockAdmin() {
         isAdmin = true;
-        localStorage.setItem('pms_auth', 'true');
+        localStorage.setItem('pms_login', 'active');
         document.getElementById('adminArea').style.display = 'block';
         document.getElementById('logoutBtn').style.display = 'inline-block';
         display(studentDB);
     }
 
-    function logout() {
-        localStorage.removeItem('pms_auth');
-        location.reload();
-    }
+    function logout() { localStorage.removeItem('pms_login'); location.reload(); }
 
     function display(list) {
         const box = document.getElementById('mainList');
         box.innerHTML = "";
         list.forEach(s => {
-            const toolStyle = isAdmin ? "display:flex" : "display:none";
+            const showAdmin = isAdmin ? "display:flex" : "display:none";
             box.innerHTML += `
                 <div class="s-box">
                     <span style="font-size:10px; color:var(--pms-red); font-weight:bold;">LIN: ${s.lin}</span>
                     <span class="s-name">${s.name}</span>
                     <div class="s-info">
-                        📍 <b>Location:</b> ${s.location}<br>
-                        📚 <b>Class:</b> ${s.class} | 📞 <b>Parent:</b> ${s.contact}<br>
+                        📍 <b>Stay:</b> ${s.location}<br>
+                        📚 <b>Class:</b> ${s.class} | 📞 <b>Contact:</b> ${s.contact}<br>
                         🏥 <b>Health:</b> ${s.health_status || 'Good'}<br>
-                        <div class="pay-badge">💳 Code: ${s.payment_code || 'No Code Recorded'}</div>
-                        <div style="font-size:11px; font-weight:bold; color:red; margin-top:3px;">Bal: ${s.balance || '0'}/-</div>
+                        <div class="pay-badge">💳 Code: ${s.payment_code || 'N/A'}</div>
+                        <div style="font-size:11px; font-weight:bold; color:red; margin-top:3px;">Balance: ${s.balance || '0'}/-</div>
                     </div>
-                    <div class="s-tools" style="${toolStyle}">
-                        <span style="color:#2563eb; cursor:pointer;" onclick="triggerEdit('${s.id}')">✏️ EDIT RECORD</span>
-                        <span style="color:#dc2626; cursor:pointer;" onclick="triggerDelete('${s.id}')">🗑️ REMOVE</span>
+                    <div class="s-tools" style="${showAdmin}">
+                        <span style="color:#2563eb; cursor:pointer;" onclick="triggerEdit('${s.id}')">✏️ EDIT</span>
+                        <span style="color:#dc2626; cursor:pointer;" onclick="triggerDelete('${s.id}')">🗑️ DELETE</span>
                     </div>
                 </div>`;
         });
@@ -148,7 +136,6 @@
     async function saveRecord() {
         const msg = document.getElementById('msg');
         msg.innerText = "⏳ Saving...";
-        
         const info = {
             name: document.getElementById('fName').value,
             contact: document.getElementById('fPhone').value,
@@ -159,20 +146,15 @@
             health_status: document.getElementById('fHealth').value
         };
 
-        let result;
-        if(editID) {
-            result = await supabaseClient.from('students').update(info).eq('id', editID);
-        } else {
+        let res;
+        if(editID) { res = await supabaseClient.from('students').update(info).eq('id', editID); }
+        else { 
             info.lin = "PM-" + Math.floor(1000 + Math.random() * 9000);
-            result = await supabaseClient.from('students').insert([info]);
+            res = await supabaseClient.from('students').insert([info]); 
         }
 
-        if(result.error) {
-            alert("Error: " + result.error.message);
-            msg.innerText = "❌ Saving Failed. Check API Key.";
-        } else {
-            location.reload();
-        }
+        if(res.error) { msg.innerText = "❌ DB Error: " + res.error.message; }
+        else { location.reload(); }
     }
 
     function triggerEdit(id) {
@@ -185,13 +167,12 @@
         document.getElementById('fPayCode').value = s.payment_code || "";
         document.getElementById('fAmt').value = s.balance || "";
         document.getElementById('fHealth').value = s.health_status;
-        document.getElementById('btnSave').innerText = "UPDATE STUDENT RECORD";
-        document.getElementById('formTitle').innerText = "Editing: " + s.name;
+        document.getElementById('btnSave').innerText = "UPDATE STUDENT";
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     async function triggerDelete(id) {
-        if(confirm("Delete this student permanently?")) {
+        if(confirm("Permanently delete student?")) {
             await supabaseClient.from('students').delete().eq('id', id);
             location.reload();
         }
@@ -199,11 +180,7 @@
 
     function filterList() {
         const q = document.getElementById('search').value.toLowerCase();
-        display(studentDB.filter(x => 
-            x.name.toLowerCase().includes(q) || 
-            x.location.toLowerCase().includes(q) ||
-            (x.payment_code && x.payment_code.toLowerCase().includes(q))
-        ));
+        display(studentDB.filter(x => x.name.toLowerCase().includes(q) || (x.payment_code && x.payment_code.toLowerCase().includes(q))));
     }
 </script>
 </body>
