@@ -6,129 +6,133 @@
     <title>Progressive Mothers | Registry</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --pms-blue: #1e40af; --pms-red: #e11d48; --white: #ffffff; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f8fafc; color: #1e293b; padding-bottom: 60px; }
-        header { background: var(--pms-blue); color: white; padding: 20px; text-align: center; border-bottom: 4px solid var(--pms-red); position: sticky; top: 0; z-index: 100; }
-        .container { max-width: 500px; margin: 0 auto; padding: 15px; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        :root { --pms-red: #e11d48; --pms-blue: #1e40af; --bg: #fdf2f8; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); padding-bottom: 60px; }
+        header { background: var(--pms-red); color: white; padding: 12px; text-align: center; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .hero { background: var(--pms-blue); color: white; padding: 25px; text-align: center; border-radius: 0 0 30px 30px; margin-bottom: 20px; }
+        .container { max-width: 450px; margin: 0 auto; padding: 15px; }
+        .card { background: white; padding: 20px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        input, select, textarea { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 12px; border: 1.5px solid #e2e8f0; box-sizing: border-box; font-size: 15px; }
+        .btn-save { background: var(--pms-blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .s-box { background: white; padding: 18px; border-radius: 20px; margin-bottom: 15px; border-left: 6px solid var(--pms-red); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .s-id { color: var(--pms-red); font-weight: bold; font-size: 12px; }
+        .s-name { font-size: 19px; color: var(--pms-blue); font-weight: 800; display: block; margin: 4px 0; text-transform: uppercase; }
+        .s-info { font-size: 13px; color: #475569; line-height: 1.6; }
+        .s-tools { display: none; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 12px; font-weight: bold; }
+        .footer { text-align: center; padding: 20px; font-size: 11px; color: #64748b; font-weight: bold; line-height: 1.5; }
         #adminArea, #logoutBtn { display: none; }
-        input, select, textarea { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 15px; }
-        .btn-main { background: var(--pms-blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .s-box { background: white; padding: 20px; border-radius: 20px; margin-bottom: 15px; border-left: 8px solid var(--pms-red); box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .s-name { font-size: 20px; color: var(--pms-blue); font-weight: 800; text-transform: uppercase; display: block; }
-        .s-info { font-size: 14px; margin-top: 8px; line-height: 1.6; color: #475569; }
-        .s-tools { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f1f5f9; }
-        .t-btn { font-size: 12px; font-weight: 700; border: none; background: none; cursor: pointer; color: var(--pms-blue); }
-        .footer { text-align: center; padding: 25px; font-size: 12px; color: #64748b; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900; font-size: 1.4rem;">PROGRESSIVE MOTHERS</div>
-    <div style="font-size: 11px; font-style: italic; opacity: 0.9;">"With God everything is possible"</div>
-    <button id="logoutBtn" onclick="logout()" style="margin-top:10px; background:white; color:var(--pms-blue); border:none; padding:5px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">LOGOUT</button>
+    <div style="width:40px"></div>
+    <span style="font-weight: 900;">SCHOOL DATA</span>
+    <div onclick="promptAdmin()" style="cursor:pointer; font-size:20px;">⚙️</div>
 </header>
 
-<div class="container">
-    <div id="loginBox" class="card" style="text-align: center;">
-        <h3 style="color:var(--pms-blue);">System Access</h3>
-        <input type="password" id="pass" placeholder="Enter Password">
-        <button class="btn-main" onclick="auth()">Unlock Dashboard</button>
-    </div>
+<div class="hero">
+    <h2 style="margin:0; font-size: 1.5rem;">PROGRESSIVE MOTHERS</h2>
+    <div style="font-style:italic; font-size:12px; opacity:0.9;">"With God everything is possible"</div>
+    <button id="logoutBtn" onclick="logout()" style="margin-top:10px; background:white; color:var(--pms-blue); border:none; padding:5px 15px; border-radius:8px; font-weight:bold; cursor:pointer;">LOGOUT ADMIN</button>
+</div>
 
+<div class="container">
     <div id="adminArea" class="card">
-        <h3 id="formTitle" style="color:var(--pms-blue); margin-top:0;">Student Registration</h3>
-        <input type="text" id="fName" placeholder="Full Student Name">
+        <h3 id="formTitle" style="margin-top:0; color:var(--pms-blue)">New Entry</h3>
+        <input type="text" id="fName" placeholder="Student Name">
         <input type="text" id="fPhone" placeholder="Parent Contact Number">
-        <input type="text" id="fLoc" placeholder="Home Village / Location">
+        <input type="text" id="fLoc" placeholder="Stay Location / Village">
         <select id="fClass">
             <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
             <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
         <textarea id="fHealth" placeholder="Health Status / Medical Notes" style="height:60px;"></textarea>
-        <button class="btn-main" id="btnSave" onclick="saveRecord()">Save To Database</button>
-        <p id="status" style="text-align:center; font-weight:bold; font-size:13px; margin-top:10px;"></p>
+        <button class="btn-save" id="btnSave" onclick="saveRecord()">SAVE TO DATABASE</button>
+        <p id="msg" style="text-align:center; font-weight:bold; font-size:12px; margin-top:10px;"></p>
     </div>
 
-    <input type="text" id="search" placeholder="🔍 Search by name or location..." onkeyup="filterList()" style="padding:16px; border-radius:15px; border:2px solid var(--pms-blue); margin-bottom:20px; font-weight:600;">
-    
+    <div class="card" style="padding: 10px; border: 2px solid var(--pms-blue);">
+        <input type="text" id="search" placeholder="🔍 Search by name or location..." onkeyup="filterList()" style="margin-bottom:0; border:none;">
+    </div>
+
     <div id="mainList"></div>
 </div>
 
 <div class="footer">
-    Developed by <b>Eudes Media</b><br>
-    Contact: +256762992440 | WhatsApp: +256762992440
+    Developed by <b>Eudes Media</b> [cite: 2026-01-28]<br>
+    Contact: +256762992440 | WhatsApp: +256762992440 [cite: 2026-01-28]
 </div>
 
 <script>
-    // CONNECTION USING YOUR NEW KEY
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co"; 
-    const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO"; 
-    
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk2NjY0MDAsImV4cCI6MjA1MTI0MjQwMH0.m1PetUo8klWCLfupRq52CVg_Y_YYrzcO"; 
     const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+    
     let studentDB = [];
     let editID = null;
+    let isAdmin = false;
 
-    if(localStorage.getItem('pms_session') === 'active') { auth(true); }
+    // Check if admin was already logged in
+    if(localStorage.getItem('pms_admin') === 'true') { loginSuccess(); }
 
-    function auth(auto = false) {
-        if(auto || document.getElementById('pass').value === "mothers.comit1") {
-            localStorage.setItem('pms_session', 'active');
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('adminArea').style.display = 'block';
-            document.getElementById('logoutBtn').style.display = 'inline-block';
-            loadData();
-        } else { alert("Incorrect Password"); }
+    loadData();
+
+    function promptAdmin() {
+        const p = prompt("Enter Admin Password:");
+        if(p === "mothers.comit1") { loginSuccess(); }
+        else if(p !== null) { alert("Wrong password"); }
     }
 
-    function logout() { localStorage.clear(); location.reload(); }
+    function loginSuccess() {
+        isAdmin = true;
+        localStorage.setItem('pms_admin', 'true');
+        document.getElementById('adminArea').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        display(studentDB); 
+    }
+
+    function logout() {
+        localStorage.removeItem('pms_admin');
+        location.reload();
+    }
 
     async function loadData() {
         const { data, error } = await supabaseClient.from('students').select('*').order('name');
-        if(!error) { studentDB = data || []; display(studentDB); }
+        if(!error) { 
+            studentDB = data || []; 
+            display(studentDB); 
+        }
     }
 
     function display(list) {
         const box = document.getElementById('mainList');
         box.innerHTML = "";
         list.forEach(s => {
+            const toolStyle = isAdmin ? "display:flex" : "display:none";
             box.innerHTML += `
                 <div class="s-box">
-                    <span style="font-size:11px; color:var(--pms-red); font-weight:bold;">ID: ${s.lin}</span>
+                    <span class="s-id">ID: ${s.lin}</span>
                     <span class="s-name">${s.name}</span>
                     <div class="s-info">
-                        <b>📍 Location:</b> ${s.location}<br>
-                        <b>📚 Class:</b> ${s.class} | <b>📞 Parent:</b> ${s.contact}<br>
-                        <b>🏥 Health:</b> ${s.health_status || 'Good'}
+                        📍 <b>Location:</b> #${s.location}<br>
+                        📚 <b>Class:</b> ${s.class} | 📞 <b>Parent:</b> ${s.contact}<br>
+                        🏥 <b>Health:</b> ${s.health_status || 'Good'}
                     </div>
-                    <div class="s-tools">
-                        <button class="t-btn" onclick="triggerEdit('${s.id}')">✏️ EDIT RECORD</button>
-                        <button class="t-btn" style="color:red" onclick="triggerDelete('${s.id}')">🗑️ REMOVE</button>
+                    <div class="s-tools" style="${toolStyle}">
+                        <span style="color:#2563eb; cursor:pointer;" onclick="triggerEdit('${s.id}')">✏️ EDIT RECORD</span>
+                        <span style="color:#dc2626; cursor:pointer;" onclick="triggerDelete('${s.id}')">🗑️ REMOVE</span>
                     </div>
                 </div>`;
         });
     }
 
-    function triggerEdit(id) {
-        const s = studentDB.find(x => x.id === id);
-        editID = id;
-        document.getElementById('formTitle').innerText = "Edit: " + s.name;
-        document.getElementById('fName').value = s.name;
-        document.getElementById('fPhone').value = s.contact;
-        document.getElementById('fLoc').value = s.location;
-        document.getElementById('fClass').value = s.class;
-        document.getElementById('fHealth').value = s.health_status;
-        document.getElementById('btnSave').innerText = "Update Now";
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    }
-
     async function saveRecord() {
-        const status = document.getElementById('status');
-        status.innerText = "⏳ Saving Record...";
-        status.style.color = "blue";
-
+        if(!isAdmin) return;
+        const msg = document.getElementById('msg');
+        msg.innerText = "⏳ Processing...";
+        
         const info = {
             name: document.getElementById('fName').value,
             contact: document.getElementById('fPhone').value,
@@ -146,13 +150,26 @@
         }
 
         if(result.error) {
-            status.innerText = "❌ Error: " + result.error.message;
-            status.style.color = "red";
+            msg.innerText = "❌ Error: " + result.error.message;
+            msg.style.color = "red";
         } else {
-            status.innerText = "✅ Saved Successfully!";
-            status.style.color = "green";
-            setTimeout(() => location.reload(), 1500);
+            msg.innerText = "✅ Successfully Updated!";
+            msg.style.color = "green";
+            setTimeout(() => location.reload(), 1200);
         }
+    }
+
+    function triggerEdit(id) {
+        const s = studentDB.find(x => x.id === id);
+        editID = id;
+        document.getElementById('formTitle').innerText = "Edit: " + s.name;
+        document.getElementById('fName').value = s.name;
+        document.getElementById('fPhone').value = s.contact;
+        document.getElementById('fLoc').value = s.location;
+        document.getElementById('fClass').value = s.class;
+        document.getElementById('fHealth').value = s.health_status;
+        document.getElementById('btnSave').innerText = "UPDATE RECORD";
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     async function triggerDelete(id) {
