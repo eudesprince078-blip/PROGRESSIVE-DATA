@@ -8,22 +8,17 @@
     <style>
         :root { --pms-blue: #1e40af; --white: #ffffff; --pms-red: #e11d48; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f9ff; padding-bottom: 60px; }
-        header { background: var(--pms-red); color: white; padding: 15px; text-align: center; font-weight: 900; letter-spacing: 1px; }
+        header { background: var(--pms-red); color: white; padding: 15px; text-align: center; font-weight: 900; }
         .hero { background: var(--pms-blue); color: white; padding: 30px 20px 50px; text-align: center; border-radius: 0 0 40px 40px; }
-        
-        /* Dashboard Stats */
         .dash-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; margin-top: -30px; }
         .stat-card { background: white; padding: 15px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--pms-red); }
         .stat-num { display: block; font-size: 26px; font-weight: 900; color: var(--pms-blue); }
         .stat-label { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; }
-
         .container { max-width: 450px; margin: 0 auto; padding: 10px; }
         .card { background: white; padding: 22px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        
         input, select, textarea { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 15px; box-sizing: border-box; }
-        .btn-save { background: var(--pms-blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        
-        .s-box { background: white; padding: 18px; border-radius: 22px; margin-bottom: 12px; border-left: 8px solid var(--pms-red); position: relative; }
+        .btn-save { background: var(--pms-blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; }
+        .s-box { background: white; padding: 18px; border-radius: 22px; margin-bottom: 12px; border-left: 8px solid var(--pms-red); }
         #adminArea { display: none; }
         .footer { text-align: center; padding: 20px; font-size: 12px; color: #64748b; font-weight: bold; }
     </style>
@@ -54,7 +49,7 @@
         <input type="text" id="fName" placeholder="Full Name">
         <input type="number" id="fAge" placeholder="Age">
         <input type="text" id="fPhone" placeholder="Contact (+256...)">
-        <input type="text" id="fLoc" placeholder="Physical Location (Where they stay)">
+        <input type="text" id="fLoc" placeholder="Physical Location">
         <select id="fClass">
             <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
@@ -64,28 +59,19 @@
             <option value="Active">Active / Still in School</option>
             <option value="Left">Inactive / Left School</option>
         </select>
-        <textarea id="fHealth" placeholder="Health Status (e.g., Normal, Allergies)"></textarea>
+        <textarea id="fHealth" placeholder="Health Status (Allergies/Conditions)"></textarea>
         <input type="text" id="fPayCode" placeholder="Receipt/Payment Code">
         <button class="btn-save" onclick="saveRecord()">SAVE TO DATABASE</button>
     </div>
 
     <div class="card" style="border: 2px solid var(--pms-blue);">
-        <input type="text" id="search" placeholder="🔍 Search name or location..." onkeyup="applyFilters()" style="margin-bottom:10px;">
-        <select id="classFilter" onchange="applyFilters()" style="margin-bottom:0; font-weight: bold; color: var(--pms-blue);">
-            <option value="All">All Classes (View All)</option>
-            <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-            <option>P.5</option><option>P.6</option><option>P.7</option>
-        </select>
+        <input type="text" id="search" placeholder="🔍 Search name or location..." onkeyup="applyFilters()">
     </div>
 
     <div id="mainList"></div>
 </div>
 
-<div class="footer">
-    Developed by Eudes Media<br>
-    Contact: +256762992440
-</div>
+<div class="footer">Developed by Eudes Media | +256762992440</div>
 
 <script>
     const SB_URL = "https://cpfttwvonuptqdpskobx.supabase.co";
@@ -104,57 +90,34 @@
 
     function openAdmin() {
         let p = prompt("Admin Pass:");
-        if(p === "mothers.comit1") {
-            document.getElementById('adminArea').style.display = 'block';
-        }
+        if(p === "mothers.comit1") document.getElementById('adminArea').style.display = 'block';
     }
 
     function applyFilters() {
         const searchVal = document.getElementById('search').value.toLowerCase();
-        const classVal = document.getElementById('classFilter').value;
-
-        // Dashboard: Only count Active students
         document.getElementById('activeTotal').innerText = studentDB.filter(s => s.status !== 'Left').length;
-
-        let filtered = studentDB.filter(s => {
-            const matchesSearch = s.name.toLowerCase().includes(searchVal) || (s.location && s.location.toLowerCase().includes(searchVal));
-            const matchesClass = (classVal === "All") || (s.class === classVal);
-            return matchesSearch && matchesClass;
-        });
-
+        let filtered = studentDB.filter(s => s.name.toLowerCase().includes(searchVal));
         document.getElementById('filterCount').innerText = filtered.length;
         const box = document.getElementById('mainList');
         box.innerHTML = "";
         filtered.forEach(s => {
-            box.innerHTML += `
-                <div class="s-box" style="${s.status === 'Left' ? 'opacity:0.6;' : ''}">
-                    <span style="font-weight: 800; color: var(--pms-blue); font-size: 18px;">${s.name}</span><br>
-                    <span style="font-size: 13px; color: #64748b;">📍 ${s.location || 'Unknown'} | 📚 ${s.class}</span><br>
-                    <span style="font-size: 11px; font-weight: bold; color: var(--pms-red);">LIN: ${s.lin}</span>
-                </div>`;
+            box.innerHTML += `<div class="s-box"><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin}</small></div>`;
         });
     }
 
     async function saveRecord() {
         const n = document.getElementById('fName').value;
-        if(!n) return alert("Please enter a student name.");
-
-        // Generate LIN: First letter + 4 digits
-        const lin = n.trim().charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
-
-        const info = {
+        if(!n) return alert("Please enter name");
+        const lin = n.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+        const { error } = await supabaseClient.from('students').insert([{
             name: n, age: document.getElementById('fAge').value,
             contact: document.getElementById('fPhone').value, location: document.getElementById('fLoc').value,
             class: document.getElementById('fClass').value, status: document.getElementById('fStatus').value,
             health_status: document.getElementById('fHealth').value, payment_code: document.getElementById('fPayCode').value,
             lin: lin
-        };
-
-        const { error } = await supabaseClient.from('students').insert([info]);
-        if(error) alert("Save Error: " + error.message); 
-        else location.reload();
+        }]);
+        if(error) alert("Error: " + error.message); else location.reload();
     }
-
     window.onload = loadData;
 </script>
 </body>
