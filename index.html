@@ -3,89 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progressive Mothers | Registry</title>
+    <title>PMS Registry | Stable</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --pms-blue: #1e40af; --pms-red: #e11d48; --white: #ffffff; --bg: #f8fafc; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--bg); color: #334155; }
+        :root { --pms-blue: #1e40af; --pms-red: #e11d48; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #fdf2f8; padding-bottom: 60px; }
+        header { background: var(--pms-red); color: white; padding: 15px; text-align: center; display: flex; justify-content: space-between; align-items: center; }
+        .hero { background: var(--pms-blue); color: white; padding: 30px 20px 50px; text-align: center; border-radius: 0 0 40px 40px; }
         
-        /* Brand Header */
-        header { background: var(--pms-red); color: var(--white); padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Dashboard Stats */
-        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; margin-top: -20px; }
-        .stat-card { background: var(--white); padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--pms-blue); }
-        .stat-num { display: block; font-size: 28px; font-weight: 800; color: var(--pms-blue); }
-        .stat-label { font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold; }
+        .dash-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; margin-top: -30px; }
+        .stat-card { background: white; padding: 15px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--pms-red); }
+        .stat-num { display: block; font-size: 26px; font-weight: 900; color: var(--pms-blue); }
+        .stat-label { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; }
 
-        .hero { background: var(--pms-blue); color: var(--white); padding: 40px 20px 60px; text-align: center; border-radius: 0 0 40px 40px; }
-        .container { max-width: 500px; margin: 0 auto; padding: 15px; }
+        .container { max-width: 450px; margin: 0 auto; padding: 10px; }
+        .card { background: white; padding: 20px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 15px; }
         
-        /* Professional Forms */
-        .card { background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; box-sizing: border-box; }
-        .btn-primary { background: var(--pms-blue); color: var(--white); border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        input, select, textarea { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 15px; box-sizing: border-box; }
+        .btn-save { background: var(--pms-blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; }
         
-        /* List Items */
-        .student-item { background: var(--white); padding: 15px; border-radius: 15px; margin-bottom: 12px; border-left: 6px solid var(--pms-red); position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .lin-badge { position: absolute; top: 10px; right: 10px; font-size: 11px; background: #f1f5f9; padding: 4px 8px; border-radius: 6px; font-weight: bold; color: var(--pms-blue); }
-        .status-tag { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: bold; }
-        .status-active { background: #dcfce7; color: #166534; }
-        .status-left { background: #fee2e2; color: #991b1b; }
-
-        .footer { text-align: center; padding: 30px; font-size: 12px; color: #94a3b8; line-height: 1.6; }
-        #adminPanel { display: none; }
+        .s-box { background: white; padding: 18px; border-radius: 20px; margin-bottom: 12px; border-left: 8px solid var(--pms-red); position: relative; }
+        #adminArea { display: none; }
+        .footer { text-align: center; padding: 20px; font-size: 11px; color: #64748b; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
     <div style="width:40px"></div>
-    <div style="font-weight: 900; font-size: 18px; letter-spacing: 1px;">PMS REGISTRY</div>
-    <div onclick="toggleAdmin()" style="cursor:pointer; font-size: 20px; padding-right: 10px;">⚙️</div>
+    <span style="font-weight: 900;">PMS REGISTRY</span>
+    <div onclick="openAdmin()" style="cursor:pointer; font-size:24px;">⚙️</div>
 </header>
 
 <div class="hero">
-    <h1 style="margin: 0; font-size: 24px;">PROGRESSIVE MOTHERS</h1>
-    <p style="margin: 5px 0 0; opacity: 0.9; font-style: italic;">"With God everything is possible"</p>
+    <h2 style="margin:0;">PROGRESSIVE MOTHERS</h2>
+    <div style="font-style:italic; font-size:12px; opacity:0.8;">"With God everything is possible"</div>
 </div>
 
-<div class="dashboard">
+<div class="dash-row">
     <div class="stat-card">
         <span class="stat-num" id="activeTotal">0</span>
         <span class="stat-label">Active Students</span>
     </div>
     <div class="stat-card">
-        <span class="stat-num" id="classTotal">0</span>
-        <span class="stat-label" id="classLabel">Total Shown</span>
+        <span class="stat-num" id="filterCount">0</span>
+        <span class="stat-label" id="filterLabel">Filtered Total</span>
     </div>
 </div>
 
 <div class="container">
-    <div id="adminPanel" class="card">
-        <h3 style="margin-top:0; color:var(--pms-blue)">New Student Registration</h3>
-        <input type="text" id="regName" placeholder="Full Student Name">
-        <input type="number" id="regAge" placeholder="Age">
-        <input type="date" id="regDOB" title="Date of Birth">
-        <input type="text" id="regContact" placeholder="Contact Number (+256...)">
-        <input type="text" id="regLoc" placeholder="Physical Location (Where they stay)">
-        <select id="regClass">
+    <div id="adminArea" class="card">
+        <h3 style="margin-top:0; color:var(--pms-blue)">New Entry</h3>
+        <input type="text" id="fName" placeholder="Student Full Name">
+        <input type="text" id="fLoc" placeholder="Location (Where they stay)">
+        <select id="fClass">
             <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
             <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
-        <select id="regStatus">
+        <select id="fStatus">
             <option value="Active">Currently in School</option>
-            <option value="Left">Has Left School</option>
+            <option value="Left">Left School</option>
         </select>
-        <textarea id="regHealth" placeholder="Health Status (e.g. Normal, Allergies)"></textarea>
-        <button class="btn-primary" onclick="submitData()">SAVE STUDENT RECORD</button>
-        <p id="statusMsg" style="text-align:center; font-size:12px; margin-top:10px;"></p>
+        <textarea id="fHealth" placeholder="Health Status (e.g. Normal)"></textarea>
+        <input type="text" id="fPayCode" placeholder="Payment/Receipt Code">
+        <button class="btn-save" onclick="saveRecord()">SAVE STUDENT RECORD</button>
     </div>
 
-    <div class="card" style="padding: 15px; border: 2px solid var(--pms-blue);">
-        <input type="text" id="searchInput" placeholder="🔍 Search name or location..." onkeyup="filterData()" style="margin-bottom:10px;">
-        <select id="filterClass" onchange="filterData()" style="margin-bottom:0; font-weight: bold; color: var(--pms-blue);">
+    <div class="card" style="padding: 10px; border: 2px solid var(--pms-blue);">
+        <input type="text" id="search" placeholder="🔍 Search name or location..." onkeyup="applyFilters()" style="margin-bottom:10px;">
+        <select id="classFilter" onchange="applyFilters()" style="margin-bottom:0; font-weight:bold;">
             <option value="All">All Classes (Show All)</option>
             <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
@@ -93,112 +80,85 @@
         </select>
     </div>
 
-    <div id="studentList"></div>
+    <div id="mainList"></div>
+    <p id="errorNote" style="text-align:center; color:red; font-weight:bold;"></p>
 </div>
 
 <div class="footer">
-    Developed by <strong>Eudes Media</strong><br>
-    Contact: +256762992440<br>
-    WhatsApp: +256762992440
+    Developed by Eudes Media<br>
+    +256762992440
 </div>
 
 <script>
-    const SB_URL = "https://kjftruucjdnhfwesrup.supabase.co";
-    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM";
-    
-    const client = supabase.createClient(SB_URL, SB_KEY);
-    let allStudents = [];
+    const SB_URL = "https://cpfttwvonuptqdpskobx.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwdGZ0d3ZvbnVwdHFkcHNrb2J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MjAxNDUsImV4cCI6MjA4ODA5NjE0NX0.gnl0g0NKUv_zfyaJufSKSRO54drR6nGjIKgioj8Tcxc";
 
-    async function loadStudents() {
-        const { data, error } = await client.from('students').select('*').order('name', { ascending: true });
-        if (error) {
-            console.error(error);
-            document.getElementById('statusMsg').innerText = "Error loading data.";
-        } else {
-            allStudents = data || [];
-            filterData();
+    const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+    let studentDB = [];
+
+    async function loadData() {
+        try {
+            const { data, error } = await supabaseClient.from('students').select('*').order('name');
+            if(error) throw error;
+            studentDB = data || [];
+            applyFilters();
+        } catch (e) {
+            document.getElementById('errorNote').innerText = "Database connection error. Check your API key.";
         }
     }
 
-    function toggleAdmin() {
-        const pass = prompt("Enter Admin Password:");
-        if (pass === "mothers.comit1") {
-            document.getElementById('adminPanel').style.display = 'block';
-        }
+    function openAdmin() {
+        const p = prompt("Password:");
+        if(p === "mothers.comit1") document.getElementById('adminArea').style.display = 'block';
     }
 
-    function filterData() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const classFilter = document.getElementById('filterClass').value;
+    function applyFilters() {
+        const sVal = document.getElementById('search').value.toLowerCase();
+        const cVal = document.getElementById('classFilter').value;
 
-        // Dashboard calculation
-        const activeOnly = allStudents.filter(s => s.status === 'Active').length;
-        document.getElementById('activeTotal').innerText = activeOnly;
+        // Count only students marked "Currently in School"
+        const activeCount = studentDB.filter(s => s.status !== 'Left').length;
+        document.getElementById('activeTotal').innerText = activeCount;
 
-        const filtered = allStudents.filter(s => {
-            const matchesSearch = s.name.toLowerCase().includes(search) || s.location.toLowerCase().includes(search);
-            const matchesClass = (classFilter === "All") || (s.class === classFilter);
-            return matchesSearch && matchesClass;
+        let filtered = studentDB.filter(s => {
+            const mS = s.name.toLowerCase().includes(sVal) || (s.location && s.location.toLowerCase().includes(sVal));
+            const mC = (cVal === "All") || (s.class === cVal);
+            return mS && mC;
         });
 
-        document.getElementById('classTotal').innerText = filtered.length;
-        document.getElementById('classLabel').innerText = classFilter === "All" ? "Total Shown" : classFilter + " Total";
-
-        renderList(filtered);
+        document.getElementById('filterCount').innerText = filtered.length;
+        display(filtered);
     }
 
-    function renderList(list) {
-        const listDiv = document.getElementById('studentList');
-        listDiv.innerHTML = "";
+    function display(list) {
+        const box = document.getElementById('mainList');
+        box.innerHTML = "";
         list.forEach(s => {
-            const statusClass = s.status === 'Active' ? 'status-active' : 'status-left';
-            listDiv.innerHTML += `
-                <div class="student-item">
-                    <span class="lin-badge">${s.lin}</span>
-                    <div style="font-weight: 800; color: var(--pms-blue); font-size: 16px;">${s.name}</div>
-                    <div style="font-size: 13px; color: #64748b; margin: 4px 0;">
-                        Class: <strong>${s.class}</strong> | Age: ${s.age || 'N/A'}
+            box.innerHTML += `
+                <div class="s-box ${s.status === 'Left' ? 'opacity:0.5' : ''}">
+                    <div style="font-weight:900; color:var(--pms-blue); font-size:18px;">${s.name}</div>
+                    <div style="font-size:13px; color:#64748b;">📍 ${s.location} | 📚 ${s.class}</div>
+                    <div style="background:#e0f2fe; padding:4px 8px; border-radius:5px; font-size:11px; margin-top:5px; display:inline-block;">
+                        Code: ${s.payment_code || 'N/A'}
                     </div>
-                    <div style="font-size: 12px; color: #94a3b8;">📍 ${s.location}</div>
-                    <div style="margin-top:8px;">
-                        <span class="status-tag ${statusClass}">${s.status.toUpperCase()}</span>
-                    </div>
-                </div>
-            `;
+                </div>`;
         });
     }
 
-    async function submitData() {
-        const name = document.getElementById('regName').value;
-        if (!name) return alert("Please enter a name");
+    async function saveRecord() {
+        const name = document.getElementById('fName').value;
+        if(!name) return;
+        const lin = name.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
 
-        // Generate LIN: First Letter + Random Number
-        const firstLetter = name.trim().charAt(0).toUpperCase();
-        const rand = Math.floor(1000 + Math.random() * 9000);
-        const generatedLin = `${firstLetter}-${rand}`;
-
-        const studentData = {
-            name: name,
-            age: document.getElementById('regAge').value,
-            dob: document.getElementById('regDOB').value,
-            contact: document.getElementById('regContact').value,
-            location: document.getElementById('regLoc').value,
-            class: document.getElementById('regClass').value,
-            status: document.getElementById('regStatus').value,
-            health_status: document.getElementById('regHealth').value,
-            lin: generatedLin
-        };
-
-        const { error } = await client.from('students').insert([studentData]);
-        if (error) {
-            alert("Error: " + error.message);
-        } else {
-            alert("Student Registered Successfully! LIN: " + generatedLin);
-            location.reload();
-        }
+        const { error } = await supabaseClient.from('students').insert([{
+            name: name, location: document.getElementById('fLoc').value,
+            class: document.getElementById('fClass').value, status: document.getElementById('fStatus').value,
+            health_status: document.getElementById('fHealth').value, payment_code: document.getElementById('fPayCode').value, lin: lin
+        }]);
+        if(error) alert("Save Error: " + error.message); else location.reload();
     }
 
-    window.onload = loadStudents;
+    window.onload = loadData;
 </script>
 </body>
 </html>
