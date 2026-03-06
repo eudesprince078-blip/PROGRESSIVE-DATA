@@ -48,7 +48,7 @@
         <h3 style="margin-top:0; color:var(--pms-blue)">New Student Entry</h3>
         <input type="text" id="fName" placeholder="Full Name">
         <input type="number" id="fAge" placeholder="Age">
-        <input type="text" id="fPhone" placeholder="Contact (+256...)">
+        <input type="text" id="fPhone" placeholder="Contact Number">
         <input type="text" id="fLoc" placeholder="Physical Location">
         <select id="fClass">
             <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
@@ -56,12 +56,12 @@
             <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
         <select id="fStatus">
-            <option value="Active">Active / Still in School</option>
-            <option value="Left">Inactive / Left School</option>
+            <option value="Active">Active Student</option>
+            <option value="Left">Left School</option>
         </select>
-        <textarea id="fHealth" placeholder="Health Status (Allergies/Conditions)"></textarea>
-        <input type="text" id="fPayCode" placeholder="Receipt/Payment Code">
-        <button class="btn-save" onclick="saveRecord()">SAVE TO DATABASE</button>
+        <textarea id="fHealth" placeholder="Health Status"></textarea>
+        <input type="text" id="fPayCode" placeholder="Payment/Receipt Code">
+        <button class="btn-save" onclick="saveRecord()">SAVE STUDENT DATA</button>
     </div>
 
     <div class="card" style="border: 2px solid var(--pms-blue);">
@@ -71,7 +71,7 @@
     <div id="mainList"></div>
 </div>
 
-<div class="footer">Developed by Eudes Media | +256762992440</div>
+<div class="footer">Eudes Media | +256762992440</div>
 
 <script>
     const SB_URL = "https://cpfttwvonuptqdpskobx.supabase.co";
