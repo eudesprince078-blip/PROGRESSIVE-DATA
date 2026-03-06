@@ -1,134 +1,382 @@
+```html
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMS Registry | Eudes Media</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root { --blue: #1e40af; --red: #e11d48; }
-        body { font-family: sans-serif; margin: 0; background: #f0f9ff; padding-bottom: 60px; }
-        header { background: var(--red); color: white; padding: 15px; text-align: center; font-weight: bold; position: relative; }
-        .hero { background: var(--blue); color: white; padding: 20px; text-align: center; border-radius: 0 0 30px 30px; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 15px; margin-top: -20px; }
-        .stat { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .container { max-width: 450px; margin: 0 auto; padding: 15px; }
-        .card { background: white; padding: 15px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 12px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
-        .btn { background: var(--blue); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        .admin-btn { position: absolute; right: 10px; top: 12px; border: 1px solid white; padding: 5px; border-radius: 5px; font-size: 10px; cursor: pointer; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Progressive Mothers School Registry</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+--blue:#1e40af;
+--red:#e11d48;
+}
+
+body{
+font-family:Arial;
+margin:0;
+background:#f1f5f9;
+}
+
+header{
+background:var(--red);
+color:white;
+padding:15px;
+text-align:center;
+font-weight:bold;
+position:relative;
+}
+
+.adminBtn{
+position:absolute;
+right:10px;
+top:12px;
+font-size:11px;
+border:1px solid white;
+padding:5px;
+cursor:pointer;
+}
+
+.hero{
+background:var(--blue);
+color:white;
+padding:20px;
+text-align:center;
+border-radius:0 0 25px 25px;
+}
+
+.statGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+padding:15px;
+margin-top:-20px;
+}
+
+.stat{
+background:white;
+padding:15px;
+border-radius:12px;
+text-align:center;
+box-shadow:0 4px 8px rgba(0,0,0,0.1);
+}
+
+.container{
+max-width:500px;
+margin:auto;
+padding:15px;
+}
+
+.card{
+background:white;
+padding:15px;
+border-radius:15px;
+margin-bottom:12px;
+box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+
+input,select{
+width:100%;
+padding:12px;
+margin-bottom:8px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+padding:10px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+margin-top:4px;
+}
+
+.btn{
+background:var(--blue);
+color:white;
+width:100%;
+}
+
+.delete{
+background:red;
+color:white;
+}
+
+.promote{
+background:green;
+color:white;
+}
+</style>
 </head>
+
 <body>
 
 <header>
-    PROGRESSIVE MOTHERS REGISTRY
-    <div class="admin-btn" onclick="openAdmin()">ADMIN LOGIN</div>
+PROGRESSIVE MOTHERS REGISTRY
+<div class="adminBtn" onclick="admin()">ADMIN</div>
 </header>
 
 <div class="hero">
-    <h2 style="margin:0; font-size:18px;">SCHOOL DATA CENTER</h2>
-    <div style="font-size:11px; opacity:0.8;">"With God everything is possible"</div>
+<h3 style="margin:0">School Data Center</h3>
+<small>With God Everything Is Possible</small>
 </div>
 
-<div class="stat-grid">
-    <div class="stat"><span id="aC" style="font-size:22px; font-weight:900; color:var(--blue)">0</span><br><small>ACTIVE</small></div>
-    <div class="stat"><span id="tC" style="font-size:22px; font-weight:900; color:var(--blue)">0</span><br><small>TOTAL</small></div>
+<div class="statGrid">
+
+<div class="stat">
+<span id="active">0</span>
+<br>ACTIVE
+</div>
+
+<div class="stat">
+<span id="total">0</span>
+<br>TOTAL
+</div>
+
 </div>
 
 <div class="container">
-    <div id="status" style="text-align:center; font-size:12px; font-weight:bold; margin-bottom:10px; color:green;">✅ Database Online</div>
 
-    <div id="regForm" class="card" style="display:none; border: 2px solid var(--red);">
-        <input type="text" id="n" placeholder="Student Name">
-        <input type="number" id="age" placeholder="Age">
-        <input type="date" id="dob">
-        <input type="text" id="ph" placeholder="Contact Number">
-        <input type="text" id="loc" placeholder="Physical Location">
-        <select id="cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-        <select id="st"><option value="Active">Active</option><option value="Left">Left</option></select>
-        <textarea id="hs" placeholder="Health Status (Conditions/Allergies)"></textarea>
-        <input type="text" id="pay" placeholder="Payment Code">
-        <button class="btn" id="saveBtn" onclick="saveData()">SAVE TO DATABASE</button>
-    </div>
+<div id="form" class="card" style="display:none">
 
-    <div class="card" style="border: 2px solid var(--blue);">
-        <input type="text" id="search" placeholder="🔍 Search student names..." onkeyup="render()">
-    </div>
-    <div id="list"></div>
+<input id="name" placeholder="Student Name">
+<input id="age" type="number" placeholder="Age">
+<input id="phone" placeholder="Contact">
+<input id="location" placeholder="Location">
+
+<select id="class">
+<option>P.1</option>
+<option>P.2</option>
+<option>P.3</option>
+<option>P.4</option>
+<option>P.5</option>
+<option>P.6</option>
+<option>P.7</option>
+</select>
+
+<button class="btn" onclick="save()">SAVE STUDENT</button>
+
 </div>
 
-<footer style="text-align: center; padding: 20px; font-size: 11px; font-weight: bold; color: #666;">
-    Eudes Media | +256762992440
-</footer>
+<div class="card">
+<input id="search" placeholder="Search student..." onkeyup="render()">
+</div>
+
+<div id="list"></div>
+
+</div>
 
 <script>
-    const URL = "https://cpfttwvonuptqdpskobx.supabase.co";
-    const KEY = "sb_secret_er0jEX9JyM89pIB7lp9zww_zP5UbQaj"; 
-    const client = supabase.createClient(URL, KEY);
-    let students = [];
 
-    async function init() {
-        try {
-            const { data, error } = await client.from('students').select('*').order('name');
-            if(!error) {
-                students = data || [];
-                render();
-            }
-        } catch (err) { console.log(err); }
-    }
+const URL="https://cpfttwvonuptqdpskobx.supabase.co";
 
-    function openAdmin() {
-        if(prompt("Admin Password:") === "mothers.comit1") document.getElementById('regForm').style.display = 'block';
-    }
+const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwdGZ0d3ZvbnVwdHFkcHNrb2J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MjAxNDUsImV4cCI6MjA4ODA5NjE0NX0.gnl0g0NKUv_zfyaJufSKSRO54drR6nGjIKgioj8Tcxc";
 
-    function render() {
-        const q = document.getElementById('search').value.toLowerCase();
-        document.getElementById('aC').innerText = students.filter(x => x.status === 'Active').length;
-        const filtered = students.filter(x => x.name.toLowerCase().includes(q));
-        document.getElementById('tC').innerText = filtered.length;
-        const box = document.getElementById('list');
-        box.innerHTML = "";
-        filtered.forEach(s => {
-            box.innerHTML += `<div class="card"><b>${s.name}</b><br><small>${s.class} | ID: ${s.lin || 'N/A'}</small></div>`;
-        });
-    }
+const client=supabase.createClient(URL,KEY);
 
-    async function saveData() {
-        const btn = document.getElementById('saveBtn');
-        const nameVal = document.getElementById('n').value;
-        if(!nameVal) return alert("Please enter a name");
-        
-        btn.innerText = "SAVING...";
-        btn.disabled = true;
+let students=[];
+let editing=null;
 
-        const lin = nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+async function init(){
 
-        // This ensures data is sent to the exact columns in your 'students' table
-        const { error } = await client.from('students').insert([{
-            name: nameVal,
-            age: document.getElementById('age').value,
-            dob: document.getElementById('dob').value,
-            contacts: document.getElementById('ph').value, 
-            location: document.getElementById('loc').value,
-            class: document.getElementById('cl').value,
-            status: document.getElementById('st').value,
-            health_status: document.getElementById('hs').value,
-            payment_: document.getElementById('pay').value,
-            lin: lin
-        }]);
+const {data}=await client
+.from("students")
+.select("*")
+.order("name");
 
-        if(error) {
-            // This will tell us exactly which column is causing the error
-            alert("Save Failed: " + error.message);
-            btn.innerText = "SAVE TO DATABASE";
-            btn.disabled = false;
-        } else {
-            alert("Success! " + nameVal + " has been registered.");
-            location.reload();
-        }
-    }
-    window.onload = init;
+students=data||[];
+
+render();
+
+}
+
+function admin(){
+if(prompt("Password")=="mothers.comit1"){
+document.getElementById("form").style.display="block";
+}
+}
+
+function render(){
+
+const q=document.getElementById("search").value.toLowerCase();
+
+let filtered=students.filter(s=>s.name.toLowerCase().includes(q));
+
+document.getElementById("total").innerText=students.length;
+
+document.getElementById("active").innerText=
+students.filter(s=>s.status=="Active").length;
+
+const box=document.getElementById("list");
+
+box.innerHTML="";
+
+filtered.forEach((s,i)=>{
+
+box.innerHTML+=`
+<div class="card">
+
+<b>${i+1}. ${s.name}</b>
+
+<br>
+
+<small>
+Class: ${s.class}
+<br>
+LIN: ${s.lin}
+</small>
+
+<br>
+
+<button onclick="idCard('${s.name}','${s.class}','${s.lin}')">ID Card</button>
+
+<button onclick="edit('${s.id}')">Edit</button>
+
+<button class="delete" onclick="del('${s.id}')">Delete</button>
+
+<button class="promote" onclick="promote('${s.id}','${s.class}')">Promote</button>
+
+</div>
+`;
+
+});
+
+}
+
+async function save(){
+
+const name=document.getElementById("name").value;
+const age=document.getElementById("age").value;
+const phone=document.getElementById("phone").value;
+const location=document.getElementById("location").value;
+const cls=document.getElementById("class").value;
+
+if(!name) return alert("Enter name");
+
+const letter=name.charAt(0).toUpperCase();
+const num=(students.length+1).toString().padStart(4,"0");
+const lin="PM"+letter+num;
+
+const payload={
+name:name,
+age:age,
+contacts:phone,
+location:location,
+class:cls,
+status:"Active",
+lin:lin
+};
+
+if(editing){
+
+await client
+.from("students")
+.update(payload)
+.eq("id",editing);
+
+editing=null;
+
+}else{
+
+await client
+.from("students")
+.insert([payload]);
+
+}
+
+location.reload();
+
+}
+
+function edit(id){
+
+const s=students.find(x=>x.id==id);
+
+document.getElementById("name").value=s.name;
+document.getElementById("age").value=s.age;
+document.getElementById("phone").value=s.contacts;
+document.getElementById("location").value=s.location;
+document.getElementById("class").value=s.class;
+
+editing=id;
+
+document.getElementById("form").style.display="block";
+
+}
+
+async function del(id){
+
+if(!confirm("Delete student?")) return;
+
+await client
+.from("students")
+.delete()
+.eq("id",id);
+
+location.reload();
+
+}
+
+async function promote(id,current){
+
+const classes=["P.1","P.2","P.3","P.4","P.5","P.6","P.7"];
+
+let i=classes.indexOf(current);
+
+if(i==6){
+alert("Candidate finished P.7");
+return;
+}
+
+let next=classes[i+1];
+
+await client
+.from("students")
+.update({class:next})
+.eq("id",id);
+
+location.reload();
+
+}
+
+function idCard(name,cls,lin){
+
+let w=window.open("");
+
+w.document.write(`
+<div style="width:320px;border:3px solid #1e40af;border-radius:15px;padding:20px;font-family:Arial">
+
+<h3 style="text-align:center;color:#1e40af">
+PROGRESSIVE MOTHERS SCHOOL
+</h3>
+
+<p style="text-align:center">
+With God Everything Is Possible
+</p>
+
+<hr>
+
+<p><b>Name:</b> ${name}</p>
+<p><b>Class:</b> ${cls}</p>
+<p><b>LIN:</b> ${lin}</p>
+
+<p style="font-size:11px">
+Gayaza Kijabijjo
+</p>
+
+</div>
+`);
+
+w.print();
+
+}
+
+window.onload=init;
+
 </script>
+
 </body>
 </html>
+```
