@@ -9,119 +9,118 @@
         :root { --blue: #1e40af; --red: #e11d48; }
         body { font-family: sans-serif; margin: 0; background: #f0f9ff; padding-bottom: 60px; }
         header { background: var(--red); color: white; padding: 15px; text-align: center; font-weight: bold; position: relative; }
-        .hero { background: var(--blue); color: white; padding: 25px; text-align: center; border-radius: 0 0 30px 30px; }
+        .hero { background: var(--blue); color: white; padding: 20px; text-align: center; border-radius: 0 0 30px 30px; }
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 15px; margin-top: -20px; }
         .stat { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .container { max-width: 450px; margin: 0 auto; padding: 15px; }
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; }
+        .card { background: white; padding: 15px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 12px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
         .btn { background: var(--blue); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        .admin-link { position: absolute; right: 10px; top: 12px; border: 1px solid white; padding: 5px; border-radius: 5px; font-size: 10px; cursor: pointer; }
+        .admin-btn { position: absolute; right: 10px; top: 12px; border: 1px solid white; padding: 5px; border-radius: 5px; font-size: 10px; }
     </style>
 </head>
 <body>
 
 <header>
     PROGRESSIVE MOTHERS REGISTRY
-    <div class="admin-link" onclick="openAdmin()">ADMIN LOGIN</div>
+    <div class="admin-btn" onclick="openAdmin()">ADMIN</div>
 </header>
 
 <div class="hero">
-    <h2 style="margin:0; font-size:18px;">SCHOOL DATA CENTER</h2>
+    <h2 style="margin:0; font-size:18px;">DATA CENTER</h2>
     <div style="font-size:11px; opacity:0.8;">"With God everything is possible"</div>
 </div>
 
 <div class="stat-grid">
-    <div class="stat"><span id="aCount" style="font-size:22px; font-weight:900; color:var(--blue)">0</span><br><small>ACTIVE</small></div>
-    <div class="stat"><span id="tCount" style="font-size:22px; font-weight:900; color:var(--blue)">0</span><br><small>TOTAL</small></div>
+    <div class="stat"><span id="aC" style="font-size:22px; font-weight:900; color:var(--blue)">0</span><br><small>ACTIVE</small></div>
+    <div class="stat"><span id="tC" style="font-size:22px; font-weight:900; color:var(--blue)">0</span><br><small>TOTAL</small></div>
 </div>
 
 <div class="container">
-    <div id="connectionStatus" style="text-align:center; font-size:11px; font-weight:bold; margin-bottom:10px; color:orange;">Connecting to 'students' table...</div>
+    <div id="status" style="text-align:center; font-size:12px; font-weight:bold; margin-bottom:10px; color:orange;">Direct Connecting...</div>
 
-    <div id="entryForm" class="card" style="display:none; border: 2px solid var(--red);">
-        <h3 style="margin-top:0; color:var(--red)">Register Student</h3>
-        <input type="text" id="name" placeholder="Full Name">
+    <div id="regForm" class="card" style="display:none; border: 2px solid var(--red);">
+        <input type="text" id="n" placeholder="Full Name">
         <input type="number" id="age" placeholder="Age">
         <input type="date" id="dob">
-        <input type="text" id="phone" placeholder="Contact Number">
-        <input type="text" id="location" placeholder="Physical Location">
-        <select id="class"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-        <select id="status"><option value="Active">Active</option><option value="Left">Left</option></select>
-        <textarea id="health" placeholder="Health Status (Full description)"></textarea>
-        <input type="text" id="payment" placeholder="Payment Code">
-        <button class="btn" onclick="sendToDatabase()">SAVE TO STUDENTS TABLE</button>
+        <input type="text" id="ph" placeholder="Contact Number">
+        <input type="text" id="loc" placeholder="Physical Location">
+        <select id="cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+        <select id="st"><option value="Active">Active</option><option value="Left">Left</option></select>
+        <textarea id="hs" placeholder="Health Status (allergies/conditions)"></textarea>
+        <input type="text" id="pay" placeholder="Payment Code">
+        <button class="btn" onclick="saveData()">SAVE STUDENT</button>
     </div>
 
     <div class="card" style="border: 2px solid var(--blue);">
-        <input type="text" id="search" placeholder="🔍 Search students..." onkeyup="updateUI()">
+        <input type="text" id="search" placeholder="🔍 Search name..." onkeyup="render()">
     </div>
-    <div id="studentCards"></div>
+    <div id="list"></div>
 </div>
 
-<div style="text-align: center; padding: 20px; font-size: 11px; font-weight: bold; color: #666;">
+<footer style="text-align: center; padding: 20px; font-size: 11px; font-weight: bold; color: #666;">
     Eudes Media | +256762992440
-</div>
+</footer>
 
 <script>
     const URL = "https://cpfttwvonuptqdpskobx.supabase.co";
-    const KEY = "sb_secret_rGJk_KqJGPlBfQ-g9INXzQ_wD4os2FE"; // Master Key
-    
-    const sb = supabase.createClient(URL, KEY);
+    const KEY = "sb_secret_rGJk_KqJGPlBfQ-g9INXzQ_wD4os2FE";
+    const client = supabase.createClient(URL, KEY);
     let students = [];
 
     async function init() {
-        const { data, error } = await sb.from('students').select('*').order('name');
-        const statusBox = document.getElementById('connectionStatus');
-        
-        if(error) {
-            statusBox.innerHTML = "<span style='color:red'>❌ Connection Failed. Check table name.</span>";
-        } else {
-            statusBox.innerHTML = "<span style='color:green'>✅ Database Connected</span>";
+        try {
+            // Force a 5-second timeout. If it doesn't load, it will show an error.
+            const { data, error } = await client.from('students').select('*').order('name');
+            
+            if(error) throw error;
+
+            document.getElementById('status').innerHTML = "<span style='color:green'>✅ Database Online</span>";
             students = data || [];
-            updateUI();
+            render();
+        } catch (err) {
+            document.getElementById('status').innerHTML = "<span style='color:red'>❌ Connection Failed: " + err.message + "</span>";
+            console.error(err);
         }
     }
 
     function openAdmin() {
-        if(prompt("Pass:") === "mothers.comit1") document.getElementById('entryForm').style.display = 'block';
+        if(prompt("Password:") === "mothers.comit1") document.getElementById('regForm').style.display = 'block';
     }
 
-    function updateUI() {
-        const query = document.getElementById('search').value.toLowerCase();
-        document.getElementById('aCount').innerText = students.filter(x => x.status === 'Active').length;
-        const filtered = students.filter(x => x.name.toLowerCase().includes(query));
-        document.getElementById('tCount').innerText = filtered.length;
+    function render() {
+        const q = document.getElementById('search').value.toLowerCase();
+        document.getElementById('aC').innerText = students.filter(x => x.status === 'Active').length;
+        const filtered = students.filter(x => x.name.toLowerCase().includes(q));
+        document.getElementById('tC').innerText = filtered.length;
         
-        const box = document.getElementById('studentCards');
+        const box = document.getElementById('list');
         box.innerHTML = "";
         filtered.forEach(s => {
-            box.innerHTML += `<div class="card"><b>${s.name}</b><br><small>LIN: ${s.lin || 'N/A'} | ${s.class}</small></div>`;
+            box.innerHTML += `<div class="card"><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin || 'N/A'}</small></div>`;
         });
     }
 
-    async function sendToDatabase() {
-        const studentName = document.getElementById('name').value;
-        if(!studentName) return alert("Please enter a name");
-        
-        const linID = studentName.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
-        
-        // Updated column names to match your request
-        const { error } = await sb.from('students').insert([{
-            name: studentName, 
-            age: document.getElementById('age').value, 
+    async function saveData() {
+        const nameVal = document.getElementById('n').value;
+        if(!nameVal) return alert("Name is required");
+        const lin = nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+
+        const { error } = await client.from('students').insert([{
+            name: nameVal,
+            age: document.getElementById('age').value,
             dob: document.getElementById('dob').value,
-            contacts: document.getElementById('phone').value, 
-            location: document.getElementById('location').value,
-            class: document.getElementById('class').value, 
-            status: document.getElementById('status').value,
-            health_status: document.getElementById('health').value, // Fixed from health_sta
-            payment_: document.getElementById('payment').value,
-            lin: linID
+            contacts: document.getElementById('ph').value, // Matches your DB
+            location: document.getElementById('loc').value,
+            class: document.getElementById('cl').value,
+            status: document.getElementById('st').value,
+            health_status: document.getElementById('hs').value, // Matches your update
+            payment_: document.getElementById('pay').value,
+            lin: lin
         }]);
 
-        if(error) alert("Database Error: " + error.message);
-        else { alert("Student Registered!"); location.reload(); }
+        if(error) alert("Error: " + error.message);
+        else { alert("Saved!"); location.reload(); }
     }
     window.onload = init;
 </script>
