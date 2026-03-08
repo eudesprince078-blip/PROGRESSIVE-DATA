@@ -27,7 +27,7 @@
 </header>
 
 <div class="hero">
-    <h2 style="margin:0; font-size:18px;">SCHOOL DATA CENTER</h2>
+    <h2 style="margin:0; font-size:18px;">DATA CENTER</h2>
     <div style="font-size:11px; opacity:0.8;">"With God everything is possible"</div>
 </div>
 
@@ -48,8 +48,7 @@
         <select id="cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         <select id="st"><option value="Active">Active</option><option value="Left">Left</option></select>
         <textarea id="hs" placeholder="Health Status"></textarea>
-        <input type="text" id="pay" placeholder="Payment Code">
-        <button class="btn" id="saveBtn" onclick="saveData()">SAVE TO DATABASE</button>
+        <button class="btn" id="saveBtn" onclick="saveData()">SAVE STUDENT</button>
     </div>
 
     <div class="card" style="border: 2px solid var(--blue);">
@@ -63,8 +62,10 @@
 </footer>
 
 <script>
-    const URL = "https://cpfttwvonuptqdpskobx.supabase.co";
-    const KEY = "sb_secret_er0jEX9JyM89pIB7lp9zww_zP5UbQaj"; 
+    // UPDATED WITH YOUR NEW KEY AND MATCHING URL
+    const URL = "https://kjftrwvuucjdnhfwesrup.supabase.co";
+    const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO"; 
+    
     const client = supabase.createClient(URL, KEY);
     let students = [];
 
@@ -76,7 +77,7 @@
             students = data || [];
             render();
         } catch (err) {
-            document.getElementById('status').innerHTML = "❌ Connection Error";
+            document.getElementById('status').innerHTML = "❌ Connection Error: Table 'students' not found";
             console.error(err);
         }
     }
@@ -109,7 +110,6 @@
 
         const lin = nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
 
-        // This payload matches your requested fields exactly
         const payload = {
             name: nameVal,
             age: document.getElementById('age').value,
@@ -119,19 +119,17 @@
             class: document.getElementById('cl').value,
             status: document.getElementById('st').value,
             health_status: document.getElementById('hs').value,
-            payment_: document.getElementById('pay').value,
             lin: lin
         };
 
         const { error } = await client.from('students').insert([payload]);
 
         if(error) {
-            // This alert will tell us EXACTLY which column name is wrong
-            alert("⚠️ ERROR: " + error.message + "\n\nPlease check if your Supabase column names match the code.");
-            btn.innerText = "SAVE TO DATABASE";
+            alert("⚠️ SAVE FAILED: " + error.message);
+            btn.innerText = "SAVE STUDENT";
             btn.disabled = false;
         } else {
-            alert("✅ Registered Successfully!");
+            alert("✅ Successfully Registered!");
             location.reload();
         }
     }
