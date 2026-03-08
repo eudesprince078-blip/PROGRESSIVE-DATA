@@ -1,252 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Progressive Mothers School Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-:root{
---blue:#1e40af;
---red:#e11d48;
-}
-body{
-font-family:Arial; margin:0; background:#f1f5f9;
-}
-header{
-background:var(--red); color:white; padding:15px; text-align:center; font-weight:bold; position:relative;
-}
-.adminBtn{
-position:absolute; right:10px; top:12px; font-size:11px; border:1px solid white; padding:5px; cursor:pointer;
-}
-.hero{
-background:var(--blue); color:white; padding:20px; text-align:center; border-radius:0 0 25px 25px;
-}
-.statGrid{
-display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; padding:15px; margin-top:-20px;
-}
-.stat{
-background:white; padding:15px; border-radius:12px; text-align:center; box-shadow:0 4px 8px rgba(0,0,0,0.1);
-}
-.container{
-max-width:600px; margin:auto; padding:15px;
-}
-.card{
-background:white; padding:15px; border-radius:15px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);
-}
-input,select{
-width:100%; padding:12px; margin-bottom:8px; border-radius:8px; border:1px solid #ccc;
-}
-button{
-padding:10px; border:none; border-radius:8px; cursor:pointer; margin-top:4px;
-}
-.btn{ background:var(--blue); color:white; width:100%; }
-.delete{ background:red; color:white; }
-.promote{ background:green; color:white; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMS Registry | Eudes Media</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --blue: #1e40af; --white: #ffffff; }
+        body { font-family: sans-serif; margin: 0; background: #f0f4f8; padding-bottom: 60px; }
+        header { background: var(--blue); color: var(--white); padding: 15px; text-align: center; font-weight: bold; position: relative; }
+        .hero { background: var(--white); color: var(--blue); padding: 20px; text-align: center; border-bottom: 3px solid var(--blue); }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 15px; margin-top: -20px; }
+        .stat { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid var(--blue); }
+        .container { max-width: 450px; margin: 0 auto; padding: 15px; }
+        .card { background: var(--white); padding: 15px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 12px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
+        .btn { background: var(--blue); color: var(--white); border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .admin-btn { position: absolute; right: 10px; top: 12px; border: 1px solid var(--white); padding: 5px; border-radius: 5px; font-size: 10px; cursor: pointer; }
+    </style>
 </head>
-
 <body>
 
 <header>
-PROGRESSIVE MOTHERS SCHOOL DASHBOARD
-<div class="adminBtn" onclick="admin()">ADMIN</div>
+    PROGRESSIVE MOTHERS REGISTRY
+    <div class="admin-btn" onclick="openAdmin()">ADMIN LOGIN</div>
 </header>
 
 <div class="hero">
-<h3 style="margin:0">School Data Center</h3>
-<small>With God Everything Is Possible</small>
+    <h2 style="margin:0; font-size:18px;">SCHOOL DATA CENTER</h2>
+    <div style="font-size:11px; opacity:0.8;">"With God everything is possible"</div>
 </div>
 
-<!-- Dashboard -->
-<div class="statGrid">
-<div class="stat">
-<span id="total">0</span><br>TOTAL STUDENTS
-</div>
-<div class="stat">
-<span id="active">0</span><br>ACTIVE
-</div>
-<div class="stat">
-<span id="graduated">0</span><br>FINISHED P.7
-</div>
-<div class="stat">
-<span id="p1">0</span><br>P.1 STUDENTS
-</div>
+<div class="stat-grid">
+    <div class="stat"><span id="aC" style="font-size:22px; font-weight:900; color:var(--blue)">0</span><br><small>ACTIVE</small></div>
+    <div class="stat"><span id="tC" style="font-size:22px; font-weight:900; color:var(--blue)">0</span><br><small>TOTAL</small></div>
 </div>
 
 <div class="container">
-<div id="form" class="card" style="display:none">
-<input id="names" placeholder="Student Name">
-<input id="age" type="number" placeholder="Age">
-<input id="contacts" placeholder="Contact">
-<input id="location" placeholder="Location">
-<input id="dob" type="date" placeholder="Date of Birth">
-<input id="health_status" placeholder="Health Status">
-<input id="payment_code" placeholder="Payment Code">
+    <div id="status" style="text-align:center; font-size:12px; font-weight:bold; margin-bottom:10px; color:orange;">Connecting...</div>
 
-<select id="class">
-<option>P.1</option>
-<option>P.2</option>
-<option>P.3</option>
-<option>P.4</option>
-<option>P.5</option>
-<option>P.6</option>
-<option>P.7</option>
-</select>
+    <div id="regForm" class="card" style="display:none; border: 2px solid var(--blue);">
+        <input type="text" id="n" placeholder="Student Name">
+        <input type="number" id="age" placeholder="Age">
+        <input type="date" id="dob">
+        <input type="text" id="ph" placeholder="Contact Number">
+        <input type="text" id="loc" placeholder="Physical Location">
+        <select id="cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+        <select id="st"><option value="Active">Active</option><option value="Left">Left</option></select>
+        <textarea id="hs" placeholder="Health Status"></textarea>
+        <input type="text" id="pay" placeholder="Payment Code">
+        <button class="btn" id="saveBtn" onclick="saveData()">SAVE TO DATABASE</button>
+    </div>
 
-<button class="btn" onclick="save()">SAVE STUDENT</button>
+    <div class="card" style="border: 2px solid var(--blue);">
+        <input type="text" id="search" placeholder="🔍 Search names..." onkeyup="render()">
+    </div>
+    <div id="list"></div>
 </div>
 
-<div class="card">
-<input id="search" placeholder="Search student..." onkeyup="render()">
-</div>
-
-<div id="list"></div>
-</div>
+<footer style="text-align: center; padding: 20px; font-size: 11px; font-weight: bold; color: #666;">
+    Eudes Media | +256762992440
+</footer>
 
 <script>
-// Supabase setup
-const URL="https://cpfttwvonuptqdpskobx.supabase.co";
-const KEY="sb_publishable_uu88mKaDL9v7-RjzDkH4PQ_oJ3nMkNl";
-const client = supabase.createClient(URL,KEY);
+    const URL = "https://cpfttwvonuptqdpskobx.supabase.co";
+    const KEY = "sb_secret_er0jEX9JyM89pIB7lp9zww_zP5UbQaj"; 
+    const client = supabase.createClient(URL, KEY);
+    let students = [];
 
-let students = [];
-let editing = null;
+    async function init() {
+        try {
+            const { data, error } = await client.from('students').select('*').order('name');
+            if(error) throw error;
+            document.getElementById('status').innerHTML = "✅ Database Online";
+            students = data || [];
+            render();
+        } catch (err) {
+            document.getElementById('status').innerHTML = "❌ Connection Error";
+            console.error(err);
+        }
+    }
 
-// Initialize
-async function init(){
-  const { data } = await client.from("students").select("*").order("names");
-  students = data || [];
-  render();
-  updateDashboard();
-}
+    function openAdmin() {
+        if(prompt("Admin Password:") === "mothers.comit1") {
+            document.getElementById('regForm').style.display = 'block';
+        }
+    }
 
-// Show admin form
-function admin(){
-  if(prompt("Admin Password:")=="mothers.comit1"){
-    document.getElementById("form").style.display="block";
-  }
-}
+    function render() {
+        const q = document.getElementById('search').value.toLowerCase();
+        document.getElementById('aC').innerText = students.filter(x => x.status === 'Active').length;
+        const filtered = students.filter(x => x.name.toLowerCase().includes(q));
+        document.getElementById('tC').innerText = filtered.length;
+        const box = document.getElementById('list');
+        box.innerHTML = "";
+        filtered.forEach(s => {
+            box.innerHTML += `<div class="card"><b>${s.name}</b><br><small>${s.class} | ID: ${s.lin || 'N/A'}</small></div>`;
+        });
+    }
 
-// Render list
-function render(){
-  const q = document.getElementById("search").value.toLowerCase();
-  const filtered = students.filter(s=>s.names.toLowerCase().includes(q));
-  const box = document.getElementById("list");
-  box.innerHTML = "";
-  filtered.forEach((s,i)=>{
-    box.innerHTML+=`
-    <div class="card">
-      <b>${i+1}. ${s.names}</b><br>
-      <small>Class: ${s.class} | LIN: ${s.lin}</small><br>
-      <button onclick="idCard('${s.names}','${s.class}','${s.lin}')">ID Card</button>
-      <button onclick="edit('${s.id}')">Edit</button>
-      <button class="delete" onclick="del('${s.id}')">Delete</button>
-      <button class="promote" onclick="promote('${s.id}','${s.class}')">Promote</button>
-    </div>
-    `;
-  });
-}
+    async function saveData() {
+        const btn = document.getElementById('saveBtn');
+        const nameVal = document.getElementById('n').value;
+        if(!nameVal) return alert("Please enter a name");
+        
+        btn.innerText = "SAVING..."; 
+        btn.disabled = true;
 
-// Update Dashboard
-function updateDashboard(){
-  document.getElementById("total").innerText = students.length;
-  document.getElementById("active").innerText = students.filter(s=>s.status=="Active").length;
-  document.getElementById("graduated").innerText = students.filter(s=>s.class=="P.7").length;
-  document.getElementById("p1").innerText = students.filter(s=>s.class=="P.1").length;
-}
+        const lin = nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
 
-// Save student
-async function save(){
-  const names = document.getElementById("names").value;
-  const age = document.getElementById("age").value;
-  const contacts = document.getElementById("contacts").value;
-  const location = document.getElementById("location").value;
-  const dob = document.getElementById("dob").value;
-  const health_status = document.getElementById("health_status").value;
-  const payment_code = document.getElementById("payment_code").value;
-  const cls = document.getElementById("class").value;
+        // This payload matches your requested fields exactly
+        const payload = {
+            name: nameVal,
+            age: document.getElementById('age').value,
+            dob: document.getElementById('dob').value,
+            contacts: document.getElementById('ph').value, 
+            location: document.getElementById('loc').value,
+            class: document.getElementById('cl').value,
+            status: document.getElementById('st').value,
+            health_status: document.getElementById('hs').value,
+            payment_: document.getElementById('pay').value,
+            lin: lin
+        };
 
-  if(!names) return alert("Enter student name");
+        const { error } = await client.from('students').insert([payload]);
 
-  const letter = names.charAt(0).toUpperCase();
-  const num = (students.length+1).toString().padStart(4,"0");
-  const lin = "PM"+letter+num;
-
-  const payload = {names, age, contacts, location, dob, health_status, payment_code, class:cls, status:"Active", lin};
-
-  if(editing){
-    await client.from("students").update(payload).eq("id",editing);
-    editing=null;
-  } else {
-    await client.from("students").insert([payload]);
-  }
-
-  // Clear form
-  document.getElementById("names").value="";
-  document.getElementById("age").value="";
-  document.getElementById("contacts").value="";
-  document.getElementById("location").value="";
-  document.getElementById("dob").value="";
-  document.getElementById("health_status").value="";
-  document.getElementById("payment_code").value="";
-  document.getElementById("form").style.display="none";
-
-  init();
-}
-
-// Edit
-function edit(id){
-  const s = students.find(x=>x.id==id);
-  document.getElementById("names").value = s.names;
-  document.getElementById("age").value = s.age;
-  document.getElementById("contacts").value = s.contacts;
-  document.getElementById("location").value = s.location;
-  document.getElementById("dob").value = s.dob;
-  document.getElementById("health_status").value = s.health_status;
-  document.getElementById("payment_code").value = s.payment_code;
-  document.getElementById("class").value = s.class;
-  editing = id;
-  document.getElementById("form").style.display="block";
-}
-
-// Delete
-async function del(id){
-  if(!confirm("Delete student?")) return;
-  await client.from("students").delete().eq("id",id);
-  init();
-}
-
-// Promote
-async function promote(id,current){
-  const classes=["P.1","P.2","P.3","P.4","P.5","P.6","P.7"];
-  let i = classes.indexOf(current);
-  if(i==6){ alert("Student finished P.7"); return; }
-  let next = classes[i+1];
-  await client.from("students").update({class:next}).eq("id",id);
-  init();
-}
-
-// ID Card
-function idCard(names,cls,lin){
-  let w=window.open("");
-  w.document.write(`
-    <div style="width:320px;border:3px solid #1e40af;border-radius:15px;padding:20px;font-family:Arial">
-      <h3 style="text-align:center;color:#1e40af">PROGRESSIVE MOTHERS SCHOOL</h3>
-      <p style="text-align:center">With God Everything Is Possible</p>
-      <hr>
-      <p><b>Name:</b> ${names}</p>
-      <p><b>Class:</b> ${cls}</p>
-      <p><b>LIN:</b> ${lin}</p>
-      <p style="font-size:11px">Gayaza Kijabijjo</p>
-    </div>
-  `);
-  w.print();
-}
-
-window.onload=init;
+        if(error) {
+            // This alert will tell us EXACTLY which column name is wrong
+            alert("⚠️ ERROR: " + error.message + "\n\nPlease check if your Supabase column names match the code.");
+            btn.innerText = "SAVE TO DATABASE";
+            btn.disabled = false;
+        } else {
+            alert("✅ Registered Successfully!");
+            location.reload();
+        }
+    }
+    window.onload = init;
 </script>
-
 </body>
 </html>
