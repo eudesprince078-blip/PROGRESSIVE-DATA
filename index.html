@@ -48,22 +48,28 @@
 </div>
 
 <script>
+// INITIALIZE CLIENT FIRST
 const URL = "https://cpfttwvonuptqdpskobx.supabase.co";
 const KEY = "sb_secret_er0jEX9JyM89pIB7lp9zww_zP5UbQaj"; 
 const client = supabase.createClient(URL, KEY);
 
 function login() {
     if(u_in.value.toUpperCase() === "PROGRESSIVE" && p_in.value.toUpperCase() === "JESUS CARES") {
-        loginBox.classList.add("hidden"); mainBox.classList.remove("hidden"); load();
-    } else { l_msg.innerText = "WRONG LOGIN"; }
+        loginBox.classList.add("hidden"); 
+        mainBox.classList.remove("hidden"); 
+        load();
+    } else { 
+        l_msg.innerText = "WRONG LOGIN"; 
+    }
 }
 
 async function save() {
     if(!f_name.value) return alert("Enter Name");
     const btn = document.getElementById('sBtn');
-    btn.innerText = "⚡ UPLOADING..."; btn.disabled = true;
+    btn.innerText = "⚡ UPLOADING..."; 
+    btn.disabled = true;
 
-    // LIN: PM + First Letter + 4 Random Numbers [cite: 2026-03-05]
+    // LIN: PM + First Letter + 4 Random Numbers
     const lin = "PM" + f_name.value.trim().charAt(0).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
 
     try {
@@ -78,19 +84,21 @@ async function save() {
             health_status: f_h.value,
             status: f_s.value,
             lin: lin,
-            is_active: f_s.value // Sending as text to match your table typing
+            is_active: f_s.value 
         }]);
 
         if(error) {
             alert("UPLOAD FAILED: " + error.message);
-            btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
+            btn.innerText = "CONFIRM & UPLOAD"; 
+            btn.disabled = false;
         } else {
             alert("✅ SUCCESS! Registered as " + lin);
             location.reload();
         }
     } catch (err) {
         alert("SYSTEM ERROR: " + err.message);
-        btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
+        btn.innerText = "CONFIRM & UPLOAD"; 
+        btn.disabled = false;
     }
 }
 
