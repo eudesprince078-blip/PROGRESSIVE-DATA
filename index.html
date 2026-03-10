@@ -26,7 +26,6 @@
     <input id="p_id" type="password" placeholder="PASSWORD (JESUS CARES)">
     <button onclick="login()">LOGIN SYSTEM</button>
     <p id="l_msg" style="color:red; text-align:center; font-weight:bold;"></p>
-    <div style="text-align:center; font-size:12px; margin-top:10px;">Eudes Media | +256762992440</div>
 </div>
 
 <div id="mainBox" class="hidden">
@@ -54,23 +53,19 @@
 <script>
 let client;
 
-// Initialize Supabase correctly
 window.onload = function() {
-    const URL = "https://cpfttwvonuptqdpskobx.supabase.co";
-    const KEY = "sb_secret_er0jEX9JyM89pIB7lp9zww_zP5UbQaj"; 
-    client = supabase.createClient(URL, KEY);
+    // UPDATED WITH YOUR NEW KEY
+    const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
+    const NEW_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNjc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM"; 
+    client = supabase.createClient(URL, NEW_KEY);
 };
 
 function login() {
     const user = document.getElementById('u_id').value.trim().toUpperCase();
     const pass = document.getElementById('p_id').value.trim().toUpperCase();
     if(user === "PROGRESSIVE" && pass === "JESUS CARES") {
-        loginBox.classList.add("hidden"); 
-        mainBox.classList.remove("hidden"); 
-        load();
-    } else { 
-        document.getElementById('l_msg').innerText = "ACCESS DENIED"; 
-    }
+        loginBox.classList.add("hidden"); mainBox.classList.remove("hidden"); load();
+    } else { document.getElementById('l_msg').innerText = "ACCESS DENIED"; }
 }
 
 async function save() {
@@ -82,7 +77,6 @@ async function save() {
     btn.innerText = "⚡ UPLOADING..."; btn.disabled = true;
     debug.classList.add("hidden");
 
-    // LIN: PM + First Letter + 4 Random Numbers [cite: 2026-03-05]
     const lin = "PM" + sName.trim().charAt(0).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
 
     try {
@@ -104,14 +98,13 @@ async function save() {
             btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
             debug.innerText = "DATABASE ERROR: " + error.message;
             debug.classList.remove("hidden");
-            alert("UPLOAD FAILED. Check the red box below.");
         } else {
             alert("✅ SUCCESS! Saved as " + lin);
             location.reload();
         }
     } catch (err) {
         btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
-        debug.innerText = "SYSTEM ERROR: " + err.message;
+        debug.innerText = "CONNECTION ERROR: " + err.message;
         debug.classList.remove("hidden");
     }
 }
