@@ -6,50 +6,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-    :root { --blue: #0056b3; --white: #ffffff; }
     body { font-family: sans-serif; margin: 0; background: #f0f4f8; padding: 10px; }
     .box { background: white; padding: 20px; border-radius: 12px; max-width: 500px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ccc; }
-    input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 15px; }
-    button { background: var(--blue); color: white; font-weight: bold; border: none; cursor: pointer; }
+    input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { background: #0056b3; color: white; font-weight: bold; border: none; cursor: pointer; }
     .hidden { display: none; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-    th { background: var(--blue); color: white; padding: 10px; text-align: left; }
-    td { border-bottom: 1px solid #ddd; padding: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
+    th { background: #0056b3; color: white; padding: 10px; text-align: left; }
+    td { border-bottom: 1px solid #ddd; padding: 8px; }
 </style>
 </head>
 <body>
 
 <div id="loginBox" class="box" style="margin-top: 50px;">
-    <h2 style="text-align:center; color:var(--blue);">SCHOOL LOGIN</h2>
-    <input id="u_id" placeholder="USERNAME (PROGRESSIVE)">
-    <div style="position:relative">
-        <input id="p_id" type="password" placeholder="PASSWORD (JESUS CARES)">
-        <span style="position:absolute; right:10px; top:18px; cursor:pointer;" onclick="p_id.type=(p_id.type==='password'?'text':'password')">👁️</span>
-    </div>
-    <button onclick="login()">LOGIN SYSTEM</button>
+    <h2 style="text-align:center; color:#0056b3;">SCHOOL LOGIN</h2>
+    <input id="u_in" placeholder="USERNAME (PROGRESSIVE)">
+    <input id="p_in" type="password" placeholder="PASSWORD (JESUS CARES)">
+    <button onclick="login()">LOGIN</button>
     <p id="l_msg" style="color:red; text-align:center; font-weight:bold;"></p>
-    <div style="text-align:center; font-size:12px; margin-top:10px;">Eudes Media | +256762992440</div>
 </div>
 
 <div id="mainBox" class="hidden">
     <div class="box" style="max-width: 800px;">
-        <h2 style="text-align:center; color:var(--blue);">STUDENT REGISTRATION</h2>
+        <h2 style="text-align:center; color:#0056b3;">STUDENT REGISTRATION</h2>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <input id="in_name" placeholder="Full Name">
-            <input id="in_age" type="number" placeholder="Age">
-            <input id="in_dob" type="date">
-            <input id="in_phone" placeholder="Contact">
-            <input id="in_loc" placeholder="Location">
-            <input id="in_pay" placeholder="Payment Code">
-            <select id="in_cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <select id="in_h"><option value="Good">Health: Good</option><option value="Attention">Attention Required</option></select>
-            <select id="in_s"><option value="Active">Status: Active</option><option value="Left">Status: Left</option></select>
+            <input id="f_name" placeholder="Full Name">
+            <input id="f_age" type="number" placeholder="Age">
+            <input id="f_dob" type="date">
+            <input id="f_phone" placeholder="Contact">
+            <input id="f_loc" placeholder="Location">
+            <input id="f_pay" placeholder="Payment Code">
+            <select id="f_cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <select id="f_h"><option value="Good">Health: Good</option><option value="Attention">Special Attention</option></select>
+            <select id="f_s"><option value="Active">Status: Active</option><option value="Left">Status: Left</option></select>
         </div>
         <button id="sBtn" onclick="save()">CONFIRM & UPLOAD</button>
-        <button onclick="downloadCSV()" style="background:#28a745; margin-top:5px;">📥 DOWNLOAD LIST</button>
         <hr>
         <div id="list"></div>
-        <p style="text-align:center; font-size:12px; font-weight:bold; margin-top:15px;">Developed by Eudes Media | +256762992440</p>
+        <p style="text-align:center; font-size:12px; font-weight:bold;">Eudes Media | +256762992440</p>
     </div>
 </div>
 
@@ -57,66 +51,56 @@
 const URL = "https://cpfttwvonuptqdpskobx.supabase.co";
 const KEY = "sb_secret_er0jEX9JyM89pIB7lp9zww_zP5UbQaj"; 
 const client = supabase.createClient(URL, KEY);
-let students = [];
 
 function login() {
-    const user = document.getElementById('u_id').value.trim().toUpperCase();
-    const pass = document.getElementById('p_id').value.trim().toUpperCase();
-    if(user === "PROGRESSIVE" && pass === "JESUS CARES") {
+    if(u_in.value.toUpperCase() === "PROGRESSIVE" && p_in.value.toUpperCase() === "JESUS CARES") {
         loginBox.classList.add("hidden"); mainBox.classList.remove("hidden"); load();
-    } else { document.getElementById('l_msg').innerText = "WRONG LOGIN DETAILS"; }
+    } else { l_msg.innerText = "WRONG LOGIN"; }
 }
 
 async function save() {
-    const sName = document.getElementById('in_name').value;
-    if(!sName) return alert("Enter Name");
-    
+    if(!f_name.value) return alert("Enter Name");
     const btn = document.getElementById('sBtn');
     btn.innerText = "⚡ UPLOADING..."; btn.disabled = true;
 
-    // LIN: PM + First Letter + 4 Random Numbers (e.g., PMM4821)
-    const lin = "PM" + sName.trim().charAt(0).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+    // LIN: PM + First Letter + 4 Random Numbers [cite: 2026-03-05]
+    const lin = "PM" + f_name.value.trim().charAt(0).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
 
-    const { error } = await client.from('students').insert([{
-        name: sName,
-        age: document.getElementById('in_age').value,
-        dob: document.getElementById('in_dob').value,
-        contact: document.getElementById('in_phone').value,
-        location: document.getElementById('in_loc').value,
-        payment_code: document.getElementById('in_pay').value,
-        class: document.getElementById('in_cl').value,
-        health_status: document.getElementById('in_h').value,
-        status: document.getElementById('in_s').value,
-        lin: lin,
-        is_active: (document.getElementById('in_s').value === "Active")
-    }]);
+    try {
+        const { error } = await client.from('students').insert([{
+            name: f_name.value,
+            age: f_age.value,
+            dob: f_dob.value,
+            contact: f_phone.value,
+            location: f_loc.value,
+            payment_code: f_pay.value,
+            class: f_cl.value,
+            health_status: f_h.value,
+            status: f_s.value,
+            lin: lin,
+            is_active: f_s.value // Sending as text to match your table typing
+        }]);
 
-    if(error) {
-        alert("CRITICAL ERROR: " + error.message + "\nDetails: " + error.details);
+        if(error) {
+            alert("UPLOAD FAILED: " + error.message);
+            btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
+        } else {
+            alert("✅ SUCCESS! Registered as " + lin);
+            location.reload();
+        }
+    } catch (err) {
+        alert("SYSTEM ERROR: " + err.message);
         btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
-    } else {
-        alert("✅ SUCCESS! Saved as " + lin);
-        location.reload();
     }
 }
 
 async function load() {
-    const { data, error } = await client.from('students').select('*').order('created_at', { ascending: false });
-    if(!error) { students = data; render(); }
-}
-
-function render() {
-    let html = "<table><tr><th>LIN</th><th>NAME</th><th>CLASS</th></tr>";
-    students.forEach(s => html += `<tr><td>${s.lin}</td><td>${s.name}</td><td>${s.class}</td></tr>`);
-    document.getElementById('list').innerHTML = html + "</table>";
-}
-
-function downloadCSV() {
-    let csv = "LIN,Name,Class,Contact,PayCode,Status\n";
-    students.forEach(s => csv += `${s.lin},${s.name},${s.class},${s.contact},${s.payment_code},${s.status}\n`);
-    const blob = new Blob([csv], {type: 'text/csv'});
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'Students.csv'; a.click();
+    const { data } = await client.from('students').select('*').order('created_at', { ascending: false });
+    if(data) {
+        let h = "<table><tr><th>LIN</th><th>NAME</th><th>CLASS</th></tr>";
+        data.forEach(x => h += `<tr><td>${x.lin}</td><td>${x.name}</td><td>${x.class}</td></tr>`);
+        list.innerHTML = h + "</table>";
+    }
 }
 </script>
 </body>
