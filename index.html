@@ -16,9 +16,9 @@
     .toggle-pass { position: absolute; right: 10px; top: 15px; cursor: pointer; }
     .hidden { display: none; }
     .footer { text-align: center; font-size: 12px; padding: 20px; font-weight: bold; border-top: 2px solid var(--blue); margin-top: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
     th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    th { background: #eee; }
+    th { background: #0056b3; color: white; }
 </style>
 </head>
 <body>
@@ -47,6 +47,7 @@
             <input type="date" id="dob">
             <input id="contact" placeholder="Contact Number">
             <input id="address" placeholder="Physical Location">
+            <input id="payCode" placeholder="Payment Code">
             <select id="cl">
                 <option>P.1</option><option>P.2</option><option>P.3</option>
                 <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
@@ -76,10 +77,8 @@ function togglePass() {
 }
 
 function login() {
-    // Force Capitalization for security
     const u = document.getElementById('username').value.trim().toUpperCase();
     const p = document.getElementById('password').value.trim().toUpperCase();
-
     if(u === "PROGRESSIVE" && p === "JESUS CARES") {
         loginBox.classList.add("hidden");
         systemBox.classList.remove("hidden");
@@ -89,38 +88,41 @@ function login() {
 
 async function saveStudent() {
     const btn = document.getElementById('saveBtn');
-    const name = document.getElementById('studentName').value;
-    if(!name) return alert("Enter Name");
+    const nameInput = document.getElementById('studentName').value;
+    if(!nameInput) return alert("Enter Name");
     
     btn.innerText = "SAVING...";
     btn.disabled = true;
 
-    // LIN: PM + First Letter + 4 Random Numbers
+    // LIN: PM + First Letter of Name + 4 Random Numbers
+    const firstLetter = nameInput.trim().charAt(0).toUpperCase();
     const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const newLin = "PM" + name.charAt(0).toUpperCase() + randomNum;
+    const newLin = "PM" + firstLetter + randomNum;
 
-    // EXACT Supabase Match (NO FEES)
+    // EXACT Supabase Column Match
     const payload = {
-        name: name,
+        name: nameInput,
+        class: document.getElementById('cl').value,
+        lin: newLin,
+        photo_url: "",
+        contact: document.getElementById('contact').value,
         age: document.getElementById('age').value,
         dob: document.getElementById('dob').value,
-        contact: document.getElementById('contact').value,
         location: document.getElementById('address').value,
-        class: document.getElementById('cl').value,
         health_status: document.getElementById('hStatus').value,
-        status: document.getElementById('sStatus').value,
-        lin: newLin,
-        is_active: document.getElementById('sStatus').value === 'Active'
+        is_active: document.getElementById('sStatus').value === 'Active',
+        payment_code: document.getElementById('payCode').value,
+        status: document.getElementById('sStatus').value
     };
 
     const { error } = await client.from('students').insert([payload]);
     
     if(error) {
-        alert("SQL Error: " + error.message);
+        alert("Database Error: " + error.message);
         btn.innerText = "CONFIRM & UPLOAD TO CLOUD";
         btn.disabled = false;
     } else {
-        alert("✅ Registered: " + name + " with LIN: " + newLin);
+        alert("✅ Registered Successfully! LIN: " + newLin);
         location.reload();
     }
 }
@@ -132,23 +134,23 @@ async function fetchData() {
 
 function render() {
     const box = document.getElementById('list');
-    let html = "<table><tr><th>LIN</th><th>NAME</th><th>CLASS</th><th>STATUS</th></tr>";
+    let html = "<table><tr><th>LIN</th><th>NAME</th><th>PAY CODE</th><th>CLASS</th><th>STATUS</th></tr>";
     studentData.forEach(s => {
-        html += `<tr><td>${s.lin}</td><td>${s.name}</td><td>${s.class}</td><td>${s.status}</td></tr>`;
+        html += `<tr><td>${s.lin}</td><td>${s.name}</td><td>${s.payment_code || '-'}</td><td>${s.class}</td><td>${s.status}</td></tr>`;
     });
     box.innerHTML = html + "</table>";
 }
 
 function downloadData() {
-    let csv = "LIN,Name,Class,Age,Contact,Status,Location\n";
+    let csv = "LIN,Name,Class,Age,Contact,Payment Code,Status,Location\n";
     studentData.forEach(s => {
-        csv += `${s.lin},${s.name},${s.class},${s.age},${s.contact},${s.status},${s.location}\n`;
+        csv += `${s.lin},${s.name},${s.class},${s.age},${s.contact},${s.payment_code},${s.status},${s.location}\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.setAttribute('href', url);
-    a.setAttribute('download', 'PMS_Student_List.csv');
+    a.setAttribute('download', 'Student_Registry.csv');
     a.click();
 }
 </script>
