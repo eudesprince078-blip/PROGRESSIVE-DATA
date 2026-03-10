@@ -6,162 +6,141 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-    :root { --blue: #0056b3; --white: #ffffff; --bg: #f0f4f8; }
-    body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); }
-    header { background: var(--blue); color: white; padding: 20px; text-align: center; border-bottom: 4px solid #003d80; }
-    .container { padding: 15px; max-width: 1200px; margin: auto; background: white; min-height: 100vh; }
-    
-    /* Dashboard Stats */
-    .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
-    .stat-card { background: white; border-left: 5px solid var(--blue); padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .stat-card p { margin: 5px 0 0; font-size: 24px; font-weight: bold; color: var(--blue); }
-
-    /* Form UI */
-    .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
-    input, select, textarea, button { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-    button { background: var(--blue); color: white; border: none; font-weight: bold; cursor: pointer; height: 50px; }
-    
-    .status-active { color: #28a745; font-weight: bold; }
-    .status-left { color: #dc3545; font-weight: bold; }
+    :root { --blue: #0056b3; --white: #ffffff; }
+    body { font-family: sans-serif; margin: 0; background: #f0f4f8; }
+    header { background: var(--blue); color: white; padding: 20px; text-align: center; }
+    .container { padding: 15px; max-width: 900px; margin: auto; background: white; min-height: 100vh; }
+    input, select, button { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+    button { background: var(--blue); color: white; font-weight: bold; border: none; cursor: pointer; }
+    .pass-container { position: relative; }
+    .toggle-pass { position: absolute; right: 10px; top: 15px; cursor: pointer; color: #666; }
     .hidden { display: none; }
-    .footer-info { text-align: center; font-size: 13px; margin-top: 30px; padding: 20px; border-top: 2px solid var(--blue); font-weight: bold; }
+    .footer { text-align: center; font-size: 12px; padding: 20px; font-weight: bold; border-top: 2px solid var(--blue); margin-top: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #eee; }
 </style>
 </head>
 <body>
 
 <div id="loginBox">
-    <header><h2>Progressive Mother’s School</h2><p>Access Portal</p></header>
-    <div class="container" style="max-width: 400px; min-height: auto; margin-top: 50px; border: 1px solid #ddd; border-radius: 15px;">
-        <input id="username" placeholder="Username">
-        <input id="password" type="password" placeholder="Password">
-        <button onclick="login()">Login to Online System</button>
-        <p id="loginMsg" style="color:red; text-align:center; font-size:12px;"></p>
-        <div class="footer-info">Eudes Media | +256762992440</div>
+    <header><h2>PROGRESSIVE MOTHER’S SCHOOL</h2></header>
+    <div class="container" style="max-width: 350px; min-height: auto; margin-top: 50px; border-radius: 10px; border: 1px solid #ddd;">
+        <input id="username" placeholder="USERNAME (ALL CAPS)">
+        <div class="pass-container">
+            <input id="password" type="password" placeholder="PASSWORD (ALL CAPS)">
+            <span class="toggle-pass" onclick="togglePass()">👁️</span>
+        </div>
+        <button onclick="login()">LOGIN SYSTEM</button>
+        <p id="msg" style="color:red; text-align:center; font-size:12px; font-weight:bold;"></p>
+        <div class="footer">Eudes Media | +256762992440</div>
     </div>
 </div>
 
 <div id="systemBox" class="hidden">
-    <header>
-        <h2 style="margin:0;">Student Management</h2>
-        <div id="dbStatus" style="font-size:11px; color:#cceeff; margin-top:5px;">Connecting...</div>
-    </header>
-
+    <header><h2>STUDENT MANAGEMENT DASHBOARD</h2></header>
     <div class="container">
-        <div class="dashboard">
-            <div class="stat-card"><h3>Total</h3><p id="totalCount">0</p></div>
-            <div class="stat-card" style="border-left-color:#28a745;"><h3>Active</h3><p id="activeCount">0</p></div>
-            <div class="stat-card" style="border-left-color:#dc3545;"><h3>Left</h3><p id="leftCount">0</p></div>
-        </div>
-
-        <h3>Register Student</h3>
-        <div class="grid-form">
-            <input id="studentName" placeholder="Full Name">
+        <h3>New Registration</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <input id="studentName" placeholder="Student Full Name">
             <input id="age" type="number" placeholder="Age">
-            <input type="date" id="dob" title="Date of Birth">
+            <input type="date" id="dob">
             <input id="contact" placeholder="Contact Number">
             <input id="address" placeholder="Physical Location">
-            <select id="healthStatus"><option value="Good">Health: Good</option><option value="Attention">Special Attention</option></select>
-            <select id="schoolStatus"><option value="Active">Status: Active</option><option value="Left">Status: Left School</option></select>
+            <select id="cl">
+                <option value="P.1">P.1 (Cost: 200,000)</option>
+                <option value="P.2">P.2 (Cost: 200,000)</option>
+                <option value="P.3">P.3 (Cost: 250,000)</option>
+                <option value="P.4">P.4 (Cost: 250,000)</option>
+                <option value="P.5">P.5 (Cost: 300,000)</option>
+                <option value="P.6">P.6 (Cost: 300,000)</option>
+                <option value="P.7">P.7 (Cost: 400,000)</option>
+            </select>
+            <select id="hStatus"><option value="Good">Health: Good</option><option value="Special">Special Attention</option></select>
+            <select id="sStatus"><option value="Active">Status: Active</option><option value="Left">Status: Left</option></select>
         </div>
-        <button onclick="saveStudent()" id="saveBtn">SAVE TO ONLINE DATABASE</button>
+        
+        <button onclick="saveStudent()" id="saveBtn" style="margin-top:10px;">CONFIRM & UPLOAD TO CLOUD</button>
+        <button onclick="downloadData()" style="background:#28a745; margin-top:10px;">📥 DOWNLOAD STUDENT LIST (CSV)</button>
 
-        <hr style="margin:30px 0; border:0; border-top:1px solid #eee;">
-        <input id="search" placeholder="🔍 Search students by name..." oninput="renderData()" style="border: 2px solid var(--blue);">
-
-        <div style="overflow-x:auto;">
-            <table width="100%" border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse; margin-top:15px; font-size:13px; border-color:#eee;">
-                <thead><tr style="background:#0056b3; color:white;">
-                    <th>No.</th><th>Name</th><th>Age</th><th>Contact</th><th>Status</th><th>Actions</th>
-                </tr></thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-        <div class="footer-info">Eudes Media | +256762992440</div>
+        <hr>
+        <h3>Student Registry</h3>
+        <div id="list"></div>
+        <div class="footer">Developed by Eudes Media | +256762992440</div>
     </div>
 </div>
 
 <script>
-// DATABASE SETTINGS
 const URL = "https://cpfttwvonuptqdpskobx.supabase.co";
 const KEY = "sb_secret_er0jEX9JyM89pIB7lp9zww_zP5UbQaj"; 
 const client = supabase.createClient(URL, KEY);
-let students = [];
+let studentData = [];
 
-async function login() {
-    if(username.value === "progressive" && password.value === "mothers.comit") {
+function togglePass() {
+    const p = document.getElementById('password');
+    p.type = p.type === "password" ? "text" : "password";
+}
+
+function login() {
+    // NEW CREDENTIALS [cite: 2026-03-05]
+    if(username.value === "PROGRESSIVE" && password.value === "JESUS CARES") {
         loginBox.classList.add("hidden");
         systemBox.classList.remove("hidden");
         fetchData();
-    } else { loginMsg.textContent = "Invalid Credentials"; }
+    } else { msg.textContent = "WRONG USERNAME OR PASSWORD"; }
+}
+
+async function saveStudent() {
+    const name = document.getElementById('studentName').value;
+    if(!name) return alert("Enter Name");
+    
+    // SMART LIN GENERATION: PM + First Letter + 4 Random Numbers (e.g., PMK2963)
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const newLin = "PM" + name.charAt(0).toUpperCase() + randomNum;
+
+    const payload = {
+        name: name,
+        age: document.getElementById('age').value,
+        dob: document.getElementById('dob').value,
+        contact: document.getElementById('contact').value,
+        location: document.getElementById('address').value,
+        class: document.getElementById('cl').value,
+        health_status: document.getElementById('hStatus').value,
+        status: document.getElementById('sStatus').value,
+        lin: newLin,
+        is_active: document.getElementById('sStatus').value === 'Active'
+    };
+
+    const { error } = await client.from('students').insert([payload]);
+    if(error) alert("Error: " + error.message);
+    else { alert("✅ Registered with LIN: " + newLin); location.reload(); }
 }
 
 async function fetchData() {
     const { data, error } = await client.from('students').select('*').order('name');
-    if(!error) {
-        students = data || [];
-        document.getElementById('dbStatus').innerText = "✅ ONLINE & SECURE";
-        renderData();
-    } else {
-        document.getElementById('dbStatus').innerText = "❌ Connection Error";
-    }
+    if(!error) { studentData = data; render(); }
 }
 
-async function saveStudent() {
-    const btn = document.getElementById('saveBtn');
-    if(!studentName.value) return alert("Please enter a name");
-    
-    btn.innerText = "UPLOADING...";
-    btn.disabled = true;
-    
-    const payload = {
-        name: studentName.value,
-        age: age.value,
-        dob: dob.value,
-        contacts: contact.value,
-        location: address.value,
-        health_status: healthStatus.value,
-        status: schoolStatus.value,
-        lin: studentName.value.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000)
-    };
-
-    const { error } = await client.from('students').insert([payload]);
-    
-    if(error) {
-        alert("Database Error: " + error.message);
-        btn.innerText = "SAVE TO ONLINE DATABASE";
-        btn.disabled = false;
-    } else {
-        alert("✅ Success! Registered Online.");
-        location.reload();
-    }
-}
-
-function renderData() {
-    const tbody = document.getElementById("tableBody");
-    tbody.innerHTML = "";
-    const q = search.value.toLowerCase();
-    
-    document.getElementById("totalCount").innerText = students.length;
-    document.getElementById("activeCount").innerText = students.filter(s => s.status === 'Active').length;
-    document.getElementById("leftCount").innerText = students.filter(s => s.status === 'Left').length;
-
-    students.filter(s => s.name.toLowerCase().includes(q)).forEach((s, i) => {
-        tbody.innerHTML += `<tr>
-            <td>${i+1}</td>
-            <td><b>${s.name}</b></td>
-            <td>${s.age}</td>
-            <td>${s.contacts}</td>
-            <td class="${s.status === 'Active' ? 'status-active' : 'status-left'}">${s.status}</td>
-            <td><button onclick="deleteRecord('${s.id}')" style="background:red; padding:5px; height:30px; font-size:10px;">Remove</button></td>
-        </tr>`;
+function render() {
+    const box = document.getElementById('list');
+    let html = "<table><tr><th>LIN</th><th>NAME</th><th>CLASS</th><th>STATUS</th></tr>";
+    studentData.forEach(s => {
+        html += `<tr><td>${s.lin}</td><td>${s.name}</td><td>${s.class}</td><td>${s.status}</td></tr>`;
     });
+    box.innerHTML = html + "</table>";
 }
 
-async function deleteRecord(id) {
-    if(confirm("Permanently delete this student from the cloud?")) {
-        await client.from('students').delete().eq('id', id);
-        fetchData();
-    }
+function downloadData() {
+    let csv = "LIN,Name,Class,Age,Contact,Status\n";
+    studentData.forEach(s => {
+        csv += `${s.lin},${s.name},${s.class},${s.age},${s.contact},${s.status}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'PMS_Student_List.csv');
+    a.click();
 }
 </script>
 </body>
