@@ -11,6 +11,7 @@
     .box { background: white; padding: 20px; border-radius: 12px; max-width: 900px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ccc; margin-bottom: 20px; }
     input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
     button { background: var(--blue); color: white; font-weight: bold; border: none; cursor: pointer; }
+    button:disabled { background: #cccccc; cursor: not-allowed; }
     .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
     .stat-card { background: var(--blue); color: white; padding: 15px; border-radius: 10px; text-align: center; }
     .stat-card h3 { margin: 0; font-size: 24px; }
@@ -29,23 +30,24 @@
     <h2 style="text-align:center; color:var(--blue);">SCHOOL LOGIN</h2>
     <input id="u_id" placeholder="USERNAME (PROGRESSIVE)">
     <input id="p_id" type="password" placeholder="PASSWORD (JESUS CARES)">
-    <button onclick="login()">LOGIN SYSTEM</button>
+    <button id="loginBtn" onclick="login()" disabled>CONNECTING...</button>
     <p id="l_msg" style="color:red; text-align:center; font-weight:bold;"></p>
 </div>
 
 <div id="mainBox" class="hidden">
     <div class="box">
-        <h2 style="color:var(--blue); margin-top:0;">SYSTEM DASHBOARD</h2>
+        <h2 style="color:var(--blue); margin-top:0;">DASHBOARD</h2>
         <div class="dash-grid">
-            <div class="stat-card"><p>Total Students</p><h3 id="stat_total">0</h3></div>
+            <div class="stat-card"><p>Total</p><h3 id="stat_total">0</h3></div>
             <div class="stat-card" style="background:#28a745;"><p>Active</p><h3 id="stat_active">0</h3></div>
-            <div class="stat-card" style="background:#ffc107; color:black;"><p>Last Entry</p><h3 id="stat_last" style="font-size:14px;">None</h3></div>
+            <div class="stat-card" style="background:#ffc107; color:black;"><p>Last Entry</p><h3 id="stat_last">None</h3></div>
         </div>
     </div>
 
     <div class="box">
-        <h2 id="formTitle" style="text-align:center; color:var(--blue);">STUDENT REGISTRATION</h2>
-        <input id="row_id" type="hidden"> <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <h2 id="formTitle" style="text-align:center; color:var(--blue);">REGISTRATION</h2>
+        <input id="row_id" type="hidden">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <input id="in_name" placeholder="Full Name">
             <input id="in_age" type="number" placeholder="Age">
             <input id="in_dob" type="date">
@@ -57,23 +59,16 @@
             <select id="in_s"><option value="Active">Status: Active</option><option value="Left">Status: Left</option></select>
         </div>
         <button id="sBtn" onclick="save()">CONFIRM & UPLOAD</button>
-        <button id="cBtn" class="hidden" style="background:#6c757d;" onclick="resetForm()">CANCEL EDIT</button>
+        <button id="cBtn" class="hidden" style="background:#6c757d;" onclick="location.reload()">CANCEL EDIT</button>
         <div id="debugBox" class="error-box hidden"></div>
     </div>
 
     <div class="box">
         <h3 style="color:var(--blue);">STUDENT RECORDS</h3>
         <div style="overflow-x:auto;">
-            <table id="stTable">
+            <table>
                 <thead>
-                    <tr>
-                        <th>LIN</th>
-                        <th>NAME</th>
-                        <th>CLASS</th>
-                        <th>CONTACT</th>
-                        <th>PAY-CODE</th>
-                        <th>ACTION</th>
-                    </tr>
+                    <tr><th>LIN</th><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>PAY-CODE</th><th>ACTION</th></tr>
                 </thead>
                 <tbody id="list"></tbody>
             </table>
@@ -90,6 +85,9 @@ const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
 window.onload = function() {
     if (typeof supabase !== 'undefined') {
         client = supabase.createClient(URL, KEY);
+        const lBtn = document.getElementById('loginBtn');
+        lBtn.innerText = "LOGIN SYSTEM";
+        lBtn.disabled = false;
     }
 };
 
@@ -106,9 +104,11 @@ async function save() {
     const rowId = document.getElementById('row_id').value;
     const statusVal = document.getElementById('in_s').value;
     const debug = document.getElementById('debugBox');
+    const btn = document.getElementById('sBtn');
     
     if(!sName) return alert("Enter Name First");
-    debug.classList.add("hidden");
+    btn.disabled = true;
+    btn.innerText = "SAVING...";
 
     const dataObj = {
         name: sName,
@@ -126,25 +126,25 @@ async function save() {
     try {
         let res;
         if (rowId) {
-            // EDIT EXISTING
             res = await client.from('students').update(dataObj).eq('id', rowId);
         } else {
-            // NEW RECORD
             dataObj.lin = "PM-" + Math.floor(1000 + Math.random() * 9000);
             res = await client.from('students').insert([dataObj]);
         }
 
         if(res.error) throw res.error;
-        alert("✅ Success!");
+        alert("✅ Operation Successful!");
         location.reload();
     } catch (err) {
+        btn.disabled = false;
+        btn.innerText = "CONFIRM & UPLOAD";
         debug.innerText = "ERROR: " + err.message;
         debug.classList.remove("hidden");
     }
 }
 
 async function load() {
-    const { data, error } = await client.from('students').select('*').order('created_at', { ascending: false });
+    const { data } = await client.from('students').select('*').order('created_at', { ascending: false });
     if(data) {
         let html = "";
         let activeCount = 0;
@@ -154,8 +154,8 @@ async function load() {
                 <td>${s.lin}</td>
                 <td>${s.name}</td>
                 <td>${s.class}</td>
-                <td>${s.contact || 'N/A'}</td>
-                <td>${s.payment_code || 'N/A'}</td>
+                <td>${s.contact || '-'}</td>
+                <td>${s.payment_code || '-'}</td>
                 <td>
                     <button class="btn-edit" onclick='editRow(${JSON.stringify(s)})'>EDIT</button>
                     <button class="btn-del" onclick="delRow(${s.id})">DEL</button>
@@ -163,8 +163,6 @@ async function load() {
             </tr>`;
         });
         document.getElementById('list').innerHTML = html;
-        
-        // Update Dashboard Stats
         document.getElementById('stat_total').innerText = data.length;
         document.getElementById('stat_active').innerText = activeCount;
         if(data[0]) document.getElementById('stat_last').innerText = data[0].name.split(' ')[0];
@@ -172,7 +170,7 @@ async function load() {
 }
 
 function editRow(item) {
-    document.getElementById('formTitle').innerText = "EDIT STUDENT: " + item.lin;
+    document.getElementById('formTitle').innerText = "EDIT: " + item.lin;
     document.getElementById('row_id').value = item.id;
     document.getElementById('in_name').value = item.name;
     document.getElementById('in_age').value = item.age;
@@ -183,20 +181,15 @@ function editRow(item) {
     document.getElementById('in_cl').value = item.class;
     document.getElementById('in_h').value = item.health_status;
     document.getElementById('in_s').value = item.status;
-    
     document.getElementById('sBtn').innerText = "UPDATE RECORD";
     document.getElementById('cBtn').classList.remove("hidden");
     window.scrollTo(0,0);
 }
 
-function resetForm() {
-    location.reload();
-}
-
 async function delRow(id) {
-    if(confirm("Are you sure you want to delete this student?")) {
-        const { error } = await client.from('students').delete().eq('id', id);
-        if(!error) location.reload();
+    if(confirm("Delete this student?")) {
+        await client.from('students').delete().eq('id', id);
+        location.reload();
     }
 }
 </script>
