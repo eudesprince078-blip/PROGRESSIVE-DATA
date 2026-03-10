@@ -112,4 +112,118 @@ async function load() {
 }
 </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PMS ONLINE SYSTEM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+    body { font-family: sans-serif; margin: 0; background: #f0f4f8; padding: 10px; }
+    .box { background: white; padding: 20px; border-radius: 12px; max-width: 500px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ccc; }
+    input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { background: #0056b3; color: white; font-weight: bold; border: none; cursor: pointer; }
+    .hidden { display: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
+    th { background: #0056b3; color: white; padding: 10px; text-align: left; }
+    td { border-bottom: 1px solid #ddd; padding: 8px; }
+</style>
+</head>
+<body>
+
+<div id="loginBox" class="box" style="margin-top: 50px;">
+    <h2 style="text-align:center; color:#0056b3;">SCHOOL LOGIN</h2>
+    <input id="u_in" placeholder="USERNAME (PROGRESSIVE)">
+    <input id="p_in" type="password" placeholder="PASSWORD (JESUS CARES)">
+    <button onclick="login()">LOGIN</button>
+    <p id="l_msg" style="color:red; text-align:center; font-weight:bold;"></p>
+</div>
+
+<div id="mainBox" class="hidden">
+    <div class="box" style="max-width: 800px;">
+        <h2 style="text-align:center; color:#0056b3;">STUDENT REGISTRATION</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <input id="f_name" placeholder="Full Name">
+            <input id="f_age" type="number" placeholder="Age">
+            <input id="f_dob" type="date">
+            <input id="f_phone" placeholder="Contact">
+            <input id="f_loc" placeholder="Location">
+            <input id="f_pay" placeholder="Payment Code">
+            <select id="f_cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <select id="f_h"><option value="Good">Health: Good</option><option value="Attention">Special Attention</option></select>
+            <select id="f_s"><option value="Active">Status: Active</option><option value="Left">Status: Left</option></select>
+        </div>
+        <button id="sBtn" onclick="save()">CONFIRM & UPLOAD</button>
+        <hr>
+        <div id="list"></div>
+        <p style="text-align:center; font-size:12px; font-weight:bold;">Eudes Media | +256762992440</p>
+    </div>
+</div>
+
+<script>
+// INITIALIZE CLIENT FIRST
+const URL = "https://cpfttwvonuptqdpskobx.supabase.co";
+const KEY = "sb_secret_er0jEX9JyM89pIB7lp9zww_zP5UbQaj"; 
+const client = supabase.createClient(URL, KEY);
+
+function login() {
+    if(u_in.value.toUpperCase() === "PROGRESSIVE" && p_in.value.toUpperCase() === "JESUS CARES") {
+        loginBox.classList.add("hidden"); 
+        mainBox.classList.remove("hidden"); 
+        load();
+    } else { 
+        l_msg.innerText = "WRONG LOGIN"; 
+    }
+}
+
+async function save() {
+    if(!f_name.value) return alert("Enter Name");
+    const btn = document.getElementById('sBtn');
+    btn.innerText = "⚡ UPLOADING..."; 
+    btn.disabled = true;
+
+    // LIN: PM + First Letter + 4 Random Numbers
+    const lin = "PM" + f_name.value.trim().charAt(0).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+
+    try {
+        const { error } = await client.from('students').insert([{
+            name: f_name.value,
+            age: f_age.value,
+            dob: f_dob.value,
+            contact: f_phone.value,
+            location: f_loc.value,
+            payment_code: f_pay.value,
+            class: f_cl.value,
+            health_status: f_h.value,
+            status: f_s.value,
+            lin: lin,
+            is_active: f_s.value 
+        }]);
+
+        if(error) {
+            alert("UPLOAD FAILED: " + error.message);
+            btn.innerText = "CONFIRM & UPLOAD"; 
+            btn.disabled = false;
+        } else {
+            alert("✅ SUCCESS! Registered as " + lin);
+            location.reload();
+        }
+    } catch (err) {
+        alert("SYSTEM ERROR: " + err.message);
+        btn.innerText = "CONFIRM & UPLOAD"; 
+        btn.disabled = false;
+    }
+}
+
+async function load() {
+    const { data } = await client.from('students').select('*').order('created_at', { ascending: false });
+    if(data) {
+        let h = "<table><tr><th>LIN</th><th>NAME</th><th>CLASS</th></tr>";
+        data.forEach(x => h += `<tr><td>${x.lin}</td><td>${x.name}</td><td>${x.class}</td></tr>`);
+        list.innerHTML = h + "</table>";
+    }
+}
+</script>
+</body>
 </html>
