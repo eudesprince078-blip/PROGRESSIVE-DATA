@@ -1,119 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>PMS ONLINE SYSTEM</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-    body { font-family: sans-serif; margin: 0; background: #f0f4f8; padding: 10px; }
-    .box { background: white; padding: 20px; border-radius: 12px; max-width: 500px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ccc; margin-bottom: 20px; }
-    input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 15px; }
-    button { background: #0056b3; color: white; font-weight: bold; border: none; cursor: pointer; }
-    .hidden { display: none; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; background: white; }
-    th { background: #0056b3; color: white; padding: 10px; text-align: left; }
-    td { border-bottom: 1px solid #ddd; padding: 10px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMS SYSTEM</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; background: #f0f4f8; padding: 10px; margin: 0; }
+        .box { background: white; padding: 20px; border-radius: 12px; max-width: 450px; margin: 20px auto; border: 1px solid #ccc; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 15px; box-sizing: border-box; }
+        button { background: #0056b3; color: white; font-weight: bold; border: none; cursor: pointer; }
+        .hidden { display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
+        th { background: #0056b3; color: white; padding: 8px; text-align: left; }
+        td { border-bottom: 1px solid #ddd; padding: 8px; }
+    </style>
 </head>
 <body>
 
-<div id="loginBox" class="box" style="margin-top: 50px;">
+<div id="loginSection" class="box">
     <h2 style="text-align:center; color:#0056b3;">SCHOOL LOGIN</h2>
-    <input id="u_id" placeholder="USERNAME">
-    <input id="p_id" type="password" placeholder="PASSWORD">
-    <button onclick="login()">LOGIN SYSTEM</button>
-    <p id="l_msg" style="color:red; text-align:center; font-weight:bold;"></p>
+    <input id="u" placeholder="USERNAME">
+    <input id="p" type="password" placeholder="PASSWORD">
+    <button id="lBtn" onclick="doLogin()">LOGIN SYSTEM</button>
+    <p id="err" style="color:red; text-align:center; font-size:12px;"></p>
 </div>
 
-<div id="mainBox" class="hidden">
+<div id="mainSection" class="hidden">
     <div class="box">
-        <h2 style="text-align:center; color:#0056b3;">REGISTRATION</h2>
+        <h2 style="text-align:center; color:#0056b3; margin-top:0;">STUDENT REGISTRATION</h2>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <input id="in_name" placeholder="Full Name">
-            <input id="in_age" type="number" placeholder="Age">
-            <input id="in_dob" type="date">
-            <input id="in_phone" placeholder="Contact Number">
-            <input id="in_loc" placeholder="Location">
-            <input id="in_pay" placeholder="Payment Code">
-            <select id="in_cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <select id="in_h"><option value="Good">Health: Good</option><option value="Attention">Attention Required</option></select>
-            <select id="in_s"><option value="active">Status: active</option><option value="left">Status: left</option></select>
+            <input id="n" placeholder="Full Name">
+            <input id="a" type="number" placeholder="Age">
+            <input id="d" type="date">
+            <input id="ph" placeholder="Contact">
+            <input id="loc" placeholder="Physical Location">
+            <input id="pay" placeholder="Payment Code">
+            <select id="cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <select id="he"><option value="Good">Health: Good</option><option value="Attention">Health: Check</option></select>
+            <select id="st"><option value="active">Status: active</option><option value="left">Status: left</option></select>
         </div>
-        <button id="sBtn" onclick="save()">CONFIRM & UPLOAD</button>
+        <button id="upBtn" onclick="doSave()">CONFIRM & UPLOAD</button>
         <hr>
-        <div id="list"></div>
-        <p style="text-align:center; font-size:12px; font-weight:bold; margin-top:15px;">Eudes Media | +256762992440</p>
+        <div id="listArea"></div>
+        <p style="text-align:center; font-weight:bold; font-size:12px; margin-top:15px;">Eudes Media | +256762992440</p>
     </div>
 </div>
 
 <script>
-let client = null; 
-const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
-const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
+    const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
+    const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
+    // Initialize immediately to avoid "client" errors
+    const sb = supabase.createClient(URL, KEY);
 
-function login() {
-    const user = document.getElementById('u_id').value.trim().toUpperCase();
-    const pass = document.getElementById('p_id').value.trim().toUpperCase();
-    
-    if(user === "PROGRESSIVE" && pass === "JESUS CARES") {
-        // We initialize the client RIGHT HERE when you login
-        if (!client) {
-            client = supabase.createClient(URL, KEY);
+    function doLogin() {
+        const user = document.getElementById('u').value.trim().toUpperCase();
+        const pass = document.getElementById('p').value.trim().toUpperCase();
+        
+        if (user === "PROGRESSIVE" && pass === "JESUS CARES") {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('mainSection').classList.remove('hidden');
+            doLoad();
+        } else {
+            document.getElementById('err').innerText = "WRONG CREDENTIALS";
         }
-        loginBox.classList.add("hidden"); 
-        mainBox.classList.remove("hidden"); 
-        load();
-    } else { 
-        document.getElementById('l_msg').innerText = "ACCESS DENIED"; 
     }
-}
 
-async function save() {
-    const sName = document.getElementById('in_name').value;
-    const statusVal = document.getElementById('in_s').value;
-    const btn = document.getElementById('sBtn');
-    
-    if(!sName) return alert("Enter Name");
-    if(!client) return alert("System error: Client not ready. Please refresh.");
+    async function doSave() {
+        const name = document.getElementById('n').value;
+        const status = document.getElementById('st').value;
+        const btn = document.getElementById('upBtn');
 
-    btn.innerText = "UPLOADING..."; btn.disabled = true;
+        if (!name) return alert("Name is required");
+        btn.innerText = "SAVING..."; btn.disabled = true;
 
-    try {
-        const { error } = await client.from('students').insert([{
-            name: sName,
-            age: document.getElementById('in_age').value,
-            dob: document.getElementById('in_dob').value,
-            contact: document.getElementById('in_phone').value,
-            location: document.getElementById('in_loc').value,
-            payment_code: document.getElementById('in_pay').value,
-            class: document.getElementById('in_cl').value,
-            health_status: document.getElementById('in_h').value,
-            status: statusVal,
-            lin: "PM-" + Math.floor(1000 + Math.random() * 9000),
-            is_active: (statusVal === "active") 
-        }]);
+        try {
+            const { error } = await sb.from('students').insert([{
+                name: name,
+                age: document.getElementById('a').value,
+                dob: document.getElementById('d').value,
+                contact: document.getElementById('ph').value,
+                location: document.getElementById('loc').value,
+                payment_code: document.getElementById('pay').value,
+                class: document.getElementById('cl').value,
+                health_status: document.getElementById('he').value,
+                status: status,
+                active: (status === "active"), // FIXED: Now uses 'active' instead of 'is_active'
+                lin: "PM-" + Math.floor(1000 + Math.random() * 9000)
+            }]);
 
-        if(error) throw error;
-        alert("✅ SUCCESS!");
-        location.reload();
-    } catch (err) {
-        alert("Error: " + err.message);
-        btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
+            if (error) throw error;
+            alert("SAVED TO DATABASE");
+            location.reload();
+        } catch (e) {
+            alert("Database Error: " + e.message);
+            btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
+        }
     }
-}
 
-async function load() {
-    if(!client) return;
-    const { data } = await client.from('students').select('*').order('created_at', { ascending: false });
-    if(data) {
-        let html = "<table><tr><th>LIN</th><th>NAME</th><th>CLASS</th></tr>";
-        data.forEach(s => {
-            html += `<tr><td>${s.lin}</td><td>${s.name}</td><td>${s.class}</td></tr>`;
-        });
-        document.getElementById('list').innerHTML = html + "</table>";
+    async function doLoad() {
+        try {
+            const { data } = await sb.from('students').select('*').order('created_at', { ascending: false });
+            if (data) {
+                let h = "<table><tr><th>LIN</th><th>NAME</th><th>CLASS</th></tr>";
+                data.forEach(r => {
+                    h += `<tr><td>${r.lin}</td><td>${r.name}</td><td>${r.class}</td></tr>`;
+                });
+                document.getElementById('listArea').innerHTML = h + "</table>";
+            }
+        } catch(e) { console.log(e); }
     }
-}
 </script>
 </body>
 </html>
