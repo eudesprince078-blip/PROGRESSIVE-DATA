@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
     body { font-family: sans-serif; margin: 0; background: #f0f4f8; padding: 10px; }
-    .box { background: white; padding: 20px; border-radius: 12px; max-width: 800px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ccc; margin-bottom: 20px; }
+    .box { background: white; padding: 20px; border-radius: 12px; max-width: 500px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ccc; margin-bottom: 20px; }
     input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 15px; }
     button { background: #0056b3; color: white; font-weight: bold; border: none; cursor: pointer; }
     .hidden { display: none; }
@@ -18,23 +18,23 @@
 </head>
 <body>
 
-<div id="loginBox" class="box" style="margin-top: 50px; max-width: 400px;">
+<div id="loginBox" class="box" style="margin-top: 50px;">
     <h2 style="text-align:center; color:#0056b3;">SCHOOL LOGIN</h2>
-    <input id="u_id" placeholder="USERNAME (PROGRESSIVE)">
-    <input id="p_id" type="password" placeholder="PASSWORD (JESUS CARES)">
+    <input id="u_id" placeholder="USERNAME">
+    <input id="p_id" type="password" placeholder="PASSWORD">
     <button onclick="login()">LOGIN SYSTEM</button>
     <p id="l_msg" style="color:red; text-align:center; font-weight:bold;"></p>
 </div>
 
 <div id="mainBox" class="hidden">
     <div class="box">
-        <h2 style="text-align:center; color:#0056b3;">STUDENT REGISTRATION</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <h2 style="text-align:center; color:#0056b3;">REGISTRATION</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
             <input id="in_name" placeholder="Full Name">
             <input id="in_age" type="number" placeholder="Age">
             <input id="in_dob" type="date">
             <input id="in_phone" placeholder="Contact Number">
-            <input id="in_loc" placeholder="Physical Location">
+            <input id="in_loc" placeholder="Location">
             <input id="in_pay" placeholder="Payment Code">
             <select id="in_cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
             <select id="in_h"><option value="Good">Health: Good</option><option value="Attention">Attention Required</option></select>
@@ -43,12 +43,12 @@
         <button id="sBtn" onclick="save()">CONFIRM & UPLOAD</button>
         <hr>
         <div id="list"></div>
-        <p style="text-align:center; font-size:12px; font-weight:bold; margin-top:15px;">Developed by Eudes Media | +256762992440</p>
+        <p style="text-align:center; font-size:12px; font-weight:bold; margin-top:15px;">Eudes Media | +256762992440</p>
     </div>
 </div>
 
 <script>
-// These connect directly immediately when the page loads
+// Direct initialization - no "Connecting" locks
 const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
 const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
 const client = supabase.createClient(URL, KEY);
@@ -66,14 +66,10 @@ async function save() {
     const statusVal = document.getElementById('in_s').value;
     const btn = document.getElementById('sBtn');
     
-    if(!sName) return alert("Enter Name First");
-    btn.innerText = "⚡ UPLOADING...";
-    btn.disabled = true;
-
-    const lin = "PM-" + Math.floor(1000 + Math.random() * 9000);
+    if(!sName) return alert("Enter Name");
+    btn.innerText = "UPLOADING..."; btn.disabled = true;
 
     try {
-        // We only add this 'is_active' line to fix the Boolean error you saw earlier
         const { error } = await client.from('students').insert([{
             name: sName,
             age: document.getElementById('in_age').value,
@@ -84,19 +80,15 @@ async function save() {
             class: document.getElementById('in_cl').value,
             health_status: document.getElementById('in_h').value,
             status: statusVal,
-            lin: lin,
-            is_active: (statusVal === "active") 
+            lin: "PM-" + Math.floor(1000 + Math.random() * 9000),
+            is_active: (statusVal === "active") // This is the ONLY fix added
         }]);
 
-        if(error) {
-            alert("Database Error: " + error.message);
-            btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
-        } else {
-            alert("✅ SUCCESS! Saved as " + lin);
-            location.reload();
-        }
+        if(error) throw error;
+        alert("✅ SUCCESS!");
+        location.reload();
     } catch (err) {
-        alert("System Error: " + err.message);
+        alert("Error: " + err.message);
         btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
     }
 }
@@ -104,9 +96,9 @@ async function save() {
 async function load() {
     const { data } = await client.from('students').select('*').order('created_at', { ascending: false });
     if(data) {
-        let html = "<table><tr><th>LIN</th><th>NAME</th><th>CONTACT</th><th>PAY-CODE</th></tr>";
+        let html = "<table><tr><th>LIN</th><th>NAME</th><th>CLASS</th></tr>";
         data.forEach(s => {
-            html += `<tr><td>${s.lin}</td><td>${s.name}</td><td>${s.contact || '-'}</td><td>${s.payment_code || '-'}</td></tr>`;
+            html += `<tr><td>${s.lin}</td><td>${s.name}</td><td>${s.class}</td></tr>`;
         });
         document.getElementById('list').innerHTML = html + "</table>";
     }
