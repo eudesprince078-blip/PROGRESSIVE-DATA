@@ -11,10 +11,6 @@
     .box { background: white; padding: 20px; border-radius: 12px; max-width: 850px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ccc; margin-bottom: 20px; }
     input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
     button { background: var(--blue); color: white; font-weight: bold; border: none; cursor: pointer; }
-    button:disabled { background: #cccccc; cursor: not-allowed; }
-    .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; }
-    .stat-card { background: var(--blue); color: white; padding: 12px; border-radius: 10px; text-align: center; }
-    .stat-card h3 { margin: 5px 0 0 0; font-size: 22px; }
     .hidden { display: none; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
     th { background: var(--blue); color: white; padding: 10px; text-align: left; }
@@ -29,19 +25,11 @@
     <h2 style="text-align:center; color:var(--blue);">SCHOOL LOGIN</h2>
     <input id="u_id" placeholder="USERNAME (PROGRESSIVE)">
     <input id="p_id" type="password" placeholder="PASSWORD (JESUS CARES)">
-    <button id="loginBtn" onclick="login()">LOGIN SYSTEM</button>
+    <button onclick="login()">LOGIN SYSTEM</button>
     <p id="l_msg" style="color:red; text-align:center; font-weight:bold;"></p>
 </div>
 
 <div id="mainBox" class="hidden">
-    <div class="box">
-        <div class="dash-grid">
-            <div class="stat-card"><p style="margin:0; font-size:12px;">Total Students</p><h3 id="stat_total">0</h3></div>
-            <div class="stat-card" style="background:#28a745;"><p style="margin:0; font-size:12px;">Active</p><h3 id="stat_active">0</h3></div>
-            <div class="stat-card" style="background:#ffc107; color:black;"><p style="margin:0; font-size:12px;">Last Entry</p><h3 id="stat_last">-</h3></div>
-        </div>
-    </div>
-
     <div class="box">
         <h2 id="formTitle" style="text-align:center; color:var(--blue); margin-top:0;">STUDENT REGISTRATION</h2>
         <input id="row_id" type="hidden">
@@ -64,6 +52,7 @@
     </div>
 
     <div class="box">
+        <h3 style="color:var(--blue); margin:0 0 10px 0;">STUDENT RECORDS</h3>
         <div style="overflow-x:auto;">
             <table>
                 <thead>
@@ -77,16 +66,9 @@
 </div>
 
 <script>
-let client; // We define it but don't use it until initialized
 const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
 const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-
-// Wait for the page and library to load before creating the client
-window.onload = function() {
-    if (typeof supabase !== 'undefined') {
-        client = supabase.createClient(URL, KEY);
-    }
-};
+const client = supabase.createClient(URL, KEY);
 
 function login() {
     const user = document.getElementById('u_id').value.trim().toUpperCase();
@@ -101,8 +83,6 @@ function login() {
 }
 
 async function save() {
-    if (!client) return alert("System still connecting. Please wait 2 seconds.");
-
     const sName = document.getElementById('in_name').value;
     const rowId = document.getElementById('row_id').value;
     const statusVal = document.getElementById('in_s').value;
@@ -111,6 +91,7 @@ async function save() {
     if(!sName) return alert("Enter Student Name");
     btn.innerText = "UPLOADING..."; btn.disabled = true;
 
+    // The data object for Supabase
     const dataObj = {
         name: sName,
         age: document.getElementById('in_age').value,
@@ -121,33 +102,28 @@ async function save() {
         class: document.getElementById('in_cl').value,
         health_status: document.getElementById('in_h').value,
         status: statusVal,
-        is_active: (statusVal === "active") 
+        is_active: (statusVal === "active") // This fixes the Boolean error!
     };
 
     try {
-        let res;
         if (rowId) {
-            res = await client.from('students').update(dataObj).eq('id', rowId);
+            await client.from('students').update(dataObj).eq('id', rowId);
         } else {
             dataObj.lin = "PM-" + Math.floor(1000 + Math.random() * 9000);
-            res = await client.from('students').insert([dataObj]);
+            await client.from('students').insert([dataObj]);
         }
-        if(res.error) throw res.error;
         location.reload();
     } catch (err) {
-        alert("Upload Error: " + err.message);
+        alert("Error: " + err.message);
         btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
     }
 }
 
 async function load() {
-    if (!client) return;
     const { data } = await client.from('students').select('*').order('created_at', { ascending: false });
     if(data) {
         let html = "";
-        let activeCount = 0;
         data.forEach(s => {
-            if(s.status === "active") activeCount++;
             html += `<tr>
                 <td>${s.lin}</td>
                 <td>${s.name}</td>
@@ -160,9 +136,6 @@ async function load() {
             </tr>`;
         });
         document.getElementById('list').innerHTML = html;
-        document.getElementById('stat_total').innerText = data.length;
-        document.getElementById('stat_active').innerText = activeCount;
-        if(data[0]) document.getElementById('stat_last').innerText = data[0].name.split(' ')[0];
     }
 }
 
@@ -184,7 +157,7 @@ function editRow(item) {
 }
 
 async function delRow(id) {
-    if(confirm("Delete this student permanently?")) {
+    if(confirm("Delete student?")) {
         await client.from('students').delete().eq('id', id);
         location.reload();
     }
