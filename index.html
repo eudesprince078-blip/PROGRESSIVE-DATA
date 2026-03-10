@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PMS Online System | Eudes Media</title>
+<title>PMS Online | Eudes Media</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -12,8 +12,8 @@
     .container { padding: 15px; max-width: 900px; margin: auto; background: white; min-height: 100vh; }
     input, select, button { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
     button { background: var(--blue); color: white; font-weight: bold; border: none; cursor: pointer; }
-    .pass-container { position: relative; }
-    .toggle-pass { position: absolute; right: 10px; top: 15px; cursor: pointer; }
+    .pass-box { position: relative; }
+    .eye { position: absolute; right: 10px; top: 15px; cursor: pointer; }
     .hidden { display: none; }
     .footer { text-align: center; font-size: 12px; padding: 20px; font-weight: bold; border-top: 2px solid var(--blue); margin-top: 20px; }
     table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
@@ -26,40 +26,33 @@
 <div id="loginBox">
     <header><h2>PROGRESSIVE MOTHER’S SCHOOL</h2></header>
     <div class="container" style="max-width: 350px; min-height: auto; margin-top: 50px; border-radius: 10px; border: 1px solid #ddd;">
-        <input id="username" placeholder="USERNAME (ALL CAPS)">
-        <div class="pass-container">
-            <input id="password" type="password" placeholder="PASSWORD (ALL CAPS)">
-            <span class="toggle-pass" onclick="togglePass()">👁️</span>
+        <input id="user" placeholder="USERNAME (ALL CAPS)">
+        <div class="pass-box">
+            <input id="pass" type="password" placeholder="PASSWORD (ALL CAPS)">
+            <span class="eye" onclick="document.getElementById('pass').type = (document.getElementById('pass').type === 'password' ? 'text' : 'password')">👁️</span>
         </div>
         <button onclick="login()">LOGIN SYSTEM</button>
-        <p id="msg" style="color:red; text-align:center; font-size:12px; font-weight:bold;"></p>
+        <p id="lMsg" style="color:red; text-align:center; font-size:12px;"></p>
         <div class="footer">Eudes Media | +256762992440</div>
     </div>
 </div>
 
-<div id="systemBox" class="hidden">
-    <header><h2>STUDENT MANAGEMENT DASHBOARD</h2></header>
+<div id="sys" class="hidden">
+    <header><h2>STUDENT DASHBOARD</h2></header>
     <div class="container">
-        <h3>New Registration</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <input id="studentName" placeholder="Student Full Name">
-            <input id="age" type="number" placeholder="Age">
-            <input type="date" id="dob">
-            <input id="contact" placeholder="Contact Number">
-            <input id="address" placeholder="Physical Location">
-            <input id="payCode" placeholder="Payment Code">
-            <select id="cl">
-                <option>P.1</option><option>P.2</option><option>P.3</option>
-                <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-            <select id="hStatus"><option value="Good">Health: Good</option><option value="Attention">Special Attention</option></select>
-            <select id="sStatus"><option value="Active">Status: Active</option><option value="Left">Status: Left</option></select>
+            <input id="sName" placeholder="Full Name">
+            <input id="sAge" type="number" placeholder="Age">
+            <input type="date" id="sDob">
+            <input id="sContact" placeholder="Contact Number">
+            <input id="sLoc" placeholder="Location">
+            <input id="sPay" placeholder="Payment Code">
+            <select id="sCl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <select id="sHealth"><option value="Good">Health: Good</option><option value="Special">Special Attention</option></select>
+            <select id="sStat"><option value="Active">Status: Active</option><option value="Left">Status: Left</option></select>
         </div>
-        
-        <button onclick="saveStudent()" id="saveBtn" style="margin-top:10px;">CONFIRM & UPLOAD TO CLOUD</button>
-        <button onclick="downloadData()" style="background:#28a745; margin-top:10px;">📥 DOWNLOAD STUDENT LIST (CSV)</button>
-
-        <hr>
+        <button onclick="save()" id="sBtn">CONFIRM & UPLOAD</button>
+        <button onclick="download()" style="background:#28a745;">📥 DOWNLOAD LIST (CSV)</button>
         <div id="list"></div>
         <div class="footer">Developed by Eudes Media | +256762992440</div>
     </div>
@@ -69,89 +62,56 @@
 const URL = "https://cpfttwvonuptqdpskobx.supabase.co";
 const KEY = "sb_secret_er0jEX9JyM89pIB7lp9zww_zP5UbQaj"; 
 const client = supabase.createClient(URL, KEY);
-let studentData = [];
-
-function togglePass() {
-    const p = document.getElementById('password');
-    p.type = p.type === "password" ? "text" : "password";
-}
+let students = [];
 
 function login() {
-    const u = document.getElementById('username').value.trim().toUpperCase();
-    const p = document.getElementById('password').value.trim().toUpperCase();
-    if(u === "PROGRESSIVE" && p === "JESUS CARES") {
-        loginBox.classList.add("hidden");
-        systemBox.classList.remove("hidden");
-        fetchData();
-    } else { msg.textContent = "WRONG USERNAME OR PASSWORD"; }
+    if(user.value.toUpperCase() === "PROGRESSIVE" && pass.value.toUpperCase() === "JESUS CARES") {
+        loginBox.classList.add("hidden"); sys.classList.remove("hidden"); load();
+    } else { lMsg.innerText = "ACCESS DENIED"; }
 }
 
-async function saveStudent() {
-    const btn = document.getElementById('saveBtn');
-    const nameInput = document.getElementById('studentName').value;
-    if(!nameInput) return alert("Enter Name");
-    
-    btn.innerText = "SAVING...";
-    btn.disabled = true;
+async function save() {
+    if(!sName.value) return alert("Missing Name");
+    sBtn.innerText = "SAVING..."; sBtn.disabled = true;
 
-    // LIN: PM + First Letter of Name + 4 Random Numbers
-    const firstLetter = nameInput.trim().charAt(0).toUpperCase();
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const newLin = "PM" + firstLetter + randomNum;
+    // LIN Formula: PM + First Letter + 4 Random Numbers (e.g., PMM4821)
+    const lin = "PM" + sName.value.charAt(0).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
 
-    // EXACT Supabase Column Match
-    const payload = {
-        name: nameInput,
-        class: document.getElementById('cl').value,
-        lin: newLin,
-        photo_url: "",
-        contact: document.getElementById('contact').value,
-        age: document.getElementById('age').value,
-        dob: document.getElementById('dob').value,
-        location: document.getElementById('address').value,
-        health_status: document.getElementById('hStatus').value,
-        is_active: document.getElementById('sStatus').value === 'Active',
-        payment_code: document.getElementById('payCode').value,
-        status: document.getElementById('sStatus').value
-    };
+    const { error } = await client.from('students').insert([{
+        name: sName.value,
+        age: sAge.value,
+        dob: sDob.value,
+        contact: sContact.value,
+        location: sLoc.value,
+        payment_code: sPay.value,
+        class: sCl.value,
+        health_status: sHealth.value,
+        status: sStat.value,
+        lin: lin,
+        is_active: (sStat.value === "Active")
+    }]);
 
-    const { error } = await client.from('students').insert([payload]);
-    
-    if(error) {
-        alert("Database Error: " + error.message);
-        btn.innerText = "CONFIRM & UPLOAD TO CLOUD";
-        btn.disabled = false;
-    } else {
-        alert("✅ Registered Successfully! LIN: " + newLin);
-        location.reload();
-    }
+    if(error) { alert("Error: " + error.message); sBtn.innerText = "TRY AGAIN"; sBtn.disabled = false; }
+    else { alert("✅ Success! Registered as " + lin); location.reload(); }
 }
 
-async function fetchData() {
-    const { data, error } = await client.from('students').select('*').order('name');
-    if(!error) { studentData = data; render(); }
+async function load() {
+    const { data } = await client.from('students').select('*').order('name');
+    if(data) { students = data; render(); }
 }
 
 function render() {
-    const box = document.getElementById('list');
-    let html = "<table><tr><th>LIN</th><th>NAME</th><th>PAY CODE</th><th>CLASS</th><th>STATUS</th></tr>";
-    studentData.forEach(s => {
-        html += `<tr><td>${s.lin}</td><td>${s.name}</td><td>${s.payment_code || '-'}</td><td>${s.class}</td><td>${s.status}</td></tr>`;
-    });
-    box.innerHTML = html + "</table>";
+    let h = "<table><tr><th>LIN</th><th>NAME</th><th>CLASS</th><th>STATUS</th></tr>";
+    students.forEach(s => h += `<tr><td>${s.lin}</td><td>${s.name}</td><td>${s.class}</td><td>${s.status}</td></tr>`);
+    list.innerHTML = h + "</table>";
 }
 
-function downloadData() {
-    let csv = "LIN,Name,Class,Age,Contact,Payment Code,Status,Location\n";
-    studentData.forEach(s => {
-        csv += `${s.lin},${s.name},${s.class},${s.age},${s.contact},${s.payment_code},${s.status},${s.location}\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'Student_Registry.csv');
-    a.click();
+function download() {
+    let c = "LIN,Name,Class,Contact,PayCode,Status\n";
+    students.forEach(s => c += `${s.lin},${s.name},${s.class},${s.contact},${s.payment_code},${s.status}\n`);
+    const b = new Blob([c], {type:'text/csv'});
+    const u = window.URL.createObjectURL(b);
+    const a = document.createElement('a'); a.href = u; a.download = 'PMS_Registry.csv'; a.click();
 }
 </script>
 </body>
