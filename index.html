@@ -48,7 +48,7 @@
 </div>
 
 <script>
-// Direct initialization - no "Connecting" locks
+// No complicated window.onload - just direct connection
 const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
 const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
 const client = supabase.createClient(URL, KEY);
@@ -57,8 +57,12 @@ function login() {
     const user = document.getElementById('u_id').value.trim().toUpperCase();
     const pass = document.getElementById('p_id').value.trim().toUpperCase();
     if(user === "PROGRESSIVE" && pass === "JESUS CARES") {
-        loginBox.classList.add("hidden"); mainBox.classList.remove("hidden"); load();
-    } else { document.getElementById('l_msg').innerText = "ACCESS DENIED"; }
+        loginBox.classList.add("hidden"); 
+        mainBox.classList.remove("hidden"); 
+        load();
+    } else { 
+        document.getElementById('l_msg').innerText = "ACCESS DENIED"; 
+    }
 }
 
 async function save() {
@@ -81,7 +85,7 @@ async function save() {
             health_status: document.getElementById('in_h').value,
             status: statusVal,
             lin: "PM-" + Math.floor(1000 + Math.random() * 9000),
-            is_active: (statusVal === "active") // This is the ONLY fix added
+            is_active: (statusVal === "active") // The ONLY fix needed for your database
         }]);
 
         if(error) throw error;
