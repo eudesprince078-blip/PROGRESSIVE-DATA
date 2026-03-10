@@ -48,15 +48,19 @@
 </div>
 
 <script>
-// No complicated window.onload - just direct connection
+let client = null; 
 const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
 const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-const client = supabase.createClient(URL, KEY);
 
 function login() {
     const user = document.getElementById('u_id').value.trim().toUpperCase();
     const pass = document.getElementById('p_id').value.trim().toUpperCase();
+    
     if(user === "PROGRESSIVE" && pass === "JESUS CARES") {
+        // We initialize the client RIGHT HERE when you login
+        if (!client) {
+            client = supabase.createClient(URL, KEY);
+        }
         loginBox.classList.add("hidden"); 
         mainBox.classList.remove("hidden"); 
         load();
@@ -71,6 +75,8 @@ async function save() {
     const btn = document.getElementById('sBtn');
     
     if(!sName) return alert("Enter Name");
+    if(!client) return alert("System error: Client not ready. Please refresh.");
+
     btn.innerText = "UPLOADING..."; btn.disabled = true;
 
     try {
@@ -85,7 +91,7 @@ async function save() {
             health_status: document.getElementById('in_h').value,
             status: statusVal,
             lin: "PM-" + Math.floor(1000 + Math.random() * 9000),
-            is_active: (statusVal === "active") // The ONLY fix needed for your database
+            is_active: (statusVal === "active") 
         }]);
 
         if(error) throw error;
@@ -98,6 +104,7 @@ async function save() {
 }
 
 async function load() {
+    if(!client) return;
     const { data } = await client.from('students').select('*').order('created_at', { ascending: false });
     if(data) {
         let html = "<table><tr><th>LIN</th><th>NAME</th><th>CLASS</th></tr>";
