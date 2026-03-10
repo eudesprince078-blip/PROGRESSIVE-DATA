@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>PMS ONLINE SYSTEM</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
     :root { --blue: #0056b3; --white: #ffffff; }
     body { font-family: sans-serif; margin: 0; background: #f0f4f8; padding: 10px; }
@@ -12,7 +12,7 @@
     input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 15px; }
     button { background: var(--blue); color: white; font-weight: bold; border: none; cursor: pointer; }
     .hidden { display: none; }
-    .debug { background: #ffeeee; color: red; font-size: 11px; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #ffcccc; }
+    .debug { background: #ffeeee; color: red; font-size: 12px; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #ffcccc; font-weight: bold; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
     th { background: var(--blue); color: white; padding: 10px; text-align: left; }
     td { border-bottom: 1px solid #ddd; padding: 10px; }
@@ -26,6 +26,7 @@
     <input id="p_id" type="password" placeholder="PASSWORD (JESUS CARES)">
     <button onclick="login()">LOGIN SYSTEM</button>
     <p id="l_msg" style="color:red; text-align:center; font-weight:bold;"></p>
+    <div style="text-align:center; font-size:12px; margin-top:10px;">Eudes Media | +256762992440</div>
 </div>
 
 <div id="mainBox" class="hidden">
@@ -51,14 +52,10 @@
 </div>
 
 <script>
-let client;
-
-window.onload = function() {
-    // UPDATED WITH YOUR NEW KEY
-    const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
-    const NEW_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNjc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM"; 
-    client = supabase.createClient(URL, NEW_KEY);
-};
+// Updated with your NEW Publishable Key
+const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
+const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO"; 
+const client = supabase.createClient(URL, KEY);
 
 function login() {
     const user = document.getElementById('u_id').value.trim().toUpperCase();
@@ -77,6 +74,7 @@ async function save() {
     btn.innerText = "⚡ UPLOADING..."; btn.disabled = true;
     debug.classList.add("hidden");
 
+    // LIN: PM + First Letter + 4 Random Numbers [cite: 2026-03-05]
     const lin = "PM" + sName.trim().charAt(0).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
 
     try {
@@ -99,12 +97,12 @@ async function save() {
             debug.innerText = "DATABASE ERROR: " + error.message;
             debug.classList.remove("hidden");
         } else {
-            alert("✅ SUCCESS! Saved as " + lin);
+            alert("✅ SUCCESS! Registered as " + lin);
             location.reload();
         }
     } catch (err) {
         btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
-        debug.innerText = "CONNECTION ERROR: " + err.message;
+        debug.innerText = "SYSTEM ERROR: " + err.message;
         debug.classList.remove("hidden");
     }
 }
