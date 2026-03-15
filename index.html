@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PMS ADMIN - STAY LOGGED IN</title>
+    <title>PMS - FULL ADMIN</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -12,14 +12,13 @@
         .stat { flex: 1; background: #0056b3; color: white; padding: 15px; border-radius: 10px; text-align: center; }
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; box-sizing: border-box; }
         button { background: #0056b3; color: white; font-weight: bold; border: none; cursor: pointer; }
-        .btn-edit { background: #ffc107; color: black; padding: 5px 10px; border-radius: 4px; width: auto; margin-right: 5px; cursor: pointer; border: none; font-size: 10px; }
-        .btn-del { background: #dc3545; color: white; padding: 5px 10px; border-radius: 4px; width: auto; cursor: pointer; border: none; font-size: 10px; }
+        .btn-edit { background: #ffc107; color: black; padding: 6px; border-radius: 4px; width: auto; font-size: 10px; cursor: pointer; border: none; margin-right: 5px; font-weight: bold; }
+        .btn-del { background: #dc3545; color: white; padding: 6px; border-radius: 4px; width: auto; font-size: 10px; cursor: pointer; border: none; font-weight: bold; }
         .hidden { display: none !important; }
         .scroll-box { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 750px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 700px; }
         th { background: #0056b3; color: white; padding: 10px; text-align: left; }
-        td { border-bottom: 1px solid #ddd; padding: 10px; background: #fff; }
-        #searchBar { border: 2px solid #0056b3; padding-left: 10px; height: 45px; }
+        td { border-bottom: 1px solid #ddd; padding: 10px; background: #fff; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -59,6 +58,7 @@
         <button id="upBtn" onclick="doUpload()">CONFIRM & UPLOAD</button>
         <button id="cancelBtn" class="hidden" style="background:#6c757d;" onclick="resetForm()">CANCEL EDIT</button>
         
+        <h3 style="color:#0056b3; margin-top:20px;">STUDENT RECORDS</h3>
         <div class="scroll-box">
             <div id="listArea"></div>
         </div>
@@ -70,7 +70,7 @@
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     let sbClient = null;
-    let allStudents = [];
+    let studentList = [];
 
     function checkLogin() {
         const u = document.getElementById('user').value.trim().toUpperCase();
@@ -98,9 +98,9 @@
         };
 
         if (!editId) {
-            // Pick first letter of name for LIN (e.g., M for Mugisha)
-            const firstLetter = name.charAt(0).toUpperCase();
-            dataObj.lin = "PM" + firstLetter + "-" + Math.floor(1000 + Math.random() * 9000);
+            // Uses the first letter of the name provided (e.g. M for Mugisha)
+            const letter = name.charAt(0).toUpperCase();
+            dataObj.lin = "PM" + letter + "-" + Math.floor(1000 + Math.random() * 9000);
         }
 
         try {
@@ -110,15 +110,15 @@
             
             if (error) throw error;
             alert("SUCCESSFULLY SAVED!");
-            resetForm(); // Clears inputs without logging out
-            fetchRecords(); // Refreshes the list instantly
+            resetForm(); 
+            fetchRecords(); 
         } catch (e) { alert(e.message); }
     }
 
     async function fetchRecords() {
         const { data } = await sbClient.from('students').select('*').order('created_at', { ascending: false });
         if (data) {
-            allStudents = data;
+            studentList = data;
             renderTable(data);
             document.getElementById('countT').innerText = data.length;
             document.getElementById('countA').innerText = data.filter(s => s.status === 'active').length;
@@ -126,13 +126,12 @@
     }
 
     function renderTable(data) {
-        let html = "<table><tr><th>LIN</th><th>NAME</th><th>CONTACT</th><th>HEALTH</th><th>CLASS</th><th>ACTION</th></tr>";
+        let h = "<table><tr><th>LIN</th><th>NAME</th><th>CONTACT</th><th>CLASS</th><th>ACTIONS</th></tr>";
         data.forEach(r => {
-            html += `<tr>
+            h += `<tr>
                 <td><b>${r.lin}</b></td>
                 <td>${r.name}</td>
                 <td>${r.contact || '-'}</td>
-                <td>${r.health_status}</td>
                 <td>${r.class}</td>
                 <td>
                     <button class="btn-edit" onclick="startEdit('${r.id}')">EDIT</button>
@@ -140,17 +139,17 @@
                 </td>
             </tr>`;
         });
-        document.getElementById('listArea').innerHTML = html + "</table>";
+        document.getElementById('listArea').innerHTML = h + "</table>";
     }
 
     function filterTable() {
         const term = document.getElementById('searchBar').value.toUpperCase();
-        const filtered = allStudents.filter(s => s.name.toUpperCase().includes(term) || s.lin.toUpperCase().includes(term));
+        const filtered = studentList.filter(s => s.name.toUpperCase().includes(term) || s.lin.toUpperCase().includes(term));
         renderTable(filtered);
     }
 
     function startEdit(id) {
-        const s = allStudents.find(x => x.id == id);
+        const s = studentList.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
         document.getElementById('n').value = s.name;
         document.getElementById('a').value = s.age;
@@ -168,7 +167,7 @@
     }
 
     async function doDelete(id) {
-        if(confirm("Are you sure you want to delete this student?")) {
+        if(confirm("Confirm Delete?")) {
             const { error } = await sbClient.from('students').delete().eq('id', id);
             if (!error) fetchRecords();
         }
