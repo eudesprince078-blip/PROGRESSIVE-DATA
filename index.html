@@ -2,222 +2,218 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PMS - FINAL STABLE</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PMS Professional - Eudes Media</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: sans-serif; background: #f0f4f8; padding: 10px; margin: 0; }
-        .box { background: white; padding: 20px; border-radius: 12px; max-width: 900px; margin: 15px auto; border: 2px solid #0056b3; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .dash { display: flex; gap: 10px; margin-bottom: 15px; }
-        .stat { flex: 1; background: #0056b3; color: white; padding: 15px; border-radius: 10px; text-align: center; }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; box-sizing: border-box; }
-        button { background: #0056b3; color: white; font-weight: bold; border: none; cursor: pointer; }
-        .btn-edit { background: #ffc107; color: black; padding: 6px 12px; border-radius: 4px; width: auto; font-size: 11px; font-weight: bold; border: none; }
-        .btn-del { background: #dc3545; color: white; padding: 6px 12px; border-radius: 4px; width: auto; font-size: 11px; font-weight: bold; border: none; }
+        :root { --blue: #0056b3; --light: #f4f7f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 10px; color: #333; }
+        .box { background: white; padding: 20px; border-radius: 12px; max-width: 1100px; margin: 10px auto; border: 1px solid #dee2e6; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .header { background: var(--blue); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; position: relative; }
+        
+        /* Stats Dashboard */
+        .dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .stat { background: white; padding: 15px; border-radius: 10px; text-align: center; border-bottom: 4px solid var(--blue); }
+        .stat b { font-size: 22px; color: var(--blue); display: block; }
+        .stat small { text-transform: uppercase; font-size: 10px; color: #666; font-weight: bold; }
+
+        /* Form Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        label { font-size: 11px; font-weight: bold; color: var(--blue); display: block; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+        
+        .btn-save { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn-promote { background: #28a745; color: white; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        
+        /* Table Styles */
+        .table-area { overflow-x: auto; margin-top: 20px; border-radius: 8px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 900px; }
+        th { background: #f8f9fa; color: var(--blue); padding: 12px; text-align: left; font-size: 12px; border-bottom: 2px solid #eee; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .bg-active { background: #e6fffa; color: #00897b; }
+        .bg-left { background: #fff5f5; color: #e53e3e; }
+        
+        .footer { text-align: center; margin-top: 30px; padding: 20px; font-size: 12px; font-weight: bold; color: #555; border-top: 1px solid #ddd; }
         .hidden { display: none !important; }
-        .scroll-box { overflow-x: auto; margin-top: 15px; border: 1px solid #ddd; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 600px; }
-        th { background: #0056b3; color: white; padding: 12px; text-align: left; }
-        td { border-bottom: 1px solid #ddd; padding: 12px; background: #fff; vertical-align: middle; }
-        .thumb { width: 45px; height: 45px; border-radius: 5px; object-fit: cover; border: 1px solid #ddd; }
-        #camArea { text-align: center; background: #000; border-radius: 8px; overflow: hidden; margin: 10px 0; display: none; padding: 10px; }
-        video { width: 100%; border-radius: 8px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div id="loginSection" class="box" style="max-width: 400px;">
-    <h2 style="text-align:center; color:#0056b3;">SCHOOL LOGIN</h2>
-    <input id="user" placeholder="USERNAME">
-    <input id="pass" type="password" placeholder="PASSWORD">
-    <button onclick="checkLogin()">LOGIN SYSTEM</button>
-    <p id="msg" style="color:red; text-align:center; font-size:12px;"></p>
+<div id="login" class="box" style="max-width:350px; margin-top:80px;">
+    <h2 style="text-align:center; color:var(--blue)">PMS LOGIN</h2>
+    <input id="u" placeholder="Username">
+    <input id="p" type="password" placeholder="Password" style="margin-top:10px;">
+    <button onclick="auth()" class="btn-save" style="margin-top:20px;">ACCESS SYSTEM</button>
 </div>
 
-<div id="mainSection" class="hidden">
-    <div class="box">
-        <h3 style="margin-top:0; color:#0056b3;">DASHBOARD</h3>
-        <div class="dash">
-            <div class="stat"><small>TOTAL</small><br><b id="countT">0</b></div>
-            <div class="stat" style="background: #28a745;"><small>ACTIVE</small><br><b id="countA">0</b></div>
-        </div>
-        <input id="searchBar" onkeyup="filterTable()" placeholder="🔍 Search Name or LIN...">
+<div id="main" class="hidden">
+    <div class="header">
+        <h2 style="margin:0">PROGRESSIVE SCHOOL MANAGEMENT</h2>
+    </div>
+
+    <div class="dash">
+        <div class="stat"><small>Total Students</small><b id="countTotal">0</b></div>
+        <div class="stat"><small>Active Students</small><b id="countActive" style="color:#28a745">0</b></div>
+        <div class="stat"><small>Search Result</small><b id="countFilter">0</b></div>
     </div>
 
     <div class="box">
-        <h2 id="formTitle" style="text-align:center; color:#0056b3; margin-top:0;">STUDENT REGISTRATION</h2>
-        <input id="editId" type="hidden">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <input id="n" placeholder="Full Name">
-            <input id="a" type="number" placeholder="Age">
-            <input id="d" type="date">
-            <input id="ph" placeholder="Contact Number">
-            <input id="loc" placeholder="Physical Location">
-            <input id="pay" placeholder="Payment Code">
-            <select id="cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <select id="he"><option value="Good">Health: Good</option><option value="Check">Health: Check</option></select>
-            <select id="st"><option value="active">Status: active</option><option value="left">Status: left</option></select>
-            
-            <div>
-                <small>Step 1: Photo</small>
-                <input type="file" id="photoInput" accept="image/*">
-                <button type="button" onclick="startCamera()" style="background:#28a745; font-size:12px;">📸 OPEN CAMERA</button>
+        <h3 style="margin-top:0; color:var(--blue)">Student Registration</h3>
+        <div class="grid">
+            <div><label>Full Name</label><input id="name"></div>
+            <div><label>Gender</label><select id="gender"><option>Male</option><option>Female</option></select></div>
+            <div><label>Age</label><input id="age" type="number"></div>
+            <div><label>Date of Birth</label><input id="dob" type="date"></div>
+            <div><label>Contact Number</label><input id="phone"></div>
+            <div><label>Physical Location</label><input id="loc"></div>
+            <div><label>Health Status</label><input id="health" placeholder="e.g. Normal"></div>
+            <div><label>Class</label>
+                <select id="class">
+                    <option>Baby</option><option>Middle</option><option>Top</option>
+                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                    <option>P.5</option><option>P.6</option><option>P.7</option>
+                </select>
             </div>
+            <div><label>Status</label><select id="status"><option value="active">Active</option><option value="left">Left School</option></select></div>
         </div>
+        <button onclick="saveStudent()" class="btn-save">REGISTER STUDENT</button>
+    </div>
 
-        <div id="camArea">
-            <video id="video" autoplay playsinline></video>
-            <button type="button" onclick="takeSnapshot()" style="background:#ffc107; color:black; margin-bottom:5px;">CAPTURE PICTURE</button>
-            <button type="button" onclick="stopCamera()" style="background:#dc3545;">CLOSE CAMERA</button>
-            <canvas id="canvas" class="hidden"></canvas>
+    <div class="box">
+        <h3 style="margin-top:0; color:var(--blue)">Student Database</h3>
+        <div class="grid">
+            <input type="text" id="search" onkeyup="filter()" placeholder="🔍 Search by Name, LIN, or Class...">
+            <button onclick="autoPromote()" class="btn-promote">🚀 END OF YEAR PROMOTION</button>
         </div>
-
-        <button id="upBtn" onclick="doUpload()" style="margin-top:15px;">CONFIRM & UPLOAD</button>
-        <button id="cancelBtn" class="hidden" style="background:#6c757d;" onclick="resetForm()">CANCEL EDIT</button>
         
-        <div class="scroll-box">
-            <div id="listArea"></div>
+        <div class="table-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th>LIN</th>
+                        <th>NAME</th>
+                        <th>GENDER</th>
+                        <th>CLASS</th>
+                        <th>LOCATION</th>
+                        <th>HEALTH</th>
+                        <th>STATUS</th>
+                        <th>ACTION</th>
+                    </tr>
+                </thead>
+                <tbody id="list"></tbody>
+            </table>
         </div>
-        <p style="text-align:center; font-weight:bold; font-size:12px; margin-top:15px;">Eudes Media | +256762992440</p>
+    </div>
+
+    <div class="footer">
+        Eudes Media | +256762992440
     </div>
 </div>
 
 <script>
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-    let sbClient = null;
-    let studentData = [];
-    let capturedBlob = null;
+    let sb = null;
+    let allData = [];
 
-    function checkLogin() {
-        const u = document.getElementById('user').value.trim().toUpperCase();
-        const p = document.getElementById('pass').value.trim().toUpperCase();
-        if (u === "PROGRESSIVE" && p === "JESUS CARES") {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('mainSection').classList.remove('hidden');
-            sbClient = supabase.createClient(SB_URL, SB_KEY);
-            fetchRecords();
-        } else { document.getElementById('msg').innerText = "WRONG CREDENTIALS"; }
+    function auth() {
+        if(document.getElementById('u').value.toUpperCase()==="PROGRESSIVE" && document.getElementById('p').value.toUpperCase()==="JESUS CARES") {
+            document.getElementById('login').classList.add('hidden');
+            document.getElementById('main').classList.remove('hidden');
+            sb = supabase.createClient(SB_URL, SB_KEY);
+            load();
+        } else { alert("Wrong Credentials"); }
     }
 
-    // Camera Controls
-    async function startCamera() {
-        document.getElementById('camArea').style.display = "block";
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        document.getElementById('video').srcObject = stream;
-    }
+    async function saveStudent() {
+        const name = document.getElementById('name').value.trim();
+        if(!name) return alert("Enter Name");
 
-    function stopCamera() {
-        const v = document.getElementById('video');
-        if (v.srcObject) { v.srcObject.getTracks().forEach(t => t.stop()); v.srcObject = null; }
-        document.getElementById('camArea').style.display = "none";
-    }
+        // LIN Generation: PM + 1st Letter of Name + Random Number
+        const lin = "PM" + name.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
 
-    function takeSnapshot() {
-        const v = document.getElementById('video');
-        const c = document.getElementById('canvas');
-        c.width = v.videoWidth; c.height = v.videoHeight;
-        c.getContext('2d').drawImage(v, 0, 0);
-        c.toBlob(blob => { capturedBlob = blob; alert("Snapshot ready!"); stopCamera(); }, 'image/jpeg');
-    }
-
-    async function doUpload() {
-        const nameVal = document.getElementById('n').value.trim();
-        const editId = document.getElementById('editId').value;
-        const fileInput = document.getElementById('photoInput').files[0];
-        
-        if (!nameVal) return alert("Enter Student Name");
-
-        let photoUrl = "";
-        let finalFile = fileInput || capturedBlob;
-        
-        if (finalFile) {
-            const fileName = Date.now() + ".jpg";
-            // FIXED: Using lowercase "photos" to match your bucket
-            const { data, error: upError } = await sbClient.storage
-                .from('photos') 
-                .upload(fileName, finalFile);
-            
-            if (upError) return alert("Upload Error: Check if bucket 'photos' exists in lowercase.");
-            photoUrl = SB_URL + "/storage/v1/object/public/photos/" + fileName;
-        }
-
-        const record = {
-            name: nameVal, age: document.getElementById('a').value,
-            dob: document.getElementById('d').value, contact: document.getElementById('ph').value,
-            location: document.getElementById('loc').value, payment_code: document.getElementById('pay').value,
-            class: document.getElementById('cl').value, health_status: document.getElementById('he').value,
-            status: document.getElementById('st').value, active: (document.getElementById('st').value === "active")
+        const student = {
+            name: name,
+            gender: document.getElementById('gender').value,
+            age: document.getElementById('age').value,
+            dob: document.getElementById('dob').value,
+            contact: document.getElementById('phone').value,
+            location: document.getElementById('loc').value,
+            health_status: document.getElementById('health').value,
+            class: document.getElementById('class').value,
+            status: document.getElementById('status').value,
+            lin: lin
         };
-        if (photoUrl) record.photo_url = photoUrl;
 
-        if (!editId) {
-            const letter = nameVal.charAt(0).toUpperCase();
-            record.lin = "PM" + letter + "-" + Math.floor(1000 + Math.random() * 9000);
+        const { error } = await sb.from('students').insert([student]);
+        if(error) alert(error.message);
+        else { alert("Saved!"); location.reload(); }
+    }
+
+    async function load() {
+        const { data } = await sb.from('students').select('*').order('name', { ascending: true });
+        if(data) {
+            allData = data;
+            render(data);
+            document.getElementById('countTotal').innerText = data.length;
+            document.getElementById('countActive').innerText = data.filter(s => s.status === 'active').length;
         }
-
-        const { error } = editId 
-            ? await sbClient.from('students').update(record).eq('id', editId)
-            : await sbClient.from('students').insert([record]);
-        
-        if (error) alert("Database error: " + error.message);
-        else { alert("SUCCESS!"); resetForm(); fetchRecords(); }
     }
 
-    async function fetchRecords() {
-        const { data } = await sbClient.from('students').select('*').order('created_at', { ascending: false });
-        if (data) { studentData = data; renderTable(data); updateStats(data); }
-    }
-
-    function renderTable(data) {
-        let html = "<table><tr><th>PHOTO</th><th>LIN</th><th>NAME</th><th>CLASS</th><th>ACTIONS</th></tr>";
-        data.forEach(r => {
-            const img = r.photo_url ? `<img src="${r.photo_url}" class="thumb">` : `<div style="width:45px; height:45px; background:#eee;"></div>`;
-            html += `<tr><td>${img}</td><td><b>${r.lin}</b></td><td>${r.name}</td><td>${r.class}</td>
-            <td><button class="btn-edit" onclick="startEdit('${r.id}')">EDIT</button> <button class="btn-del" onclick="doDelete('${r.id}')">DEL</button></td></tr>`;
+    function render(arr) {
+        let h = "";
+        arr.forEach(s => {
+            const badge = s.status === 'active' ? 'bg-active' : 'bg-left';
+            h += `<tr>
+                <td><b>${s.lin}</b></td>
+                <td>${s.name.toUpperCase()}</td>
+                <td>${s.gender}</td>
+                <td>${s.class}</td>
+                <td>${s.location}</td>
+                <td>${s.health_status}</td>
+                <td><span class="badge ${badge}">${s.status.toUpperCase()}</span></td>
+                <td><button onclick="toggleStatus('${s.id}', '${s.status}')" style="font-size:10px; cursor:pointer;">Change Status</button></td>
+            </tr>`;
         });
-        document.getElementById('listArea').innerHTML = html + "</table>";
+        document.getElementById('list').innerHTML = h;
+        document.getElementById('countFilter').innerText = arr.length;
     }
 
-    function updateStats(data) {
-        document.getElementById('countT').innerText = data.length;
-        document.getElementById('countA').innerText = data.filter(s => s.status === 'active').length;
+    function filter() {
+        const val = document.getElementById('search').value.toUpperCase();
+        const filtered = allData.filter(s => 
+            s.name.toUpperCase().includes(val) || 
+            s.lin.toUpperCase().includes(val) || 
+            s.class.toUpperCase().includes(val)
+        );
+        render(filtered);
     }
 
-    function filterTable() {
-        const term = document.getElementById('searchBar').value.toUpperCase();
-        renderTable(studentData.filter(s => s.name.toUpperCase().includes(term) || s.lin.toUpperCase().includes(term)));
+    async function toggleStatus(id, current) {
+        const next = current === 'active' ? 'left' : 'active';
+        if(confirm(`Mark student as ${next}?`)) {
+            await sb.from('students').update({ status: next }).eq('id', id);
+            load();
+        }
     }
 
-    function startEdit(id) {
-        const s = studentData.find(x => x.id == id);
-        document.getElementById('editId').value = s.id;
-        document.getElementById('n').value = s.name;
-        document.getElementById('a').value = s.age;
-        document.getElementById('d').value = s.dob;
-        document.getElementById('ph').value = s.contact;
-        document.getElementById('loc').value = s.location;
-        document.getElementById('pay').value = s.payment_code;
-        document.getElementById('cl').value = s.class;
-        document.getElementById('he').value = s.health_status;
-        document.getElementById('st').value = s.status;
-        document.getElementById('formTitle').innerText = "EDITING: " + s.lin;
-        document.getElementById('upBtn').innerText = "SAVE CHANGES";
-        document.getElementById('cancelBtn').classList.remove('hidden');
-        window.scrollTo(0,0);
-    }
-
-    async function doDelete(id) {
-        if(confirm("Delete student?")) { await sbClient.from('students').delete().eq('id', id); fetchRecords(); }
-    }
-
-    function resetForm() {
-        document.querySelectorAll('input').forEach(i => i.value = "");
-        document.getElementById('editId').value = "";
-        capturedBlob = null;
-        document.getElementById('formTitle').innerText = "STUDENT REGISTRATION";
-        document.getElementById('upBtn').innerText = "CONFIRM & UPLOAD";
-        document.getElementById('cancelBtn').classList.add('hidden');
+    async function autoPromote() {
+        if(!confirm("This will move all students to the next class (e.g., P.1 to P.2). Are you sure?")) return;
+        
+        const classes = ["Baby", "Middle", "Top", "P.1", "P.2", "P.3", "P.4", "P.5", "P.6", "P.7", "Graduated"];
+        
+        for (let s of allData) {
+            if(s.status === 'active') {
+                let currentIndex = classes.indexOf(s.class);
+                if(currentIndex < classes.length - 1) {
+                    let nextClass = classes[currentIndex + 1];
+                    await sb.from('students').update({ class: nextClass }).eq('id', s.id);
+                }
+            }
+        }
+        alert("Promotion Complete!");
+        load();
     }
 </script>
 </body>
