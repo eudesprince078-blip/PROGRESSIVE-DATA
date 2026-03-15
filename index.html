@@ -53,26 +53,26 @@ const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
 let db = null;
 
 function loginNow() {
+    // This part now automatically fixes your typing to all CAPITALS
     const user = document.getElementById('u_id').value.trim().toUpperCase();
     const pass = document.getElementById('p_id').value.trim().toUpperCase();
     
     if(user === "PROGRESSIVE" && pass === "JESUS CARES") {
-        // Initialize connection only after successful login
         if (typeof supabase !== 'undefined') {
             db = supabase.createClient(URL, KEY);
             document.getElementById('loginBox').style.display = "none"; 
             document.getElementById('mainBox').classList.remove("hidden"); 
             loadData();
         } else {
-            alert("Internet issue: Could not load database library. Refresh the page.");
+            alert("Connection error. Please refresh.");
         }
     } else { 
-        document.getElementById('l_msg').innerText = "ACCESS DENIED"; 
+        document.getElementById('l_msg').innerText = "ACCESS DENIED - CHECK SPELLING"; 
     }
 }
 
 async function saveData() {
-    if(!db) return alert("System not ready");
+    if(!db) return;
     const name = document.getElementById('in_name').value;
     const statusVal = document.getElementById('in_s').value;
     const btn = document.getElementById('sBtn');
@@ -91,15 +91,15 @@ async function saveData() {
             class: document.getElementById('in_cl').value,
             health_status: document.getElementById('in_h').value,
             status: statusVal,
-            active: (statusVal === "active"), // FIXED: Using 'active' as requested
+            active: (statusVal === "active"), 
             lin: "PM-" + Math.floor(1000 + Math.random() * 9000)
         }]);
 
         if(error) throw error;
-        alert("✅ SAVED SUCCESSFULLY!");
+        alert("✅ SAVED!");
         location.reload();
     } catch (err) {
-        alert("Database Error: " + err.message);
+        alert("Error: " + err.message);
         btn.innerText = "CONFIRM & UPLOAD"; btn.disabled = false;
     }
 }
