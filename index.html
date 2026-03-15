@@ -2,234 +2,188 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PMS PRO - Progressive School</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>PMS - FULL ADMIN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #0056b3; --white: #ffffff; --green: #28a745; --red: #dc3545; }
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; margin: 0; padding: 10px; }
-        .box { background: var(--white); padding: 25px; border-radius: 15px; max-width: 1000px; margin: 15px auto; border: 1px solid #d1d9e6; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
-        .header { background: linear-gradient(135deg, var(--blue), #003d7a); color: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
-        .dash { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-        .stat { background: white; padding: 15px; border-radius: 10px; text-align: center; border-bottom: 4px solid var(--blue); }
-        .stat b { font-size: 22px; color: var(--blue); display: block; }
-        .stat span { font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        label { font-size: 12px; font-weight: bold; color: var(--blue); display: block; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 12px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: var(--blue); }
-        .btn { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; text-transform: uppercase; }
-        .btn:disabled { background: #888; cursor: not-allowed; }
-        .btn-promo { background: #6f42c1; margin-top: 15px; }
-        .table-wrap { overflow-x: auto; margin-top: 20px; border-radius: 10px; }
-        table { width: 100%; border-collapse: collapse; background: white; min-width: 900px; }
-        th { background: #f8f9fa; color: var(--blue); padding: 12px; text-align: left; border-bottom: 2px solid #ddd; font-size: 11px; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .footer { text-align: center; margin-top: 25px; font-size: 12px; font-weight: bold; color: #444; }
+        body { font-family: sans-serif; background: #f0f4f8; padding: 10px; margin: 0; }
+        .box { background: white; padding: 20px; border-radius: 12px; max-width: 900px; margin: 15px auto; border: 2px solid #0056b3; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .dash { display: flex; gap: 10px; margin-bottom: 15px; }
+        .stat { flex: 1; background: #0056b3; color: white; padding: 15px; border-radius: 10px; text-align: center; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; box-sizing: border-box; }
+        button { background: #0056b3; color: white; font-weight: bold; border: none; cursor: pointer; }
+        .btn-edit { background: #ffc107; color: black; padding: 6px; border-radius: 4px; width: auto; font-size: 10px; cursor: pointer; border: none; margin-right: 5px; font-weight: bold; }
+        .btn-del { background: #dc3545; color: white; padding: 6px; border-radius: 4px; width: auto; font-size: 10px; cursor: pointer; border: none; font-weight: bold; }
         .hidden { display: none !important; }
-        #searchBox { border: 2px solid var(--blue); height: 48px; font-size: 15px; margin-bottom: 10px; }
+        .scroll-box { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 700px; }
+        th { background: #0056b3; color: white; padding: 10px; text-align: left; }
+        td { border-bottom: 1px solid #ddd; padding: 10px; background: #fff; vertical-align: middle; }
     </style>
 </head>
 <body>
 
-<div id="gate" class="box" style="max-width:350px; margin-top:100px; text-align:center;">
-    <h2 style="color:var(--blue)">PMS LOGIN</h2>
-    <input id="u" placeholder="USERNAME">
-    <input id="p" type="password" placeholder="PASSWORD" style="margin-top:10px;">
-    <button onclick="login()" class="btn" style="margin-top:20px;">ENTER SYSTEM</button>
+<div id="loginSection" class="box" style="max-width: 400px;">
+    <h2 style="text-align:center; color:#0056b3;">SCHOOL LOGIN</h2>
+    <input id="user" placeholder="USERNAME">
+    <input id="pass" type="password" placeholder="PASSWORD">
+    <button onclick="checkLogin()">LOGIN SYSTEM</button>
+    <p id="msg" style="color:red; text-align:center; font-size:12px;"></p>
 </div>
 
-<div id="main" class="hidden">
-    <div class="header">
-        <h2 style="margin:0;">PROGRESSIVE SCHOOL DATA</h2>
-    </div>
-
-    <div class="dash">
-        <div class="stat"><span>Total</span><b id="tCnt">0</b></div>
-        <div class="stat"><span>Active</span><b id="aCnt" style="color:var(--green)">0</b></div>
-        <div class="stat"><span>Left</span><b id="lCnt" style="color:var(--red)">0</b></div>
+<div id="mainSection" class="hidden">
+    <div class="box">
+        <h3 style="margin-top:0; color:#0056b3;">DASHBOARD</h3>
+        <div class="dash">
+            <div class="stat"><small>TOTAL</small><br><b id="countT">0</b></div>
+            <div class="stat" style="background: #28a745;"><small>ACTIVE</small><br><b id="countA">0</b></div>
+        </div>
+        <input id="searchBar" onkeyup="filterTable()" placeholder="🔍 Search Name or LIN...">
     </div>
 
     <div class="box">
-        <h3 id="fTitle" style="color:var(--blue); margin-top:0;">Registration Form</h3>
-        <input type="hidden" id="editId">
-        <div class="grid">
-            <div><label>Full Name</label><input id="name"></div>
-            <div><label>Age</label><input id="age" type="number"></div>
-            <div><label>Date of Birth</label><input id="dob" type="date"></div>
-            <div><label>Contact Number</label><input id="phone"></div>
-            <div><label>Physical Location</label><input id="loc"></div>
-            <div><label>Payment Code</label><input id="pay"></div>
-            <div><label>Class</label>
-                <select id="cl">
-                    <option>Baby</option><option>Middle</option><option>Top</option>
-                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                    <option>P.5</option><option>P.6</option><option>P.7</option>
-                </select>
-            </div>
-            <div><label>Health Status</label><input id="health" value="Good"></div>
-            <div><label>Student Status</label>
-                <select id="st">
-                    <option value="active">Active Pupil</option>
-                    <option value="left">Left School</option>
-                </select>
-            </div>
+        <h2 id="formTitle" style="text-align:center; color:#0056b3; margin-top:0;">STUDENT REGISTRATION</h2>
+        <input id="editId" type="hidden">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <input id="n" placeholder="Full Name">
+            <input id="a" type="number" placeholder="Age">
+            <input id="d" type="date">
+            <input id="ph" placeholder="Contact Number">
+            <input id="loc" placeholder="Physical Location">
+            <input id="pay" placeholder="Payment Code">
+            <select id="cl"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <select id="he"><option value="Good">Health: Good</option><option value="Check">Health: Check</option></select>
+            <select id="st"><option value="active">Status: active</option><option value="left">Status: left</option></select>
         </div>
-        <button onclick="save()" id="sBtn" class="btn">CONFIRM & SAVE RECORD</button>
-        <button onclick="cancelEdit()" id="cBtn" class="btn hidden" style="background:#666; margin-top:10px;">CANCEL EDIT</button>
-    </div>
-
-    <div class="box">
-        <input type="text" id="searchBox" onkeyup="search()" placeholder="🔍 Search Name, LIN, Class, or Payment Code...">
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr><th>LIN</th><th>NAME</th><th>AGE</th><th>CLASS</th><th>PAYMENT CODE</th><th>STATUS</th><th>ACTIONS</th></tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-            </table>
+        <button id="upBtn" onclick="doUpload()">CONFIRM & UPLOAD</button>
+        <button id="cancelBtn" class="hidden" style="background:#6c757d;" onclick="resetForm()">CANCEL EDIT</button>
+        
+        <h3 style="color:#0056b3; margin-top:20px;">STUDENT RECORDS</h3>
+        <div class="scroll-box">
+            <div id="listArea"></div>
         </div>
-        <button onclick="promote()" class="btn btn-promo">🚀 END OF YEAR PROMOTION (MOVE ALL CLASSES UP)</button>
+        <p style="text-align:center; font-weight:bold; font-size:12px; margin-top:15px;">Eudes Media | +256762992440</p>
     </div>
-
-    <div class="footer">Eudes Media | +256762992440</div>
 </div>
 
 <script>
-    const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
-    const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-    let sb = null;
-    let students = [];
+    const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
+    const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
+    let sbClient = null;
+    let studentList = [];
 
-    function login() {
-        if(document.getElementById('u').value.toUpperCase()==="PROGRESSIVE" && document.getElementById('p').value.toUpperCase()==="JESUS CARES") {
-            document.getElementById('gate').classList.add('hidden');
-            document.getElementById('main').classList.remove('hidden');
-            sb = supabase.createClient(URL, KEY);
-            refresh();
-        } else { alert("Wrong Credentials"); }
+    function checkLogin() {
+        const u = document.getElementById('user').value.trim().toUpperCase();
+        const p = document.getElementById('pass').value.trim().toUpperCase();
+        if (u === "PROGRESSIVE" && p === "JESUS CARES") {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('mainSection').classList.remove('hidden');
+            sbClient = supabase.createClient(SB_URL, SB_KEY);
+            fetchRecords();
+        } else { document.getElementById('msg').innerText = "WRONG CREDENTIALS"; }
     }
 
-    async function refresh() {
-        const { data } = await sb.from('students').select('*').order('created_at', { ascending: false });
-        if(data) {
-            students = data;
-            render(data);
-            document.getElementById('tCnt').innerText = data.length;
-            document.getElementById('aCnt').innerText = data.filter(s => s.status === 'active').length;
-            document.getElementById('lCnt').innerText = data.filter(s => s.status === 'left').length;
+    async function doUpload() {
+        const name = document.getElementById('n').value.trim();
+        const editId = document.getElementById('editId').value;
+        const status = document.getElementById('st').value;
+        if (!name) return alert("Enter Name");
+
+        const dataObj = {
+            name: name, age: document.getElementById('a').value,
+            dob: document.getElementById('d').value, contact: document.getElementById('ph').value,
+            location: document.getElementById('loc').value, payment_code: document.getElementById('pay').value,
+            class: document.getElementById('cl').value, health_status: document.getElementById('he').value,
+            status: status, active: (status === "active")
+        };
+
+        if (!editId) {
+            // Uses the first letter of the name provided (e.g. M for Mugisha)
+            const letter = name.charAt(0).toUpperCase();
+            dataObj.lin = "PM" + letter + "-" + Math.floor(1000 + Math.random() * 9000);
+        }
+
+        try {
+            const { error } = editId 
+                ? await sbClient.from('students').update(dataObj).eq('id', editId)
+                : await sbClient.from('students').insert([dataObj]);
+            
+            if (error) throw error;
+            alert("SUCCESSFULLY SAVED!");
+            resetForm(); 
+            fetchRecords(); 
+        } catch (e) { alert(e.message); }
+    }
+
+    async function fetchRecords() {
+        const { data } = await sbClient.from('students').select('*').order('created_at', { ascending: false });
+        if (data) {
+            studentList = data;
+            renderTable(data);
+            document.getElementById('countT').innerText = data.length;
+            document.getElementById('countA').innerText = data.filter(s => s.status === 'active').length;
         }
     }
 
-    function render(list) {
-        let html = "";
-        list.forEach(s => {
-            html += `<tr>
-                <td style="color:var(--blue); font-weight:bold;">${s.lin || '---'}</td>
-                <td><b>${(s.name || '').toUpperCase()}</b></td>
-                <td>${s.age || '--'}</td>
-                <td><b>${s.class || '--'}</b></td>
-                <td style="color:#555;">${s.payment_code || '---'}</td>
-                <td style="font-weight:bold; color:${s.status==='active'?'green':'red'}">${(s.status || 'active').toUpperCase()}</td>
+    function renderTable(data) {
+        let h = "<table><tr><th>LIN</th><th>NAME</th><th>CONTACT</th><th>CLASS</th><th>ACTIONS</th></tr>";
+        data.forEach(r => {
+            h += `<tr>
+                <td><b>${r.lin}</b></td>
+                <td>${r.name}</td>
+                <td>${r.contact || '-'}</td>
+                <td>${r.class}</td>
                 <td>
-                    <button onclick="editStep('${s.id}')" style="background:#ffc107; border:none; padding:6px; border-radius:4px; cursor:pointer; font-size:10px;">EDIT</button>
-                    <button onclick="delStep('${s.id}')" style="background:#dc3545; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; font-size:10px;">DEL</button>
+                    <button class="btn-edit" onclick="startEdit('${r.id}')">EDIT</button>
+                    <button class="btn-del" onclick="doDelete('${r.id}')">DEL</button>
                 </td>
             </tr>`;
         });
-        document.getElementById('tbody').innerHTML = html;
+        document.getElementById('listArea').innerHTML = h + "</table>";
     }
 
-    async function save() {
-        const id = document.getElementById('editId').value;
-        const name = document.getElementById('name').value.trim();
-        if(!name) return alert("Enter Student Name");
-
-        const btn = document.getElementById('sBtn');
-        btn.disabled = true; btn.innerText = "SAVING...";
-
-        // GENDER REMOVED FROM PAYLOAD TO PREVENT CRASH
-        const pupil = {
-            name: name, age: document.getElementById('age').value,
-            dob: document.getElementById('dob').value, contact: document.getElementById('phone').value,
-            location: document.getElementById('loc').value, payment_code: document.getElementById('pay').value,
-            class: document.getElementById('cl').value, health_status: document.getElementById('health').value,
-            status: document.getElementById('st').value
-        };
-
-        try {
-            if(!id) {
-                // Generate LIN: PM + First Letter + 4 Numbers
-                pupil.lin = "PM" + name.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
-                await sb.from('students').insert([pupil]);
-            } else {
-                await sb.from('students').update(pupil).eq('id', id);
-            }
-            alert("SAVED SUCCESSFULLY!");
-            cancelEdit();
-            await refresh();
-        } catch (e) {
-            alert("Database Error: " + e.message);
-        } finally {
-            btn.disabled = false; btn.innerText = "CONFIRM & SAVE RECORD";
-        }
+    function filterTable() {
+        const term = document.getElementById('searchBar').value.toUpperCase();
+        const filtered = studentList.filter(s => s.name.toUpperCase().includes(term) || s.lin.toUpperCase().includes(term));
+        renderTable(filtered);
     }
 
-    function editStep(id) {
-        const s = students.find(x => x.id == id);
+    function startEdit(id) {
+        const s = studentList.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
-        document.getElementById('name').value = s.name;
-        document.getElementById('age').value = s.age;
-        document.getElementById('dob').value = s.dob;
-        document.getElementById('phone').value = s.contact;
+        document.getElementById('n').value = s.name;
+        document.getElementById('a').value = s.age;
+        document.getElementById('d').value = s.dob;
+        document.getElementById('ph').value = s.contact;
         document.getElementById('loc').value = s.location;
         document.getElementById('pay').value = s.payment_code;
         document.getElementById('cl').value = s.class;
-        document.getElementById('health').value = s.health_status;
+        document.getElementById('he').value = s.health_status;
         document.getElementById('st').value = s.status;
-        
-        document.getElementById('fTitle').innerText = "Edit: " + s.lin;
-        document.getElementById('sBtn').innerText = "UPDATE CHANGES";
-        document.getElementById('cBtn').classList.remove('hidden');
+        document.getElementById('formTitle').innerText = "EDITING: " + s.lin;
+        document.getElementById('upBtn').innerText = "SAVE CHANGES";
+        document.getElementById('cancelBtn').classList.remove('hidden');
         window.scrollTo(0,0);
     }
 
-    async function delStep(id) {
-        if(confirm("Delete student?")) {
-            await sb.from('students').delete().eq('id', id);
-            refresh();
+    async function doDelete(id) {
+        if(confirm("Confirm Delete?")) {
+            const { error } = await sbClient.from('students').delete().eq('id', id);
+            if (!error) fetchRecords();
         }
     }
 
-    async function promote() {
-        if(!confirm("Promote all active students to the next class?")) return;
-        const map = {'Baby':'Middle','Middle':'Top','Top':'P.1','P.1':'P.2','P.2':'P.3','P.3':'P.4','P.4':'P.5','P.5':'P.6','P.6':'P.7','P.7':'GRADUATED'};
-        for(let s of students) {
-            if(s.status === 'active' && map[s.class]) {
-                await sb.from('students').update({class: map[s.class]}).eq('id', s.id);
-            }
-        }
-        alert("Promotion Complete!"); refresh();
-    }
-
-    function search() {
-        const q = document.getElementById('searchBox').value.toUpperCase();
-        const f = students.filter(s => 
-            (s.name && s.name.toUpperCase().includes(q)) || 
-            (s.lin && s.lin.toUpperCase().includes(q)) || 
-            (s.class && s.class.toUpperCase().includes(q)) ||
-            (s.payment_code && s.payment_code.includes(q))
-        );
-        render(f);
-    }
-
-    function cancelEdit() {
+    function resetForm() {
         document.getElementById('editId').value = "";
-        document.getElementById('name').value = "";
+        document.getElementById('n').value = "";
+        document.getElementById('a').value = "";
+        document.getElementById('d').value = "";
+        document.getElementById('ph').value = "";
+        document.getElementById('loc').value = "";
         document.getElementById('pay').value = "";
-        document.getElementById('fTitle').innerText = "Registration Form";
-        document.getElementById('sBtn').innerText = "CONFIRM & SAVE RECORD";
-        document.getElementById('cBtn').classList.add('hidden');
+        document.getElementById('formTitle').innerText = "STUDENT REGISTRATION";
+        document.getElementById('upBtn').innerText = "CONFIRM & UPLOAD";
+        document.getElementById('cancelBtn').classList.add('hidden');
     }
 </script>
 </body>
