@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PMS SYSTEM - ADMIN</title>
+    <title>PMS ADMIN - STAY LOGGED IN</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -12,14 +12,14 @@
         .stat { flex: 1; background: #0056b3; color: white; padding: 15px; border-radius: 10px; text-align: center; }
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; box-sizing: border-box; }
         button { background: #0056b3; color: white; font-weight: bold; border: none; cursor: pointer; }
-        .btn-edit { background: #ffc107; color: black; padding: 5px; font-size: 10px; width: auto; margin: 2px; }
-        .btn-del { background: #dc3545; color: white; padding: 5px; font-size: 10px; width: auto; margin: 2px; }
+        .btn-edit { background: #ffc107; color: black; padding: 5px 10px; border-radius: 4px; width: auto; margin-right: 5px; cursor: pointer; border: none; font-size: 10px; }
+        .btn-del { background: #dc3545; color: white; padding: 5px 10px; border-radius: 4px; width: auto; cursor: pointer; border: none; font-size: 10px; }
         .hidden { display: none !important; }
-        .scroll-box { overflow-x: auto; margin-top: 15px; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 700px; }
+        .scroll-box { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 750px; }
         th { background: #0056b3; color: white; padding: 10px; text-align: left; }
         td { border-bottom: 1px solid #ddd; padding: 10px; background: #fff; }
-        #searchBar { border: 2px solid #0056b3; background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 10px center; padding-left: 40px; }
+        #searchBar { border: 2px solid #0056b3; padding-left: 10px; height: 45px; }
     </style>
 </head>
 <body>
@@ -39,7 +39,7 @@
             <div class="stat"><small>TOTAL</small><br><b id="countT">0</b></div>
             <div class="stat" style="background: #28a745;"><small>ACTIVE</small><br><b id="countA">0</b></div>
         </div>
-        <input id="searchBar" onkeyup="filterTable()" placeholder="Search Name or LIN...">
+        <input id="searchBar" onkeyup="filterTable()" placeholder="🔍 Search Name or LIN...">
     </div>
 
     <div class="box">
@@ -58,7 +58,7 @@
         </div>
         <button id="upBtn" onclick="doUpload()">CONFIRM & UPLOAD</button>
         <button id="cancelBtn" class="hidden" style="background:#6c757d;" onclick="resetForm()">CANCEL EDIT</button>
-        <hr>
+        
         <div class="scroll-box">
             <div id="listArea"></div>
         </div>
@@ -70,7 +70,7 @@
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     let sbClient = null;
-    let allData = [];
+    let allStudents = [];
 
     function checkLogin() {
         const u = document.getElementById('user').value.trim().toUpperCase();
@@ -84,12 +84,12 @@
     }
 
     async function doUpload() {
-        const name = document.getElementById('n').value;
+        const name = document.getElementById('n').value.trim();
         const editId = document.getElementById('editId').value;
         const status = document.getElementById('st').value;
         if (!name) return alert("Enter Name");
 
-        const studentData = {
+        const dataObj = {
             name: name, age: document.getElementById('a').value,
             dob: document.getElementById('d').value, contact: document.getElementById('ph').value,
             location: document.getElementById('loc').value, payment_code: document.getElementById('pay').value,
@@ -98,23 +98,27 @@
         };
 
         if (!editId) {
-            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            studentData.lin = "PM" + letters.charAt(Math.floor(Math.random()*26)) + "-" + Math.floor(1000+Math.random()*9000);
+            // Pick first letter of name for LIN (e.g., M for Mugisha)
+            const firstLetter = name.charAt(0).toUpperCase();
+            dataObj.lin = "PM" + firstLetter + "-" + Math.floor(1000 + Math.random() * 9000);
         }
 
         try {
             const { error } = editId 
-                ? await sbClient.from('students').update(studentData).eq('id', editId)
-                : await sbClient.from('students').insert([studentData]);
+                ? await sbClient.from('students').update(dataObj).eq('id', editId)
+                : await sbClient.from('students').insert([dataObj]);
+            
             if (error) throw error;
-            alert("SUCCESS!"); location.reload();
+            alert("SUCCESSFULLY SAVED!");
+            resetForm(); // Clears inputs without logging out
+            fetchRecords(); // Refreshes the list instantly
         } catch (e) { alert(e.message); }
     }
 
     async function fetchRecords() {
         const { data } = await sbClient.from('students').select('*').order('created_at', { ascending: false });
         if (data) {
-            allData = data;
+            allStudents = data;
             renderTable(data);
             document.getElementById('countT').innerText = data.length;
             document.getElementById('countA').innerText = data.filter(s => s.status === 'active').length;
@@ -122,31 +126,31 @@
     }
 
     function renderTable(data) {
-        let h = "<table><tr><th>LIN</th><th>NAME</th><th>CONTACT</th><th>CLASS</th><th>STATUS</th><th>ACTION</th></tr>";
+        let html = "<table><tr><th>LIN</th><th>NAME</th><th>CONTACT</th><th>HEALTH</th><th>CLASS</th><th>ACTION</th></tr>";
         data.forEach(r => {
-            h += `<tr>
+            html += `<tr>
                 <td><b>${r.lin}</b></td>
                 <td>${r.name}</td>
                 <td>${r.contact || '-'}</td>
+                <td>${r.health_status}</td>
                 <td>${r.class}</td>
-                <td style="color:${r.status === 'active' ? 'green' : 'red'}">${r.status}</td>
                 <td>
                     <button class="btn-edit" onclick="startEdit('${r.id}')">EDIT</button>
                     <button class="btn-del" onclick="doDelete('${r.id}')">DEL</button>
                 </td>
             </tr>`;
         });
-        document.getElementById('listArea').innerHTML = h + "</table>";
+        document.getElementById('listArea').innerHTML = html + "</table>";
     }
 
     function filterTable() {
         const term = document.getElementById('searchBar').value.toUpperCase();
-        const filtered = allData.filter(s => s.name.toUpperCase().includes(term) || s.lin.toUpperCase().includes(term));
+        const filtered = allStudents.filter(s => s.name.toUpperCase().includes(term) || s.lin.toUpperCase().includes(term));
         renderTable(filtered);
     }
 
     function startEdit(id) {
-        const s = allData.find(x => x.id == id);
+        const s = allStudents.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
         document.getElementById('n').value = s.name;
         document.getElementById('a').value = s.age;
@@ -164,13 +168,24 @@
     }
 
     async function doDelete(id) {
-        if(confirm("Delete this student permanently?")) {
+        if(confirm("Are you sure you want to delete this student?")) {
             const { error } = await sbClient.from('students').delete().eq('id', id);
-            if (!error) location.reload();
+            if (!error) fetchRecords();
         }
     }
 
-    function resetForm() { location.reload(); }
+    function resetForm() {
+        document.getElementById('editId').value = "";
+        document.getElementById('n').value = "";
+        document.getElementById('a').value = "";
+        document.getElementById('d').value = "";
+        document.getElementById('ph').value = "";
+        document.getElementById('loc').value = "";
+        document.getElementById('pay').value = "";
+        document.getElementById('formTitle').innerText = "STUDENT REGISTRATION";
+        document.getElementById('upBtn').innerText = "CONFIRM & UPLOAD";
+        document.getElementById('cancelBtn').classList.add('hidden');
+    }
 </script>
 </body>
 </html>
