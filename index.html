@@ -2,72 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PMS Professional - Eudes Media</title>
+    <title>PMS Professional - Stable</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #0056b3; --light: #f4f7f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 10px; color: #333; }
-        .box { background: white; padding: 20px; border-radius: 12px; max-width: 1100px; margin: 10px auto; border: 1px solid #dee2e6; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .header { background: var(--blue); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; position: relative; }
-        
-        /* Stats Dashboard */
-        .dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .stat { background: white; padding: 15px; border-radius: 10px; text-align: center; border-bottom: 4px solid var(--blue); }
-        .stat b { font-size: 22px; color: var(--blue); display: block; }
-        .stat small { text-transform: uppercase; font-size: 10px; color: #666; font-weight: bold; }
-
-        /* Form Grid */
+        :root { --blue: #0056b3; --white: #ffffff; --bg: #f4f7f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .box { background: var(--white); padding: 20px; border-radius: 12px; max-width: 1000px; margin: 10px auto; border: 1px solid #ddd; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .header { background: var(--blue); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; }
+        .dash { display: flex; gap: 10px; margin-bottom: 15px; }
+        .stat { flex: 1; background: white; padding: 12px; border-radius: 8px; text-align: center; border-bottom: 4px solid var(--blue); }
+        .stat b { font-size: 20px; color: var(--blue); display: block; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px; }
         label { font-size: 11px; font-weight: bold; color: var(--blue); display: block; margin-bottom: 4px; }
         input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
-        
-        .btn-save { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn-promote { background: #28a745; color: white; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        
-        /* Table Styles */
-        .table-area { overflow-x: auto; margin-top: 20px; border-radius: 8px; border: 1px solid #eee; }
-        table { width: 100%; border-collapse: collapse; background: white; min-width: 900px; }
-        th { background: #f8f9fa; color: var(--blue); padding: 12px; text-align: left; font-size: 12px; border-bottom: 2px solid #eee; }
+        .btn { background: var(--blue); color: white; padding: 14px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .table-wrap { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 800px; }
+        th { background: #f1f4f9; color: var(--blue); padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
-        .bg-active { background: #e6fffa; color: #00897b; }
-        .bg-left { background: #fff5f5; color: #e53e3e; }
-        
-        .footer { text-align: center; margin-top: 30px; padding: 20px; font-size: 12px; font-weight: bold; color: #555; border-top: 1px solid #ddd; }
         .hidden { display: none !important; }
+        .footer { text-align: center; margin-top: 20px; font-size: 11px; color: #777; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="login" class="box" style="max-width:350px; margin-top:80px;">
-    <h2 style="text-align:center; color:var(--blue)">PMS LOGIN</h2>
+<div id="loginSection" class="box" style="max-width:350px; margin-top:60px; text-align:center;">
+    <h2 style="color:var(--blue)">PMS ACCESS</h2>
     <input id="u" placeholder="Username">
     <input id="p" type="password" placeholder="Password" style="margin-top:10px;">
-    <button onclick="auth()" class="btn-save" style="margin-top:20px;">ACCESS SYSTEM</button>
+    <button onclick="doLogin()" class="btn" style="margin-top:20px;">LOGIN SYSTEM</button>
 </div>
 
-<div id="main" class="hidden">
-    <div class="header">
-        <h2 style="margin:0">PROGRESSIVE SCHOOL MANAGEMENT</h2>
-    </div>
+<div id="mainSection" class="hidden">
+    <div class="header"><h2>PROGRESSIVE SCHOOL DATA</h2></div>
 
     <div class="dash">
-        <div class="stat"><small>Total Students</small><b id="countTotal">0</b></div>
-        <div class="stat"><small>Active Students</small><b id="countActive" style="color:#28a745">0</b></div>
-        <div class="stat"><small>Search Result</small><b id="countFilter">0</b></div>
+        <div class="stat"><span>Total Students</span><b id="tCount">0</b></div>
+        <div class="stat"><span>Active</span><b id="aCount" style="color:#28a745">0</b></div>
+        <div class="stat"><span>Search/Class Count</span><b id="vCount">0</b></div>
     </div>
 
     <div class="box">
-        <h3 style="margin-top:0; color:var(--blue)">Student Registration</h3>
         <div class="grid">
             <div><label>Full Name</label><input id="name"></div>
             <div><label>Gender</label><select id="gender"><option>Male</option><option>Female</option></select></div>
             <div><label>Age</label><input id="age" type="number"></div>
-            <div><label>Date of Birth</label><input id="dob" type="date"></div>
-            <div><label>Contact Number</label><input id="phone"></div>
-            <div><label>Physical Location</label><input id="loc"></div>
-            <div><label>Health Status</label><input id="health" placeholder="e.g. Normal"></div>
+            <div><label>Contact</label><input id="phone"></div>
+            <div><label>Location</label><input id="loc"></div>
+            <div><label>Health Status</label><input id="health" value="Good"></div>
             <div><label>Class</label>
                 <select id="class">
                     <option>Baby</option><option>Middle</option><option>Top</option>
@@ -77,17 +60,12 @@
             </div>
             <div><label>Status</label><select id="status"><option value="active">Active</option><option value="left">Left School</option></select></div>
         </div>
-        <button onclick="saveStudent()" class="btn-save">REGISTER STUDENT</button>
+        <button onclick="savePupil()" id="saveBtn" class="btn">CONFIRM & SAVE RECORD</button>
     </div>
 
     <div class="box">
-        <h3 style="margin-top:0; color:var(--blue)">Student Database</h3>
-        <div class="grid">
-            <input type="text" id="search" onkeyup="filter()" placeholder="🔍 Search by Name, LIN, or Class...">
-            <button onclick="autoPromote()" class="btn-promote">🚀 END OF YEAR PROMOTION</button>
-        </div>
-        
-        <div class="table-area">
+        <input type="text" id="find" onkeyup="filterTable()" placeholder="🔍 Search Name, LIN, or Class (P.1, P.5, etc)...">
+        <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
@@ -96,124 +74,98 @@
                         <th>GENDER</th>
                         <th>CLASS</th>
                         <th>LOCATION</th>
-                        <th>HEALTH</th>
                         <th>STATUS</th>
-                        <th>ACTION</th>
                     </tr>
                 </thead>
-                <tbody id="list"></tbody>
+                <tbody id="listBody"></tbody>
             </table>
         </div>
     </div>
-
-    <div class="footer">
-        Eudes Media | +256762992440
-    </div>
+    <div class="footer">Eudes Media | +256762992440</div>
 </div>
 
 <script>
-    const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
-    const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
+    const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
+    const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     let sb = null;
-    let allData = [];
+    let localData = [];
 
-    function auth() {
+    function doLogin() {
         if(document.getElementById('u').value.toUpperCase()==="PROGRESSIVE" && document.getElementById('p').value.toUpperCase()==="JESUS CARES") {
-            document.getElementById('login').classList.add('hidden');
-            document.getElementById('main').classList.remove('hidden');
-            sb = supabase.createClient(SB_URL, SB_KEY);
-            load();
-        } else { alert("Wrong Credentials"); }
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('mainSection').classList.remove('hidden');
+            sb = supabase.createClient(URL, KEY);
+            fetchData();
+        } else { alert("Wrong Login"); }
     }
 
-    async function saveStudent() {
-        const name = document.getElementById('name').value.trim();
-        if(!name) return alert("Enter Name");
+    async function savePupil() {
+        const n = document.getElementById('name').value.trim();
+        if(!n) return alert("Enter Name");
 
-        // LIN Generation: PM + 1st Letter of Name + Random Number
-        const lin = "PM" + name.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+        const btn = document.getElementById('saveBtn');
+        btn.disabled = true;
+        btn.innerText = "SAVING...";
 
-        const student = {
-            name: name,
-            gender: document.getElementById('gender').value,
-            age: document.getElementById('age').value,
-            dob: document.getElementById('dob').value,
-            contact: document.getElementById('phone').value,
-            location: document.getElementById('loc').value,
-            health_status: document.getElementById('health').value,
-            class: document.getElementById('class').value,
-            status: document.getElementById('status').value,
+        const lin = "PM" + n.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+        
+        const pupil = {
+            name: n, gender: document.getElementById('gender').value,
+            age: document.getElementById('age').value, contact: document.getElementById('phone').value,
+            location: document.getElementById('loc').value, health_status: document.getElementById('health').value,
+            class: document.getElementById('class').value, status: document.getElementById('status').value,
             lin: lin
         };
 
-        const { error } = await sb.from('students').insert([student]);
-        if(error) alert(error.message);
-        else { alert("Saved!"); location.reload(); }
+        const { error } = await sb.from('students').insert([pupil]);
+        
+        if(error) {
+            alert("Error: " + error.message);
+        } else {
+            alert("Saved Successfully!");
+            // Clear form
+            document.getElementById('name').value = "";
+            document.getElementById('age').value = "";
+            await fetchData(); // Refresh data without logging out
+        }
+        btn.disabled = false;
+        btn.innerText = "CONFIRM & SAVE RECORD";
     }
 
-    async function load() {
-        const { data } = await sb.from('students').select('*').order('name', { ascending: true });
+    async function fetchData() {
+        const { data, error } = await sb.from('students').select('*').order('created_at', { ascending: false });
         if(data) {
-            allData = data;
-            render(data);
-            document.getElementById('countTotal').innerText = data.length;
-            document.getElementById('countActive').innerText = data.filter(s => s.status === 'active').length;
+            localData = data;
+            renderTable(data);
+            document.getElementById('tCount').innerText = data.length;
+            document.getElementById('aCount').innerText = data.filter(s => s.status === 'active').length;
         }
     }
 
-    function render(arr) {
-        let h = "";
+    function renderTable(arr) {
+        let rows = "";
         arr.forEach(s => {
-            const badge = s.status === 'active' ? 'bg-active' : 'bg-left';
-            h += `<tr>
+            rows += `<tr>
                 <td><b>${s.lin}</b></td>
                 <td>${s.name.toUpperCase()}</td>
                 <td>${s.gender}</td>
                 <td>${s.class}</td>
                 <td>${s.location}</td>
-                <td>${s.health_status}</td>
-                <td><span class="badge ${badge}">${s.status.toUpperCase()}</span></td>
-                <td><button onclick="toggleStatus('${s.id}', '${s.status}')" style="font-size:10px; cursor:pointer;">Change Status</button></td>
+                <td>${s.status.toUpperCase()}</td>
             </tr>`;
         });
-        document.getElementById('list').innerHTML = h;
-        document.getElementById('countFilter').innerText = arr.length;
+        document.getElementById('listBody').innerHTML = rows;
+        document.getElementById('vCount').innerText = arr.length;
     }
 
-    function filter() {
-        const val = document.getElementById('search').value.toUpperCase();
-        const filtered = allData.filter(s => 
-            s.name.toUpperCase().includes(val) || 
-            s.lin.toUpperCase().includes(val) || 
-            s.class.toUpperCase().includes(val)
+    function filterTable() {
+        const q = document.getElementById('find').value.toUpperCase();
+        const filtered = localData.filter(s => 
+            s.name.toUpperCase().includes(q) || 
+            s.lin.toUpperCase().includes(q) || 
+            (s.class && s.class.toUpperCase().includes(q))
         );
-        render(filtered);
-    }
-
-    async function toggleStatus(id, current) {
-        const next = current === 'active' ? 'left' : 'active';
-        if(confirm(`Mark student as ${next}?`)) {
-            await sb.from('students').update({ status: next }).eq('id', id);
-            load();
-        }
-    }
-
-    async function autoPromote() {
-        if(!confirm("This will move all students to the next class (e.g., P.1 to P.2). Are you sure?")) return;
-        
-        const classes = ["Baby", "Middle", "Top", "P.1", "P.2", "P.3", "P.4", "P.5", "P.6", "P.7", "Graduated"];
-        
-        for (let s of allData) {
-            if(s.status === 'active') {
-                let currentIndex = classes.indexOf(s.class);
-                if(currentIndex < classes.length - 1) {
-                    let nextClass = classes[currentIndex + 1];
-                    await sb.from('students').update({ class: nextClass }).eq('id', s.id);
-                }
-            }
-        }
-        alert("Promotion Complete!");
-        load();
+        renderTable(filtered);
     }
 </script>
 </body>
