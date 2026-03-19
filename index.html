@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V16 FINAL</title>
+    <title>PROGRESSIVE PMS - V17 FIXED</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #0056b3; --dark: #002244; --white: #ffffff; --green: #25d366; --red: #dc3545; --gray: #f4f7f9; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 10px; }
-        .box { background: var(--white); padding: 18px; border-radius: 12px; max-width: 1000px; margin: 10px auto; border: 1px solid #ddd; }
+        .box { background: var(--white); padding: 18px; border-radius: 12px; max-width: 1000px; margin: 10px auto; border: 1.5px solid #ddd; }
         .header { background: linear-gradient(135deg, var(--blue), var(--dark)); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 15px 0; }
         label { font-size: 11px; font-weight: bold; color: var(--blue); }
@@ -16,7 +16,7 @@
         .btn-main { background: var(--blue); color: white; padding: 14px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .student-card { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; border-left: 5px solid var(--blue); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-row { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
-        .action-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; min-width: 60px; }
+        .action-btn { flex: 1; padding: 10px; border: none; border-radius: 5px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; }
         .edit { background: var(--blue); }
         .del { background: var(--red); }
         .sms { background: #555; }
@@ -40,12 +40,12 @@
         <p style="margin:0; font-size:10px; opacity:0.8;">Smart System by Eudes Media</p>
     </div>
 
-    <div class="box" style="border-color: var(--blue); background: #f0f7ff;">
-        <h4 style="margin:0 0 10px 0; color:var(--dark);">📢 Broadcast Updates</h4>
-        <textarea id="bulkMsg" rows="2" placeholder="Type general update for all parents..."></textarea>
+    <div class="box" style="border-color: var(--green);">
+        <h4 style="margin:0 0 10px 0; color:var(--dark);">📢 Bulk Messaging</h4>
+        <textarea id="bulkMsg" rows="2" placeholder="Message for all parents..."></textarea>
         <div style="display:flex; gap:10px; margin-top:10px;">
-            <button onclick="sendBulk('sms')" class="action-btn sms" style="padding:12px; font-size:12px;">SEND ALL SMS</button>
-            <button onclick="sendBulk('wa')" class="action-btn wa" style="padding:12px; font-size:12px;">SEND ALL WHATSAPP</button>
+            <button onclick="sendBulk('sms')" class="action-btn sms">SEND ALL SMS</button>
+            <button onclick="sendBulk('wa')" class="action-btn wa">SEND ALL WHATSAPP</button>
         </div>
     </div>
 
@@ -70,8 +70,11 @@
     </div>
 
     <div class="box" style="border:none; background:transparent; padding:0;">
-        <input type="text" id="sBar" onkeyup="search()" placeholder="🔍 Quick Search Students..." style="border: 2px solid var(--blue); margin-bottom:10px;">
-        <div id="listBody"></div>
+        <div style="position:relative;">
+            <input type="text" id="sBar" oninput="search()" placeholder="🔍 Type Student Name to Search..." style="border: 2px solid var(--blue); padding-right: 40px;">
+            <span onclick="clearSearch()" style="position:absolute; right:15px; top:12px; color:var(--red); font-weight:bold; cursor:pointer;">X</span>
+        </div>
+        <div id="listBody" style="margin-top:10px;"></div>
     </div>
 
     <div class="footer">Eudes Media | +256762992440</div>
@@ -91,18 +94,18 @@
             document.getElementById('loginGate').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             refresh();
-        } else { alert("Login Error"); }
+        } else { alert("Login Failed"); }
     }
 
     async function refresh() {
         const { data } = await sb.from('students').select('*').order('name', { ascending: true });
         students = data || [];
-        render();
+        render(students);
     }
 
-    function render() {
+    function render(list) {
         let html = "";
-        students.forEach(s => {
+        list.forEach(s => {
             html += `<div class="student-card">
                 <div><b>${s.name.toUpperCase()}</b><br>
                 <small>Bal: UGX ${Number(s.fees_balance).toLocaleString()} | ${s.class}</small></div>
@@ -117,51 +120,62 @@
         document.getElementById('listBody').innerHTML = html;
     }
 
+    // FIXED SEARCH FUNCTION
+    function search() {
+        const query = document.getElementById('sBar').value.trim().toUpperCase();
+        const filtered = students.filter(s => 
+            s.name.toUpperCase().includes(query) || 
+            (s.lin && s.lin.toUpperCase().includes(query)) ||
+            s.class.toUpperCase().includes(query)
+        );
+        render(filtered);
+    }
+
+    function clearSearch() {
+        document.getElementById('sBar').value = "";
+        render(students);
+    }
+
     async function save() {
         const name = document.getElementById('name').value.trim();
         const ph = document.getElementById('ph').value.trim();
-        const age = document.getElementById('age').value;
         const id = document.getElementById('editId').value;
+        const paid = document.getElementById('fPaid').value || 0;
+        const bal = document.getElementById('fBal').value || 0;
 
-        // DUPLICATE BLOCKER
         if(!id && students.some(s => s.name.toLowerCase() === name.toLowerCase() && s.contact === ph)) {
-            return alert("❌ ERROR: Student already exists with this name and phone!");
+            return alert("Student already exists!");
         }
 
-        const data = {
-            name: name, contact: ph, age: age,
-            class: document.getElementById('cl').value,
-            fees_paid: document.getElementById('fPaid').value || 0,
-            fees_balance: document.getElementById('fBal').value || 0
-        };
+        const data = { name, contact: ph, age: document.getElementById('age').value, class: document.getElementById('cl').value, fees_paid: paid, fees_balance: bal };
 
         if(!id) {
             data.lin = "PM-" + Math.floor(1000 + Math.random() * 9000);
             await sb.from('students').insert([data]);
         } else {
             await sb.from('students').update(data).eq('id', id);
-            // AUTO WHATSAPP RECEIPT
-            if(confirm("Send Fee Receipt to parent?")) quickMsg(ph, 'wa', data);
+            const text = `PROGRESSIVE SCHOOL\nStudent: ${name}\nPaid: UGX ${Number(paid).toLocaleString()}\nBalance: UGX ${Number(bal).toLocaleString()}`;
+            if(confirm("Send WhatsApp Receipt?")) window.open(`https://wa.me/${ph}?text=${encodeURIComponent(text)}`, '_blank');
         }
         refresh(); reset();
     }
 
     async function delRecord(id, name) {
-        if(confirm("Permanently delete " + name + "?")) {
-            const { error } = await sb.from('students').delete().eq('id', id);
-            if(!error) refresh(); else alert("Delete failed");
+        if(confirm("Delete " + name + "?")) {
+            await sb.from('students').delete().eq('id', id);
+            refresh();
         }
     }
 
-    function quickMsg(num, type, studentData = null) {
-        let msg = studentData ? `PROGRESSIVE SCHOOL\nStudent: ${studentData.name}\nPaid: UGX ${Number(studentData.fees_paid).toLocaleString()}\nBalance: UGX ${Number(studentData.fees_balance).toLocaleString()}` : "Hello Parent, this is Progressive School.";
+    function quickMsg(num, type) {
+        let msg = "Hello from Progressive School.";
         let url = type === 'wa' ? `https://wa.me/${num}?text=${encodeURIComponent(msg)}` : `sms:${num}?body=${encodeURIComponent(msg)}`;
         window.open(url, '_blank');
     }
 
     async function sendBulk(type) {
         const msg = document.getElementById('bulkMsg').value;
-        if(!msg) return alert("Enter a message first!");
+        if(!msg) return alert("Enter message!");
         for (let s of students) {
             if(s.contact) {
                 let url = type === 'wa' ? `https://wa.me/${s.contact}?text=${encodeURIComponent(msg)}` : `sms:${s.contact}?body=${encodeURIComponent(msg)}`;
@@ -179,13 +193,8 @@
         document.getElementById('age').value = s.age;
         document.getElementById('fPaid').value = s.fees_paid;
         document.getElementById('fBal').value = s.fees_balance;
-        document.getElementById('fTitle').innerText = "Updating: " + s.name;
+        document.getElementById('fTitle').innerText = "UPDATING: " + s.name;
         window.scrollTo(0,0);
-    }
-
-    function search() {
-        const q = document.getElementById('sBar').value.toUpperCase();
-        render(students.filter(s => s.name.toUpperCase().includes(q)));
     }
 
     function reset() {
