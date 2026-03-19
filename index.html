@@ -2,23 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V7 OFFICIAL</title>
+    <title>PROGRESSIVE PMS - ULTIMATE V8</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #0056b3; --white: #ffffff; --green: #28a745; --red: #dc3545; --gold: #ffc107; }
+        :root { --blue: #0056b3; --white: #ffffff; --green: #28a745; --red: #dc3545; --gold: #ffc107; --purple: #6f42c1; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding: 10px; }
         .box { background: var(--white); padding: 20px; border-radius: 12px; max-width: 1100px; margin: 10px auto; border: 1.5px solid var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .header { background: linear-gradient(135deg, var(--blue), #003366); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
-        .dash { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px; }
         .stat { background: white; padding: 10px; border-radius: 10px; text-align: center; border-bottom: 3px solid var(--blue); }
-        .stat b { font-size: 18px; color: var(--blue); display: block; }
-        .stat span { font-size: 9px; font-weight: bold; color: #666; text-transform: uppercase; }
+        .stat b { font-size: 16px; color: var(--blue); display: block; }
+        .stat span { font-size: 8px; font-weight: bold; color: #666; text-transform: uppercase; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 15px; }
         label { font-size: 11px; font-weight: bold; color: var(--blue); display: block; margin-bottom: 3px; }
-        input, select { width: 100%; padding: 10px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none; }
-        .btn { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .btn:disabled { background: #888; cursor: not-allowed; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none; }
+        .btn { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; }
+        .btn-promo { background: var(--purple); font-size: 11px; padding: 10px; }
+        .btn-sms { background: var(--green); font-size: 11px; padding: 10px; }
         .table-wrap { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 12px; }
         th { background: #f8f9fa; color: var(--blue); padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
@@ -42,13 +43,23 @@
 <div id="mainApp" class="hidden">
     <div class="header">
         <h2 style="margin:0;">PROGRESSIVE SCHOOL DATA</h2>
-        <p style="margin:0; font-size:11px;">Official Management System</p>
+        <p style="margin:0; font-size:11px;">Management & Messaging System</p>
     </div>
 
     <div class="dash">
         <div class="stat"><span>Students</span><b id="tCnt">0</b></div>
-        <div class="stat"><span>Fully Paid</span><b id="pCnt" style="color:var(--green)">0</b></div>
+        <div class="stat"><span>Paid</span><b id="pCnt" style="color:var(--green)">0</b></div>
         <div class="stat"><span>Balances</span><b id="bCnt" style="color:var(--red)">0</b></div>
+        <button onclick="runPromotion()" class="btn btn-promo">🚀 AUTO PROMOTION</button>
+    </div>
+
+    <div class="box" style="border-color: var(--green);">
+        <h3 style="color:var(--green); margin:0 0 10px 0;">Bulk SMS Portal</h3>
+        <textarea id="smsMsg" placeholder="Type message here... e.g. Dear Parent, please clear the balance of UGX..."></textarea>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button onclick="sendBulkSMS('all')" class="btn btn-sms">Send to All</button>
+            <button onclick="sendBulkSMS('debt')" class="btn btn-sms" style="background:var(--red)">Send to Debtors Only</button>
+        </div>
     </div>
 
     <div class="box">
@@ -59,13 +70,13 @@
             <div><label>Official LIN</label><input id="olin"></div>
             <div><label>Date of Birth</label><input id="dob" type="date" onchange="calcAge()"></div>
             <div><label>Age (Auto)</label><input id="age" readonly style="background:#f0f0f0;"></div>
-            <div><label>Contact Number</label><input id="ph"></div>
-            <div><label>Physical Location</label><input id="loc"></div>
+            <div><label>Parent Contact</label><input id="ph" placeholder="2567..."></div>
+            <div><label>Location</label><input id="loc"></div>
             <div><label>Class</label>
                 <select id="cl">
-                    <option>Baby</option><option>Middle</option><option>Top</option>
-                    <option>P.1</option><option>P.2</option><option>P.3</option>
-                    <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+                    <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+                    <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+                    <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
                 </select>
             </div>
             <div><label>Fees Status</label>
@@ -91,7 +102,7 @@
         <div class="table-wrap">
             <table>
                 <thead>
-                    <tr><th>GEN LIN</th><th>OFFICIAL LIN</th><th>NAME</th><th>AGE</th><th>CLASS</th><th>FEES</th><th>BALANCE</th><th>ACTION</th></tr>
+                    <tr><th>GEN LIN</th><th>OFFICIAL LIN</th><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>FEES</th><th>BALANCE</th><th>ACTION</th></tr>
                 </thead>
                 <tbody id="tbody"></tbody>
             </table>
@@ -107,29 +118,19 @@
     let sb = null;
     let students = [];
 
+    const classOrder = ["Baby", "Middle", "Top", "P.1", "P.2", "P.3", "P.4", "P.5", "P.6", "P.7"];
+
     function login() {
         const u = document.getElementById('u').value.trim().toUpperCase();
         const p = document.getElementById('p').value.trim().toUpperCase();
-        
         if(u === "PROGRESSIVE" && p === "JESUS CARES") {
             try {
-                // Connecting here ensures the database is ready
                 sb = supabase.createClient(SB_URL, SB_KEY);
                 document.getElementById('loginGate').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
                 refresh();
-            } catch (err) {
-                alert("Connection Error: " + err.message);
-            }
-        } else {
-            alert("Wrong Credentials");
-        }
-    }
-
-    function calcAge() {
-        const d = document.getElementById('dob').value;
-        if(!d) return;
-        document.getElementById('age').value = new Date().getFullYear() - new Date(d).getFullYear();
+            } catch (err) { alert("Link Error: " + err.message); }
+        } else { alert("Access Denied"); }
     }
 
     async function refresh() {
@@ -140,70 +141,91 @@
             render(students);
             document.getElementById('tCnt').innerText = students.length;
             document.getElementById('pCnt').innerText = students.filter(s => s.fees_status === 'Full').length;
-            document.getElementById('bCnt').innerText = students.filter(s => s.fees_status === 'Balance').length;
+            document.getElementById('bCnt').innerText = students.filter(s => s.fees_status === 'Balance' || s.fees_status === 'None').length;
         }
     }
 
     function render(list) {
         let rows = "";
         list.forEach(s => {
-            const icon = s.fees_status === 'Full' ? "✅" : (s.fees_status === 'Balance' ? "💰" : "❌");
             const cls = s.fees_status === 'Full' ? "paid" : "unpaid";
             rows += `<tr>
-                <td style="color:var(--blue); font-weight:bold;">${s.lin || '--'}</td>
-                <td style="color:#6f42c1; font-weight:bold;">${s.official_lin || '---'}</td>
+                <td style="font-weight:bold; color:var(--blue);">${s.lin || '--'}</td>
+                <td>${s.official_lin || '---'}</td>
                 <td><b>${(s.name || '').toUpperCase()}</b></td>
-                <td>${s.age || '--'}</td>
                 <td><b>${s.class}</b></td>
-                <td><span class="badge ${cls}">${icon} ${s.fees_status}</span></td>
+                <td>${s.contact || 'No No.'}</td>
+                <td><span class="badge ${cls}">${s.fees_status}</span></td>
                 <td style="color:var(--red); font-weight:bold;">${Number(s.fees_balance || 0).toLocaleString()}</td>
-                <td><button onclick="editStep('${s.id}')" style="background:var(--gold); border:none; padding:6px 10px; border-radius:5px; font-weight:bold; cursor:pointer;">EDIT</button></td>
+                <td><button onclick="editStep('${s.id}')" style="background:var(--gold); border:none; padding:5px 8px; border-radius:4px; cursor:pointer;">EDIT</button></td>
             </tr>`;
         });
         document.getElementById('tbody').innerHTML = rows;
     }
 
+    async function sendBulkSMS(type) {
+        const msg = document.getElementById('smsMsg').value;
+        if(!msg) return alert("Please type a message first!");
+
+        let targets = type === 'debt' ? students.filter(s => s.fees_status !== 'Full') : students;
+        let numbers = targets.map(s => s.contact).filter(n => n && n.length > 5);
+
+        if(numbers.length === 0) return alert("No valid phone numbers found!");
+
+        // Launch SMS intent for mobile devices
+        window.location.href = `sms:${numbers.join(',')}?body=${encodeURIComponent(msg + "\n- Progressive PMS")}`;
+        alert(`Opening SMS app for ${numbers.length} parents...`);
+    }
+
+    async function runPromotion() {
+        if(!confirm("⚠️ WARNING: This will move ALL students to the next class and reset fee balances. Continue?")) return;
+        
+        for(let s of students) {
+            let currentIndex = classOrder.indexOf(s.class);
+            if(currentIndex !== -1 && currentIndex < classOrder.length - 1) {
+                let nextClass = classOrder[currentIndex + 1];
+                await sb.from('students').update({ 
+                    class: nextClass,
+                    fees_paid: 0,
+                    fees_balance: 0,
+                    fees_status: 'None'
+                }).eq('id', s.id);
+            }
+        }
+        alert("Success: All students promoted!");
+        refresh();
+    }
+
+    function calcAge() {
+        const d = document.getElementById('dob').value;
+        if(d) document.getElementById('age').value = new Date().getFullYear() - new Date(d).getFullYear();
+    }
+
     async function save() {
         const nameVal = document.getElementById('name').value.trim();
         if(!nameVal) return alert("Enter Name");
-        
-        // Safety check to prevent the "null" error
         if(!sb) sb = supabase.createClient(SB_URL, SB_KEY);
-
         const btn = document.getElementById('sBtn');
         btn.disabled = true; btn.innerText = "SAVING...";
-
         const id = document.getElementById('editId').value;
         const pupil = {
-            name: nameVal, 
-            official_lin: document.getElementById('olin').value,
-            age: document.getElementById('age').value, 
-            dob: document.getElementById('dob').value,
-            contact: document.getElementById('ph').value, 
-            location: document.getElementById('loc').value,
-            class: document.getElementById('cl').value, 
-            fees_status: document.getElementById('fStat').value,
-            fees_paid: document.getElementById('fPaid').value || 0, 
-            fees_balance: document.getElementById('fBal').value || 0,
-            health_status: document.getElementById('health').value, 
-            status: document.getElementById('st').value
+            name: nameVal, official_lin: document.getElementById('olin').value,
+            age: document.getElementById('age').value, dob: document.getElementById('dob').value,
+            contact: document.getElementById('ph').value, location: document.getElementById('loc').value,
+            class: document.getElementById('cl').value, fees_status: document.getElementById('fStat').value,
+            fees_paid: document.getElementById('fPaid').value || 0, fees_balance: document.getElementById('fBal').value || 0,
+            health_status: document.getElementById('health').value, status: document.getElementById('st').value
         };
-
         try {
             if(!id) {
                 pupil.lin = "PM" + nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
-                const { error } = await sb.from('students').insert([pupil]);
-                if(error) throw error;
+                await sb.from('students').insert([pupil]);
             } else {
-                const { error } = await sb.from('students').update(pupil).eq('id', id);
-                if(error) throw error;
+                await sb.from('students').update(pupil).eq('id', id);
             }
-            alert("Record Saved!"); resetForm(); refresh();
-        } catch(e) {
-            alert("Save Error: " + e.message);
-        } finally {
-            btn.disabled = false; btn.innerText = "CONFIRM & UPLOAD RECORD";
-        }
+            alert("Saved!"); resetForm(); refresh();
+        } catch(e) { alert("Error: " + e.message); }
+        finally { btn.disabled = false; btn.innerText = "CONFIRM & UPLOAD RECORD"; }
     }
 
     function editStep(id) {
@@ -211,18 +233,11 @@
         if(!s) return;
         document.getElementById('editId').value = s.id;
         document.getElementById('name').value = s.name;
-        document.getElementById('olin').value = s.official_lin || '';
-        document.getElementById('dob').value = s.dob || '';
-        document.getElementById('age').value = s.age || '';
-        document.getElementById('ph').value = s.contact || '';
-        document.getElementById('loc').value = s.location || '';
         document.getElementById('cl').value = s.class;
-        document.getElementById('fStat').value = s.fees_status || 'None';
-        document.getElementById('fPaid').value = s.fees_paid || 0;
-        document.getElementById('fBal').value = s.fees_balance || 0;
-        document.getElementById('health').value = s.health_status || 'Good';
-        document.getElementById('st').value = s.status || 'active';
-        document.getElementById('fTitle').innerText = "Updating: " + s.name;
+        document.getElementById('ph').value = s.contact || '';
+        document.getElementById('fStat').value = s.fees_status;
+        document.getElementById('fBal').value = s.fees_balance;
+        document.getElementById('fTitle').innerText = "Edit: " + s.name;
         document.getElementById('cBtn').classList.remove('hidden');
         window.scrollTo(0,0);
     }
@@ -230,18 +245,13 @@
     function search() {
         const q = document.getElementById('sBar').value.toUpperCase();
         render(students.filter(s => 
-            (s.name && s.name.toUpperCase().includes(q)) || 
-            (s.official_lin && s.official_lin.toUpperCase().includes(q)) ||
-            (s.class && s.class.toUpperCase().includes(q))
+            (s.name && s.name.toUpperCase().includes(q)) || (s.class && s.class.toUpperCase().includes(q))
         ));
     }
 
     function resetForm() {
         document.getElementById('editId').value = "";
         document.getElementById('name').value = "";
-        document.getElementById('olin').value = "";
-        document.getElementById('age').value = "";
-        document.getElementById('dob').value = "";
         document.getElementById('fTitle').innerText = "Student Registration";
         document.getElementById('cBtn').classList.add('hidden');
     }
