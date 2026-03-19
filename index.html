@@ -2,69 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - DUAL MESSAGING V13</title>
+    <title>PROGRESSIVE PMS - PRO V15</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #0056b3; --white: #ffffff; --green: #25d366; --red: #dc3545; --gold: #ffc107; --dark-blue: #003366; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding: 10px; }
-        .box { background: var(--white); padding: 20px; border-radius: 12px; max-width: 1200px; margin: 10px auto; border: 1.5px solid var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, var(--blue), var(--dark-blue)); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        label { font-size: 11px; font-weight: bold; color: var(--blue); display: block; margin-bottom: 3px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
-        .btn { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .btn-wa { background: var(--green); color: white; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 11px; flex: 1; }
-        .btn-sms { background: #555; color: white; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 11px; flex: 1; }
-        .btn-call { background: #007bff; color: white; padding: 6px 10px; border-radius: 5px; text-decoration: none; font-size: 10px; font-weight: bold; display: inline-block; }
-        .table-wrap { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1100px; font-size: 12px; }
-        th { background: #f8f9fa; color: var(--blue); padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
-        td { padding: 12px; border-bottom: 1px solid #eee; background: white; }
-        .footer { text-align: center; margin-top: 20px; font-size: 12px; font-weight: bold; color: #444; }
+        :root { --blue: #0056b3; --white: #ffffff; --green: #25d366; --red: #dc3545; --dark: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; padding: 10px; }
+        .box { background: var(--white); padding: 18px; border-radius: 12px; max-width: 1000px; margin: 10px auto; border: 1.5px solid var(--blue); }
+        .header { background: linear-gradient(135deg, var(--blue), #002244); color: white; padding: 15px; border-radius: 12px; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 15px 0; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+        .btn { background: var(--blue); color: white; padding: 14px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-wa { background: var(--green); margin-top: 10px; }
+        .footer { text-align: center; margin-top: 20px; font-size: 11px; font-weight: bold; color: #777; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" class="box" style="max-width:350px; margin-top:80px; text-align:center;">
-    <h2 style="color:var(--blue)">PMS LOGIN</h2>
-    <input id="u" placeholder="USERNAME" autocomplete="off">
-    <input id="p" type="password" placeholder="PASSWORD" style="margin-top:10px;">
-    <button onclick="login()" class="btn" style="margin-top:20px;">ENTER SYSTEM</button>
+<div id="loginGate" class="box" style="max-width:320px; margin-top:100px; text-align:center;">
+    <h3 style="color:var(--blue)">PROGRESSIVE LOGIN</h3>
+    <input id="u" placeholder="USERNAME" style="margin-bottom:10px;">
+    <input id="p" type="password" placeholder="PASSWORD">
+    <button onclick="login()" class="btn" style="margin-top:15px;">LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
         <h2 style="margin:0;">PROGRESSIVE SCHOOL DATA</h2>
-        <p style="margin:0; font-size:11px;">Dual-Channel Messaging Center</p>
-    </div>
-
-    <div class="box" style="border-color: var(--green);">
-        <h3 style="color:var(--dark-blue); margin:0 0 10px 0; font-size:14px;">Broadcast Center</h3>
-        <textarea id="msgContent" rows="3" placeholder="Type your message for parents here..."></textarea>
-        
-        <div style="margin-top:10px;">
-            <label style="color:#666">1. SELECT TARGET GROUP:</label>
-            <select id="msgTarget" style="margin-bottom:10px;">
-                <option value="all">All Registered Parents</option>
-                <option value="debt">Parents with Balances Only</option>
-            </select>
-            
-            <label style="color:#666">2. CHOOSE METHOD:</label>
-            <div style="display:flex; gap:10px;">
-                <button onclick="sendBulk('whatsapp')" class="btn-wa">🟢 SEND VIA WHATSAPP</button>
-                <button onclick="sendBulk('sms')" class="btn-sms">🔘 SEND VIA SMS</button>
-            </div>
-        </div>
+        <p style="margin:0; font-size:10px;">Eudes Media Smart System</p>
     </div>
 
     <div class="box">
-        <h3 id="fTitle" style="color:var(--blue); margin-top:0;">Student Registration</h3>
+        <h4 id="fTitle" style="margin-top:0; color:var(--blue);">Student Registration</h4>
         <input type="hidden" id="editId">
         <div class="grid">
             <div><label>Full Name</label><input id="name"></div>
-            <div><label>Parent Phone (256...)</label><input id="ph"></div>
+            <div><label>Parent Phone</label><input id="ph" placeholder="2567..."></div>
+            <div><label>Age</label><input id="age" type="number"></div>
             <div><label>Class</label>
                 <select id="cl">
                     <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
@@ -72,29 +47,15 @@
                     <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
                 </select>
             </div>
-            <div><label>Fees Status</label>
-                <select id="fStat">
-                    <option value="Full">Fully Paid ✅</option>
-                    <option value="Balance">Has Balance 💰</option>
-                </select>
-            </div>
-            <div><label>Paid (UGX)</label><input id="fPaid" type="number"></div>
-            <div><label>Balance (UGX)</label><input id="fBal" type="number"></div>
-            <div><label>Health Status</label><input id="health" value="Good"></div>
+            <div><label>Amount Paid (UGX)</label><input id="fPaid" type="number" value="0"></div>
+            <div><label>Balance (UGX)</label><input id="fBal" type="number" value="0"></div>
         </div>
-        <button onclick="save()" id="sBtn" class="btn">CONFIRM & UPLOAD RECORD</button>
+        <button onclick="processRecord()" id="sBtn" class="btn">CONFIRM & SAVE RECORD</button>
     </div>
 
     <div class="box">
-        <input type="text" id="sBar" onkeyup="search()" placeholder="🔍 Quick Search Students..." style="border: 2px solid var(--blue); height: 45px; border-radius: 8px; padding-left: 15px; margin-bottom:10px;">
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr><th>GEN LIN</th><th>NAME</th><th>CLASS</th><th>PAID</th><th>BALANCE</th><th>ACTION</th><th>MANAGE</th></tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-            </table>
-        </div>
+        <input type="text" id="sBar" onkeyup="search()" placeholder="🔍 Search Students..." style="margin-bottom:10px; height:40px;">
+        <div id="statusList" style="font-size:12px;"></div>
     </div>
 
     <div class="footer">Eudes Media | +256762992440</div>
@@ -105,6 +66,7 @@
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO".trim();
     let sb = null;
     let students = [];
+    let messagedNumbers = new Set(); // To avoid double sending
 
     function login() {
         const u = document.getElementById('u').value.trim().toUpperCase();
@@ -114,93 +76,94 @@
             document.getElementById('loginGate').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             refresh();
-        } else { alert("Login Error"); }
+        } else { alert("Access Denied"); }
     }
 
     async function refresh() {
-        const { data, error } = await sb.from('students').select('*').order('name', { ascending: true });
-        if(!error) { students = data || []; render(students); }
+        const { data } = await sb.from('students').select('*').order('name', { ascending: true });
+        students = data || [];
+        render();
     }
 
-    function render(list) {
-        let rows = "";
-        list.forEach(s => {
-            const contact = s.contact || '';
-            rows += `<tr>
-                <td style="font-weight:bold; color:var(--blue);">${s.lin || '--'}</td>
-                <td><b>${(s.name || '').toUpperCase()}</b></td>
-                <td>${s.class}</td>
-                <td>UGX ${Number(s.fees_paid || 0).toLocaleString()}</td>
-                <td style="color:var(--red); font-weight:bold;">UGX ${Number(s.fees_balance || 0).toLocaleString()}</td>
-                <td>
-                    ${contact ? `<button onclick="window.location.href='tel:${contact}'" class="btn-call">📞 CALL</button>` : '<small>NO NO.</small>'}
-                </td>
-                <td>
-                    <button onclick="editStep('${s.id}')" style="background:var(--gold); border:none; padding:5px; border-radius:4px; font-size:10px;">EDIT</button>
-                    <button onclick="delStep('${s.id}')" style="background:var(--red); color:white; border:none; padding:5px; border-radius:4px; font-size:10px;">DEL</button>
-                </td>
-            </tr>`;
+    function render() {
+        let html = "";
+        students.forEach(s => {
+            html += `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+                <div><b>${s.name.toUpperCase()}</b><br><small>Bal: UGX ${Number(s.fees_balance).toLocaleString()}</small></div>
+                <button onclick="editStep('${s.id}')" style="background:var(--blue); color:white; border:none; padding:5px 10px; border-radius:4px;">EDIT</button>
+            </div>`;
         });
-        document.getElementById('tbody').innerHTML = rows;
+        document.getElementById('statusList').innerHTML = html;
     }
 
-    async function sendBulk(method) {
-        const msg = document.getElementById('msgContent').value;
-        const targetType = document.getElementById('msgTarget').value;
-        if(!msg) return alert("Please enter a message!");
-
-        let list = targetType === 'debt' ? students.filter(s => s.fees_status !== 'Full') : students;
-        let numbers = list.map(s => s.contact).filter(n => n && n.length > 5);
-
-        if(numbers.length === 0) return alert("No valid contacts found for this group.");
-
-        alert(`Ready to send to ${numbers.length} parents. Please follow the prompts.`);
-
-        for (let num of numbers) {
-            let url = "";
-            if(method === 'whatsapp') {
-                url = `https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msg)}`;
-            } else {
-                url = `sms:${num}?body=${encodeURIComponent(msg)}`;
-            }
-            
-            window.open(url, '_blank');
-            await new Promise(r => setTimeout(r, 1200)); // Delay to prevent app crash
-        }
-    }
-
-    async function save() {
-        const nameVal = document.getElementById('name').value.trim();
+    async function processRecord() {
+        const name = document.getElementById('name').value.trim();
+        const age = document.getElementById('age').value;
+        const ph = document.getElementById('ph').value.trim();
         const id = document.getElementById('editId').value;
-        const pupil = {
-            name: nameVal, contact: document.getElementById('ph').value,
-            class: document.getElementById('cl').value, fees_status: document.getElementById('fStat').value,
-            fees_paid: document.getElementById('fPaid').value || 0, fees_balance: document.getElementById('fBal').value || 0,
-            health_status: document.getElementById('health').value
-        };
+        
+        // 1. DUPLICATE CHECK (Only for new registrations)
         if(!id) {
-            pupil.lin = "PM" + nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
-            await sb.from('students').insert([pupil]);
-        } else {
-            await sb.from('students').update(pupil).eq('id', id);
+            const isDuplicate = students.some(s => 
+                s.name.toLowerCase() === name.toLowerCase() && 
+                s.age == age && 
+                s.contact === ph
+            );
+            if(isDuplicate) return alert("❌ ERROR: This student is already registered with the same age and contact!");
         }
-        alert("Success!"); refresh();
+
+        const pupil = {
+            name: name, contact: ph, age: age,
+            class: document.getElementById('cl').value,
+            fees_paid: document.getElementById('fPaid').value || 0,
+            fees_balance: document.getElementById('fBal').value || 0,
+            lin: id ? undefined : "PM-" + Math.floor(1000 + Math.random() * 9000)
+        };
+
+        try {
+            if(!id) {
+                await sb.from('students').insert([pupil]);
+                alert("New Student Registered!");
+            } else {
+                await sb.from('students').update(pupil).eq('id', id);
+                // 2. AUTO WHATSAPP TRIGGER ON FEE ADJUSTMENT
+                autoNotify(pupil);
+            }
+            refresh();
+            reset();
+        } catch(e) { alert("Error saving."); }
     }
 
-    async function delStep(id) { if(confirm("Delete?")) { await sb.from('students').delete().eq('id', id); refresh(); } }
+    function autoNotify(s) {
+        if(messagedNumbers.has(s.contact)) {
+            console.log("Already messaged this number in this session.");
+            return;
+        }
 
-    function search() {
-        const q = document.getElementById('sBar').value.toUpperCase();
-        render(students.filter(s => s.name.toUpperCase().includes(q)));
+        const msg = `OFFICIAL RECEIPT - PROGRESSIVE SCHOOL\n\nStudent: ${s.name}\nClass: ${s.class}\nAmount Paid: UGX ${Number(s.fees_paid).toLocaleString()}\nRemaining Balance: UGX ${Number(s.fees_balance).toLocaleString()}\n\nThank you for your payment.\nContact: +256762992440`;
+        
+        if(confirm(`Send automatic WhatsApp receipt to ${s.name}'s parent?`)) {
+            window.open(`https://api.whatsapp.com/send?phone=${s.contact}&text=${encodeURIComponent(msg)}`, '_blank');
+            messagedNumbers.add(s.contact); // Mark as sent
+        }
     }
 
     function editStep(id) {
         const s = students.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
         document.getElementById('name').value = s.name;
-        document.getElementById('ph').value = s.contact || '';
-        document.getElementById('fTitle').innerText = "Updating: " + s.name;
+        document.getElementById('ph').value = s.contact;
+        document.getElementById('age').value = s.age;
+        document.getElementById('fPaid').value = s.fees_paid;
+        document.getElementById('fBal').value = s.fees_balance;
+        document.getElementById('fTitle').innerText = "UPDATING: " + s.name;
         window.scrollTo(0,0);
+    }
+
+    function reset() {
+        document.getElementById('editId').value = "";
+        document.getElementById('fTitle').innerText = "Student Registration";
+        document.getElementById('name').value = "";
     }
 </script>
 </body>
