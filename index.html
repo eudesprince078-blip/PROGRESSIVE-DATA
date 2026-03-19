@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - OFFICIAL V6</title>
+    <title>PROGRESSIVE PMS - V7 OFFICIAL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #0056b3; --white: #ffffff; --green: #28a745; --red: #dc3545; --gold: #ffc107; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f4f8; margin: 0; padding: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding: 10px; }
         .box { background: var(--white); padding: 20px; border-radius: 12px; max-width: 1100px; margin: 10px auto; border: 1.5px solid var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .header { background: linear-gradient(135deg, var(--blue), #003366); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
         .dash { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
@@ -34,15 +34,15 @@
 
 <div id="loginGate" class="box" style="max-width:350px; margin-top:80px; text-align:center;">
     <h2 style="color:var(--blue)">PMS LOGIN</h2>
-    <input id="u" placeholder="USERNAME">
+    <input id="u" placeholder="USERNAME" autocomplete="off">
     <input id="p" type="password" placeholder="PASSWORD" style="margin-top:10px;">
-    <button onclick="login()" class="btn" style="margin-top:20px;">ENTER SYSTEM</button>
+    <button onclick="login()" id="loginBtn" class="btn" style="margin-top:20px;">ENTER SYSTEM</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
         <h2 style="margin:0;">PROGRESSIVE SCHOOL DATA</h2>
-        <p style="margin:0; font-size:11px;">Official Admin System</p>
+        <p style="margin:0; font-size:11px;">Official Management System</p>
     </div>
 
     <div class="dash">
@@ -56,9 +56,9 @@
         <input type="hidden" id="editId">
         <div class="grid">
             <div><label>Full Name</label><input id="name"></div>
-            <div><label>Official LIN (Manual)</label><input id="olin"></div>
+            <div><label>Official LIN</label><input id="olin"></div>
             <div><label>Date of Birth</label><input id="dob" type="date" onchange="calcAge()"></div>
-            <div><label>Age (Auto)</label><input id="age" readonly style="background:#f0f0f0; font-weight:bold;"></div>
+            <div><label>Age (Auto)</label><input id="age" readonly style="background:#f0f0f0;"></div>
             <div><label>Contact Number</label><input id="ph"></div>
             <div><label>Physical Location</label><input id="loc"></div>
             <div><label>Class</label>
@@ -91,10 +91,7 @@
         <div class="table-wrap">
             <table>
                 <thead>
-                    <tr>
-                        <th>GEN LIN</th><th>OFFICIAL LIN</th><th>NAME</th><th>AGE</th>
-                        <th>CLASS</th><th>LOCATION</th><th>FEES</th><th>BALANCE</th><th>ACTION</th>
-                    </tr>
+                    <tr><th>GEN LIN</th><th>OFFICIAL LIN</th><th>NAME</th><th>AGE</th><th>CLASS</th><th>FEES</th><th>BALANCE</th><th>ACTION</th></tr>
                 </thead>
                 <tbody id="tbody"></tbody>
             </table>
@@ -105,31 +102,34 @@
 </div>
 
 <script>
-    const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
-    const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
+    const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
+    const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     let sb = null;
     let students = [];
 
-    // Login function forces connection to avoid "null" error
     function login() {
-        const user = document.getElementById('u').value.trim().toUpperCase();
-        const pass = document.getElementById('p').value.trim().toUpperCase();
+        const u = document.getElementById('u').value.trim().toUpperCase();
+        const p = document.getElementById('p').value.trim().toUpperCase();
         
-        if(user === "PROGRESSIVE" && pass === "JESUS CARES") {
+        if(u === "PROGRESSIVE" && p === "JESUS CARES") {
             try {
-                sb = supabase.createClient(URL, KEY);
+                // Connecting here ensures the database is ready
+                sb = supabase.createClient(SB_URL, SB_KEY);
                 document.getElementById('loginGate').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
                 refresh();
-            } catch(e) { alert("Connection Error: " + e.message); }
-        } else { alert("Access Denied: Wrong Credentials"); }
+            } catch (err) {
+                alert("Connection Error: " + err.message);
+            }
+        } else {
+            alert("Wrong Credentials");
+        }
     }
 
     function calcAge() {
         const d = document.getElementById('dob').value;
         if(!d) return;
-        const age = new Date().getFullYear() - new Date(d).getFullYear();
-        document.getElementById('age').value = age;
+        document.getElementById('age').value = new Date().getFullYear() - new Date(d).getFullYear();
     }
 
     async function refresh() {
@@ -155,7 +155,6 @@
                 <td><b>${(s.name || '').toUpperCase()}</b></td>
                 <td>${s.age || '--'}</td>
                 <td><b>${s.class}</b></td>
-                <td>${s.location || '--'}</td>
                 <td><span class="badge ${cls}">${icon} ${s.fees_status}</span></td>
                 <td style="color:var(--red); font-weight:bold;">${Number(s.fees_balance || 0).toLocaleString()}</td>
                 <td><button onclick="editStep('${s.id}')" style="background:var(--gold); border:none; padding:6px 10px; border-radius:5px; font-weight:bold; cursor:pointer;">EDIT</button></td>
@@ -166,32 +165,45 @@
 
     async function save() {
         const nameVal = document.getElementById('name').value.trim();
-        if(!nameVal) return alert("Enter Student Name");
-        if(!sb) sb = supabase.createClient(URL, KEY);
+        if(!nameVal) return alert("Enter Name");
+        
+        // Safety check to prevent the "null" error
+        if(!sb) sb = supabase.createClient(SB_URL, SB_KEY);
 
         const btn = document.getElementById('sBtn');
         btn.disabled = true; btn.innerText = "SAVING...";
 
         const id = document.getElementById('editId').value;
         const pupil = {
-            name: nameVal, official_lin: document.getElementById('olin').value,
-            age: document.getElementById('age').value, dob: document.getElementById('dob').value,
-            contact: document.getElementById('ph').value, location: document.getElementById('loc').value,
-            class: document.getElementById('cl').value, fees_status: document.getElementById('fStat').value,
-            fees_paid: document.getElementById('fPaid').value || 0, fees_balance: document.getElementById('fBal').value || 0,
-            health_status: document.getElementById('health').value, status: document.getElementById('st').value
+            name: nameVal, 
+            official_lin: document.getElementById('olin').value,
+            age: document.getElementById('age').value, 
+            dob: document.getElementById('dob').value,
+            contact: document.getElementById('ph').value, 
+            location: document.getElementById('loc').value,
+            class: document.getElementById('cl').value, 
+            fees_status: document.getElementById('fStat').value,
+            fees_paid: document.getElementById('fPaid').value || 0, 
+            fees_balance: document.getElementById('fBal').value || 0,
+            health_status: document.getElementById('health').value, 
+            status: document.getElementById('st').value
         };
 
         try {
             if(!id) {
                 pupil.lin = "PM" + nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
-                await sb.from('students').insert([pupil]);
+                const { error } = await sb.from('students').insert([pupil]);
+                if(error) throw error;
             } else {
-                await sb.from('students').update(pupil).eq('id', id);
+                const { error } = await sb.from('students').update(pupil).eq('id', id);
+                if(error) throw error;
             }
-            alert("SUCCESS: Saved!"); resetForm(); refresh();
-        } catch(e) { alert("Error: " + e.message); }
-        finally { btn.disabled = false; btn.innerText = "CONFIRM & UPLOAD RECORD"; }
+            alert("Record Saved!"); resetForm(); refresh();
+        } catch(e) {
+            alert("Save Error: " + e.message);
+        } finally {
+            btn.disabled = false; btn.innerText = "CONFIRM & UPLOAD RECORD";
+        }
     }
 
     function editStep(id) {
@@ -210,8 +222,7 @@
         document.getElementById('fBal').value = s.fees_balance || 0;
         document.getElementById('health').value = s.health_status || 'Good';
         document.getElementById('st').value = s.status || 'active';
-        
-        document.getElementById('fTitle').innerText = "UPDATING: " + s.name;
+        document.getElementById('fTitle').innerText = "Updating: " + s.name;
         document.getElementById('cBtn').classList.remove('hidden');
         window.scrollTo(0,0);
     }
