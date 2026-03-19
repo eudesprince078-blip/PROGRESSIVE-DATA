@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V20 FINAL</title>
+    <title>PROGRESSIVE PMS - V21 STABLE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -15,7 +15,8 @@
         input, select { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
         .btn-main { background: var(--blue); color: white; padding: 14px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .student-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 6px solid var(--blue); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .lin-badge { font-size: 10px; background: #e9ecef; padding: 3px 7px; border-radius: 4px; font-weight: bold; color: #444; margin-right: 5px; }
+        .lin-row { display: flex; gap: 8px; margin: 5px 0; }
+        .lin-badge { font-size: 9px; background: #f0f0f0; padding: 2px 6px; border-radius: 4px; color: #555; font-weight: bold; border: 1px solid #ddd; }
         .btn-row { display: flex; gap: 5px; margin-top: 10px; }
         .action-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; }
         .edit { background: var(--blue); }
@@ -40,7 +41,7 @@
         <p style="margin:0; font-size:10px; opacity:0.8;">Eudes Media Smart System</p>
     </div>
 
-    <div class="box">
+    <div class="box" id="formContainer" style="border: 2px solid #eee;">
         <h4 id="fTitle" style="margin:0; color:var(--blue);">Student Registration</h4>
         <input type="hidden" id="editId">
         <div class="grid">
@@ -57,7 +58,8 @@
             <div><label>Paid (UGX)</label><input id="fPaid" type="number" value="0"></div>
             <div><label>Balance (UGX)</label><input id="fBal" type="number" value="0"></div>
         </div>
-        <button onclick="save()" class="btn-main">CONFIRM & SAVE RECORD</button>
+        <button id="saveBtn" onclick="save()" class="btn-main">CONFIRM & SAVE RECORD</button>
+        <button id="cancelBtn" onclick="reset()" class="hidden" style="width:100%; padding:10px; margin-top:5px; border:none; background:#ccc; border-radius:8px; font-weight:bold;">CANCEL EDIT</button>
     </div>
 
     <div class="box" style="border:none; background:transparent; padding:0;">
@@ -82,7 +84,7 @@
             document.getElementById('loginGate').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             refresh();
-        } else { alert("Login Denied"); }
+        } else { alert("Login Failed"); }
     }
 
     async function refresh() {
@@ -97,12 +99,12 @@
         list.forEach(s => {
             html += `<div class="student-card">
                 <div>
-                    <b style="font-size:15px; color:var(--dark);">${s.name.toUpperCase()}</b><br>
-                    <div style="margin: 5px 0;">
+                    <b style="font-size:15px; color:var(--dark);">${s.name.toUpperCase()}</b>
+                    <div class="lin-row">
                         <span class="lin-badge">AUTO: ${s.lin || 'NONE'}</span>
                         <span class="lin-badge">OFFICIAL: ${s.official_lin || 'NONE'}</span>
                     </div>
-                    <span style="font-size:12px; color:#555;">Class: ${s.class} | Bal: <b style="color:var(--red);">UGX ${Number(s.fees_balance).toLocaleString()}</b></span>
+                    <span style="font-size:12px; color:#666;">Class: ${s.class} | <b style="color:var(--red);">Bal: UGX ${Number(s.fees_balance).toLocaleString()}</b></span>
                 </div>
                 <div class="btn-row">
                     <button onclick="editMode('${s.id}')" class="action-btn edit">EDIT</button>
@@ -115,10 +117,13 @@
     }
 
     async function save() {
-        const name = document.getElementById('name').value.trim();
+        if(!sb) return;
         const id = document.getElementById('editId').value;
+        const name = document.getElementById('name').value.trim();
+        
         const payload = {
-            name: name, contact: document.getElementById('ph').value,
+            name: name,
+            contact: document.getElementById('ph').value,
             class: document.getElementById('cl').value,
             official_lin: document.getElementById('officialLin').value,
             fees_paid: document.getElementById('fPaid').value || 0,
@@ -126,31 +131,39 @@
         };
 
         if(!id) {
+            // REGISTER NEW: Create unique LIN
             payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
-            await sb.from('students').insert([payload]);
+            const { error } = await sb.from('students').insert([payload]);
+            if(error) alert("Save Error: " + error.message);
         } else {
-            await sb.from('students').update(payload).eq('id', id);
+            // UPDATE EXISTING: Do NOT change the LIN, just update the row
+            const { error } = await sb.from('students').update(payload).eq('id', id);
+            if(error) alert("Update Error: " + error.message);
         }
-        refresh(); reset();
+        
+        refresh(); 
+        reset();
     }
 
-    // --- REPAIRED DELETE FUNCTION ---
     async function delRecord(id, name) {
-        if(!confirm("DELETE PERMANENTLY: " + name + "?")) return;
+        if(!confirm("ARE YOU SURE? This will permanently delete " + name)) return;
         
-        // This is the critical fix: Waiting for Supabase to confirm the deletion
-        const { error } = await sb.from('students').delete().eq('id', id);
+        // Use direct ID matching to ensure the right one is deleted
+        const { error } = await sb.from('students').delete().match({ id: id });
         
         if(error) {
-            alert("Database Error: Could not delete " + name);
+            alert("Delete Failed: " + error.message);
         } else {
             alert(name + " removed successfully.");
-            refresh(); // Only re-loads the list AFTER the delete works
+            refresh();
         }
     }
 
     function editMode(id) {
         const s = students.find(x => x.id == id);
+        if(!s) return;
+
+        // Populate fields
         document.getElementById('editId').value = s.id;
         document.getElementById('name').value = s.name;
         document.getElementById('ph').value = s.contact;
@@ -158,8 +171,26 @@
         document.getElementById('officialLin').value = s.official_lin || '';
         document.getElementById('fPaid').value = s.fees_paid;
         document.getElementById('fBal').value = s.fees_balance;
+
+        // Change UI to Update Mode
         document.getElementById('fTitle').innerText = "UPDATING: " + s.name;
+        document.getElementById('saveBtn').innerText = "SAVE CHANGES";
+        document.getElementById('formContainer').style.borderColor = "var(--blue)";
+        document.getElementById('cancelBtn').classList.remove('hidden');
         window.scrollTo(0,0);
+    }
+
+    function reset() {
+        document.getElementById('editId').value = "";
+        document.getElementById('name').value = "";
+        document.getElementById('ph').value = "";
+        document.getElementById('officialLin').value = "";
+        document.getElementById('fPaid').value = "0";
+        document.getElementById('fBal').value = "0";
+        document.getElementById('fTitle').innerText = "Student Registration";
+        document.getElementById('saveBtn').innerText = "CONFIRM & SAVE RECORD";
+        document.getElementById('formContainer').style.borderColor = "#eee";
+        document.getElementById('cancelBtn').classList.add('hidden');
     }
 
     function search() {
@@ -170,12 +201,6 @@
     function sendWA(num, name, bal) {
         const msg = `PROGRESSIVE SCHOOL\nStudent: ${name}\nBalance: UGX ${Number(bal).toLocaleString()}\nEudes Media: +256762992440`;
         window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function reset() {
-        document.getElementById('editId').value = "";
-        document.getElementById('name').value = "";
-        document.getElementById('fTitle').innerText = "Student Registration";
     }
 </script>
 </body>
