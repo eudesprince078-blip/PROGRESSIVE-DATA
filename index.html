@@ -1,99 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PROGRESSIVE PMS - OFFICIAL V6</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --blue: #0056b3; --white: #ffffff; --green: #28a745; --red: #dc3545; --gold: #ffc107; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f4f8; margin: 0; padding: 10px; }
+        .box { background: var(--white); padding: 20px; border-radius: 12px; max-width: 1100px; margin: 10px auto; border: 1.5px solid var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, var(--blue), #003366); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
+        .dash { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .stat { background: white; padding: 10px; border-radius: 10px; text-align: center; border-bottom: 3px solid var(--blue); }
+        .stat b { font-size: 18px; color: var(--blue); display: block; }
+        .stat span { font-size: 9px; font-weight: bold; color: #666; text-transform: uppercase; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        label { font-size: 11px; font-weight: bold; color: var(--blue); display: block; margin-bottom: 3px; }
+        input, select { width: 100%; padding: 10px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none; }
+        .btn { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn:disabled { background: #888; cursor: not-allowed; }
+        .table-wrap { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 12px; }
+        th { background: #f8f9fa; color: var(--blue); padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
+        td { padding: 12px; border-bottom: 1px solid #eee; background: white; }
+        .badge { padding: 4px 8px; border-radius: 5px; font-weight: bold; }
+        .paid { background: #d4edda; color: var(--green); }
+        .unpaid { background: #f8d7da; color: var(--red); }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; font-weight: bold; color: #444; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="loginGate" class="box" style="max-width:350px; margin-top:80px; text-align:center;">
+    <h2 style="color:var(--blue)">PMS LOGIN</h2>
+    <input id="u" placeholder="USERNAME">
+    <input id="p" type="password" placeholder="PASSWORD" style="margin-top:10px;">
+    <button onclick="login()" class="btn" style="margin-top:20px;">ENTER SYSTEM</button>
+</div>
+
+<div id="mainApp" class="hidden">
+    <div class="header">
+        <h2 style="margin:0;">PROGRESSIVE SCHOOL DATA</h2>
+        <p style="margin:0; font-size:11px;">Official Admin System</p>
+    </div>
+
+    <div class="dash">
+        <div class="stat"><span>Students</span><b id="tCnt">0</b></div>
+        <div class="stat"><span>Fully Paid</span><b id="pCnt" style="color:var(--green)">0</b></div>
+        <div class="stat"><span>Balances</span><b id="bCnt" style="color:var(--red)">0</b></div>
+    </div>
+
+    <div class="box">
+        <h3 id="fTitle" style="color:var(--blue); margin-top:0;">Student Registration</h3>
+        <input type="hidden" id="editId">
+        <div class="grid">
+            <div><label>Full Name</label><input id="name"></div>
+            <div><label>Official LIN (Manual)</label><input id="olin"></div>
+            <div><label>Date of Birth</label><input id="dob" type="date" onchange="calcAge()"></div>
+            <div><label>Age (Auto)</label><input id="age" readonly style="background:#f0f0f0; font-weight:bold;"></div>
+            <div><label>Contact Number</label><input id="ph"></div>
+            <div><label>Physical Location</label><input id="loc"></div>
+            <div><label>Class</label>
+                <select id="cl">
+                    <option>Baby</option><option>Middle</option><option>Top</option>
+                    <option>P.1</option><option>P.2</option><option>P.3</option>
+                    <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+                </select>
+            </div>
+            <div><label>Fees Status</label>
+                <select id="fStat">
+                    <option value="Full">Fully Paid ✅</option>
+                    <option value="Balance">Has Balance 💰</option>
+                    <option value="None">Not Paid ❌</option>
+                </select>
+            </div>
+            <div><label>Amount Paid (UGX)</label><input id="fPaid" type="number" value="0"></div>
+            <div><label>Balance (UGX)</label><input id="fBal" type="number" value="0"></div>
+            <div><label>Health Status</label><input id="health" value="Good"></div>
+            <div><label>Status</label>
+                <select id="st"><option value="active">Active Pupil</option><option value="left">Left School</option></select>
+            </div>
+        </div>
+        <button onclick="save()" id="sBtn" class="btn">CONFIRM & UPLOAD RECORD</button>
+        <button onclick="resetForm()" id="cBtn" class="btn hidden" style="background:#666; margin-top:10px;">CANCEL EDIT</button>
+    </div>
+
+    <div class="box">
+        <input type="text" id="sBar" onkeyup="search()" placeholder="🔍 Search Name, LIN, or Class..." style="border: 2px solid var(--blue); height: 45px; border-radius: 8px; padding-left: 15px; margin-bottom:10px;">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>GEN LIN</th><th>OFFICIAL LIN</th><th>NAME</th><th>AGE</th>
+                        <th>CLASS</th><th>LOCATION</th><th>FEES</th><th>BALANCE</th><th>ACTION</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">Eudes Media | +256762992440</div>
+</div>
+
 <script>
     const URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-    let sb = null; // This starts as null
+    let sb = null;
     let students = [];
 
-    // 1. IMPROVED LOGIN: This now forces the connection
+    // Login function forces connection to avoid "null" error
     function login() {
         const user = document.getElementById('u').value.trim().toUpperCase();
         const pass = document.getElementById('p').value.trim().toUpperCase();
         
         if(user === "PROGRESSIVE" && pass === "JESUS CARES") {
-            // FORCE INITIALIZATION HERE
             try {
                 sb = supabase.createClient(URL, KEY);
-                console.log("Database Connected");
-            } catch (err) {
-                alert("Connection Error: " + err.message);
-                return;
-            }
+                document.getElementById('loginGate').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                refresh();
+            } catch(e) { alert("Connection Error: " + e.message); }
+        } else { alert("Access Denied: Wrong Credentials"); }
+    }
 
-            document.getElementById('loginGate').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            refresh();
-        } else { 
-            alert("Wrong Username or Password"); 
-        }
+    function calcAge() {
+        const d = document.getElementById('dob').value;
+        if(!d) return;
+        const age = new Date().getFullYear() - new Date(d).getFullYear();
+        document.getElementById('age').value = age;
     }
 
     async function refresh() {
-        // Safety check: if sb is null, try to connect again
-        if(!sb) sb = supabase.createClient(URL, KEY);
-
+        if(!sb) return;
         const { data, error } = await sb.from('students').select('*').order('created_at', { ascending: false });
-        if(error) {
-            console.error("Refresh Error:", error.message);
-            return;
+        if(!error) {
+            students = data || [];
+            render(students);
+            document.getElementById('tCnt').innerText = students.length;
+            document.getElementById('pCnt').innerText = students.filter(s => s.fees_status === 'Full').length;
+            document.getElementById('bCnt').innerText = students.filter(s => s.fees_status === 'Balance').length;
         }
-        students = data || [];
-        render(students);
-        
-        // Update stats if elements exist
-        if(document.getElementById('tCnt')) document.getElementById('tCnt').innerText = students.length;
+    }
+
+    function render(list) {
+        let rows = "";
+        list.forEach(s => {
+            const icon = s.fees_status === 'Full' ? "✅" : (s.fees_status === 'Balance' ? "💰" : "❌");
+            const cls = s.fees_status === 'Full' ? "paid" : "unpaid";
+            rows += `<tr>
+                <td style="color:var(--blue); font-weight:bold;">${s.lin || '--'}</td>
+                <td style="color:#6f42c1; font-weight:bold;">${s.official_lin || '---'}</td>
+                <td><b>${(s.name || '').toUpperCase()}</b></td>
+                <td>${s.age || '--'}</td>
+                <td><b>${s.class}</b></td>
+                <td>${s.location || '--'}</td>
+                <td><span class="badge ${cls}">${icon} ${s.fees_status}</span></td>
+                <td style="color:var(--red); font-weight:bold;">${Number(s.fees_balance || 0).toLocaleString()}</td>
+                <td><button onclick="editStep('${s.id}')" style="background:var(--gold); border:none; padding:6px 10px; border-radius:5px; font-weight:bold; cursor:pointer;">EDIT</button></td>
+            </tr>`;
+        });
+        document.getElementById('tbody').innerHTML = rows;
     }
 
     async function save() {
-        const nameInput = document.getElementById('name').value.trim();
-        if(!nameInput) return alert("Please enter a student name");
-
-        // IMPORTANT: Re-connect if somehow lost
-        if(!sb) {
-            console.log("Re-connecting to Supabase...");
-            sb = supabase.createClient(URL, KEY);
-        }
+        const nameVal = document.getElementById('name').value.trim();
+        if(!nameVal) return alert("Enter Student Name");
+        if(!sb) sb = supabase.createClient(URL, KEY);
 
         const btn = document.getElementById('sBtn');
-        btn.disabled = true; 
-        btn.innerText = "SAVING...";
+        btn.disabled = true; btn.innerText = "SAVING...";
 
         const id = document.getElementById('editId').value;
-        const pupilData = {
-            name: nameInput,
-            official_lin: document.getElementById('olin').value,
-            age: document.getElementById('age').value,
-            dob: document.getElementById('dob').value,
-            contact: document.getElementById('ph').value,
-            location: document.getElementById('loc').value,
-            class: document.getElementById('cl').value,
-            fees_status: document.getElementById('fStat').value,
-            fees_paid: document.getElementById('fPaid').value || 0,
-            fees_balance: document.getElementById('fBal').value || 0,
-            health_status: document.getElementById('health').value,
-            status: document.getElementById('st').value
+        const pupil = {
+            name: nameVal, official_lin: document.getElementById('olin').value,
+            age: document.getElementById('age').value, dob: document.getElementById('dob').value,
+            contact: document.getElementById('ph').value, location: document.getElementById('loc').value,
+            class: document.getElementById('cl').value, fees_status: document.getElementById('fStat').value,
+            fees_paid: document.getElementById('fPaid').value || 0, fees_balance: document.getElementById('fBal').value || 0,
+            health_status: document.getElementById('health').value, status: document.getElementById('st').value
         };
 
         try {
-            let res;
             if(!id) {
-                pupilData.lin = "PM" + nameInput.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
-                res = await sb.from('students').insert([pupilData]);
+                pupil.lin = "PM" + nameVal.charAt(0).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+                await sb.from('students').insert([pupil]);
             } else {
-                res = await sb.from('students').update(pupilData).eq('id', id);
+                await sb.from('students').update(pupil).eq('id', id);
             }
-
-            if(res.error) throw res.error;
-
-            alert("SUCCESS: Record Saved to Progressive School Data!");
-            resetForm();
-            refresh();
-        } catch (e) {
-            alert("SAVE ERROR: " + e.message);
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "CONFIRM & UPLOAD RECORD";
-        }
+            alert("SUCCESS: Saved!"); resetForm(); refresh();
+        } catch(e) { alert("Error: " + e.message); }
+        finally { btn.disabled = false; btn.innerText = "CONFIRM & UPLOAD RECORD"; }
     }
 
-    // Include your other helper functions (render, calcAge, search, etc.) below this line
+    function editStep(id) {
+        const s = students.find(x => x.id == id);
+        if(!s) return;
+        document.getElementById('editId').value = s.id;
+        document.getElementById('name').value = s.name;
+        document.getElementById('olin').value = s.official_lin || '';
+        document.getElementById('dob').value = s.dob || '';
+        document.getElementById('age').value = s.age || '';
+        document.getElementById('ph').value = s.contact || '';
+        document.getElementById('loc').value = s.location || '';
+        document.getElementById('cl').value = s.class;
+        document.getElementById('fStat').value = s.fees_status || 'None';
+        document.getElementById('fPaid').value = s.fees_paid || 0;
+        document.getElementById('fBal').value = s.fees_balance || 0;
+        document.getElementById('health').value = s.health_status || 'Good';
+        document.getElementById('st').value = s.status || 'active';
+        
+        document.getElementById('fTitle').innerText = "UPDATING: " + s.name;
+        document.getElementById('cBtn').classList.remove('hidden');
+        window.scrollTo(0,0);
+    }
+
+    function search() {
+        const q = document.getElementById('sBar').value.toUpperCase();
+        render(students.filter(s => 
+            (s.name && s.name.toUpperCase().includes(q)) || 
+            (s.official_lin && s.official_lin.toUpperCase().includes(q)) ||
+            (s.class && s.class.toUpperCase().includes(q))
+        ));
+    }
+
+    function resetForm() {
+        document.getElementById('editId').value = "";
+        document.getElementById('name').value = "";
+        document.getElementById('olin').value = "";
+        document.getElementById('age').value = "";
+        document.getElementById('dob').value = "";
+        document.getElementById('fTitle').innerText = "Student Registration";
+        document.getElementById('cBtn').classList.add('hidden');
+    }
 </script>
+</body>
+</html>
