@@ -1,18 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eudes Media - Student Management</title>
+    <title>School Data System</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-        /* Basic styling to match your brand */
-        body { font-family: Arial, sans-serif; background-color: white; color: #003366; padding: 20px; }
-        input, select, button { display: block; width: 100%; margin: 10px 0; padding: 10px; border: 1px solid blue; border-radius: 5px; }
-        button { background-color: #003366; color: white; font-weight: bold; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #003366; color: white; }
+        body { font-family: sans-serif; padding: 10px; color: #003366; }
+        input, select, button { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #003366; border-radius: 4px; box-sizing: border-box; }
+        button { background: #003366; color: white; font-weight: bold; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        th, td { border: 1px solid #003366; padding: 8px; text-align: left; }
+        th { background: #003366; color: white; }
     </style>
 </head>
 <body>
@@ -20,7 +18,6 @@
     <h2>SCHOOL DATA +</h2>
     
     <input type="text" id="regName" placeholder="Full Name">
-    <input type="date" id="regDOB">
     <input type="text" id="regLocation" placeholder="Physical Location">
     <input type="text" id="regContact" placeholder="Contact Number">
     <input type="text" id="regOfficialLIN" placeholder="Official LIN">
@@ -28,14 +25,11 @@
     <select id="regHealth">
         <option value="Good">Health: Good</option>
         <option value="Fair">Health: Fair</option>
-        <option value="Sick">Health: Sick</option>
     </select>
 
     <button id="uploadBtn" onclick="registerStudent()">CONFIRM & UPLOAD RECORD</button>
 
-    <hr>
-
-    <table id="studentTable">
+    <table>
         <thead>
             <tr>
                 <th>#</th>
@@ -46,16 +40,13 @@
                 <th>STATUS</th>
             </tr>
         </thead>
-        <tbody id="recordTableBody">
-            </tbody>
+        <tbody id="recordTableBody"></tbody>
     </table>
 
-    <p style="text-align:center; font-size: 12px; margin-top: 30px;">
-        Eudes Media | +256762992440
-    </p>
+    <p style="text-align:center; margin-top: 20px;">Eudes Media | +256762992440</p>
 
     <script>
-        // REPLACE THESE with your actual credentials from Supabase
+        // Use your actual Supabase URL and Key here
         const _URL = "YOUR_SUPABASE_URL"; 
         const _KEY = "YOUR_SUPABASE_ANON_KEY";
         const supabase = supabase.createClient(_URL, _KEY);
@@ -68,7 +59,7 @@
             tableBody.innerHTML = ""; 
 
             data.forEach((student, index) => {
-                const row = `<tr>
+                tableBody.innerHTML += `<tr>
                     <td>${index + 1}</td>
                     <td>${student.gen_lin || 'N/A'}</td>
                     <td>${student.official_lin || 'N/A'}</td>
@@ -76,7 +67,6 @@
                     <td>${student.location || 'N/A'}</td>
                     <td>${student.student_status || 'Active'}</td>
                 </tr>`;
-                tableBody.insertAdjacentHTML('beforeend', row);
             });
         }
 
@@ -89,8 +79,7 @@
 
             const { error } = await supabase.from('students').insert([{
                 name: name,
-                location: location, // Matches your 'location' column
-                dob: document.getElementById('regDOB').value,
+                location: location, 
                 contact_number: document.getElementById('regContact').value,
                 official_lin: document.getElementById('regOfficialLIN').value,
                 health_status: document.getElementById('regHealth').value,
@@ -107,7 +96,6 @@
             btn.innerText = "CONFIRM & UPLOAD RECORD";
         }
 
-        // Run fetch on load
         window.onload = fetchRecords;
     </script>
 </body>
