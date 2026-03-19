@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - ULTIMATE V8</title>
+    <title>PROGRESSIVE PMS - CALL & MESSAGE V9</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #0056b3; --white: #ffffff; --green: #28a745; --red: #dc3545; --gold: #ffc107; --purple: #6f42c1; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding: 10px; }
-        .box { background: var(--white); padding: 20px; border-radius: 12px; max-width: 1100px; margin: 10px auto; border: 1.5px solid var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .box { background: var(--white); padding: 20px; border-radius: 12px; max-width: 1150px; margin: 10px auto; border: 1.5px solid var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .header { background: linear-gradient(135deg, var(--blue), #003366); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
         .dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px; }
         .stat { background: white; padding: 10px; border-radius: 10px; text-align: center; border-bottom: 3px solid var(--blue); }
@@ -18,10 +18,10 @@
         label { font-size: 11px; font-weight: bold; color: var(--blue); display: block; margin-bottom: 3px; }
         input, select, textarea { width: 100%; padding: 10px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none; }
         .btn { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; }
-        .btn-promo { background: var(--purple); font-size: 11px; padding: 10px; }
-        .btn-sms { background: var(--green); font-size: 11px; padding: 10px; }
+        .btn-call { background: var(--green); color: white; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; text-decoration: none; display: inline-block; font-size: 11px; }
+        .btn-edit { background: var(--gold); border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
         .table-wrap { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1050px; font-size: 12px; }
         th { background: #f8f9fa; color: var(--blue); padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
         td { padding: 12px; border-bottom: 1px solid #eee; background: white; }
         .badge { padding: 4px 8px; border-radius: 5px; font-weight: bold; }
@@ -43,22 +43,22 @@
 <div id="mainApp" class="hidden">
     <div class="header">
         <h2 style="margin:0;">PROGRESSIVE SCHOOL DATA</h2>
-        <p style="margin:0; font-size:11px;">Management & Messaging System</p>
+        <p style="margin:0; font-size:11px;">Admin Control & Communication</p>
     </div>
 
     <div class="dash">
         <div class="stat"><span>Students</span><b id="tCnt">0</b></div>
         <div class="stat"><span>Paid</span><b id="pCnt" style="color:var(--green)">0</b></div>
         <div class="stat"><span>Balances</span><b id="bCnt" style="color:var(--red)">0</b></div>
-        <button onclick="runPromotion()" class="btn btn-promo">🚀 AUTO PROMOTION</button>
+        <button onclick="runPromotion()" class="btn" style="background:var(--purple); font-size:10px; padding:10px;">🚀 AUTO PROMOTION</button>
     </div>
 
     <div class="box" style="border-color: var(--green);">
-        <h3 style="color:var(--green); margin:0 0 10px 0;">Bulk SMS Portal</h3>
-        <textarea id="smsMsg" placeholder="Type message here... e.g. Dear Parent, please clear the balance of UGX..."></textarea>
+        <h3 style="color:var(--green); margin:0 0 10px 0; font-size:14px;">Bulk SMS Portal</h3>
+        <textarea id="smsMsg" rows="2" placeholder="Write message to parents..."></textarea>
         <div style="display:flex; gap:10px; margin-top:10px;">
-            <button onclick="sendBulkSMS('all')" class="btn btn-sms">Send to All</button>
-            <button onclick="sendBulkSMS('debt')" class="btn btn-sms" style="background:var(--red)">Send to Debtors Only</button>
+            <button onclick="sendBulkSMS('all')" class="btn" style="background:var(--green); font-size:11px; padding:10px;">Sms All Parents</button>
+            <button onclick="sendBulkSMS('debt')" class="btn" style="background:var(--red); font-size:11px; padding:10px;">Sms Debtors Only</button>
         </div>
     </div>
 
@@ -70,7 +70,7 @@
             <div><label>Official LIN</label><input id="olin"></div>
             <div><label>Date of Birth</label><input id="dob" type="date" onchange="calcAge()"></div>
             <div><label>Age (Auto)</label><input id="age" readonly style="background:#f0f0f0;"></div>
-            <div><label>Parent Contact</label><input id="ph" placeholder="2567..."></div>
+            <div><label>Parent Contact (256...)</label><input id="ph"></div>
             <div><label>Location</label><input id="loc"></div>
             <div><label>Class</label>
                 <select id="cl">
@@ -98,11 +98,11 @@
     </div>
 
     <div class="box">
-        <input type="text" id="sBar" onkeyup="search()" placeholder="🔍 Search Name, LIN, or Class..." style="border: 2px solid var(--blue); height: 45px; border-radius: 8px; padding-left: 15px; margin-bottom:10px;">
+        <input type="text" id="sBar" onkeyup="search()" placeholder="🔍 Quick Search Students..." style="border: 2px solid var(--blue); height: 45px; border-radius: 8px; padding-left: 15px; margin-bottom:10px;">
         <div class="table-wrap">
             <table>
                 <thead>
-                    <tr><th>GEN LIN</th><th>OFFICIAL LIN</th><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>FEES</th><th>BALANCE</th><th>ACTION</th></tr>
+                    <tr><th>GEN LIN</th><th>OFFICIAL LIN</th><th>NAME</th><th>CLASS</th><th>PAID</th><th>BALANCE</th><th>COMMUNICATION</th><th>MANAGE</th></tr>
                 </thead>
                 <tbody id="tbody"></tbody>
             </table>
@@ -117,7 +117,6 @@
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     let sb = null;
     let students = [];
-
     const classOrder = ["Baby", "Middle", "Top", "P.1", "P.2", "P.3", "P.4", "P.5", "P.6", "P.7"];
 
     function login() {
@@ -129,19 +128,19 @@
                 document.getElementById('loginGate').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
                 refresh();
-            } catch (err) { alert("Link Error: " + err.message); }
-        } else { alert("Access Denied"); }
+            } catch (err) { alert("Supabase Error: " + err.message); }
+        } else { alert("Login failed."); }
     }
 
     async function refresh() {
         if(!sb) return;
-        const { data, error } = await sb.from('students').select('*').order('created_at', { ascending: false });
+        const { data, error } = await sb.from('students').select('*').order('name', { ascending: true });
         if(!error) {
             students = data || [];
             render(students);
             document.getElementById('tCnt').innerText = students.length;
             document.getElementById('pCnt').innerText = students.filter(s => s.fees_status === 'Full').length;
-            document.getElementById('bCnt').innerText = students.filter(s => s.fees_status === 'Balance' || s.fees_status === 'None').length;
+            document.getElementById('bCnt').innerText = students.filter(s => s.fees_status !== 'Full').length;
         }
     }
 
@@ -149,64 +148,32 @@
         let rows = "";
         list.forEach(s => {
             const cls = s.fees_status === 'Full' ? "paid" : "unpaid";
+            const contact = s.contact ? s.contact : '';
+            
             rows += `<tr>
                 <td style="font-weight:bold; color:var(--blue);">${s.lin || '--'}</td>
                 <td>${s.official_lin || '---'}</td>
                 <td><b>${(s.name || '').toUpperCase()}</b></td>
                 <td><b>${s.class}</b></td>
-                <td>${s.contact || 'No No.'}</td>
-                <td><span class="badge ${cls}">${s.fees_status}</span></td>
-                <td style="color:var(--red); font-weight:bold;">${Number(s.fees_balance || 0).toLocaleString()}</td>
-                <td><button onclick="editStep('${s.id}')" style="background:var(--gold); border:none; padding:5px 8px; border-radius:4px; cursor:pointer;">EDIT</button></td>
+                <td>UGX ${Number(s.fees_paid || 0).toLocaleString()}</td>
+                <td style="color:var(--red); font-weight:bold;">UGX ${Number(s.fees_balance || 0).toLocaleString()}</td>
+                <td>
+                    ${contact ? `<a href="tel:${contact}" class="btn-call">📞 CALL PARENT</a>` : '<span style="color:#999;font-size:10px;">NO NUMBER</span>'}
+                </td>
+                <td>
+                    <button onclick="editStep('${s.id}')" class="btn-edit">EDIT</button>
+                </td>
             </tr>`;
         });
         document.getElementById('tbody').innerHTML = rows;
     }
 
-    async function sendBulkSMS(type) {
-        const msg = document.getElementById('smsMsg').value;
-        if(!msg) return alert("Please type a message first!");
-
-        let targets = type === 'debt' ? students.filter(s => s.fees_status !== 'Full') : students;
-        let numbers = targets.map(s => s.contact).filter(n => n && n.length > 5);
-
-        if(numbers.length === 0) return alert("No valid phone numbers found!");
-
-        // Launch SMS intent for mobile devices
-        window.location.href = `sms:${numbers.join(',')}?body=${encodeURIComponent(msg + "\n- Progressive PMS")}`;
-        alert(`Opening SMS app for ${numbers.length} parents...`);
-    }
-
-    async function runPromotion() {
-        if(!confirm("⚠️ WARNING: This will move ALL students to the next class and reset fee balances. Continue?")) return;
-        
-        for(let s of students) {
-            let currentIndex = classOrder.indexOf(s.class);
-            if(currentIndex !== -1 && currentIndex < classOrder.length - 1) {
-                let nextClass = classOrder[currentIndex + 1];
-                await sb.from('students').update({ 
-                    class: nextClass,
-                    fees_paid: 0,
-                    fees_balance: 0,
-                    fees_status: 'None'
-                }).eq('id', s.id);
-            }
-        }
-        alert("Success: All students promoted!");
-        refresh();
-    }
-
-    function calcAge() {
-        const d = document.getElementById('dob').value;
-        if(d) document.getElementById('age').value = new Date().getFullYear() - new Date(d).getFullYear();
-    }
-
     async function save() {
         const nameVal = document.getElementById('name').value.trim();
-        if(!nameVal) return alert("Enter Name");
+        if(!nameVal) return alert("Student Name Required");
         if(!sb) sb = supabase.createClient(SB_URL, SB_KEY);
         const btn = document.getElementById('sBtn');
-        btn.disabled = true; btn.innerText = "SAVING...";
+        btn.disabled = true; btn.innerText = "UPLOADING...";
         const id = document.getElementById('editId').value;
         const pupil = {
             name: nameVal, official_lin: document.getElementById('olin').value,
@@ -223,9 +190,34 @@
             } else {
                 await sb.from('students').update(pupil).eq('id', id);
             }
-            alert("Saved!"); resetForm(); refresh();
-        } catch(e) { alert("Error: " + e.message); }
+            alert("Student Record Updated!"); resetForm(); refresh();
+        } catch(e) { alert("Save Error: " + e.message); }
         finally { btn.disabled = false; btn.innerText = "CONFIRM & UPLOAD RECORD"; }
+    }
+
+    async function runPromotion() {
+        if(!confirm("Promote all students and reset fees for the new term?")) return;
+        for(let s of students) {
+            let idx = classOrder.indexOf(s.class);
+            if(idx !== -1 && idx < classOrder.length - 1) {
+                await sb.from('students').update({ class: classOrder[idx + 1], fees_paid: 0, fees_balance: 0, fees_status: 'None' }).eq('id', s.id);
+            }
+        }
+        alert("Promotion Complete!"); refresh();
+    }
+
+    async function sendBulkSMS(type) {
+        const msg = document.getElementById('smsMsg').value;
+        if(!msg) return alert("Write a message first!");
+        let targets = type === 'debt' ? students.filter(s => s.fees_status !== 'Full') : students;
+        let numbers = targets.map(s => s.contact).filter(n => n && n.length > 5);
+        if(numbers.length === 0) return alert("No contacts found!");
+        window.location.href = `sms:${numbers.join(',')}?body=${encodeURIComponent(msg)}`;
+    }
+
+    function calcAge() {
+        const d = document.getElementById('dob').value;
+        if(d) document.getElementById('age').value = new Date().getFullYear() - new Date(d).getFullYear();
     }
 
     function editStep(id) {
@@ -233,20 +225,22 @@
         if(!s) return;
         document.getElementById('editId').value = s.id;
         document.getElementById('name').value = s.name;
-        document.getElementById('cl').value = s.class;
+        document.getElementById('olin').value = s.official_lin || '';
+        document.getElementById('dob').value = s.dob || '';
+        document.getElementById('age').value = s.age || '';
         document.getElementById('ph').value = s.contact || '';
+        document.getElementById('cl').value = s.class;
         document.getElementById('fStat').value = s.fees_status;
+        document.getElementById('fPaid').value = s.fees_paid;
         document.getElementById('fBal').value = s.fees_balance;
-        document.getElementById('fTitle').innerText = "Edit: " + s.name;
+        document.getElementById('fTitle').innerText = "UPDATING: " + s.name;
         document.getElementById('cBtn').classList.remove('hidden');
         window.scrollTo(0,0);
     }
 
     function search() {
         const q = document.getElementById('sBar').value.toUpperCase();
-        render(students.filter(s => 
-            (s.name && s.name.toUpperCase().includes(q)) || (s.class && s.class.toUpperCase().includes(q))
-        ));
+        render(students.filter(s => s.name.toUpperCase().includes(q) || s.class.toUpperCase().includes(q)));
     }
 
     function resetForm() {
