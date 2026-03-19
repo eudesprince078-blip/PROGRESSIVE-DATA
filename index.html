@@ -1,30 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>School Data System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progressive School Management System</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <style>
-        body { font-family: sans-serif; padding: 10px; color: #003366; }
-        input, select, button { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #003366; border-radius: 4px; box-sizing: border-box; }
-        button { background: #003366; color: white; font-weight: bold; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        th, td { border: 1px solid #003366; padding: 8px; text-align: left; }
-        th { background: #003366; color: white; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; color: #003366; padding: 15px; }
+        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        h2 { text-align: center; color: #003366; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #003366; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { background-color: #003366; color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        button:hover { background-color: #0055aa; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
+        th { background-color: #003366; color: white; }
+        .footer { text-align: center; margin-top: 20px; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
 
+<div class="container">
     <h2>SCHOOL DATA +</h2>
     
     <input type="text" id="regName" placeholder="Full Name">
     <input type="text" id="regLocation" placeholder="Physical Location">
     <input type="text" id="regContact" placeholder="Contact Number">
-    <input type="text" id="regOfficialLIN" placeholder="Official LIN">
+    <input type="text" id="regOfficialLIN" placeholder="Official LIN (Optional)">
     
     <select id="regHealth">
-        <option value="Good">Health: Good</option>
-        <option value="Fair">Health: Fair</option>
+        <option value="Good">Health Status: Good</option>
+        <option value="Fair">Health Status: Fair</option>
+        <option value="Sick">Health Status: Sick</option>
     </select>
 
     <button id="uploadBtn" onclick="registerStudent()">CONFIRM & UPLOAD RECORD</button>
@@ -40,63 +47,103 @@
                 <th>STATUS</th>
             </tr>
         </thead>
-        <tbody id="recordTableBody"></tbody>
+        <tbody id="recordTableBody">
+            </tbody>
     </table>
 
-    <p style="text-align:center; margin-top: 20px;">Eudes Media | +256762992440</p>
+    <div class="footer">
+        Eudes Media | +256762992440
+    </div>
+</div>
 
-    <script>
-        // Use your actual Supabase URL and Key here
-        const _URL = "YOUR_SUPABASE_URL"; 
-        const _KEY = "YOUR_SUPABASE_ANON_KEY";
-        const supabase = supabase.createClient(_URL, _KEY);
+<script>
+    // --- DATABASE CONNECTION ---
+    // PASTE YOUR REAL SUPABASE DETAILS HERE
+    const _URL = "YOUR_SUPABASE_URL"; 
+    const _KEY = "YOUR_SUPABASE_ANON_KEY";
+    const supabase = supabase.createClient(_URL, _KEY);
 
-        async function fetchRecords() {
-            const { data, error } = await supabase.from('students').select('*');
-            if (error) { console.error(error); return; }
+    // --- FUNCTION: FETCH DATA ---
+    async function fetchRecords() {
+        console.log("Attempting to load data...");
+        const { data, error } = await supabase
+            .from('students')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-            const tableBody = document.getElementById('recordTableBody');
-            tableBody.innerHTML = ""; 
+        if (error) {
+            console.error("Fetch Error:", error.message);
+            return;
+        }
 
-            data.forEach((student, index) => {
-                tableBody.innerHTML += `<tr>
+        const tableBody = document.getElementById('recordTableBody');
+        tableBody.innerHTML = ""; 
+
+        if (data.length === 0) {
+            tableBody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>No records found.</td></tr>";
+            return;
+        }
+
+        data.forEach((student, index) => {
+            const row = `
+                <tr>
                     <td>${index + 1}</td>
                     <td>${student.gen_lin || 'N/A'}</td>
                     <td>${student.official_lin || 'N/A'}</td>
                     <td>${student.name || 'No Name'}</td>
                     <td>${student.location || 'N/A'}</td>
                     <td>${student.student_status || 'Active'}</td>
-                </tr>`;
-            });
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    // --- FUNCTION: UPLOAD DATA ---
+    async function registerStudent() {
+        const btn = document.getElementById('uploadBtn');
+        const name = document.getElementById('regName').value;
+        const location = document.getElementById('regLocation').value;
+
+        if (!name || !location) {
+            alert("Please fill in the Name and Location.");
+            return;
         }
 
-        async function registerStudent() {
-            const btn = document.getElementById('uploadBtn');
-            btn.innerText = "UPLOADING...";
-            
-            const name = document.getElementById('regName').value;
-            const location = document.getElementById('regLocation').value;
+        btn.innerText = "UPLOADING...";
+        btn.disabled = true;
 
-            const { error } = await supabase.from('students').insert([{
+        const genLin = "PM" + name.charAt(0).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+
+        const { error } = await supabase
+            .from('students')
+            .insert([{
                 name: name,
-                location: location, 
+                location: location, // Matches Supabase column 'location'
                 contact_number: document.getElementById('regContact').value,
                 official_lin: document.getElementById('regOfficialLIN').value,
                 health_status: document.getElementById('regHealth').value,
-                gen_lin: "PM" + Math.floor(1000 + Math.random() * 9000),
+                gen_lin: genLin,
                 student_status: 'Active'
             }]);
 
-            if (error) {
-                alert("Error: " + error.message);
-            } else {
-                alert("Success!");
-                fetchRecords();
-            }
-            btn.innerText = "CONFIRM & UPLOAD RECORD";
+        if (error) {
+            alert("Upload Failed: " + error.message);
+        } else {
+            alert("Record Saved Successfully!");
+            // Clear inputs
+            document.getElementById('regName').value = "";
+            document.getElementById('regLocation').value = "";
+            fetchRecords(); // Refresh table
         }
 
-        window.onload = fetchRecords;
-    </script>
+        btn.innerText = "CONFIRM & UPLOAD RECORD";
+        btn.disabled = false;
+    }
+
+    // Run automatically when the page opens
+    window.onload = fetchRecords;
+</script>
+
 </body>
 </html>
