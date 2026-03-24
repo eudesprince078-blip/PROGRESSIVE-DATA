@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V23 ULTIMATE</title>
+    <title>PROGRESSIVE PMS - V26 SORT & FILTER</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -16,12 +16,14 @@
         .btn-main { background: var(--blue); color: white; padding: 14px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .student-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 6px solid var(--blue); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .lin-row { display: flex; flex-wrap: wrap; gap: 5px; margin: 5px 0; }
-        .lin-badge { font-size: 9px; background: #e9ecef; padding: 2px 6px; border-radius: 4px; color: #333; font-weight: bold; }
+        .lin-badge { font-size: 9px; background: #e9ecef; padding: 2px 6px; border-radius: 4px; color: #333; font-weight: bold; border: 1px solid #ccc; }
+        .pay-badge { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
         .btn-row { display: flex; gap: 5px; margin-top: 10px; }
         .action-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; color: white; }
         .edit { background: var(--blue); }
         .del { background: var(--red); }
         .wa { background: var(--green); }
+        .search-container { display: flex; gap: 10px; margin-top: 10px; }
         .footer { text-align: center; margin-top: 25px; font-size: 11px; font-weight: bold; color: #666; padding: 10px; border-top: 1px solid #ddd; }
         .hidden { display: none !important; }
     </style>
@@ -55,6 +57,7 @@
                 </select>
             </div>
             <div><label>Official LIN</label><input id="officialLin" placeholder="Enter Official Link"></div>
+            <div><label>Payment Code</label><input id="payCode" placeholder="Enter Manual Code"></div>
             <div><label>Paid (UGX)</label><input id="fPaid" type="number" value="0"></div>
             <div><label>Balance (UGX)</label><input id="fBal" type="number" value="0"></div>
         </div>
@@ -63,7 +66,15 @@
     </div>
 
     <div class="box" style="border:none; background:transparent; padding:0;">
-        <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Name or LIN..." style="border: 2px solid var(--blue);">
+        <div class="search-container">
+            <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Name or Pay Code..." style="flex: 2; border: 2px solid var(--blue);">
+            <select id="filterClass" onchange="search()" style="flex: 1; border: 2px solid var(--blue); padding: 5px;">
+                <option value="ALL">ALL CLASSES</option>
+                <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+                <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+                <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+            </select>
+        </div>
         <div id="listBody" style="margin-top:10px;"></div>
     </div>
 
@@ -100,19 +111,20 @@
                 <div>
                     <b style="font-size:15px; color:var(--dark);">${s.name.toUpperCase()}</b>
                     <div class="lin-row">
-                        <span class="lin-badge">AUTO: ${s.lin || 'NONE'}</span>
-                        <span class="lin-badge">OFFICIAL: ${s.official_lin || 'NONE'}</span>
+                        <span class="lin-badge">LIN: ${s.lin || 'NONE'}</span>
+                        <span class="lin-badge pay-badge">PAY CODE: ${s.payment_code || 'NONE'}</span>
+                        <span class="lin-badge" style="background:var(--blue); color:white;">CLASS: ${s.class}</span>
                     </div>
-                    <span style="font-size:12px; color:#666;">Class: ${s.class} | <b style="color:var(--red);">Bal: UGX ${Number(s.fees_balance).toLocaleString()}</b></span>
+                    <span style="font-size:12px; color:#666;">Contact: ${s.contact} | <b style="color:var(--red);">Bal: UGX ${Number(s.fees_balance).toLocaleString()}</b></span>
                 </div>
                 <div class="btn-row">
                     <button onclick="editMode('${s.id}')" class="action-btn edit">EDIT</button>
                     <button onclick="delRecord('${s.id}', '${s.name}')" class="action-btn del">DELETE</button>
-                    <button onclick="sendWA('${s.contact}', '${s.name}', '${s.fees_balance}')" class="action-btn wa">WHATSAPP</button>
+                    <button onclick="sendWA('${s.contact}', '${s.name}', '${s.fees_balance}', '${s.payment_code}')" class="action-btn wa">WHATSAPP</button>
                 </div>
             </div>`;
         });
-        document.getElementById('listBody').innerHTML = html;
+        document.getElementById('listBody').innerHTML = html || "<p style='text-align:center; color:#888;'>No students found.</p>";
     }
 
     async function save() {
@@ -122,6 +134,7 @@
             contact: document.getElementById('ph').value,
             class: document.getElementById('cl').value,
             official_lin: document.getElementById('officialLin').value,
+            payment_code: document.getElementById('payCode').value.trim().toUpperCase(),
             fees_paid: document.getElementById('fPaid').value || 0,
             fees_balance: document.getElementById('fBal').value || 0
         };
@@ -130,7 +143,6 @@
             payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
             await sb.from('students').insert([payload]);
         } else {
-            // THE FIX: Uses filter inside update to hit the specific ID
             await sb.from('students').update(payload).eq('id', id);
         }
         await refresh(); reset();
@@ -138,16 +150,9 @@
 
     async function delRecord(id, name) {
         if(!confirm("Permanently delete " + name + "?")) return;
-        
-        // THE FIX: Direct match on the hidden database ID
         const { error } = await sb.from('students').delete().eq('id', id);
-        
-        if(error) {
-            alert("Delete Error: " + error.message);
-        } else {
-            alert(name + " deleted.");
-            await refresh(); 
-        }
+        if(error) { alert("Delete Error: " + error.message); }
+        else { alert(name + " deleted."); await refresh(); }
     }
 
     function editMode(id) {
@@ -158,6 +163,7 @@
         document.getElementById('ph').value = s.contact;
         document.getElementById('cl').value = s.class;
         document.getElementById('officialLin').value = s.official_lin || '';
+        document.getElementById('payCode').value = s.payment_code || '';
         document.getElementById('fPaid').value = s.fees_paid;
         document.getElementById('fBal').value = s.fees_balance;
         document.getElementById('fTitle').innerText = "EDITING: " + s.name;
@@ -171,6 +177,7 @@
         document.getElementById('name').value = "";
         document.getElementById('ph').value = "";
         document.getElementById('officialLin').value = "";
+        document.getElementById('payCode').value = "";
         document.getElementById('fPaid').value = "0";
         document.getElementById('fBal').value = "0";
         document.getElementById('fTitle').innerText = "Student Registration";
@@ -180,11 +187,19 @@
 
     function search() {
         const q = document.getElementById('sBar').value.toUpperCase();
-        render(students.filter(s => s.name.toUpperCase().includes(q)));
+        const classFilter = document.getElementById('filterClass').value;
+        
+        const filtered = students.filter(s => {
+            const matchesSearch = s.name.toUpperCase().includes(q) || (s.payment_code && s.payment_code.toUpperCase().includes(q));
+            const matchesClass = (classFilter === "ALL") || (s.class === classFilter);
+            return matchesSearch && matchesClass;
+        });
+        
+        render(filtered);
     }
 
-    function sendWA(num, name, bal) {
-        const msg = `PROGRESSIVE SCHOOL\nStudent: ${name}\nBalance: UGX ${Number(bal).toLocaleString()}\nEudes Media: +256762992440`;
+    function sendWA(num, name, bal, payCode) {
+        const msg = `PROGRESSIVE SCHOOL\nStudent: ${name}\nPayment Code: ${payCode || 'N/A'}\nBalance: UGX ${Number(bal).toLocaleString()}\nEudes Media: +256762992440`;
         window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 </script>
