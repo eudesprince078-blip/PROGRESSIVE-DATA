@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V26 SORT & FILTER</title>
+    <title>PROGRESSIVE PMS - V27 SMART SEARCH</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -56,8 +56,8 @@
                     <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
                 </select>
             </div>
-            <div><label>Official LIN</label><input id="officialLin" placeholder="Enter Official Link"></div>
-            <div><label>Payment Code</label><input id="payCode" placeholder="Enter Manual Code"></div>
+            <div><label>Official LIN (Manual)</label><input id="officialLin" placeholder="Enter Official Link"></div>
+            <div><label>Payment Code (Manual)</label><input id="payCode" placeholder="Enter Payment Code"></div>
             <div><label>Paid (UGX)</label><input id="fPaid" type="number" value="0"></div>
             <div><label>Balance (UGX)</label><input id="fBal" type="number" value="0"></div>
         </div>
@@ -67,7 +67,7 @@
 
     <div class="box" style="border:none; background:transparent; padding:0;">
         <div class="search-container">
-            <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Name or Pay Code..." style="flex: 2; border: 2px solid var(--blue);">
+            <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Name, LIN, or Pay Code..." style="flex: 2; border: 2px solid var(--blue);">
             <select id="filterClass" onchange="search()" style="flex: 1; border: 2px solid var(--blue); padding: 5px;">
                 <option value="ALL">ALL CLASSES</option>
                 <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
@@ -111,8 +111,8 @@
                 <div>
                     <b style="font-size:15px; color:var(--dark);">${s.name.toUpperCase()}</b>
                     <div class="lin-row">
-                        <span class="lin-badge">LIN: ${s.lin || 'NONE'}</span>
-                        <span class="lin-badge pay-badge">PAY CODE: ${s.payment_code || 'NONE'}</span>
+                        <span class="lin-badge" style="background:#d1ecf1; color:#0c5460;">AUTO LIN: ${s.lin || 'N/A'}</span>
+                        <span class="lin-badge pay-badge">PAY CODE: ${s.payment_code || 'N/A'}</span>
                         <span class="lin-badge" style="background:var(--blue); color:white;">CLASS: ${s.class}</span>
                     </div>
                     <span style="font-size:12px; color:#666;">Contact: ${s.contact} | <b style="color:var(--red);">Bal: UGX ${Number(s.fees_balance).toLocaleString()}</b></span>
@@ -124,7 +124,7 @@
                 </div>
             </div>`;
         });
-        document.getElementById('listBody').innerHTML = html || "<p style='text-align:center; color:#888;'>No students found.</p>";
+        document.getElementById('listBody').innerHTML = html || "<p style='text-align:center; color:#888;'>No matches found.</p>";
     }
 
     async function save() {
@@ -140,6 +140,7 @@
         };
 
         if(!id) {
+            // Generate the Auto-LIN once on creation
             payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
             await sb.from('students').insert([payload]);
         } else {
@@ -185,12 +186,18 @@
         document.getElementById('cancelBtn').classList.add('hidden');
     }
 
+    // --- UPDATED SEARCH LOGIC ---
     function search() {
-        const q = document.getElementById('sBar').value.toUpperCase();
+        const query = document.getElementById('sBar').value.toUpperCase();
         const classFilter = document.getElementById('filterClass').value;
         
         const filtered = students.filter(s => {
-            const matchesSearch = s.name.toUpperCase().includes(q) || (s.payment_code && s.payment_code.toUpperCase().includes(q));
+            // Checks Name, Payment Code, AND Automatic LIN
+            const matchesSearch = 
+                s.name.toUpperCase().includes(query) || 
+                (s.payment_code && s.payment_code.toUpperCase().includes(query)) ||
+                (s.lin && s.lin.toUpperCase().includes(query));
+                
             const matchesClass = (classFilter === "ALL") || (s.class === classFilter);
             return matchesSearch && matchesClass;
         });
