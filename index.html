@@ -2,108 +2,120 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V39 EXECUTIVE</title>
+    <title>PROGRESSIVE PMS V40 - EXECUTIVE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #0056b3; --dark: #002244; --white: #ffffff; --green: #28a745; --red: #dc3545; --gray: #f8f9fa; --orange: #fd7e14; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e9ecef; margin: 0; padding: 10px; color: #333; }
-        .box { background: var(--white); padding: 20px; border-radius: 15px; max-width: 1100px; margin: 10px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        :root { --blue: #0056b3; --dark: #001a33; --white: #ffffff; --green: #2ecc71; --red: #e74c3c; --gray: #f1f4f8; --gold: #f1c40f; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; }
         
-        /* Dashboard Styling */
-        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .dash-card { background: var(--white); padding: 15px; border-radius: 12px; text-align: center; border-top: 5px solid var(--blue); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .dash-card h2 { margin: 5px 0; font-size: 24px; color: var(--dark); }
-        .dash-card span { font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; }
+        /* Dashboard Header */
+        .header-box { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 30px 20px; text-align: center; border-radius: 0 0 25px 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .clock { font-family: monospace; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px; display: inline-block; margin-top: 10px; font-size: 14px; }
         
-        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 25px; border-radius: 15px; text-align: center; position: relative; }
-        .time-display { font-family: monospace; font-size: 14px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 20px; display: inline-block; margin-top: 10px; }
-        
-        .tab-bar { display: flex; background: #dee2e6; border-radius: 10px; overflow: hidden; margin: 15px 0; }
-        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        /* Professional Stats Cards */
+        .stats-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 20px; margin-top: -30px; }
+        .stat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-bottom: 4px solid var(--blue); }
+        .stat-card h2 { margin: 5px 0; font-size: 28px; color: var(--dark); }
+        .stat-card p { margin: 0; font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase; }
+
+        /* Tabs */
+        .tab-nav { display: flex; margin: 10px 20px; background: #ddd; border-radius: 10px; overflow: hidden; }
+        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-weight: bold; background: none; }
         .tab-active { background: var(--blue); color: white; }
 
-        .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; color: white; display: inline-block; }
-        .bg-active { background: var(--green); }
-        .bg-absent { background: var(--red); }
-        .bg-left { background: #6c757d; }
-
-        input, select { width: 100%; padding: 14px; border: 1.5px solid #ced4da; border-radius: 8px; margin-top: 5px; box-sizing: border-box; }
-        .btn-action { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; }
+        .content-box { padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        .student-row { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--blue); }
+        input, select { width: 100%; padding: 14px; margin-top: 8px; border: 1.5px solid #dfe6e9; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        .btn-save { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 10px; font-weight: bold; font-size: 16px; margin-top: 20px; cursor: pointer; }
+        
+        .student-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--blue); }
+        .status-tag { padding: 3px 8px; border-radius: 5px; font-size: 9px; font-weight: bold; color: white; }
+        
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" class="box" style="max-width:350px; margin-top:100px; text-align:center;">
-    <h1 style="color:var(--dark); margin-bottom:5px;">PMS ADMIN</h1>
-    <p style="font-size:12px; color:#666;">Secure Digital School Management</p>
-    <input id="passInput" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; letter-spacing: 3px;">
-    <button onclick="handleLogin()" class="btn-action">UNLOCK SYSTEM</button>
+<div id="loginGate" style="padding: 50px 20px; text-align: center;">
+    <div class="card" style="max-width: 350px; margin: auto;">
+        <h2 style="color:var(--blue)">ADMIN LOGIN</h2>
+        <input id="passInput" type="password" placeholder="Access Key" style="text-align:center;">
+        <button onclick="handleLogin()" class="btn-save">ENTER DASHBOARD</button>
+    </div>
 </div>
 
 <div id="mainApp" class="hidden">
-    <div class="header">
-        <h2 style="margin:0; letter-spacing: 1px;">PROGRESSIVE SCHOOL</h2>
-        <div id="liveClock" class="time-display">00:00:00 PM</div>
-        <div style="margin-top:15px;"><button onclick="location.reload()" style="background:none; border:1px solid white; color:white; padding:5px 15px; border-radius:5px; cursor:pointer; font-size:11px;">LOGOUT SYSTEM</button></div>
+    <div class="header-box">
+        <h1 style="margin:0;">PROGRESSIVE PMS</h1>
+        <div id="liveClock" class="clock">00:00:00 PM</div>
+        <div style="margin-top:15px;"><button onclick="location.reload()" style="background:none; border:1px solid white; color:white; padding:5px 10px; border-radius:5px; font-size:10px;">LOGOUT</button></div>
     </div>
 
-    <div class="dash-grid" style="margin-top:15px;">
-        <div class="dash-card" style="border-top-color: var(--blue);"><span>Total Students</span><h2 id="statTotal">0</h2></div>
-        <div class="dash-card" style="border-top-color: var(--green);"><span>Active Today</span><h2 id="statActive">0</h2></div>
-        <div class="dash-card" style="border-top-color: var(--red);"><span>Total Absent</span><h2 id="statAbsent">0</h2></div>
-        <div class="dash-card" style="border-top-color: #6c757d;"><span>Students Left</span><h2 id="statLeft">0</h2></div>
-    </div>
-
-    <div class="tab-bar">
-        <button id="btnManage" onclick="switchTab('MANAGE')" class="tab-btn tab-active">MANAGEMENT</button>
-        <button id="btnArchive" onclick="switchTab('ARCHIVE')" class="tab-btn">LEFT/ARCHIVE</button>
-    </div>
-
-    <div id="viewManage">
-        <div class="box">
-            <h3 id="fTitle" style="margin-top:0;">Register / Update Student</h3>
-            <input type="hidden" id="editId">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label>Full Name</label><input id="name"></div>
-                <div><label>Class</label>
-                    <select id="cl">
-                        <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-                        <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-                        <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-                    </select>
-                </div>
-                <div><label>Fees Balance (UGX)</label><input id="fBal" type="number"></div>
-                <div><label>Status</label>
-                    <select id="status">
-                        <option value="Active">Active</option>
-                        <option value="Left">Left School</option>
-                    </select>
-                </div>
-            </div>
-            <button onclick="save()" class="btn-action">CONFIRM CHANGES</button>
-            <button onclick="resetForm()" style="width:100%; margin-top:10px; background:none; border:none; color:var(--red); cursor:pointer;">Clear Form</button>
+    <div class="stats-container">
+        <div class="stat-card" style="border-color: var(--blue);">
+            <p>Total Students</p><h2 id="totalSt">0</h2>
         </div>
+        <div class="stat-card" style="border-color: var(--green);">
+            <p>Active Today</p><h2 id="activeSt">0</h2>
+        </div>
+        <div class="stat-card" style="border-color: var(--red);">
+            <p>Absent</p><h2 id="absentSt">0</h2>
+        </div>
+        <div class="stat-card" style="border-color: #636e72;">
+            <p>Left School</p><h2 id="leftSt">0</h2>
+        </div>
+    </div>
 
-        <div class="box">
-            <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Active Students..." style="border:2px solid var(--blue); margin-bottom:15px;">
+    <div class="tab-nav">
+        <button id="btnReg" onclick="switchView('REG')" class="tab-btn tab-active">RECORDS</button>
+        <button id="btnArc" onclick="switchView('ARC')" class="tab-btn">ARCHIVE (LEFT)</button>
+    </div>
+
+    <div class="content-box">
+        <div id="viewReg">
+            <div class="card">
+                <h3 id="fTitle" style="margin-top:0; color:var(--blue);">Student Update Form</h3>
+                <input type="hidden" id="editId">
+                
+                <label style="font-size:11px; font-weight:bold;">Student Full Name</label>
+                <input id="name" placeholder="Enter Name">
+                
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <div style="flex:1;">
+                        <label style="font-size:11px; font-weight:bold;">Class</label>
+                        <select id="cl">
+                            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+                            <option value="P.1">P.1</option><option value="P.7">P.7</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-size:11px; font-weight:bold;">Current Status</label>
+                        <select id="status">
+                            <option value="Active">Active</option>
+                            <option value="Left">Left School</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label style="font-size:11px; font-weight:bold; margin-top:10px; display:block;">Fees Balance (UGX)</label>
+                <input id="fBal" type="number" placeholder="0">
+
+                <button id="saveBtn" onclick="save()" class="btn-save">CONFIRM & UPDATE</button>
+            </div>
+
+            <input type="text" id="searchBar" oninput="doSearch()" placeholder="🔍 Search Active Students..." style="margin-bottom:15px; border:2px solid var(--blue);">
             <div id="listActive"></div>
         </div>
-    </div>
 
-    <div id="viewArchive" class="hidden">
-        <div class="box">
-            <h3 style="color:#6c757d;">Students Who Left</h3>
+        <div id="viewArc" class="hidden">
+            <h3 style="color:#636e72;">Archived Students (Left School)</h3>
             <div id="listLeft"></div>
         </div>
     </div>
 
-    <div style="text-align:center; padding:20px; font-size:11px; font-weight:bold; color:#888;">
-        DESIGNED BY EUDES MEDIA | +256762992440
-    </div>
+    <div style="text-align:center; padding:20px; font-size:11px; color:#aaa;">Eudes Media Support | +256762992440</div>
 </div>
 
 <script>
@@ -111,65 +123,69 @@
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     let sb = null, students = [];
 
-    function updateClock() {
-        const now = new Date();
-        document.getElementById('liveClock').innerText = now.toLocaleTimeString();
-    }
-    setInterval(updateClock, 1000);
+    // 1. Clock Update
+    setInterval(() => {
+        document.getElementById('liveClock').innerText = new Date().toLocaleTimeString();
+    }, 1000);
 
+    // 2. Login Logic
     function handleLogin() {
         const p = document.getElementById('passInput').value.trim().toUpperCase();
         if (p === "JESUS CARES") {
             sb = supabase.createClient(SB_URL, SB_KEY);
             document.getElementById('loginGate').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
-            refresh();
-        } else { alert("Invalid Admin Key"); }
+            refreshData();
+        } else { alert("Invalid Access Key"); }
     }
 
-    async function refresh() {
+    // 3. Refresh Data & Stats
+    async function refreshData() {
         const { data } = await sb.from('students').select('*').order('name', { ascending: true });
         students = data || [];
-        updateStats();
-        renderLists();
-    }
-
-    function updateStats() {
+        
+        // Calculate Stats
         const total = students.length;
         const active = students.filter(s => s.status !== 'Left').length;
         const left = students.filter(s => s.status === 'Left').length;
-        
-        document.getElementById('statTotal').innerText = total;
-        document.getElementById('statActive').innerText = active;
-        document.getElementById('statLeft').innerText = left;
+
+        document.getElementById('totalSt').innerText = total;
+        document.getElementById('activeSt').innerText = active;
+        document.getElementById('leftSt').innerText = left;
+
+        renderLists();
     }
 
+    // 4. Render Active vs Left
     function renderLists() {
         let activeHtml = "";
         let leftHtml = "";
-        
+
         students.forEach(s => {
-            const row = `<div class="student-row" style="border-left-color:${s.status === 'Left' ? '#6c757d' : 'var(--blue)'}">
-                <div>
-                    <b style="font-size:14px;">${s.name.toUpperCase()}</b><br>
-                    <small>${s.class} | LIN: ${s.lin || 'N/A'}</small>
-                </div>
-                <div style="text-align:right;">
-                    <span class="status-pill ${s.status === 'Left' ? 'bg-left' : 'bg-active'}">${s.status || 'Active'}</span><br>
-                    <button onclick="editMode('${s.id}')" style="margin-top:5px; font-size:10px; cursor:pointer;">EDIT</button>
-                </div>
-            </div>`;
+            const template = `
+                <div class="student-item" style="border-left-color: ${s.status === 'Left' ? '#636e72' : 'var(--blue)'}">
+                    <div>
+                        <b>${s.name.toUpperCase()}</b><br>
+                        <small>${s.class} | BAL: ${Number(s.fees_balance).toLocaleString()}</small>
+                    </div>
+                    <div style="text-align:right;">
+                        <span class="status-tag" style="background:${s.status === 'Left' ? '#636e72' : '#2ecc71'}">${s.status || 'Active'}</span><br>
+                        <button onclick="editMode('${s.id}')" style="margin-top:5px; font-size:10px; cursor:pointer;">EDIT</button>
+                    </div>
+                </div>`;
             
-            if(s.status === 'Left') leftHtml += row;
-            else activeHtml += row;
+            if(s.status === 'Left') leftHtml += template;
+            else activeHtml += template;
         });
 
         document.getElementById('listActive').innerHTML = activeHtml || "No active students.";
-        document.getElementById('listLeft').innerHTML = leftHtml || "No archived records.";
+        document.getElementById('listLeft').innerHTML = leftHtml || "No archived students.";
     }
 
+    // 5. Save Data
     async function save() {
         const id = document.getElementById('editId').value;
+        const btn = document.getElementById('saveBtn');
         const payload = {
             name: document.getElementById('name').value.trim(),
             class: document.getElementById('cl').value,
@@ -177,20 +193,24 @@
             status: document.getElementById('status').value
         };
 
-        if(!payload.name) return alert("Name required");
+        if(!payload.name) return alert("Please enter a name");
 
-        if(!id) {
-            payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
-            await sb.from('students').insert([payload]);
-        } else {
-            await sb.from('students').update(payload).eq('id', id);
-        }
-        
-        alert("System Updated");
-        resetForm();
-        refresh();
+        btn.innerText = "SAVING..."; btn.disabled = true;
+
+        try {
+            if(!id) {
+                payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
+                await sb.from('students').insert([payload]);
+            } else {
+                await sb.from('students').update(payload).eq('id', id);
+            }
+            alert("Updated Successfully!");
+            resetForm(); refreshData();
+        } catch (e) { alert(e.message); }
+        finally { btn.innerText = "CONFIRM & UPDATE"; btn.disabled = false; }
     }
 
+    // 6. Support Functions
     function editMode(id) {
         const s = students.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
@@ -198,35 +218,32 @@
         document.getElementById('cl').value = s.class;
         document.getElementById('fBal').value = s.fees_balance;
         document.getElementById('status').value = s.status || 'Active';
-        document.getElementById('fTitle').innerText = "Edit: " + s.name;
-        switchTab('MANAGE');
+        document.getElementById('fTitle').innerText = "Updating: " + s.name;
+        switchView('REG');
         window.scrollTo(0,0);
     }
 
-    function switchTab(tab) {
-        document.getElementById('viewManage').classList.toggle('hidden', tab !== 'MANAGE');
-        document.getElementById('viewArchive').classList.toggle('hidden', tab !== 'ARCHIVE');
-        document.getElementById('btnManage').classList.toggle('tab-active', tab === 'MANAGE');
-        document.getElementById('btnArchive').classList.toggle('tab-active', tab === 'ARCHIVE');
+    function switchView(v) {
+        document.getElementById('viewReg').classList.toggle('hidden', v !== 'REG');
+        document.getElementById('viewArc').classList.toggle('hidden', v !== 'ARC');
+        document.getElementById('btnReg').classList.toggle('tab-active', v === 'REG');
+        document.getElementById('btnArc').classList.toggle('tab-active', v === 'ARC');
     }
 
     function resetForm() {
         document.getElementById('editId').value = "";
         document.getElementById('name').value = "";
         document.getElementById('fBal').value = "";
-        document.getElementById('fTitle').innerText = "Register / Update Student";
+        document.getElementById('fTitle').innerText = "Student Update Form";
     }
 
-    function search() {
-        const q = document.getElementById('sBar').value.toUpperCase();
+    function doSearch() {
+        const q = document.getElementById('searchBar').value.toUpperCase();
         const filtered = students.filter(s => s.name.toUpperCase().includes(q) && s.status !== 'Left');
-        // Manual render for search
+        // Rerender just the active list for the search
         let html = "";
         filtered.forEach(s => {
-            html += `<div class="student-row">
-                <div><b>${s.name.toUpperCase()}</b><br><small>${s.class}</small></div>
-                <button onclick="editMode('${s.id}')">EDIT</button>
-            </div>`;
+            html += `<div class="student-item"><div><b>${s.name.toUpperCase()}</b><br><small>${s.class}</small></div><button onclick="editMode('${s.id}')">EDIT</button></div>`;
         });
         document.getElementById('listActive').innerHTML = html;
     }
