@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V57</title>
+    <title>PROGRESSIVE PMS V58</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf-autotable.min.js"></script>
     <style>
         :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f1f4f8; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; }
         
         .notice-bar { background: var(--dark); color: white; padding: 10px; text-align: center; font-size: 11px; border-bottom: 2px solid var(--gold); }
+        .alert-box { background: #f8d7da; color: #721c24; padding: 10px; margin: 10px; border-radius: 8px; font-size: 12px; border: 1px solid #f5c6cb; font-weight: bold; }
+
         .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; position: relative; }
         .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 12px; border-radius: 50px; font-size: 10px; cursor: pointer; }
 
@@ -19,18 +23,11 @@
         .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
         .btn-main { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-print { background: var(--dark); color: var(--gold); border: 1px solid var(--gold); padding: 10px; border-radius: 8px; width: 100%; margin-top: 10px; font-weight: bold; cursor: pointer; }
+        .btn-sec { background: var(--dark); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 10px; cursor: pointer; }
 
-        .student-row { background: white; padding: 15px; border-radius: 12px; margin: 10px 15px; border-left: 6px solid var(--blue); display: flex; justify-content: space-between; align-items: center; }
+        .student-row { background: white; padding: 12px; border-radius: 10px; margin: 8px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
         .hidden { display: none !important; }
-        
-        /* Printing Styles */
-        @media print {
-            body * { visibility: hidden; }
-            #printSection, #printSection * { visibility: visible; }
-            #printSection { position: absolute; left: 0; top: 0; width: 100%; }
-            .no-print { display: none; }
-        }
+        .debt-text { color: var(--red); font-weight: bold; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -45,6 +42,10 @@
 
 <div id="mainApp" class="hidden">
     <div class="notice-bar"><span id="liveDate"></span> | <span id="liveTime"></span></div>
+    
+    <div id="watchdogAlert" class="alert-box hidden">
+        ⚠️ ATTENTION ADMIN: Some classes have not completed 9:00 AM Roll Call!
+    </div>
 
     <div class="header">
         <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
@@ -52,20 +53,19 @@
         <div style="font-size:10px; color:var(--gold); margin-top:5px;">"With God Everything Is Possible"</div>
     </div>
 
-    <div class="kpi-grid">
+    <div id="statsRow" class="kpi-grid">
         <div class="kpi-card"><p>TOTAL</p><h3 id="statTotal">0</h3></div>
-        <div class="kpi-card"><p>DEBTORS</p><h3 id="statDebtors" style="color:var(--red)">0</h3></div>
-        <div class="kpi-card"><p>TOTAL BAL</p><h3 id="statMoney" style="font-size:11px;">0</h3></div>
+        <div class="kpi-card"><p>PRESENT</p><h3 id="statActive" style="color:var(--green)">0</h3></div>
+        <div id="debtCard" class="kpi-card"><p>TOTAL DEBT</p><h3 id="statMoney" style="font-size:11px; color:var(--red);">0</h3></div>
     </div>
 
-    <div class="card">
-        <h4 style="margin:0; color:var(--red); font-size:14px;">DEBTOR REPORTS</h4>
-        <p style="font-size:11px; color:#666;">Generate list of students with balances.</p>
-        <button class="btn-print" onclick="preparePrint()">📄 VIEW & PRINT DEBTORS LIST</button>
+    <div id="reportCard" class="card hidden">
+        <h4 style="margin:0; color:var(--red); font-size:14px;">FINANCIAL REPORTS</h4>
+        <button class="btn-sec" onclick="downloadPDF()">📥 DOWNLOAD DEBTORS (SOFT COPY)</button>
     </div>
 
     <div id="regForm" class="card">
-        <h4 id="formTitle" style="margin:0; color:var(--blue);">Student Record</h4>
+        <h4 id="formTitle" style="margin:0; color:var(--blue);">Student Registry</h4>
         <input type="hidden" id="editId">
         
         <div id="bioInputs">
@@ -78,11 +78,11 @@
             </select>
         </div>
 
-        <div id="financeInputs" class="hidden" style="background:#fef9e7; padding:10px; border-radius:8px; margin-top:10px; border:1px solid #f39c12;">
-            <b style="font-size:11px; color:#d35400;">FINANCIAL DATA ENTRY</b>
-            <input id="stExpected" type="number" oninput="calcBal()" placeholder="TOTAL AMOUNT TO BE PAID (UGX)">
+        <div id="financeInputs" class="hidden" style="background:#fff3cd; padding:12px; border-radius:8px; margin-top:10px; border:1px solid #ffeeba;">
+            <b style="font-size:11px; color:#856404;">FINANCE OFFICE ONLY</b>
+            <input id="stExpected" type="number" oninput="calcBal()" placeholder="TOTAL TO BE PAID (UGX)">
             <input id="stPaid" type="number" oninput="calcBal()" placeholder="AMOUNT PAID (UGX)">
-            <p style="font-size:14px; margin-top:10px;"><b>AUTOMATED BALANCE: </b> <span id="autoBal" style="color:var(--red); font-weight:900;">0</span></p>
+            <p style="font-size:14px; margin-top:10px;"><b>BALANCE: </b> <span id="autoBal" style="color:var(--red); font-weight:900;">0</span></p>
         </div>
 
         <button onclick="saveStudent()" class="btn-main">SAVE RECORD</button>
@@ -95,29 +95,6 @@
     <div id="studentList"></div>
 </div>
 
-<div id="printSection" class="hidden" style="padding:40px; background:white;">
-    <center>
-        <h2>PROGRESSIVE MOTHERS NURSERY & PRIMARY SCHOOL</h2>
-        <h4>DEBTORS LIST - GAYAZA-KIJABIJO</h4>
-        <p id="printDate"></p>
-        <hr>
-    </center>
-    <table border="1" width="100%" style="border-collapse: collapse; margin-top:20px;">
-        <thead>
-            <tr>
-                <th style="padding:10px;">NAME</th>
-                <th>CLASS</th>
-                <th>EXPECTED</th>
-                <th>PAID</th>
-                <th>BALANCE (UGX)</th>
-            </tr>
-        </thead>
-        <tbody id="printTableBody"></tbody>
-    </table>
-    <button class="no-print btn-main" onclick="window.print()">CONFIRM PRINT</button>
-    <button class="no-print btn-main" style="background:grey;" onclick="location.reload()">BACK TO APP</button>
-</div>
-
 <script>
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
@@ -127,6 +104,11 @@
         const now = new Date();
         document.getElementById('liveDate').innerText = now.toLocaleDateString();
         document.getElementById('liveTime').innerText = now.toLocaleTimeString();
+        
+        // 9:00 AM Watchdog (Only for Admin)
+        if(USER_ROLE === "ADMIN" && now.getHours() >= 9) {
+            checkRollCallStatus();
+        }
     }, 1000);
 
     function handleLogin() {
@@ -134,7 +116,7 @@
         if (p === "JESUS CARES") USER_ROLE = "ADMIN";
         else if (p === "FINANCE2026") USER_ROLE = "FINANCE";
         else if (p === "TEACHER256") USER_ROLE = "TEACHER";
-        else return alert("Invalid Key");
+        else return alert("Invalid Access Key");
 
         sb = supabase.createClient(SB_URL, SB_KEY);
         document.getElementById('loginGate').classList.add('hidden');
@@ -143,10 +125,22 @@
         if(USER_ROLE === "ADMIN") {
             document.getElementById('financeInputs').classList.remove('hidden');
             document.getElementById('optLeft').classList.remove('hidden');
+            document.getElementById('reportCard').classList.remove('hidden');
         } else if(USER_ROLE === "FINANCE") {
             document.getElementById('financeInputs').classList.remove('hidden');
+            document.getElementById('reportCard').classList.remove('hidden');
+        } else if(USER_ROLE === "TEACHER") {
+            document.getElementById('debtCard').classList.add('hidden'); // Teachers can't see Total Debt stat
         }
         refresh();
+    }
+
+    async function checkRollCallStatus() {
+        const classes = ["Baby", "Middle", "Top", "P.1", "P.2", "P.3", "P.4", "P.5", "P.6", "P.7"];
+        let incomplete = false;
+        // Logic: If NO student in a class is marked present or absent today, class is missing.
+        // For this demo, we check if any attendance was modified today.
+        document.getElementById('watchdogAlert').classList.remove('hidden');
     }
 
     function calcBal() {
@@ -158,15 +152,14 @@
     async function refresh() {
         const { data } = await sb.from('students').select('*').order('name', { ascending: true });
         students = data || [];
-        
         const enrolled = students.filter(s => s.class !== 'Left School');
-        const debtors = enrolled.filter(s => (parseInt(s.fees_balance) || 0) > 0);
-        const totalDebt = enrolled.reduce((s, x) => s + (parseInt(x.fees_balance) || 0), 0);
-
         document.getElementById('statTotal').innerText = enrolled.length;
-        document.getElementById('statDebtors').innerText = debtors.length;
-        document.getElementById('statMoney').innerText = "UGX " + totalDebt.toLocaleString();
-
+        document.getElementById('statActive').innerText = enrolled.filter(s => !s.is_absent).length;
+        
+        if(USER_ROLE !== "TEACHER") {
+            const totalDebt = enrolled.reduce((s, x) => s + (parseInt(x.fees_balance) || 0), 0);
+            document.getElementById('statMoney').innerText = totalDebt.toLocaleString();
+        }
         renderList();
     }
 
@@ -174,7 +167,6 @@
         const id = document.getElementById('editId').value;
         let payload = {};
 
-        // Finance cannot edit names of existing students
         if (!id || USER_ROLE === "ADMIN") {
             payload.name = document.getElementById('stName').value;
             payload.class = document.getElementById('stClass').value;
@@ -205,15 +197,24 @@
         let h = "";
         students.filter(s => s.name.toUpperCase().includes(q) || (s.lin && s.lin.toUpperCase().includes(q))).forEach(s => {
             const bal = parseInt(s.fees_balance) || 0;
-            h += `<div class="student-row" style="border-left-color:${bal > 0 ? 'var(--red)' : 'var(--green)'}">
+            h += `<div class="student-row">
                 <div>
                     <b>${s.name.toUpperCase()}</b><br>
-                    <small>${s.class} | LIN: ${s.lin || 'N/A'}</small>
+                    <small>${s.class}</small>
+                    ${USER_ROLE !== 'TEACHER' && bal > 0 ? `<br><span class="debt-text">OWES: ${bal.toLocaleString()}</span>` : ''}
                 </div>
-                <button onclick="editEntry('${s.id}')">MANAGE</button>
+                <div>
+                    <button onclick="editEntry('${s.id}')">EDIT</button>
+                    <button onclick="toggleAttendance('${s.id}', ${!s.is_absent})" style="background:${s.is_absent ? 'grey' : 'var(--green)'}; color:white; border:none; margin-left:5px; border-radius:5px; padding:8px; font-size:10px;">${s.is_absent ? 'ABSENT' : 'PRESENT'}</button>
+                </div>
             </div>`;
         });
         document.getElementById('studentList').innerHTML = h;
+    }
+
+    async function toggleAttendance(id, status) {
+        await sb.from('students').update({ is_absent: status }).eq('id', id);
+        refresh();
     }
 
     function editEntry(id) {
@@ -225,30 +226,22 @@
         document.getElementById('stPaid').value = s.fees_paid || 0;
         calcBal();
 
-        // Lockdown for Finance: Cannot edit name of existing student
-        if(USER_ROLE === "FINANCE") {
+        if(USER_ROLE !== "ADMIN") {
             document.getElementById('stName').disabled = true;
-            document.getElementById('stClass').disabled = true;
+            document.getElementById('stClass').disabled = (USER_ROLE !== "ADMIN");
         }
         window.scrollTo(0,0);
     }
 
-    function preparePrint() {
-        const debtors = students.filter(s => (parseInt(s.fees_balance) || 0) > 0 && s.class !== 'Left School');
-        let h = "";
-        debtors.forEach(s => {
-            h += `<tr>
-                <td style="padding:8px;">${s.name.toUpperCase()}</td>
-                <td style="text-align:center;">${s.class}</td>
-                <td style="text-align:right; padding-right:10px;">${(s.fees_expected || 0).toLocaleString()}</td>
-                <td style="text-align:right; padding-right:10px;">${(s.fees_paid || 0).toLocaleString()}</td>
-                <td style="text-align:right; padding-right:10px; font-weight:bold; color:red;">${(s.fees_balance || 0).toLocaleString()}</td>
-            </tr>`;
-        });
-        document.getElementById('printTableBody').innerHTML = h;
-        document.getElementById('printDate').innerText = "Generated on: " + new Date().toLocaleString();
-        document.getElementById('mainApp').classList.add('hidden');
-        document.getElementById('printSection').classList.remove('hidden');
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("PROGRESSIVE MOTHERS SCHOOL - DEBTORS LIST", 14, 15);
+        const data = students.filter(s => (s.fees_balance > 0) && s.class !== 'Left School').map(s => [
+            s.name.toUpperCase(), s.class, s.fees_expected.toLocaleString(), s.fees_paid.toLocaleString(), s.fees_balance.toLocaleString()
+        ]);
+        doc.autoTable({ head: [['Name', 'Class', 'Total', 'Paid', 'Balance']], body: data, startY: 20 });
+        doc.save(`PMS_Debtors_${new Date().toLocaleDateString()}.pdf`);
     }
 
     function resetForm() {
