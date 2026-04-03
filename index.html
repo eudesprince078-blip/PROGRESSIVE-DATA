@@ -2,32 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V55</title>
+    <title>PROGRESSIVE PMS V56</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f1f4f8; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; }
         
-        /* Notification Center */
+        /* Notifications & Headers */
         .notice-bar { background: var(--dark); color: white; padding: 10px; text-align: center; font-size: 11px; border-bottom: 2px solid var(--gold); }
-        .holiday-banner { background: #fff3cd; color: #856404; padding: 8px; font-size: 12px; font-weight: bold; text-align: center; border-bottom: 1px solid #ffeeba; }
-
         .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; position: relative; }
         .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 12px; border-radius: 50px; font-size: 10px; cursor: pointer; }
-        
-        .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
-        .kpi-card { background: white; padding: 12px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        
+
+        /* Stats Dashboard */
+        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 15px; margin-top: -30px; }
+        .kpi-card { background: white; padding: 10px; border-radius: 12px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .kpi-card h3 { margin: 5px 0; font-size: 16px; }
+        .kpi-card p { margin: 0; font-size: 8px; color: #888; font-weight: bold; }
+
+        /* Form & UI Elements */
         .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; }
-        
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
         .btn-main { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-delete { background: var(--red); color: white; border: none; padding: 10px; border-radius: 8px; font-size: 11px; margin-top: 10px; width: 100%; }
+        
+        /* Messaging */
+        .chat-box { background: #eef2f7; padding: 10px; border-radius: 8px; max-height: 120px; overflow-y: auto; margin-bottom: 10px; font-size: 12px; }
+        .msg-entry { border-bottom: 1px solid #ddd; padding: 5px 0; }
+
+        .pass-wrapper { position: relative; }
+        .toggle-pass { position: absolute; right: 10px; top: 20px; cursor: pointer; font-size: 18px; }
         
         .student-row { background: white; padding: 15px; border-radius: 12px; margin: 10px 15px; border-left: 6px solid var(--blue); display: flex; justify-content: space-between; align-items: center; }
         .hidden { display: none !important; }
-        .fee-calc-box { background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px dashed #ccc; }
+        .absent-bg { background: #ffebeb !important; border-left-color: var(--red) !important; }
     </style>
 </head>
 <body>
@@ -35,16 +42,16 @@
 <div id="loginGate" style="padding: 100px 20px; text-align: center;">
     <h2 style="color:var(--blue)">PROGRESSIVE PMS</h2>
     <div class="card" style="max-width: 320px; margin: auto;">
-        <input id="passInput" type="password" placeholder="Access Key" style="text-align:center;">
+        <div class="pass-wrapper">
+            <input id="passInput" type="password" placeholder="Access Key" style="text-align:center;">
+            <span class="toggle-pass" onclick="togglePass()">👁️</span>
+        </div>
         <button onclick="handleLogin()" class="btn-main">LOGIN</button>
     </div>
 </div>
 
 <div id="mainApp" class="hidden">
-    <div class="notice-bar">
-        <span id="liveDate"></span> | <span id="liveTime"></span>
-    </div>
-    <div id="holidayBanner" class="holiday-banner hidden"></div>
+    <div class="notice-bar"><span id="liveDate"></span> | <span id="liveTime"></span></div>
 
     <div class="header">
         <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
@@ -53,36 +60,46 @@
     </div>
 
     <div class="kpi-grid">
-        <div class="kpi-card"><p style="font-size:9px; color:#888;">ENROLLED</p><h3 id="statTotal">0</h3></div>
-        <div class="kpi-card"><p style="font-size:9px; color:#888;">TOTAL DEBT</p><h3 id="statMoney" style="color:var(--red)">0</h3></div>
+        <div class="kpi-card"><p>TOTAL</p><h3 id="statTotal">0</h3></div>
+        <div class="kpi-card"><p>ACTIVE</p><h3 id="statActive" style="color:var(--green)">0</h3></div>
+        <div class="kpi-card"><p>ABSENT</p><h3 id="statAbsent" style="color:var(--red)">0</h3></div>
     </div>
 
-    <div id="masterForm" class="card">
-        <h4 id="formTitle" style="margin:0; color:var(--blue);">Student Registration & Profile</h4>
+    <div class="card">
+        <h4 style="margin:0 0 10px 0; font-size:13px; color:var(--blue);">COMMUNICATION HUB</h4>
+        <div id="chatDisplay" class="chat-box">Loading messages...</div>
+        <textarea id="msgInput" placeholder="Write a message..." rows="2"></textarea>
+        <select id="msgTarget">
+            <option value="ADMIN">To: Admin</option>
+            <option value="FINANCE">To: Finance</option>
+            <option value="TEACHERS">To: Teachers</option>
+        </select>
+        <button onclick="sendMsg()" class="btn-main" style="background:var(--dark); padding:10px;">SEND MESSAGE</button>
+    </div>
+
+    <div id="regForm" class="card">
+        <h4 id="formTitle" style="margin:0; color:var(--blue);">Student Management</h4>
         <input type="hidden" id="editId">
         
-        <div id="bioSection">
-            <input id="stName" placeholder="Student Full Name">
+        <div id="bioInputs">
+            <input id="stName" placeholder="Full Name">
             <select id="stClass">
                 <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
                 <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
                 <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-                <option value="Left School">Left School (Alumni)</option>
+                <option id="optLeft" class="hidden" value="Left School">Left School</option>
             </select>
-            <input id="stPhone" placeholder="Parent Contact Number">
+            <input id="stPhone" placeholder="Parent Contact">
         </div>
 
-        <div id="financeSection" class="hidden">
-            <div class="fee-calc-box">
-                <label style="font-size:11px; font-weight:bold;">FEES MANAGEMENT (UGX)</label>
-                <input id="stExpected" type="number" oninput="calcBal()" placeholder="Total Expected Fees">
-                <input id="stPaid" type="number" oninput="calcBal()" placeholder="Amount Paid">
-                <p style="font-size:12px; margin-top:10px;">Balance: <b id="autoBal" style="color:var(--red)">0</b></p>
-            </div>
+        <div id="financeInputs" class="hidden" style="background:#f9f9f9; padding:10px; border-radius:8px; margin-top:10px; border:1px dashed #ccc;">
+            <label style="font-size:11px; font-weight:bold; color:var(--blue);">FINANCE OFFICE ONLY</label>
+            <input id="stExpected" type="number" oninput="calcBal()" placeholder="TOTAL FEES TO BE PAID (UGX)">
+            <input id="stPaid" type="number" oninput="calcBal()" placeholder="AMOUNT PAID (UGX)">
+            <p style="font-size:13px; margin-top:10px;"><b>BALANCE: </b> <span id="autoBal" style="color:var(--red)">0</span></p>
         </div>
 
-        <button onclick="saveStudent()" class="btn-main">SAVE STUDENT DATA</button>
-        <button id="delBtn" onclick="deleteStudent()" class="btn-delete hidden">DELETE STUDENT PERMANENTLY</button>
+        <button onclick="saveStudent()" class="btn-main">SAVE RECORD</button>
     </div>
 
     <div class="card">
@@ -97,48 +114,40 @@
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     let sb = null, students = [], USER_ROLE = "";
 
-    // Uganda Holiday Engine
-    const UG_CALENDAR = {
-        "1-1": "New Year's Day", "1-26": "NRM Liberation Day", "2-16": "Janani Luwum Day",
-        "3-8": "Women's Day", "4-3": "Good Friday", "4-6": "Easter Monday",
-        "5-1": "Labour Day", "6-3": "Martyrs' Day", "6-9": "Heroes' Day", "10-9": "Independence Day"
-    };
-
-    function updateClock() {
-        const now = new Date();
-        document.getElementById('liveDate').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        document.getElementById('liveTime').innerText = now.toLocaleTimeString();
-        
-        const key = `${now.getMonth() + 1}-${now.getDate()}`;
-        if(UG_CALENDAR[key]) {
-            const banner = document.getElementById('holidayBanner');
-            banner.classList.remove('hidden');
-            banner.innerText = "🇺🇬 IMPORTANT: Today is " + UG_CALENDAR[key];
-        }
+    function togglePass() {
+        const x = document.getElementById("passInput");
+        x.type = x.type === "password" ? "text" : "password";
     }
-    setInterval(updateClock, 1000);
+
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('liveDate').innerText = now.toLocaleDateString();
+        document.getElementById('liveTime').innerText = now.toLocaleTimeString();
+    }, 1000);
 
     function handleLogin() {
         const p = document.getElementById('passInput').value.trim().toUpperCase();
         if (p === "JESUS CARES") USER_ROLE = "ADMIN";
         else if (p === "FINANCE2026") USER_ROLE = "FINANCE";
         else if (p === "TEACHER256") USER_ROLE = "TEACHER";
-        else return alert("Invalid Key");
+        else return alert("Invalid Access Key");
 
         sb = supabase.createClient(SB_URL, SB_KEY);
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         
-        // Dynamic UI Permissions
-        if(USER_ROLE === "ADMIN") {
-            document.getElementById('financeSection').classList.remove('hidden');
-            document.getElementById('bioSection').classList.remove('hidden');
-        } else if(USER_ROLE === "FINANCE") {
-            document.getElementById('financeSection').classList.remove('hidden');
-            document.getElementById('bioSection').classList.add('hidden'); // Finance only registers, doesn't edit Bio
-        }
-        
+        applyPermissions();
         refresh();
+        loadMsgs();
+    }
+
+    function applyPermissions() {
+        if(USER_ROLE === "ADMIN") {
+            document.getElementById('financeInputs').classList.remove('hidden');
+            document.getElementById('optLeft').classList.remove('hidden');
+        } else if(USER_ROLE === "FINANCE") {
+            document.getElementById('financeInputs').classList.remove('hidden');
+        }
     }
 
     function calcBal() {
@@ -150,24 +159,29 @@
     async function refresh() {
         const { data } = await sb.from('students').select('*').order('name', { ascending: true });
         students = data || [];
-        document.getElementById('statTotal').innerText = students.length;
-        const totalBal = students.reduce((s, x) => s + (parseInt(x.fees_balance) || 0), 0);
-        document.getElementById('statMoney').innerText = "UGX " + totalBal.toLocaleString();
+        
+        const enrolled = students.filter(s => s.class !== 'Left School');
+        document.getElementById('statTotal').innerText = enrolled.length;
+        document.getElementById('statAbsent').innerText = enrolled.filter(s => s.is_absent).length;
+        document.getElementById('statActive').innerText = enrolled.filter(s => !s.is_absent).length;
+
         renderList();
     }
 
     async function saveStudent() {
         const id = document.getElementById('editId').value;
-        const exp = parseInt(document.getElementById('stExpected').value) || 0;
-        const paid = parseInt(document.getElementById('stPaid').value) || 0;
-
         let payload = {};
-        if(USER_ROLE === "ADMIN" || USER_ROLE === "TEACHER" || (USER_ROLE === "FINANCE" && !id)) {
+
+        // Teachers can ONLY edit if it is a NEW student
+        if (!id || USER_ROLE === "ADMIN") {
             payload.name = document.getElementById('stName').value;
             payload.class = document.getElementById('stClass').value;
             payload.contact = document.getElementById('stPhone').value;
         }
-        if(USER_ROLE === "ADMIN" || USER_ROLE === "FINANCE") {
+
+        if (USER_ROLE === "ADMIN" || USER_ROLE === "FINANCE") {
+            const exp = parseInt(document.getElementById('stExpected').value) || 0;
+            const paid = parseInt(document.getElementById('stPaid').value) || 0;
             payload.fees_expected = exp;
             payload.fees_paid = paid;
             payload.fees_balance = exp - paid;
@@ -180,34 +194,32 @@
             await sb.from('students').update(payload).eq('id', id);
         }
         
-        alert("Record Updated Successfully");
+        alert("Success");
         resetForm();
         refresh();
-    }
-
-    async function deleteStudent() {
-        const id = document.getElementById('editId').value;
-        if(confirm("Are you sure? This will permanently delete this student.")) {
-            await sb.from('students').delete().eq('id', id);
-            alert("Deleted");
-            resetForm();
-            refresh();
-        }
     }
 
     function renderList() {
         const q = document.getElementById('sBar').value.toUpperCase();
         let h = "";
         students.filter(s => s.name.toUpperCase().includes(q) || (s.lin && s.lin.toUpperCase().includes(q))).forEach(s => {
-            h += `<div class="student-row">
+            h += `<div class="student-row ${s.is_absent ? 'absent-bg' : ''}">
                 <div>
                     <b>${s.name.toUpperCase()}</b><br>
                     <small>${s.class} | LIN: ${s.lin || 'N/A'}</small>
                 </div>
-                <button onclick="editEntry('${s.id}')">MANAGE</button>
+                <div>
+                    <button onclick="editEntry('${s.id}')">EDIT</button>
+                    <button onclick="markAbsence('${s.id}', ${!s.is_absent})" style="background:${s.is_absent ? 'green' : 'red'}; color:white; border:none; margin-left:5px; border-radius:5px; font-size:10px; padding:8px;">${s.is_absent ? 'PRESENT' : 'ABSENT'}</button>
+                </div>
             </div>`;
         });
         document.getElementById('studentList').innerHTML = h;
+    }
+
+    async function markAbsence(id, status) {
+        await sb.from('students').update({ is_absent: status }).eq('id', id);
+        refresh();
     }
 
     function editEntry(id) {
@@ -219,15 +231,39 @@
         document.getElementById('stExpected').value = s.fees_expected || 0;
         document.getElementById('stPaid').value = s.fees_paid || 0;
         calcBal();
+
+        // Lock Bio inputs if Teacher is trying to edit an existing student
+        const isTeacher = USER_ROLE === "TEACHER";
+        document.getElementById('stName').disabled = isTeacher;
+        document.getElementById('stClass').disabled = isTeacher;
+        document.getElementById('stPhone').disabled = isTeacher;
         
-        if(USER_ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
         window.scrollTo(0,0);
+    }
+
+    async function sendMsg() {
+        const body = document.getElementById('msgInput').value;
+        const target = document.getElementById('msgTarget').value;
+        if(!body) return;
+        await sb.from('messages').insert([{ body, target, sender: USER_ROLE }]);
+        document.getElementById('msgInput').value = "";
+        loadMsgs();
+    }
+
+    async function loadMsgs() {
+        const { data } = await sb.from('messages').select('*').or(`target.eq.${USER_ROLE},target.eq.TEACHERS,target.eq.FINANCE`).order('id', { ascending: false }).limit(5);
+        if(data) {
+            let h = "";
+            data.forEach(m => { h += `<div class="msg-entry"><b>From ${m.sender}:</b> ${m.body}</div>`; });
+            document.getElementById('chatDisplay').innerHTML = h;
+        }
     }
 
     function resetForm() {
         document.getElementById('editId').value = "";
-        document.getElementById('delBtn').classList.add('hidden');
-        document.getElementById('stName').value = "";
+        document.getElementById('stName').disabled = false;
+        document.getElementById('stClass').disabled = false;
+        document.getElementById('stPhone').disabled = false;
     }
 </script>
 </body>
