@@ -2,169 +2,102 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V34 DIRECTOR BOARD</title>
+    <title>PROGRESSIVE PMS - V35 FIX</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root { --blue: #0056b3; --dark: #002244; --white: #ffffff; --green: #25d366; --red: #dc3545; --gray: #f4f7f9; --orange: #ff9800; --gold: #ffd700; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 10px; }
         .box { background: var(--white); padding: 18px; border-radius: 12px; max-width: 1000px; margin: 10px auto; border: 1px solid #ddd; }
-        .header { background: linear-gradient(135deg, var(--blue), var(--dark)); color: white; padding: 15px; border-radius: 12px; text-align: center; position: relative; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 15px 0; }
-        label { font-size: 11px; font-weight: bold; color: var(--blue); }
-        input, select { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
-        .btn-main { background: var(--blue); color: white; padding: 14px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        
-        /* Roles & Tabs */
+        .header { background: linear-gradient(135deg, var(--blue), var(--dark)); color: white; padding: 20px; border-radius: 12px; text-align: center; position: relative; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 15px 0; }
+        label { font-size: 12px; font-weight: bold; color: var(--blue); display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 14px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .btn-main { background: var(--blue); color: white; padding: 16px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; text-transform: uppercase; }
         .role-badge { background: var(--gold); color: #000; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; position: absolute; top: 10px; right: 10px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: #ddd; font-weight: bold; cursor: pointer; font-size: 11px; }
-        .tab-active { background: var(--blue); color: white; }
-
-        /* Director Cards */
-        .dir-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .dir-card { background: var(--dark); color: white; padding: 15px; border-radius: 12px; text-align: center; border-bottom: 4px solid var(--gold); }
-        .dir-card h1 { margin: 5px 0; font-size: 22px; color: var(--gold); }
-
-        .student-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 6px solid var(--blue); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .hidden { display: none !important; }
-        .logout { background: transparent; color: white; border: 1px solid white; padding: 4px 8px; font-size: 9px; cursor: pointer; border-radius: 4px; margin-top: 5px; }
+        .student-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 6px solid var(--blue); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
 
 <div id="loginGate" class="box" style="max-width:320px; margin-top:80px; text-align:center;">
     <h2 style="color:var(--blue)">PROGRESSIVE PMS</h2>
-    <p style="font-size:12px;">Enter Access Key</p>
-    <input id="passInput" type="password" placeholder="••••••••" style="text-align:center; font-size: 20px;">
+    <input id="passInput" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center;">
     <button onclick="handleLogin()" class="btn-main" style="margin-top:15px;">LOGIN</button>
-    <p style="font-size: 10px; color: #999; margin-top: 20px;">Eudes Media Tech Support</p>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
         <div id="roleDisplay" class="role-badge">ADMIN</div>
         <h2 style="margin:0;">PROGRESSIVE SCHOOL</h2>
-        <button class="logout" onclick="location.reload()">LOGOUT SYSTEM</button>
+        <button onclick="location.reload()" style="background:none; border:1px solid white; color:white; font-size:10px; margin-top:10px; padding:5px 10px; border-radius:4px; cursor:pointer;">LOGOUT SYSTEM</button>
     </div>
 
-    <div style="display:flex; margin: 10px auto; max-width:1000px; border-radius:8px; overflow:hidden; border: 1px solid #ccc;">
-        <button id="tabDir" onclick="switchTab('DIR')" class="tab-btn hidden">DIRECTOR BOARD</button>
-        <button id="tabReg" onclick="switchTab('REG')" class="tab-btn">STUDENT RECORDS</button>
-        <button id="tabRoll" onclick="switchTab('ROLL')" class="tab-btn">ATTENDANCE</button>
-    </div>
-
-    <div id="viewDir" class="hidden">
-        <div class="box">
-            <h3 style="margin:0 0 15px 0; color:var(--dark);">School Financial Summary</h3>
-            <div class="dir-grid">
-                <div class="dir-card"><span>Total Students</span><h1 id="dTotalSt">0</h1></div>
-                <div class="dir-card"><span>Total Expected</span><h1 id="dTotalExp">0</h1></div>
-                <div class="dir-card"><span>Total Balances</span><h1 id="dTotalBal">0</h1></div>
+    <div class="box" id="formContainer">
+        <h3 id="fTitle" style="margin:0 0 15px 0; color:var(--blue);">Student Record Update</h3>
+        <input type="hidden" id="editId">
+        
+        <div class="grid">
+            <div id="adminFields">
+                <label>Full Name</label>
+                <input id="name" placeholder="Enter Full Name">
+                <label style="margin-top:10px;">Class</label>
+                <select id="cl">
+                    <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+                    <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+                    <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+                </select>
             </div>
-            <div id="classBreakdown" style="font-size: 12px; color: #555;"></div>
+            
+            <label>Phone Contact</label>
+            <input id="ph" placeholder="Parent Contact">
+            
+            <label>Payment Code</label>
+            <input id="payCode" placeholder="Payment Reference">
+            
+            <label>Balance (UGX)</label>
+            <input id="fBal" type="number" placeholder="0">
         </div>
+
+        <button id="saveBtn" onclick="save()" class="btn-main">UPDATE SYSTEM</button>
+        <button onclick="resetForm()" style="width:100%; background:#eee; border:none; padding:10px; margin-top:10px; border-radius:8px; cursor:pointer;">CANCEL / CLEAR</button>
     </div>
 
-    <div id="viewReg">
-        <div class="box" id="formContainer">
-            <h4 id="fTitle" style="margin:0; color:var(--blue);">Student Record Update</h4>
-            <input type="hidden" id="editId">
-            <div class="grid">
-                <div class="admin-only"><label>Full Name</label><input id="name"></div>
-                <div class="admin-only"><label>Class</label>
-                    <select id="cl">
-                        <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-                        <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-                        <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-                    </select>
-                </div>
-                <div><label>Phone Contact</label><input id="ph"></div>
-                <div><label>Payment Code</label><input id="payCode"></div>
-                <div><label>Balance (UGX)</label><input id="fBal" type="number"></div>
-            </div>
-            <button id="saveBtn" onclick="save()" class="btn-main">UPDATE SYSTEM</button>
-            <button onclick="reset()" class="logout" style="color:black; border-color: black; width:100%; margin-top:5px;">CANCEL</button>
-        </div>
-
-        <div class="box" style="border:none; background:transparent; padding:0;">
-            <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Name or Code..." style="border: 2px solid var(--blue); margin-bottom: 10px;">
-            <div id="listBody"></div>
-        </div>
+    <div class="box">
+        <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Name or Code..." style="margin-bottom:15px; border:2px solid var(--blue);">
+        <div id="listBody"></div>
     </div>
-
-    <div id="viewRoll" class="hidden">
-        <div class="box">
-            <h3 style="color:var(--orange);">Class Roll Call</h3>
-            <select id="rollClass" onchange="loadRollCall()" style="border: 2px solid var(--orange); margin-bottom:15px;">
-                <option value="">-- Choose Class --</option>
-                <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-                <option value="P.1">P.1</option><option value="P.7">P.7</option>
-            </select>
-            <div id="rollList"></div>
-            <button onclick="submitRoll()" class="btn-main" style="background:var(--green); margin-top:20px;">SAVE ATTENDANCE</button>
-        </div>
-    </div>
-
-    <div class="footer">Eudes Media | +256762992440</div>
 </div>
 
 <script>
+    // Database Config
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-    let sb = null, students = [], attendanceMap = {}, USER_ROLE = "";
+    let sb = null, students = [], USER_ROLE = "";
 
     function handleLogin() {
         const p = document.getElementById('passInput').value.trim().toUpperCase();
         if (p === "JESUS CARES") USER_ROLE = "ADMIN";
         else if (p === "FINANCE2026") USER_ROLE = "FINANCE";
-        else if (p === "TEACHER256") USER_ROLE = "TEACHER";
-        else if (p === "DIRECTOR2026") USER_ROLE = "DIRECTOR";
-        else { alert("Access Denied"); return; }
+        else { alert("Wrong Password"); return; }
 
         sb = supabase.createClient(SB_URL, SB_KEY);
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         document.getElementById('roleDisplay').innerText = USER_ROLE;
         
-        applyPermissions();
+        if(USER_ROLE === "FINANCE") {
+            document.getElementById('adminFields').classList.add('hidden');
+        }
         refresh();
     }
 
-    function applyPermissions() {
-        // Finance can't change Name/Class or see Director Tab
-        if (USER_ROLE === "FINANCE") {
-            const adminFields = document.querySelectorAll('.admin-only');
-            adminFields.forEach(f => f.style.display = "none");
-            document.getElementById('tabDir').classList.add('hidden');
-        }
-        // Director can see the Director Board
-        if (USER_ROLE === "DIRECTOR" || USER_ROLE === "ADMIN") {
-            document.getElementById('tabDir').classList.remove('hidden');
-            if(USER_ROLE === "DIRECTOR") switchTab('DIR');
-        }
-        // Teacher only Roll Call
-        if (USER_ROLE === "TEACHER") {
-            document.getElementById('tabReg').classList.add('hidden');
-            switchTab('ROLL');
-        }
-    }
-
     async function refresh() {
-        const { data } = await sb.from('students').select('*').order('name', { ascending: true });
+        const { data, error } = await sb.from('students').select('*').order('name', { ascending: true });
+        if(error) { alert("Database Error: " + error.message); return; }
         students = data || [];
         render(students);
-        updateDirectorStats();
-    }
-
-    function updateDirectorStats() {
-        let totalSt = students.length;
-        let totalBal = students.reduce((sum, s) => sum + Number(s.fees_balance || 0), 0);
-        
-        document.getElementById('dTotalSt').innerText = totalSt;
-        document.getElementById('dTotalBal').innerText = totalBal.toLocaleString();
-        document.getElementById('dTotalExp').innerText = "TBC"; // You can set a fixed fee target here
     }
 
     function render(list) {
@@ -172,102 +105,98 @@
         list.forEach(s => {
             html += `<div class="student-card">
                 <b>${s.name.toUpperCase()}</b>
-                <div style="font-size:10px; color:#666;">LIN: ${s.lin} | Class: ${s.class}</div>
-                ${USER_ROLE !== 'TEACHER' ? `<div style="color:var(--red); font-weight:bold;">BAL: ${Number(s.fees_balance).toLocaleString()}</div>` : ''}
-                <div class="btn-row" style="display:flex; gap:5px; margin-top:8px;">
-                    ${USER_ROLE !== 'DIRECTOR' && USER_ROLE !== 'TEACHER' ? `<button onclick="editMode('${s.id}')" style="flex:1; padding:5px; font-size:10px;">EDIT</button>` : ''}
-                    <button onclick="sendWA('${s.contact}', '${s.name}', '${s.fees_balance}')" style="flex:1; padding:5px; font-size:10px; background:var(--green); color:white; border:none; border-radius:4px;">WA</button>
-                    ${USER_ROLE === 'ADMIN' ? `<button onclick="delSt('${s.id}')" style="padding:5px; font-size:10px; background:var(--red); color:white; border:none; border-radius:4px;">DEL</button>` : ''}
+                <div style="font-size:11px; color:#666;">LIN: ${s.lin} | Class: ${s.class}</div>
+                <div style="color:var(--red); font-weight:bold; margin-top:5px;">BAL: UGX ${Number(s.fees_balance).toLocaleString()}</div>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button onclick="editMode('${s.id}')" style="flex:1; padding:8px; background:var(--blue); color:white; border:none; border-radius:4px;">EDIT</button>
+                    ${USER_ROLE === 'ADMIN' ? `<button onclick="deleteStudent('${s.id}')" style="flex:1; padding:8px; background:var(--red); color:white; border:none; border-radius:4px;">DELETE</button>` : ''}
                 </div>
             </div>`;
         });
-        document.getElementById('listBody').innerHTML = html;
+        document.getElementById('listBody').innerHTML = html || "<p style='text-align:center;'>No students found.</p>";
     }
 
-    async function delSt(id) {
-        if(confirm("Admin, are you sure you want to delete this student permanently?")) {
-            await sb.from('students').delete().eq('id', id);
-            refresh();
+    async function save() {
+        const id = document.getElementById('editId').value;
+        const btn = document.getElementById('saveBtn');
+        
+        // Data Prep
+        const payload = {
+            contact: document.getElementById('ph').value.trim(),
+            fees_balance: parseInt(document.getElementById('fBal').value) || 0,
+            payment_code: document.getElementById('payCode').value.trim().toUpperCase()
+        };
+
+        // Admin Specific Data
+        if (USER_ROLE === "ADMIN") {
+            payload.name = document.getElementById('name').value.trim();
+            payload.class = document.getElementById('cl').value;
+            if(!payload.name) { alert("Please enter a name"); return; }
         }
-    }
 
-    function switchTab(t) {
-        document.getElementById('viewDir').classList.toggle('hidden', t !== 'DIR');
-        document.getElementById('viewReg').classList.toggle('hidden', t !== 'REG');
-        document.getElementById('viewRoll').classList.toggle('hidden', t !== 'ROLL');
+        btn.innerText = "SAVING...";
+        btn.disabled = true;
+
+        try {
+            if (!id) {
+                // ADD NEW STUDENT (Admin Only)
+                if (USER_ROLE !== "ADMIN") { alert("Only Admin can add students"); return; }
+                payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
+                payload.absent_days = 0;
+                const { error } = await sb.from('students').insert([payload]);
+                if(error) throw error;
+                alert("New student added successfully!");
+            } else {
+                // UPDATE EXISTING
+                const { error } = await sb.from('students').update(payload).eq('id', id);
+                if(error) throw error;
+                alert("Student updated successfully!");
+            }
+            resetForm();
+            refresh();
+        } catch (err) {
+            alert("Error: " + err.message);
+        } finally {
+            btn.innerText = "UPDATE SYSTEM";
+            btn.disabled = false;
+        }
     }
 
     function editMode(id) {
         const s = students.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
-        document.getElementById('fBal').value = s.fees_balance;
-        document.getElementById('ph').value = s.contact;
+        document.getElementById('ph').value = s.contact || '';
+        document.getElementById('fBal').value = s.fees_balance || 0;
         document.getElementById('payCode').value = s.payment_code || '';
+        
         if(USER_ROLE === "ADMIN") {
             document.getElementById('name').value = s.name;
             document.getElementById('cl').value = s.class;
         }
-        document.getElementById('fTitle').innerText = "UPDATING: " + s.name;
+        document.getElementById('fTitle').innerText = "EDITING: " + s.name;
+        window.scrollTo(0,0);
     }
 
-    async function save() {
-        const id = document.getElementById('editId').value;
-        const payload = {
-            contact: document.getElementById('ph').value,
-            fees_balance: document.getElementById('fBal').value,
-            payment_code: document.getElementById('payCode').value.toUpperCase()
-        };
-        
-        if (USER_ROLE === "ADMIN") {
-            payload.name = document.getElementById('name').value;
-            payload.class = document.getElementById('cl').value;
-        }
-
-        if(!id && USER_ROLE === "ADMIN") {
-            payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
-            await sb.from('students').insert([payload]);
-        } else if (id) {
-            await sb.from('students').update(payload).eq('id', id);
-        } else {
-            alert("Only Admin can add new students.");
-        }
-        refresh(); reset();
+    async function deleteStudent(id) {
+        if(!confirm("Are you sure you want to delete this student? This cannot be undone.")) return;
+        const { error } = await sb.from('students').delete().eq('id', id);
+        if(error) alert(error.message);
+        else { alert("Student removed."); refresh(); }
     }
 
-    function reset() { document.getElementById('editId').value = ""; document.getElementById('fTitle').innerText = "Student Record Update"; }
-    
-    function loadRollCall() {
-        const cls = document.getElementById('rollClass').value;
-        const filtered = students.filter(s => s.class === cls);
-        let html = ""; attendanceMap = {};
-        filtered.forEach(s => {
-            attendanceMap[s.id] = true;
-            html += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
-                <span>${s.name}</span>
-                <button onclick="this.innerText=(this.innerText=='P'?'A':'P'); attendanceMap['${s.id}']=!attendanceMap['${s.id}']" style="width:40px; border-radius:50%; border:none; background:var(--blue); color:white;">P</button>
-            </div>`;
-        });
-        document.getElementById('rollList').innerHTML = html;
-    }
-
-    async function submitRoll() {
-        for (let id in attendanceMap) {
-            if (!attendanceMap[id]) {
-                const s = students.find(x => x.id == id);
-                await sb.from('students').update({ absent_days: (s.absent_days || 0) + 1 }).eq('id', id);
-            }
-        }
-        alert("Attendance saved."); refresh();
-    }
-
-    function sendWA(num, name, bal) {
-        const msg = `PROGRESSIVE SCHOOL\nStudent: ${name}\nBalance: UGX ${Number(bal).toLocaleString()}\nEudes Media: +256762992440`;
-        window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
+    function resetForm() {
+        document.getElementById('editId').value = "";
+        document.getElementById('name').value = "";
+        document.getElementById('ph').value = "";
+        document.getElementById('fBal').value = "";
+        document.getElementById('payCode').value = "";
+        document.getElementById('fTitle').innerText = "Student Record Update";
     }
 
     function search() {
         const q = document.getElementById('sBar').value.toUpperCase();
-        render(students.filter(s => s.name.toUpperCase().includes(q) || (s.payment_code && s.payment_code.includes(q))));
+        const filtered = students.filter(s => s.name.toUpperCase().includes(q) || s.lin.toUpperCase().includes(q));
+        render(filtered);
     }
 </script>
 </body>
