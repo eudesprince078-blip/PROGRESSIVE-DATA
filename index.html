@@ -2,167 +2,192 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V50</title>
+    <title>PROGRESSIVE MOTHERS SCHOOL - V52</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --orange: #fd7e14; --gray: #f1f4f8; --gold: #ffc107; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; color: #333; }
-        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
+        :root { --blue: #004085; --light-blue: #e7f1ff; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f8f9fa; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; color: #333; }
         
-        /* KPI Dashboard */
-        .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 15px; margin-top: -15px; }
-        .kpi-card { background: white; padding: 10px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        /* Premium Header */
+        .header { background: linear-gradient(180deg, var(--dark) 0%, var(--blue) 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 0 0 30px 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        .motto { font-style: italic; font-size: 11px; opacity: 0.9; letter-spacing: 1px; margin-top: 5px; color: var(--gold); }
         
-        /* Teacher Logs Section */
-        .log-item { font-size: 11px; padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
-        .log-time { color: #888; font-style: italic; }
+        /* Communication Hub */
+        .msg-chip { background: var(--white); padding: 12px; border-radius: 12px; margin: 15px; border-left: 5px solid var(--gold); font-size: 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .private-chat { background: var(--light-blue); padding: 15px; border-radius: 15px; margin: 15px; border: 1px solid #cce5ff; }
 
-        /* Student Row & Color Coding */
-        .student-row { background: white; padding: 15px; border-radius: 12px; margin: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); position: relative; overflow: hidden; }
-        .fee-indicator { position: absolute; left: 0; top: 0; bottom: 0; width: 8px; }
-        .status-paid { background: var(--green); }
-        .status-partial { background: var(--orange); }
-        .status-debt { background: var(--red); }
-
-        .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 8px; }
-        .btn-main { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        /* Professional Cards */
+        .card { background: white; padding: 20px; border-radius: 18px; margin: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #eee; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; margin-top: -25px; }
+        .kpi-box { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        
+        /* Inputs & Buttons */
+        input, select, textarea { width: 100%; padding: 14px; margin-top: 8px; border: 1.5px solid #e0e0e0; border-radius: 10px; font-size: 14px; transition: 0.3s; }
+        input:focus { border-color: var(--blue); outline: none; }
+        .btn-primary { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 15px; }
+        
+        /* Status Colors */
+        .strip { position: absolute; left: 0; top: 0; bottom: 0; width: 6px; }
+        .s-paid { border-left: 6px solid var(--green); }
+        .s-partial { border-left: 6px solid var(--gold); }
+        .s-debt { border-left: 6px solid var(--red); }
+        
+        .student-item { background: white; padding: 18px; border-radius: 15px; margin: 10px 15px; display: flex; justify-content: space-between; align-items: center; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .hidden { display: none !important; }
+        .badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; background: #eee; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" style="padding: 80px 20px; text-align: center;">
-    <div class="card" style="max-width: 300px; margin: auto;">
-        <h2 style="color:var(--blue)">PMS V50</h2>
-        <input id="passInput" type="password" placeholder="Access Key" style="text-align:center;">
-        <button onclick="handleLogin()" class="btn-main">LOGIN</button>
+<div id="loginGate" style="padding: 100px 25px; text-align: center;">
+    <img src="https://img.icons8.com/fluency/96/education.png" style="margin-bottom: 20px;">
+    <h2 style="color:var(--blue); margin:0;">PROGRESSIVE PMS</h2>
+    <p style="font-size:12px; color:#666;">Gayaza - Kijabijjo Campus</p>
+    <div class="card" style="max-width: 350px; margin: 20px auto;">
+        <input id="passInput" type="password" placeholder="Enter Security Key" style="text-align:center;">
+        <button onclick="handleLogin()" class="btn-primary">SECURE LOGIN</button>
     </div>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <h3 style="margin:0;">PROGRESSIVE MOTHERS SCHOOL</h3>
-        <div id="liveTime" style="font-size:12px; opacity:0.8;"></div>
+        <h2 style="margin:0; letter-spacing: 1px;">PROGRESSIVE MOTHERS</h2>
+        <div class="motto">"With God Everything Is Possible"</div>
+        <div id="clock" style="font-size:12px; margin-top:10px; opacity:0.8;"></div>
     </div>
 
-    <div id="adminLogView" class="card hidden">
-        <h4 style="margin:0 0 10px 0; color:var(--blue); font-size:13px;">Teacher Activity Logs (Today)</h4>
-        <div id="logList" style="max-height: 100px; overflow-y: auto;">
-            <p style="font-size:11px; color:#999;">No activity recorded yet.</p>
-        </div>
+    <div class="msg-chip">
+        <span style="color:var(--red); font-weight:bold; font-size:10px;">📢 GENERAL ANNOUNCEMENT</span>
+        <div id="publicMsg" style="margin-top:5px; font-weight:500;">Welcome to Term 1, 2026.</div>
+    </div>
+
+    <div id="commHub" class="private-chat">
+        <h4 style="margin:0 0 10px 0; color:var(--blue); font-size:13px;">Message Center</h4>
+        <div id="inbox" style="font-size:12px; margin-bottom:10px; color:#555;">No new private messages.</div>
+        <textarea id="msgBody" rows="2" placeholder="Write message..."></textarea>
+        <select id="msgTarget">
+            <option value="ADMIN">To: Admin</option>
+            <option value="DIRECTOR">To: Director</option>
+            <option value="STAFF">To: All Teachers</option>
+        </select>
+        <button onclick="sendMessage()" class="btn-primary" style="padding:10px; background:var(--dark);">SEND MESSAGE</button>
     </div>
 
     <div class="kpi-grid">
-        <div class="kpi-card"><p style="font-size:9px; color:#888;">TOTAL STUDENTS</p><h3 id="statTotal">0</h3></div>
-        <div class="kpi-card"><p style="font-size:9px; color:#888;">TOTAL BAL (UGX)</p><h3 id="statMoney" style="color:var(--red)">0</h3></div>
+        <div class="kpi-box"><p style="font-size:9px; color:#888; margin:0;">TOTAL STUDENTS</p><h3 id="statTotal" style="margin:5px 0 0 0;">0</h3></div>
+        <div class="kpi-box"><p style="font-size:9px; color:#888; margin:0;">PENDING FEES</p><h3 id="statMoney" style="color:var(--red); margin:5px 0 0 0;">0</h3></div>
     </div>
 
-    <div id="rollCallArea" class="card">
-        <h4 style="margin:0; font-size:14px;">Daily Roll Call</h4>
-        <select id="classSel" onchange="renderRoll()">
-            <option value="">-- Select Class --</option>
-            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-            <option value="P.1">P.1</option><option value="P.7">P.7</option>
-        </select>
-        <div id="rollStudents" style="margin-top:10px;"></div>
+    <div id="mgmtTools" class="card hidden">
+        <h4 style="margin:0 0 15px 0; color:var(--blue);">Management Control</h4>
+        <button onclick="autoPromote()" class="btn-primary" style="background:var(--green); margin:0;">🚀 AUTO-PROMOTE ALL STUDENTS (+1 CLASS)</button>
+        <div style="margin-top:15px;">
+            <label style="font-size:11px; font-weight:bold;">Update Public Notice Board</label>
+            <input id="newPublicMsg" placeholder="Type general message here...">
+            <button onclick="updatePublic()" class="btn-primary" style="background:var(--gold); color:black; padding:10px;">POST TO EVERYONE</button>
+        </div>
     </div>
 
-    <div class="content">
-        <div style="padding: 0 15px;"><input type="text" id="sBar" oninput="renderStudents()" placeholder="🔍 Search student name..."></div>
-        <div id="studentList"></div>
+    <div class="card">
+        <h4 style="margin:0 0 10px 0; color:var(--blue);">Search Records</h4>
+        <input type="text" id="sBar" oninput="renderStudents()" placeholder="🔍 Enter name or LIN code...">
     </div>
+
+    <div id="studentList"></div>
 </div>
 
 <script>
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-    let sb = null, students = [], USER_ROLE = "", teacherName = "Staff";
+    let sb = null, students = [], USER_ROLE = "";
 
-    setInterval(() => { document.getElementById('liveTime').innerText = new Date().toLocaleString(); }, 1000);
+    // Updated Passwords
+    const KEYS = {
+        "ADMIN2026": "ADMIN",
+        "DIRECTOR2026": "DIRECTOR",
+        "TEACHER256": "TEACHER",
+        "FINANCE2026": "FINANCE"
+    };
+
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
 
     function handleLogin() {
         const p = document.getElementById('passInput').value.trim().toUpperCase();
-        if (p === "JESUS CARES") USER_ROLE = "ADMIN";
-        else if (p === "TEACHER256") USER_ROLE = "TEACHER";
-        else return alert("Access Denied");
-
-        sb = supabase.createClient(SB_URL, SB_KEY);
-        document.getElementById('loginGate').classList.add('hidden');
-        document.getElementById('mainApp').classList.remove('hidden');
-        
-        if(USER_ROLE === "ADMIN") {
-            document.getElementById('adminLogView').classList.remove('hidden');
-            loadLogs();
+        if (KEYS[p]) {
+            USER_ROLE = KEYS[p];
+            sb = supabase.createClient(SB_URL, SB_KEY);
+            document.getElementById('loginGate').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            if(USER_ROLE === "ADMIN" || USER_ROLE === "DIRECTOR") document.getElementById('mgmtTools').classList.remove('hidden');
+            refresh();
+            loadMessages();
+        } else {
+            alert("Security Key Invalid. Please contact Admin.");
         }
-        refresh();
     }
 
     async function refresh() {
         const { data } = await sb.from('students').select('*').order('name', { ascending: true });
         students = data || [];
         document.getElementById('statTotal').innerText = students.length;
-        const total = students.reduce((s, x) => s + (parseInt(x.fees_balance) || 0), 0);
-        document.getElementById('statMoney').innerText = total.toLocaleString();
+        const bal = students.reduce((s, x) => s + (parseInt(x.fees_balance) || 0), 0);
+        document.getElementById('statMoney').innerText = "UGX " + bal.toLocaleString();
         renderStudents();
+    }
+
+    async function loadMessages() {
+        const { data } = await sb.from('messages').select('*').or(`target.eq.${USER_ROLE},target.eq.STAFF`).order('id', { ascending: false }).limit(3);
+        if(data && data.length > 0) {
+            let h = "";
+            data.forEach(m => { h += `<div style="border-bottom:1px solid #ddd; padding:5px 0;"><b>From ${m.sender}:</b> ${m.body}</div>`; });
+            document.getElementById('inbox').innerHTML = h;
+        }
+    }
+
+    async function sendMessage() {
+        const body = document.getElementById('msgBody').value;
+        const target = document.getElementById('msgTarget').value;
+        if(!body) return;
+        await sb.from('messages').insert([{ body, target, sender: USER_ROLE }]);
+        alert("Message Sent!");
+        document.getElementById('msgBody').value = "";
+    }
+
+    async function updatePublic() {
+        const msg = document.getElementById('newPublicMsg').value;
+        await sb.from('school_config').update({ notice: msg }).eq('id', 1);
+        document.getElementById('publicMsg').innerText = msg;
+        alert("Public Notice Updated");
     }
 
     function renderStudents() {
         const q = document.getElementById('sBar').value.toUpperCase();
         let h = "";
-        students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
+        students.filter(s => s.name.toUpperCase().includes(q) || s.class.toUpperCase().includes(q)).forEach(s => {
             const bal = parseInt(s.fees_balance) || 0;
-            let colorClass = "status-paid";
-            if (bal > 0 && bal < 100000) colorClass = "status-partial";
-            if (bal >= 100000) colorClass = "status-debt";
-
-            h += `<div class="student-row">
-                <div class="fee-indicator ${colorClass}"></div>
+            let c = bal === 0 ? "s-paid" : (bal < 150000 ? "s-partial" : "s-debt");
+            h += `<div class="student-item ${c}">
                 <div>
-                    <b>${s.name.toUpperCase()}</b><br>
-                    <small>${s.class} | LIN: ${s.lin || '---'}</small>
+                    <b style="font-size:15px;">${s.name.toUpperCase()}</b><br>
+                    <span class="badge">${s.class}</span> <span class="badge" style="background:#004085; color:white;">${s.lin || 'N/A'}</span>
                 </div>
-                ${USER_ROLE === 'ADMIN' ? `<div style="text-align:right;"><b style="color:var(--red); font-size:11px;">UGX ${bal.toLocaleString()}</b></div>` : ''}
+                ${USER_ROLE !== 'TEACHER' ? `<div style="text-align:right;"><b style="color:var(--red); font-size:12px;">${bal.toLocaleString()}</b></div>` : ''}
             </div>`;
         });
         document.getElementById('studentList').innerHTML = h;
     }
 
-    function renderRoll() {
-        const cls = document.getElementById('classSel').value;
-        const filtered = students.filter(s => s.class === cls);
-        let h = "";
-        filtered.forEach(s => {
-            h += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
-                <span>${s.name}</span>
-                <button onclick="logAttendance('${s.name}', '${cls}')" style="background:var(--green); color:white; border:none; padding:5px 10px; border-radius:5px; font-size:10px;">MARK PRESENT</button>
-            </div>`;
-        });
-        document.getElementById('rollStudents').innerHTML = h;
-    }
-
-    async function logAttendance(name, cls) {
-        // Record the teacher's action in the logs table
-        const entry = {
-            action: `Roll Call: ${name} (${cls})`,
-            staff: USER_ROLE,
-            time: new Date().toLocaleTimeString()
-        };
-        await sb.from('activity_logs').insert([entry]);
-        alert("Attendance Logged");
-        if(USER_ROLE === "ADMIN") loadLogs();
-    }
-
-    async function loadLogs() {
-        const { data } = await sb.from('activity_logs').select('*').order('id', { ascending: false }).limit(10);
-        if(data) {
-            let h = "";
-            data.forEach(l => {
-                h += `<div class="log-item"><span>${l.action}</span> <span class="log-time">${l.time}</span></div>`;
-            });
-            document.getElementById('logList').innerHTML = h;
+    async function autoPromote() {
+        if(!confirm("This will move every student to the next class. Continue?")) return;
+        const order = ["Baby", "Middle", "Top", "P.1", "P.2", "P.3", "P.4", "P.5", "P.6", "P.7", "Alumni"];
+        for(let s of students) {
+            let idx = order.indexOf(s.class);
+            if(idx !== -1 && idx < order.length - 1) {
+                await sb.from('students').update({ class: order[idx+1] }).eq('id', s.id);
+            }
         }
+        alert("Annual Promotion Complete!"); refresh();
     }
 </script>
 </body>
