@@ -2,118 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V41 - ALL ROLES</title>
+    <title>PROGRESSIVE PMS V43</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #0056b3; --dark: #001a33; --white: #ffffff; --green: #2ecc71; --red: #e74c3c; --gray: #f1f4f8; --gold: #f1c40f; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; }
+        :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gray: #f8f9fa; --gold: #ffc107; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; font-size: 14px; }
+        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; position: relative; }
+        .role-tag { position: absolute; top: 10px; right: 10px; background: var(--gold); color: black; padding: 3px 10px; border-radius: 15px; font-size: 10px; font-weight: bold; }
         
-        .header-box { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 25px 20px; text-align: center; border-radius: 0 0 20px 20px; }
-        .role-badge { background: var(--gold); color: black; font-size: 10px; font-weight: bold; padding: 4px 12px; border-radius: 20px; position: absolute; top: 15px; right: 15px; }
-        
-        /* Dashboard Stats */
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; margin-top: -20px; }
-        .s-card { background: white; padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-bottom: 3px solid var(--blue); }
-        .s-card h3 { margin: 5px 0; font-size: 22px; color: var(--dark); }
-        .s-card p { margin: 0; font-size: 9px; color: #888; text-transform: uppercase; }
+        .dash-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; margin-top: -20px; }
+        .stat-card { background: white; padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .stat-card h3 { margin: 5px 0; color: var(--blue); }
 
-        /* Navigation */
-        .nav { display: flex; margin: 10px 15px; background: #ddd; border-radius: 8px; overflow: hidden; }
-        .nav-btn { flex: 1; padding: 12px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; }
-        .active-nav { background: var(--blue); color: white; }
+        .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .tab-nav { display: flex; margin: 0 15px; background: #ddd; border-radius: 8px; overflow: hidden; }
+        .tab-btn { flex: 1; padding: 12px; border: none; cursor: pointer; font-weight: bold; font-size: 11px; }
+        .active-tab { background: var(--blue); color: white; }
 
-        /* Container */
-        .content { padding: 15px; }
-        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        label { display: block; margin-top: 10px; font-weight: bold; color: var(--blue); font-size: 11px; }
+        input, select { width: 100%; padding: 12px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        .btn { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer; }
         
-        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1.2px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
-        .btn-action { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        
-        .student-row { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--blue); }
+        .student-row { background: white; padding: 12px; border-radius: 10px; margin: 0 15px 8px 15px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--blue); }
         .hidden { display: none !important; }
+        .search-container { position: sticky; top: 0; background: var(--gray); z-index: 100; padding-top: 10px; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" style="padding: 60px 20px; text-align: center;">
-    <div class="card" style="max-width: 320px; margin: auto;">
-        <h2 style="color:var(--blue)">PROGRESSIVE PMS</h2>
-        <p style="font-size: 12px; color: #666;">Enter your specialized access key</p>
-        <input id="passInput" type="password" placeholder="Access Key" style="text-align:center; font-size: 18px;">
-        <button onclick="handleLogin()" class="btn-action">SIGN IN</button>
-        <p style="font-size: 9px; color: #aaa; margin-top: 15px;">Eudes Media Tech</p>
+<div id="loginGate" style="padding: 80px 20px; text-align: center;">
+    <div class="card" style="max-width: 300px; margin: auto;">
+        <h2 style="color:var(--blue)">PMS LOGIN</h2>
+        <input id="passInput" type="password" placeholder="Access Key" style="text-align:center;">
+        <button onclick="handleLogin()" class="btn">LOGIN</button>
     </div>
 </div>
 
 <div id="mainApp" class="hidden">
-    <div class="header-box">
-        <div id="roleDisplay" class="role-badge">ROLE</div>
+    <div class="header">
+        <div id="roleDisplay" class="role-tag">ROLE</div>
         <h2 style="margin:0;">PROGRESSIVE SCHOOL</h2>
-        <div id="clock" style="font-size: 12px; opacity: 0.8; margin-top: 5px;">00:00:00</div>
-        <button onclick="location.reload()" style="background:none; border:1px solid white; color:white; padding:3px 8px; border-radius:4px; font-size:9px; margin-top:10px;">LOGOUT</button>
+        <div id="clock" style="font-size: 11px; opacity: 0.8;">00:00:00</div>
+        <button onclick="location.reload()" style="background:none; border:1px solid white; color:white; padding:2px 8px; border-radius:4px; font-size:9px; margin-top:10px; cursor:pointer;">LOGOUT</button>
     </div>
 
-    <div id="statsSection" class="stats-grid hidden">
-        <div class="s-card"> <p>Total Students</p> <h3 id="statTotal">0</h3> </div>
-        <div class="s-card" style="border-color: var(--green);"> <p>Active Today</p> <h3 id="statActive">0</h3> </div>
-        <div class="s-card" style="border-color: var(--red);"> <p>Total Balances</p> <h3 id="statMoney">0</h3> </div>
-        <div class="s-card" style="border-color: #666;"> <p>Students Left</p> <h3 id="statLeft">0</h3> </div>
+    <div id="statsBox" class="dash-grid hidden">
+        <div class="stat-card"> <p style="font-size:9px;">TOTAL STUDENTS</p> <h3 id="statTotal">0</h3> </div>
+        <div id="moneyStat" class="stat-card"> <p style="font-size:9px;">TOTAL UNPAID (UGX)</p> <h3 id="statMoney" style="color:var(--red)">0</h3> </div>
     </div>
 
-    <div id="mainNav" class="nav">
-        <button id="navRec" onclick="switchView('REC')" class="nav-btn active-nav">RECORDS</button>
-        <button id="navRoll" onclick="switchView('ROLL')" class="nav-btn">ROLL CALL</button>
-        <button id="navArc" onclick="switchView('ARC')" class="nav-btn hidden">ARCHIVE</button>
+    <div class="tab-nav" id="mainTabs">
+        <button id="tRec" onclick="switchTab('REC')" class="tab-btn active-tab">RECORDS</button>
+        <button id="tRoll" onclick="switchTab('ROLL')" class="tab-btn">ROLL CALL</button>
+        <button id="tArc" onclick="switchTab('ARC')" class="tab-btn hidden">ARCHIVE</button>
     </div>
 
     <div class="content">
-        <div id="viewRec">
-            <div id="editForm" class="card hidden">
-                <h4 id="fTitle" style="margin:0; color:var(--blue);">Update Record</h4>
-                <input type="hidden" id="editId">
-                
-                <div id="adminOnlyFields">
-                    <label style="font-size:10px; font-weight:bold;">Full Name</label>
-                    <input id="stName">
-                    <label style="font-size:10px; font-weight:bold;">Class</label>
-                    <select id="stClass">
-                        <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-                        <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-                        <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-                    </select>
-                </div>
+        <div id="formCard" class="card hidden">
+            <h4 id="fTitle" style="margin:0; color:var(--blue);">Add New Student</h4>
+            <input type="hidden" id="editId">
+            
+            <label>Student Name</label>
+            <input id="stName" placeholder="Full Name">
+            
+            <label>Class</label>
+            <select id="stClass">
+                <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+                <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+                <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+            </select>
 
-                <label style="font-size:10px; font-weight:bold;">Fees Balance (UGX)</label>
-                <input id="stBal" type="number">
-                
-                <label style="font-size:10px; font-weight:bold;">Status</label>
+            <label>Parent Contact</label>
+            <input id="stPhone" placeholder="07...">
+
+            <div id="financeFields" class="hidden">
+                <label>Total Required Fees (UGX)</label>
+                <input id="feesReq" type="number" oninput="calcBal()">
+                <label>Amount Paid (UGX)</label>
+                <input id="feesPaid" type="number" oninput="calcBal()">
+                <label>Auto-Calculated Balance</label>
+                <input id="stBal" type="number" readonly style="background:#eee; font-weight:bold; color:var(--red);">
+            </div>
+
+            <div id="adminFields" class="hidden">
+                <label>Student Status</label>
                 <select id="stStatus">
                     <option value="Active">Active</option>
                     <option value="Left">Left School</option>
                 </select>
-
-                <button id="saveBtn" onclick="saveData()" class="btn-action">SAVE UPDATES</button>
             </div>
-            
-            <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Active Students..." style="margin-bottom:10px;">
+
+            <button id="saveBtn" onclick="saveData()" class="btn">SAVE TO SYSTEM</button>
+            <button onclick="resetForm()" style="width:100%; border:none; background:none; color:var(--red); font-size:11px; margin-top:10px; cursor:pointer;">Cancel</button>
+        </div>
+
+        <div id="searchSection" class="search-container hidden">
+            <input type="text" id="sBar" oninput="searchStudents()" placeholder="🔍 Search Name or LIN Code..." style="margin: 0 15px 15px 15px; width: calc(100% - 30px); border: 2px solid var(--blue);">
+        </div>
+
+        <div id="viewRec">
             <div id="listActive"></div>
         </div>
 
         <div id="viewRoll" class="hidden">
-            <div class="card">
-                <h3>Daily Attendance</h3>
-                <select id="rollCl" onchange="loadRoll()">
-                    <option value="">-- Choose Class --</option>
-                    <option value="Baby">Baby</option><option value="P.1">P.1</option><option value="P.7">P.7</option>
-                </select>
-                <div id="rollList" style="margin-top:15px;"></div>
-                <button class="btn-action" style="background:var(--green)">SUBMIT ATTENDANCE</button>
-            </div>
+            <div class="card"><h3>Daily Roll Call</h3><div id="rollList"></div></div>
         </div>
 
         <div id="viewArc" class="hidden">
-            <h4 style="color:#666;">Students who left the school</h4>
             <div id="listArchive"></div>
         </div>
     </div>
@@ -126,38 +122,54 @@
 
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 
+    function calcBal() {
+        const req = parseInt(document.getElementById('feesReq').value) || 0;
+        const paid = parseInt(document.getElementById('feesPaid').value) || 0;
+        document.getElementById('stBal').value = req - paid;
+    }
+
     function handleLogin() {
         const p = document.getElementById('passInput').value.trim().toUpperCase();
         if (p === "JESUS CARES") USER_ROLE = "ADMIN";
         else if (p === "DIRECTOR2026") USER_ROLE = "DIRECTOR";
         else if (p === "FINANCE2026") USER_ROLE = "FINANCE";
         else if (p === "TEACHER256") USER_ROLE = "TEACHER";
-        else { alert("Incorrect Key"); return; }
+        else { alert("Access Denied"); return; }
 
         sb = supabase.createClient(SB_URL, SB_KEY);
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         document.getElementById('roleDisplay').innerText = USER_ROLE;
         
-        applyPermissions();
+        setupPermissions();
         refresh();
     }
 
-    function applyPermissions() {
+    function setupPermissions() {
+        // Everyone except Teachers can use the Search Bar
+        if(USER_ROLE !== "TEACHER") document.getElementById('searchSection').classList.remove('hidden');
+        
         if(USER_ROLE === "ADMIN" || USER_ROLE === "DIRECTOR") {
-            document.getElementById('statsSection').classList.remove('hidden');
+            document.getElementById('statsBox').classList.remove('hidden');
             if(USER_ROLE === "ADMIN") {
-                document.getElementById('navArc').classList.remove('hidden');
-                document.getElementById('editForm').classList.remove('hidden');
+                document.getElementById('tArc').classList.remove('hidden');
+                document.getElementById('formCard').classList.remove('hidden');
+                document.getElementById('adminFields').classList.remove('hidden');
+                document.getElementById('financeFields').classList.remove('hidden');
             }
         }
+        
         if(USER_ROLE === "FINANCE") {
-            document.getElementById('editForm').classList.remove('hidden');
-            document.getElementById('adminOnlyFields').classList.add('hidden');
+            document.getElementById('statsBox').classList.remove('hidden');
+            document.getElementById('formCard').classList.remove('hidden');
+            document.getElementById('financeFields').classList.remove('hidden');
+            // Hide the total school balance from Finance if you wish, or keep it visible.
         }
+
         if(USER_ROLE === "TEACHER") {
-            document.getElementById('navRec').classList.add('hidden');
-            switchView('ROLL');
+            document.getElementById('formCard').classList.remove('hidden');
+            document.getElementById('tRec').classList.add('hidden');
+            switchTab('ROLL');
         }
     }
 
@@ -165,68 +177,100 @@
         const { data } = await sb.from('students').select('*').order('name', { ascending: true });
         students = data || [];
         
-        // Director Stats
-        document.getElementById('statTotal').innerText = students.length;
-        document.getElementById('statActive').innerText = students.filter(s => s.status !== 'Left').length;
-        document.getElementById('statLeft').innerText = students.filter(s => s.status === 'Left').length;
-        const totalBal = students.reduce((sum, s) => sum + (parseInt(s.fees_balance) || 0), 0);
-        document.getElementById('statMoney').innerText = totalBal.toLocaleString();
-
-        renderLists();
+        const activeOnly = students.filter(s => s.status !== 'Left');
+        document.getElementById('statTotal').innerText = activeOnly.length;
+        
+        const totalDebt = activeOnly.reduce((sum, s) => sum + (parseInt(s.fees_balance) || 0), 0);
+        document.getElementById('statMoney').innerText = totalDebt.toLocaleString();
+        
+        render(activeOnly, 'listActive');
+        render(students.filter(s => s.status === 'Left'), 'listArchive');
     }
 
-    function renderLists() {
-        let act = "", arc = "";
-        students.forEach(s => {
-            const row = `<div class="student-row">
-                <div><b>${s.name.toUpperCase()}</b><br><small>${s.class} | Bal: ${Number(s.fees_balance).toLocaleString()}</small></div>
-                <div>${(USER_ROLE === 'ADMIN' || USER_ROLE === 'FINANCE') ? `<button onclick="edit('${s.id}')" style="font-size:10px; cursor:pointer;">EDIT</button>` : ''}</div>
+    function render(list, targetId) {
+        let html = "";
+        list.forEach(s => {
+            html += `<div class="student-row">
+                <div>
+                    <b>${s.name.toUpperCase()}</b> <small style="color:#888;">[${s.lin || 'NO LIN'}]</small><br>
+                    <small>${s.class} | 📞 ${s.contact || 'No Contact'}</small>
+                    ${(USER_ROLE !== 'TEACHER') ? `<br><small style="color:var(--red); font-weight:bold;">BAL: UGX ${Number(s.fees_balance).toLocaleString()}</small>` : ''}
+                </div>
+                <div>
+                    ${(USER_ROLE === 'ADMIN') ? `<button onclick="edit('${s.id}')">EDIT</button>` : 
+                      (USER_ROLE === 'FINANCE') ? `<button onclick="edit('${s.id}')">FEES</button>` : ''}
+                </div>
             </div>`;
-            if(s.status === 'Left') arc += row; else act += row;
         });
-        document.getElementById('listActive').innerHTML = act;
-        document.getElementById('listArchive').innerHTML = arc;
+        document.getElementById(targetId).innerHTML = html || "<p style='text-align:center; color:#ccc;'>No Records Found</p>";
+    }
+
+    function searchStudents() {
+        const query = document.getElementById('sBar').value.toUpperCase();
+        const activeFiltered = students.filter(s => 
+            s.status !== 'Left' && 
+            (s.name.toUpperCase().includes(query) || (s.lin && s.lin.toUpperCase().includes(query)))
+        );
+        render(activeFiltered, 'listActive');
     }
 
     async function saveData() {
         const id = document.getElementById('editId').value;
         const payload = {
-            fees_balance: parseInt(document.getElementById('stBal').value) || 0,
-            status: document.getElementById('stStatus').value
+            name: document.getElementById('stName').value.trim(),
+            class: document.getElementById('stClass').value,
+            contact: document.getElementById('stPhone').value.trim(),
+            fees_balance: parseInt(document.getElementById('stBal').value) || 0
         };
-        if(USER_ROLE === "ADMIN") {
-            payload.name = document.getElementById('stName').value;
-            payload.class = document.getElementById('stClass').value;
-        }
 
-        if(!id && USER_ROLE === "ADMIN") {
-            payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
-            await sb.from('students').insert([payload]);
-        } else {
-            await sb.from('students').update(payload).eq('id', id);
-        }
-        alert("Saved!"); refresh();
+        if(USER_ROLE === "ADMIN") payload.status = document.getElementById('stStatus').value;
+
+        try {
+            if(!id) {
+                payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
+                await sb.from('students').insert([payload]);
+            } else {
+                if(USER_ROLE === "FINANCE") { delete payload.name; delete payload.class; }
+                await sb.from('students').update(payload).eq('id', id);
+            }
+            alert("System Updated!");
+            resetForm(); refresh();
+        } catch (e) { alert("Save Error: " + e.message); }
     }
 
     function edit(id) {
         const s = students.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
+        document.getElementById('stName').value = s.name;
+        document.getElementById('stClass').value = s.class;
+        document.getElementById('stPhone').value = s.contact || '';
         document.getElementById('stBal').value = s.fees_balance;
-        document.getElementById('stStatus').value = s.status || 'Active';
-        if(USER_ROLE === "ADMIN") {
-            document.getElementById('stName').value = s.name;
-            document.getElementById('stClass').value = s.class;
+        if(USER_ROLE === "FINANCE") {
+            document.getElementById('stName').disabled = true;
+            document.getElementById('stClass').disabled = true;
         }
+        document.getElementById('fTitle').innerText = "Update: " + s.name;
         window.scrollTo(0,0);
     }
 
-    function switchView(v) {
+    function switchTab(v) {
         document.getElementById('viewRec').classList.toggle('hidden', v !== 'REC');
         document.getElementById('viewRoll').classList.toggle('hidden', v !== 'ROLL');
         document.getElementById('viewArc').classList.toggle('hidden', v !== 'ARC');
-        document.getElementById('navRec').classList.toggle('active-nav', v === 'REC');
-        document.getElementById('navRoll').classList.toggle('active-nav', v === 'ROLL');
-        document.getElementById('navArc').classList.toggle('active-nav', v === 'ARC');
+        document.getElementById('tRec').classList.toggle('active-tab', v === 'REC');
+        document.getElementById('tRoll').classList.toggle('active-tab', v === 'ROLL');
+        document.getElementById('tArc').classList.toggle('active-tab', v === 'ARC');
+    }
+
+    function resetForm() {
+        document.getElementById('editId').value = "";
+        document.getElementById('stName').disabled = false;
+        document.getElementById('stClass').disabled = false;
+        document.getElementById('stName').value = "";
+        document.getElementById('stPhone').value = "";
+        document.getElementById('feesReq').value = "";
+        document.getElementById('feesPaid').value = "";
+        document.getElementById('stBal').value = "";
     }
 </script>
 </body>
