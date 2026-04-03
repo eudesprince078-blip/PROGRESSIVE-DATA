@@ -2,144 +2,167 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V48</title>
+    <title>PROGRESSIVE PMS V50</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gray: #f1f4f8; --gold: #ffc107; }
+        :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --orange: #fd7e14; --gray: #f1f4f8; --gold: #ffc107; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; color: #333; }
-        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 25px 20px; text-align: center; border-radius: 0 0 25px 25px; position: relative; }
-        .notice-board { background: #fff3cd; border-left: 6px solid var(--gold); padding: 15px; margin: 15px; border-radius: 10px; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
-        .kpi-card { background: white; padding: 12px; border-radius: 15px; text-align: center; box-shadow: 0 5px 10px rgba(0,0,0,0.05); border-bottom: 4px solid var(--blue); }
-        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin: 0 15px 15px 15px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 4px; border: 1.5px solid #eee; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
-        .btn-save { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        .student-row { background: white; padding: 15px; border-radius: 12px; margin: 0 15px 10px 15px; border-left: 6px solid var(--blue); box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
+        
+        /* KPI Dashboard */
+        .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 15px; margin-top: -15px; }
+        .kpi-card { background: white; padding: 10px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        
+        /* Teacher Logs Section */
+        .log-item { font-size: 11px; padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .log-time { color: #888; font-style: italic; }
+
+        /* Student Row & Color Coding */
+        .student-row { background: white; padding: 15px; border-radius: 12px; margin: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); position: relative; overflow: hidden; }
+        .fee-indicator { position: absolute; left: 0; top: 0; bottom: 0; width: 8px; }
+        .status-paid { background: var(--green); }
+        .status-partial { background: var(--orange); }
+        .status-debt { background: var(--red); }
+
+        .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-main { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .hidden { display: none !important; }
-        .lin-tag { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #555; }
-        .bal-tag { color: var(--red); font-weight: bold; font-size: 11px; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" style="padding: 100px 20px; text-align: center;">
-    <div class="card" style="max-width: 320px; margin: auto;">
-        <h2 style="color:var(--blue)">PROGRESSIVE LOGIN</h2>
+<div id="loginGate" style="padding: 80px 20px; text-align: center;">
+    <div class="card" style="max-width: 300px; margin: auto;">
+        <h2 style="color:var(--blue)">PMS V50</h2>
         <input id="passInput" type="password" placeholder="Access Key" style="text-align:center;">
-        <button onclick="handleLogin()" class="btn-save">ENTER SYSTEM</button>
+        <button onclick="handleLogin()" class="btn-main">LOGIN</button>
     </div>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <h2 style="margin:0;">PROGRESSIVE SCHOOL</h2>
-        <div id="liveClock" style="font-size:13px; margin-top:5px;">00:00:00</div>
+        <h3 style="margin:0;">PROGRESSIVE MOTHERS SCHOOL</h3>
+        <div id="liveTime" style="font-size:12px; opacity:0.8;"></div>
     </div>
 
-    <div id="adminControls" class="card hidden">
-        <h4 style="margin:0 0 10px 0; color:var(--blue);">Update Announcement</h4>
-        <textarea id="infoInput" rows="2" placeholder="Write message to staff..."></textarea>
-        <button onclick="postNotice()" class="btn-save" style="background:var(--gold); color:black;">POST TO BOARD</button>
-    </div>
-
-    <div id="noticeArea" class="notice-board">
-        <span style="font-weight:bold; color:#856404; font-size:11px;">📢 ANNOUNCEMENT</span>
-        <div id="noticeText" style="margin-top:5px; font-weight:500;">No active announcements.</div>
+    <div id="adminLogView" class="card hidden">
+        <h4 style="margin:0 0 10px 0; color:var(--blue); font-size:13px;">Teacher Activity Logs (Today)</h4>
+        <div id="logList" style="max-height: 100px; overflow-y: auto;">
+            <p style="font-size:11px; color:#999;">No activity recorded yet.</p>
+        </div>
     </div>
 
     <div class="kpi-grid">
         <div class="kpi-card"><p style="font-size:9px; color:#888;">TOTAL STUDENTS</p><h3 id="statTotal">0</h3></div>
-        <div class="kpi-card"><p style="font-size:9px; color:#888;">TOTAL UNPAID</p><h3 id="statMoney" style="color:var(--red)">0</h3></div>
+        <div class="kpi-card"><p style="font-size:9px; color:#888;">TOTAL BAL (UGX)</p><h3 id="statMoney" style="color:var(--red)">0</h3></div>
+    </div>
+
+    <div id="rollCallArea" class="card">
+        <h4 style="margin:0; font-size:14px;">Daily Roll Call</h4>
+        <select id="classSel" onchange="renderRoll()">
+            <option value="">-- Select Class --</option>
+            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+            <option value="P.1">P.1</option><option value="P.7">P.7</option>
+        </select>
+        <div id="rollStudents" style="margin-top:10px;"></div>
     </div>
 
     <div class="content">
-        <div class="card">
-            <input type="text" id="sBar" oninput="renderList()" placeholder="🔍 Search Name or LIN Code..." style="border:2px solid var(--blue);">
-        </div>
-        <div id="activeList"></div>
+        <div style="padding: 0 15px;"><input type="text" id="sBar" oninput="renderStudents()" placeholder="🔍 Search student name..."></div>
+        <div id="studentList"></div>
     </div>
 </div>
 
 <script>
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-    let sb = null, students = [], USER_ROLE = "";
+    let sb = null, students = [], USER_ROLE = "", teacherName = "Staff";
 
-    setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString(); }, 1000);
+    setInterval(() => { document.getElementById('liveTime').innerText = new Date().toLocaleString(); }, 1000);
 
     function handleLogin() {
         const p = document.getElementById('passInput').value.trim().toUpperCase();
         if (p === "JESUS CARES") USER_ROLE = "ADMIN";
         else if (p === "TEACHER256") USER_ROLE = "TEACHER";
-        else if (p === "DIRECTOR2026") USER_ROLE = "DIRECTOR";
-        else if (p === "FINANCE2026") USER_ROLE = "FINANCE";
-        else return alert("Invalid Access Key");
+        else return alert("Access Denied");
 
         sb = supabase.createClient(SB_URL, SB_KEY);
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         
-        if(USER_ROLE === "ADMIN") document.getElementById('adminControls').classList.remove('hidden');
-        
-        refresh();
-        loadAnnouncement();
-    }
-
-    async function loadAnnouncement() {
-        // Fetch notice from the settings table
-        const { data, error } = await sb.from('school_config').select('notice').eq('id', 1).single();
-        if(data) document.getElementById('noticeText').innerText = data.notice;
-    }
-
-    async function postNotice() {
-        const msg = document.getElementById('infoInput').value;
-        const { error } = await sb.from('school_config').update({ notice: msg }).eq('id', 1);
-        if(!error) {
-            alert("Announcement Posted!");
-            loadAnnouncement();
-        } else {
-            alert("Error updating board. Ensure 'school_config' table exists with 'notice' column.");
+        if(USER_ROLE === "ADMIN") {
+            document.getElementById('adminLogView').classList.remove('hidden');
+            loadLogs();
         }
+        refresh();
     }
 
     async function refresh() {
         const { data } = await sb.from('students').select('*').order('name', { ascending: true });
         students = data || [];
-        
-        const unpaid = students.reduce((sum, s) => sum + (parseInt(s.fees_balance) || 0), 0);
         document.getElementById('statTotal').innerText = students.length;
-        document.getElementById('statMoney').innerText = "UGX " + unpaid.toLocaleString();
-        
-        renderList();
+        const total = students.reduce((s, x) => s + (parseInt(x.fees_balance) || 0), 0);
+        document.getElementById('statMoney').innerText = total.toLocaleString();
+        renderStudents();
     }
 
-    function renderList() {
-        const query = document.getElementById('sBar').value.toUpperCase();
+    function renderStudents() {
+        const q = document.getElementById('sBar').value.toUpperCase();
         let h = "";
-        
-        const filtered = students.filter(s => 
-            s.name.toUpperCase().includes(query) || (s.lin && s.lin.toUpperCase().includes(query))
-        );
+        students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
+            const bal = parseInt(s.fees_balance) || 0;
+            let colorClass = "status-paid";
+            if (bal > 0 && bal < 100000) colorClass = "status-partial";
+            if (bal >= 100000) colorClass = "status-debt";
 
-        filtered.forEach(s => {
-            const isRestricted = USER_ROLE === "TEACHER";
             h += `<div class="student-row">
-                <div style="width:100%">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <b style="font-size:15px;">${s.name.toUpperCase()}</b>
-                        <span class="lin-tag">${s.lin || 'PENDING'}</span>
-                    </div>
-                    <div style="margin-top:5px; font-size:12px; color:#666;">
-                        Class: <b>${s.class}</b> | 📞 ${s.contact || 'No Contact'}
-                    </div>
-                    ${!isRestricted ? `<div style="margin-top:8px; padding-top:8px; border-top:1px solid #eee;">
-                        <span class="bal-tag">FEES BALANCE: UGX ${Number(s.fees_balance || 0).toLocaleString()}</span>
-                    </div>` : ''}
+                <div class="fee-indicator ${colorClass}"></div>
+                <div>
+                    <b>${s.name.toUpperCase()}</b><br>
+                    <small>${s.class} | LIN: ${s.lin || '---'}</small>
                 </div>
+                ${USER_ROLE === 'ADMIN' ? `<div style="text-align:right;"><b style="color:var(--red); font-size:11px;">UGX ${bal.toLocaleString()}</b></div>` : ''}
             </div>`;
         });
-        document.getElementById('activeList').innerHTML = h || "<p style='text-align:center; color:#999;'>No students found.</p>";
+        document.getElementById('studentList').innerHTML = h;
+    }
+
+    function renderRoll() {
+        const cls = document.getElementById('classSel').value;
+        const filtered = students.filter(s => s.class === cls);
+        let h = "";
+        filtered.forEach(s => {
+            h += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
+                <span>${s.name}</span>
+                <button onclick="logAttendance('${s.name}', '${cls}')" style="background:var(--green); color:white; border:none; padding:5px 10px; border-radius:5px; font-size:10px;">MARK PRESENT</button>
+            </div>`;
+        });
+        document.getElementById('rollStudents').innerHTML = h;
+    }
+
+    async function logAttendance(name, cls) {
+        // Record the teacher's action in the logs table
+        const entry = {
+            action: `Roll Call: ${name} (${cls})`,
+            staff: USER_ROLE,
+            time: new Date().toLocaleTimeString()
+        };
+        await sb.from('activity_logs').insert([entry]);
+        alert("Attendance Logged");
+        if(USER_ROLE === "ADMIN") loadLogs();
+    }
+
+    async function loadLogs() {
+        const { data } = await sb.from('activity_logs').select('*').order('id', { ascending: false }).limit(10);
+        if(data) {
+            let h = "";
+            data.forEach(l => {
+                h += `<div class="log-item"><span>${l.action}</span> <span class="log-time">${l.time}</span></div>`;
+            });
+            document.getElementById('logList').innerHTML = h;
+        }
     }
 </script>
 </body>
