@@ -2,24 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V54</title>
+    <title>PROGRESSIVE PMS V55</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f1f4f8; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; }
+        
+        /* Notification Center */
+        .notice-bar { background: var(--dark); color: white; padding: 10px; text-align: center; font-size: 11px; border-bottom: 2px solid var(--gold); }
+        .holiday-banner { background: #fff3cd; color: #856404; padding: 8px; font-size: 12px; font-weight: bold; text-align: center; border-bottom: 1px solid #ffeeba; }
+
         .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; position: relative; }
         .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 12px; border-radius: 50px; font-size: 10px; cursor: pointer; }
         
-        /* Calendar/Holiday Strip */
-        .holiday-alert { background: #fff3cd; border: 1px solid #ffeeba; padding: 10px; margin: 15px; border-radius: 10px; font-size: 12px; color: #856404; display: flex; align-items: center; gap: 10px; }
-
         .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
         .kpi-card { background: white; padding: 12px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
         .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; }
+        
         .btn-main { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-delete { background: var(--red); color: white; border: none; padding: 10px; border-radius: 8px; font-size: 11px; margin-top: 10px; width: 100%; }
         
         .student-row { background: white; padding: 15px; border-radius: 12px; margin: 10px 15px; border-left: 6px solid var(--blue); display: flex; justify-content: space-between; align-items: center; }
         .hidden { display: none !important; }
@@ -37,46 +41,48 @@
 </div>
 
 <div id="mainApp" class="hidden">
+    <div class="notice-bar">
+        <span id="liveDate"></span> | <span id="liveTime"></span>
+    </div>
+    <div id="holidayBanner" class="holiday-banner hidden"></div>
+
     <div class="header">
         <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
         <h3 style="margin:0;">PROGRESSIVE MOTHERS</h3>
-        <div style="font-size:10px; color:var(--gold); margin-top:5px;">Gayaza-Kijabijjo | Uganda</div>
-    </div>
-
-    <div id="holidayDisplay" class="holiday-alert hidden">
-        <span>🇺🇬</span> <b id="holidayText"></b>
+        <div style="font-size:10px; color:var(--gold); margin-top:5px;">"With God Everything Is Possible"</div>
     </div>
 
     <div class="kpi-grid">
-        <div class="kpi-card"><p style="font-size:9px; color:#888;">TOTAL STUDENTS</p><h3 id="statTotal">0</h3></div>
-        <div id="statFinance" class="kpi-card hidden"><p style="font-size:9px; color:#888;">TOTAL BAL</p><h3 id="statMoney" style="color:var(--red)">0</h3></div>
+        <div class="kpi-card"><p style="font-size:9px; color:#888;">ENROLLED</p><h3 id="statTotal">0</h3></div>
+        <div class="kpi-card"><p style="font-size:9px; color:#888;">TOTAL DEBT</p><h3 id="statMoney" style="color:var(--red)">0</h3></div>
     </div>
 
-    <div id="regForm" class="card">
-        <h4 id="formTitle" style="margin:0; color:var(--blue);">Student Record</h4>
+    <div id="masterForm" class="card">
+        <h4 id="formTitle" style="margin:0; color:var(--blue);">Student Registration & Profile</h4>
         <input type="hidden" id="editId">
         
         <div id="bioSection">
-            <input id="stName" placeholder="Full Name">
+            <input id="stName" placeholder="Student Full Name">
             <select id="stClass">
                 <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
                 <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
                 <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+                <option value="Left School">Left School (Alumni)</option>
             </select>
-            <input id="stPhone" placeholder="Parent Contact">
+            <input id="stPhone" placeholder="Parent Contact Number">
         </div>
 
         <div id="financeSection" class="hidden">
             <div class="fee-calc-box">
-                <label style="font-size:11px;">Expected Fees (UGX)</label>
-                <input id="stExpected" type="number" oninput="calcBal()" placeholder="Total Amount to Pay">
-                <label style="font-size:11px; margin-top:10px; display:block;">Amount Paid (UGX)</label>
-                <input id="stPaid" type="number" oninput="calcBal()" placeholder="How much has been paid?">
-                <p style="font-size:12px; margin-top:10px; font-weight:bold;">Remaining Balance: <span id="autoBal" style="color:var(--red)">0</span></p>
+                <label style="font-size:11px; font-weight:bold;">FEES MANAGEMENT (UGX)</label>
+                <input id="stExpected" type="number" oninput="calcBal()" placeholder="Total Expected Fees">
+                <input id="stPaid" type="number" oninput="calcBal()" placeholder="Amount Paid">
+                <p style="font-size:12px; margin-top:10px;">Balance: <b id="autoBal" style="color:var(--red)">0</b></p>
             </div>
         </div>
 
-        <button onclick="saveStudent()" class="btn-main">SAVE DATA</button>
+        <button onclick="saveStudent()" class="btn-main">SAVE STUDENT DATA</button>
+        <button id="delBtn" onclick="deleteStudent()" class="btn-delete hidden">DELETE STUDENT PERMANENTLY</button>
     </div>
 
     <div class="card">
@@ -91,22 +97,26 @@
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     let sb = null, students = [], USER_ROLE = "";
 
-    // Uganda Holidays 2026
-    const UG_HOLIDAYS = {
-        "1-1": "New Year's Day", "1-26": "NRM Liberation Day", "2-16": "Archbishop Janani Luwum Day",
-        "3-8": "International Women's Day", "4-3": "Good Friday", "4-6": "Easter Monday",
-        "5-1": "Labour Day", "6-3": "Martyrs' Day", "6-9": "Heroes' Day", "10-9": "Independence Day",
-        "12-25": "Christmas Day", "12-26": "Boxing Day"
+    // Uganda Holiday Engine
+    const UG_CALENDAR = {
+        "1-1": "New Year's Day", "1-26": "NRM Liberation Day", "2-16": "Janani Luwum Day",
+        "3-8": "Women's Day", "4-3": "Good Friday", "4-6": "Easter Monday",
+        "5-1": "Labour Day", "6-3": "Martyrs' Day", "6-9": "Heroes' Day", "10-9": "Independence Day"
     };
 
-    function checkCalendar() {
-        const d = new Date();
-        const key = `${d.getMonth() + 1}-${d.getDate()}`;
-        if(UG_HOLIDAYS[key]) {
-            document.getElementById('holidayDisplay').classList.remove('hidden');
-            document.getElementById('holidayText').innerText = "Today is " + UG_HOLIDAYS[key];
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('liveDate').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('liveTime').innerText = now.toLocaleTimeString();
+        
+        const key = `${now.getMonth() + 1}-${now.getDate()}`;
+        if(UG_CALENDAR[key]) {
+            const banner = document.getElementById('holidayBanner');
+            banner.classList.remove('hidden');
+            banner.innerText = "🇺🇬 IMPORTANT: Today is " + UG_CALENDAR[key];
         }
     }
+    setInterval(updateClock, 1000);
 
     function handleLogin() {
         const p = document.getElementById('passInput').value.trim().toUpperCase();
@@ -119,18 +129,15 @@
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         
-        // Strict Role Controls
-        if(USER_ROLE === "FINANCE") {
-            document.getElementById('financeSection').classList.remove('hidden');
-            document.getElementById('bioSection').classList.add('hidden'); // Finance cannot edit bio
-            document.getElementById('statFinance').classList.remove('hidden');
-        }
+        // Dynamic UI Permissions
         if(USER_ROLE === "ADMIN") {
             document.getElementById('financeSection').classList.remove('hidden');
-            document.getElementById('statFinance').classList.remove('hidden');
+            document.getElementById('bioSection').classList.remove('hidden');
+        } else if(USER_ROLE === "FINANCE") {
+            document.getElementById('financeSection').classList.remove('hidden');
+            document.getElementById('bioSection').classList.add('hidden'); // Finance only registers, doesn't edit Bio
         }
         
-        checkCalendar();
         refresh();
     }
 
@@ -145,7 +152,7 @@
         students = data || [];
         document.getElementById('statTotal').innerText = students.length;
         const totalBal = students.reduce((s, x) => s + (parseInt(x.fees_balance) || 0), 0);
-        if(document.getElementById('statMoney')) document.getElementById('statMoney').innerText = totalBal.toLocaleString();
+        document.getElementById('statMoney').innerText = "UGX " + totalBal.toLocaleString();
         renderList();
     }
 
@@ -155,12 +162,12 @@
         const paid = parseInt(document.getElementById('stPaid').value) || 0;
 
         let payload = {};
-        if(USER_ROLE === "TEACHER" || USER_ROLE === "ADMIN") {
+        if(USER_ROLE === "ADMIN" || USER_ROLE === "TEACHER" || (USER_ROLE === "FINANCE" && !id)) {
             payload.name = document.getElementById('stName').value;
             payload.class = document.getElementById('stClass').value;
             payload.contact = document.getElementById('stPhone').value;
         }
-        if(USER_ROLE === "FINANCE" || USER_ROLE === "ADMIN") {
+        if(USER_ROLE === "ADMIN" || USER_ROLE === "FINANCE") {
             payload.fees_expected = exp;
             payload.fees_paid = paid;
             payload.fees_balance = exp - paid;
@@ -173,8 +180,19 @@
             await sb.from('students').update(payload).eq('id', id);
         }
         
-        alert("Data Secured & Saved");
+        alert("Record Updated Successfully");
+        resetForm();
         refresh();
+    }
+
+    async function deleteStudent() {
+        const id = document.getElementById('editId').value;
+        if(confirm("Are you sure? This will permanently delete this student.")) {
+            await sb.from('students').delete().eq('id', id);
+            alert("Deleted");
+            resetForm();
+            refresh();
+        }
     }
 
     function renderList() {
@@ -186,10 +204,7 @@
                     <b>${s.name.toUpperCase()}</b><br>
                     <small>${s.class} | LIN: ${s.lin || 'N/A'}</small>
                 </div>
-                <div>
-                    <button onclick="editEntry('${s.id}')">MANAGE</button>
-                    ${USER_ROLE === 'ADMIN' ? `<button onclick="markAbsent('${s.id}')" style="background:red; color:white; border:none; margin-left:5px; border-radius:4px;">ABSENT</button>` : ''}
-                </div>
+                <button onclick="editEntry('${s.id}')">MANAGE</button>
             </div>`;
         });
         document.getElementById('studentList').innerHTML = h;
@@ -198,14 +213,21 @@
     function editEntry(id) {
         const s = students.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
-        if(USER_ROLE !== "FINANCE") {
-            document.getElementById('stName').value = s.name;
-            document.getElementById('stClass').value = s.class;
-            document.getElementById('stPhone').value = s.contact || '';
-        }
+        document.getElementById('stName').value = s.name;
+        document.getElementById('stClass').value = s.class;
+        document.getElementById('stPhone').value = s.contact || '';
         document.getElementById('stExpected').value = s.fees_expected || 0;
         document.getElementById('stPaid').value = s.fees_paid || 0;
         calcBal();
+        
+        if(USER_ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
+        window.scrollTo(0,0);
+    }
+
+    function resetForm() {
+        document.getElementById('editId').value = "";
+        document.getElementById('delBtn').classList.add('hidden');
+        document.getElementById('stName').value = "";
     }
 </script>
 </body>
