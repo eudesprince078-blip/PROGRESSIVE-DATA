@@ -2,129 +2,100 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V45</title>
+    <title>PROGRESSIVE PMS V47</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gray: #f1f4f8; --gold: #ffc107; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; color: #333; }
         
-        /* Executive Header */
-        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 30px 20px; text-align: center; border-radius: 0 0 25px 25px; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .time-box { font-family: 'Courier New', monospace; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 50px; display: inline-block; margin-top: 10px; font-size: 14px; letter-spacing: 1px; }
-        .date-text { display: block; font-size: 11px; opacity: 0.8; text-transform: uppercase; margin-bottom: 5px; }
+        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 25px 20px; text-align: center; border-radius: 0 0 25px 25px; position: relative; }
+        .time-box { font-family: 'Courier New', monospace; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 50px; display: inline-block; margin-top: 8px; font-size: 13px; }
 
-        /* KPI Dashboard Grid */
-        .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 20px; margin-top: -35px; }
-        .kpi-card { background: white; padding: 15px; border-radius: 18px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-bottom: 4px solid var(--blue); }
-        .kpi-card h3 { margin: 5px 0; font-size: 24px; color: var(--dark); }
-        .kpi-card p { margin: 0; font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase; }
+        /* Info Board / Notice Area */
+        .notice-board { background: #fff3cd; border-left: 6px solid var(--gold); padding: 15px; margin: 15px; border-radius: 10px; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .notice-title { font-weight: bold; color: #856404; display: block; margin-bottom: 5px; text-transform: uppercase; font-size: 11px; }
 
-        /* Finance Section (Restricted) */
-        .finance-card { background: var(--dark); color: white; margin: 0 20px 20px 20px; padding: 20px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Navigation */
-        .nav-bar { display: flex; margin: 0 20px 15px 20px; background: #e0e0e0; border-radius: 12px; overflow: hidden; }
-        .nav-item { flex: 1; padding: 15px; border: none; background: none; font-weight: bold; font-size: 12px; cursor: pointer; transition: 0.3s; }
-        .nav-active { background: var(--blue); color: white; }
+        /* School Time Switch */
+        .school-status { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .on-time { background: var(--green); box-shadow: 0 0 8px var(--green); }
+        .off-time { background: var(--red); }
 
-        .content { padding: 0 20px 20px 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 20px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
+        .kpi-card { background: white; padding: 12px; border-radius: 15px; text-align: center; box-shadow: 0 5px 10px rgba(0,0,0,0.05); border-bottom: 4px solid var(--blue); }
+        .kpi-card h3 { margin: 5px 0; font-size: 22px; color: var(--dark); }
         
-        input, select { width: 100%; padding: 14px; margin-top: 8px; border: 1.5px solid #dee2e6; border-radius: 10px; font-size: 15px; box-sizing: border-box; }
-        .btn-main { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 15px; cursor: pointer; }
+        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin: 0 15px 15px 15px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 4px; border: 1.5px solid #eee; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+        .btn-call { background: var(--green); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-block; font-size: 11px; }
+        .btn-save { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer; }
         
-        .student-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid var(--blue); }
+        .student-row { background: white; padding: 15px; border-radius: 12px; margin: 0 15px 10px 15px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid var(--blue); box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" style="padding: 100px 25px; text-align: center;">
-    <div class="card" style="max-width: 350px; margin: auto;">
-        <h2 style="color:var(--blue); margin-bottom:5px;">PROGRESSIVE PMS</h2>
-        <p style="font-size:12px; color:#666; margin-bottom:20px;">Secure Management Portal</p>
-        <input id="passInput" type="password" placeholder="Enter Access Key" style="text-align:center;">
-        <button onclick="handleLogin()" class="btn-main">ACCESS DASHBOARD</button>
+<div id="loginGate" style="padding: 100px 20px; text-align: center;">
+    <div class="card" style="max-width: 320px; margin: auto;">
+        <h2 style="color:var(--blue)">PROGRESSIVE LOGIN</h2>
+        <input id="passInput" type="password" placeholder="Access Key" style="text-align:center;">
+        <button onclick="handleLogin()" class="btn-save">ENTER SYSTEM</button>
     </div>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <span class="date-text" id="liveDate">Friday, April 3, 2026</span>
-        <h2 style="margin:0; letter-spacing:1px;">PROGRESSIVE SCHOOL</h2>
-        <div class="time-box" id="liveClock">00:00:00 PM</div>
-        <div style="margin-top:15px;"><button onclick="location.reload()" style="background:none; border:1px solid white; color:white; padding:5px 12px; border-radius:8px; font-size:10px;">LOGOUT SYSTEM</button></div>
+        <p id="liveDate" style="margin:0; font-size:10px; opacity:0.8;"></p>
+        <h2 style="margin:0;">PROGRESSIVE SCHOOL</h2>
+        <div class="time-box" id="liveClock">00:00:00</div>
+        
+        <div class="school-status" style="margin-top:15px;">
+            <div id="statusDot" class="status-dot off-time"></div>
+            <span id="statusText" style="font-size:11px; font-weight:bold;">OFF SCHOOL TIME</span>
+        </div>
+    </div>
+
+    <div id="adminControls" class="card hidden">
+        <h4 style="margin:0 0 10px 0; color:var(--blue);">Admin Control Center</h4>
+        <label>School Time Switch</label>
+        <select id="schoolTimeToggle" onchange="toggleSchoolTime()">
+            <option value="false">Off School Time</option>
+            <option value="true">Active School Time (9:00AM Roll Call)</option>
+        </select>
+        
+        <label style="margin-top:10px;">Post Information for Teachers</label>
+        <textarea id="infoInput" rows="2" placeholder="Write message to staff..."></textarea>
+        <button onclick="postNotice()" class="btn-save" style="padding:10px; margin-top:10px; background:var(--gold); color:black;">UPDATE NOTICE BOARD</button>
+    </div>
+
+    <div id="noticeArea" class="notice-board">
+        <span class="notice-title">📢 Staff Information</span>
+        <div id="noticeText">Loading notices...</div>
     </div>
 
     <div class="kpi-grid">
-        <div class="kpi-card" style="border-color: var(--blue);">
-            <p>Total Registered</p><h3 id="statTotal">0</h3>
-        </div>
-        <div class="kpi-card" style="border-color: var(--green);">
-            <p>Active Students</p><h3 id="statActive">0</h3>
-        </div>
-        <div class="kpi-card" style="border-color: var(--red);">
-            <p>Absent Today</p><h3 id="statAbsent">0</h3>
-        </div>
-        <div class="kpi-card" style="border-color: #6c757d;">
-            <p>Left School</p><h3 id="statLeft">0</h3>
-        </div>
-    </div>
-
-    <div id="financeOverview" class="finance-card hidden">
-        <div>
-            <p style="margin:0; font-size:10px; color:var(--gold); font-weight:bold;">TOTAL SCHOOL BALANCE</p>
-            <h2 style="margin:5px 0 0 0;" id="statMoney">UGX 0</h2>
-        </div>
-        <div style="text-align:right;">
-            <span style="font-size:20px;">💰</span>
-        </div>
-    </div>
-
-    <div class="nav-bar">
-        <button id="btnRec" onclick="switchView('REC')" class="nav-item nav-active">RECORDS</button>
-        <button id="btnRoll" onclick="switchView('ROLL')" class="nav-item">ROLL CALL</button>
+        <div class="kpi-card"><p style="font-size:9px; color:#888;">REGISTERED</p><h3 id="statTotal">0</h3></div>
+        <div class="kpi-card"><p style="font-size:9px; color:#888;">ABSENT TODAY</p><h3 id="statAbsent" style="color:var(--red)">0</h3></div>
     </div>
 
     <div class="content">
-        <div id="viewRec">
-            <div id="regForm" class="card">
-                <h3 id="fTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:18px;">Student Registration</h3>
-                <input type="hidden" id="editId">
-                
-                <input id="stName" placeholder="Full Name">
-                <select id="stClass">
-                    <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-                    <option value="P.1">P.1</option><option value="P.7">P.7</option>
-                </select>
-                <input id="stPhone" placeholder="Parent Contact (07...)">
-
-                <div id="financeInputs" class="hidden">
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <input id="fReq" type="number" placeholder="Required Fees" oninput="doMath()">
-                        <input id="fPaid" type="number" placeholder="Amount Paid" oninput="doMath()">
-                    </div>
-                    <input id="stBal" type="number" placeholder="Balance" readonly style="background:#f1f1f1; color:var(--red); font-weight:bold;">
-                </div>
-
-                <button onclick="saveStudent()" class="btn-main">SAVE TO SYSTEM</button>
-            </div>
-
-            <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Name or LIN Code..." style="margin-bottom:15px; border:2px solid var(--blue);">
-            <div id="activeList"></div>
+        <div id="regForm" class="card">
+            <h4 id="fTitle" style="margin:0; color:var(--blue);">Student Entry</h4>
+            <input type="hidden" id="editId">
+            <input id="stName" placeholder="Full Name">
+            <select id="stClass">
+                <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+                <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+                <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+            </select>
+            <input id="stPhone" placeholder="Parent Contact (07...)">
+            <button onclick="save()" class="btn-save">SAVE DATA</button>
         </div>
 
-        <div id="viewRoll" class="hidden">
-            <div class="card">
-                <h3>Daily Attendance</h3>
-                <select id="rollClass" onchange="renderRoll()">
-                    <option value="">-- Choose Class --</option>
-                    <option value="Baby">Baby</option><option value="P.1">P.1</option><option value="P.7">P.7</option>
-                </select>
-                <div id="rollContainer" style="margin-top:20px;"></div>
-            </div>
-        </div>
+        <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Name or Code..." style="margin:0 15px 15px 15px; width:calc(100% - 30px); border:2px solid var(--blue);">
+        <div id="activeList"></div>
     </div>
 </div>
 
@@ -133,110 +104,102 @@
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     let sb = null, students = [], USER_ROLE = "";
 
-    // Live Clock & Date
     setInterval(() => {
-        const now = new Date();
-        document.getElementById('liveClock').innerText = now.toLocaleTimeString();
-        document.getElementById('liveDate').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const d = new Date();
+        document.getElementById('liveClock').innerText = d.toLocaleTimeString();
+        document.getElementById('liveDate').innerText = d.toDateString();
+        
+        // Auto-Check for Roll Call Alarm at 9:00 AM
+        if(d.getHours() === 9 && d.getMinutes() === 0 && d.getSeconds() === 0) {
+            checkRollCallTrigger();
+        }
     }, 1000);
 
     function handleLogin() {
         const p = document.getElementById('passInput').value.trim().toUpperCase();
         if (p === "JESUS CARES") USER_ROLE = "ADMIN";
-        else if (p === "DIRECTOR2026") USER_ROLE = "DIRECTOR";
-        else if (p === "FINANCE2026") USER_ROLE = "FINANCE";
         else if (p === "TEACHER256") USER_ROLE = "TEACHER";
-        else return alert("Invalid Access Key");
+        else return alert("Invalid Key");
 
         sb = supabase.createClient(SB_URL, SB_KEY);
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         
-        applySecurity();
-        loadData();
+        if(USER_ROLE === "ADMIN") document.getElementById('adminControls').classList.remove('hidden');
+        
+        refresh();
+        loadSettings();
     }
 
-    function applySecurity() {
-        // Finance, Admin, Director see the Money Bar
-        if(["ADMIN", "DIRECTOR", "FINANCE"].includes(USER_ROLE)) {
-            document.getElementById('financeOverview').classList.remove('hidden');
-        }
-        // Finance and Admin can see Finance Inputs
-        if(["ADMIN", "FINANCE"].includes(USER_ROLE)) {
-            document.getElementById('financeInputs').classList.remove('hidden');
+    async function loadSettings() {
+        // Fetch notice and school time from a 'settings' table or similar in Supabase
+        const { data } = await sb.from('school_config').select('*').single();
+        if(data) {
+            document.getElementById('noticeText').innerText = data.notice || "No new updates from Admin.";
+            updateStatusUI(data.is_school_time);
         }
     }
 
-    async function loadData() {
+    async function postNotice() {
+        const msg = document.getElementById('infoInput').value;
+        await sb.from('school_config').update({ notice: msg }).eq('id', 1);
+        alert("Notice Updated");
+        loadSettings();
+    }
+
+    async function toggleSchoolTime() {
+        const val = document.getElementById('schoolTimeToggle').value === "true";
+        await sb.from('school_config').update({ is_school_time: val }).eq('id', 1);
+        updateStatusUI(val);
+    }
+
+    function updateStatusUI(isActive) {
+        const dot = document.getElementById('statusDot');
+        const txt = document.getElementById('statusText');
+        if(isActive) {
+            dot.className = "status-dot on-time";
+            txt.innerText = "ACTIVE SCHOOL TIME";
+        } else {
+            dot.className = "status-dot off-time";
+            txt.innerText = "OFF SCHOOL TIME";
+        }
+    }
+
+    function checkRollCallTrigger() {
+        // This function would check if 'is_school_time' is true and alert teachers
+        // Logic to notify teachers would go here
+    }
+
+    async function refresh() {
         const { data } = await sb.from('students').select('*').order('name', { ascending: true });
         students = data || [];
-        
-        // Update Dashboard Numbers
         document.getElementById('statTotal').innerText = students.length;
-        document.getElementById('statActive').innerText = students.filter(s => s.status !== 'Left').length;
-        document.getElementById('statLeft').innerText = students.filter(s => s.status === 'Left').length;
         document.getElementById('statAbsent').innerText = students.filter(s => (s.absent_days || 0) > 0).length;
-        
-        const totalBal = students.reduce((sum, s) => sum + (parseInt(s.fees_balance) || 0), 0);
-        document.getElementById('statMoney').innerText = "UGX " + totalBal.toLocaleString();
-
-        renderActiveList();
+        renderActive();
     }
 
-    function renderActiveList() {
-        let html = "";
-        students.filter(s => s.status !== 'Left').forEach(s => {
-            html += `<div class="student-item">
+    function renderActive() {
+        let h = "";
+        students.forEach(s => {
+            const hasPhone = s.contact && s.contact.length >= 10;
+            h += `<div class="student-row">
+                <div><b>${s.name.toUpperCase()}</b><br><small>${s.class}</small></div>
                 <div>
-                    <b>${s.name.toUpperCase()}</b><br>
-                    <small>${s.class} | LIN: ${s.lin || '---'}</small>
-                    ${USER_ROLE !== 'TEACHER' ? `<br><small style="color:var(--red); font-weight:bold;">BAL: ${Number(s.fees_balance).toLocaleString()}</small>` : ''}
+                    ${hasPhone ? `<a href="tel:${s.contact}" class="btn-call">📞 CALL PARENT</a>` : '<small style="color:#ccc;">No Phone</small>'}
                 </div>
-                ${USER_ROLE !== 'DIRECTOR' ? `<button onclick="edit('${s.id}')" style="font-size:10px; cursor:pointer;">EDIT</button>` : ''}
             </div>`;
         });
-        document.getElementById('activeList').innerHTML = html;
+        document.getElementById('activeList').innerHTML = h;
     }
 
-    function doMath() {
-        const r = parseInt(document.getElementById('fReq').value) || 0;
-        const p = parseInt(document.getElementById('fPaid').value) || 0;
-        document.getElementById('stBal').value = r - p;
-    }
-
-    async function saveStudent() {
-        const id = document.getElementById('editId').value;
+    async function save() {
         const payload = {
             name: document.getElementById('stName').value.trim(),
             class: document.getElementById('stClass').value,
-            contact: document.getElementById('stPhone').value.trim(),
-            fees_balance: parseInt(document.getElementById('stBal').value) || 0
+            contact: document.getElementById('stPhone').value.trim()
         };
-
-        if(!id) {
-            payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
-            await sb.from('students').insert([payload]);
-        } else {
-            if(USER_ROLE === "FINANCE") { delete payload.name; delete payload.class; }
-            await sb.from('students').update(payload).eq('id', id);
-        }
-        alert("Success!");
-        reset(); loadData();
-    }
-
-    function switchView(v) {
-        document.getElementById('viewRec').classList.toggle('hidden', v !== 'REC');
-        document.getElementById('viewRoll').classList.toggle('hidden', v !== 'ROLL');
-        document.getElementById('btnRec').classList.toggle('nav-active', v === 'REC');
-        document.getElementById('btnRoll').classList.toggle('nav-active', v === 'ROLL');
-    }
-
-    function reset() {
-        document.getElementById('editId').value = "";
-        document.getElementById('stName').value = "";
-        document.getElementById('fReq').value = "";
-        document.getElementById('fPaid').value = "";
-        document.getElementById('stBal').value = "";
+        await sb.from('students').insert([payload]);
+        alert("Student Saved"); refresh();
     }
 </script>
 </body>
