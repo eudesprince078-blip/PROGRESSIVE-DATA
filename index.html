@@ -2,183 +2,233 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V38 STABLE</title>
+    <title>PROGRESSIVE PMS - V39 EXECUTIVE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #0056b3; --dark: #002244; --white: #ffffff; --green: #25d366; --red: #dc3545; --gray: #f4f7f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 10px; }
-        .box { background: var(--white); padding: 18px; border-radius: 12px; max-width: 1000px; margin: 10px auto; border: 1px solid #ddd; }
-        .header { background: linear-gradient(135deg, var(--blue), var(--dark)); color: white; padding: 20px; border-radius: 12px; text-align: center; }
-        label { font-size: 12px; font-weight: bold; color: var(--blue); display: block; margin-top: 10px; }
-        input, select { width: 100%; padding: 14px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        .btn-main { background: var(--blue); color: white; padding: 16px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 20px; }
-        .student-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 6px solid var(--blue); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        :root { --blue: #0056b3; --dark: #002244; --white: #ffffff; --green: #28a745; --red: #dc3545; --gray: #f8f9fa; --orange: #fd7e14; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e9ecef; margin: 0; padding: 10px; color: #333; }
+        .box { background: var(--white); padding: 20px; border-radius: 15px; max-width: 1100px; margin: 10px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        
+        /* Dashboard Styling */
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .dash-card { background: var(--white); padding: 15px; border-radius: 12px; text-align: center; border-top: 5px solid var(--blue); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .dash-card h2 { margin: 5px 0; font-size: 24px; color: var(--dark); }
+        .dash-card span { font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; }
+        
+        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 25px; border-radius: 15px; text-align: center; position: relative; }
+        .time-display { font-family: monospace; font-size: 14px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 20px; display: inline-block; margin-top: 10px; }
+        
+        .tab-bar { display: flex; background: #dee2e6; border-radius: 10px; overflow: hidden; margin: 15px 0; }
+        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .tab-active { background: var(--blue); color: white; }
+
+        .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; color: white; display: inline-block; }
+        .bg-active { background: var(--green); }
+        .bg-absent { background: var(--red); }
+        .bg-left { background: #6c757d; }
+
+        input, select { width: 100%; padding: 14px; border: 1.5px solid #ced4da; border-radius: 8px; margin-top: 5px; box-sizing: border-box; }
+        .btn-action { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; }
+        
+        .student-row { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--blue); }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" class="box" style="max-width:320px; margin-top:80px; text-align:center;">
-    <h2 style="color:var(--blue)">PROGRESSIVE PMS</h2>
-    <input id="passInput" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center;">
-    <button onclick="handleLogin()" class="btn-main">LOGIN</button>
+<div id="loginGate" class="box" style="max-width:350px; margin-top:100px; text-align:center;">
+    <h1 style="color:var(--dark); margin-bottom:5px;">PMS ADMIN</h1>
+    <p style="font-size:12px; color:#666;">Secure Digital School Management</p>
+    <input id="passInput" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; letter-spacing: 3px;">
+    <button onclick="handleLogin()" class="btn-action">UNLOCK SYSTEM</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <h2 style="margin:0;">PROGRESSIVE SCHOOL</h2>
-        <button onclick="location.reload()" style="background:none; border:1px solid white; color:white; font-size:10px; margin-top:10px; padding:5px 10px; border-radius:4px; cursor:pointer;">LOGOUT</button>
+        <h2 style="margin:0; letter-spacing: 1px;">PROGRESSIVE SCHOOL</h2>
+        <div id="liveClock" class="time-display">00:00:00 PM</div>
+        <div style="margin-top:15px;"><button onclick="location.reload()" style="background:none; border:1px solid white; color:white; padding:5px 15px; border-radius:5px; cursor:pointer; font-size:11px;">LOGOUT SYSTEM</button></div>
     </div>
 
-    <div class="box">
-        <h3 id="fTitle" style="margin:0; color:var(--blue);">Student Record Update</h3>
-        <input type="hidden" id="editId">
-        
-        <div id="adminFields">
-            <label>Full Name</label>
-            <input id="name" placeholder="Name">
-            
-            <label>Gender (Inactive)</label>
-            <select id="gender">
-                <option value="Boy">Boy</option>
-                <option value="Girl">Girl</option>
-            </select>
+    <div class="dash-grid" style="margin-top:15px;">
+        <div class="dash-card" style="border-top-color: var(--blue);"><span>Total Students</span><h2 id="statTotal">0</h2></div>
+        <div class="dash-card" style="border-top-color: var(--green);"><span>Active Today</span><h2 id="statActive">0</h2></div>
+        <div class="dash-card" style="border-top-color: var(--red);"><span>Total Absent</span><h2 id="statAbsent">0</h2></div>
+        <div class="dash-card" style="border-top-color: #6c757d;"><span>Students Left</span><h2 id="statLeft">0</h2></div>
+    </div>
 
-            <label>Class</label>
-            <select id="cl">
-                <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-                <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-                <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-            </select>
+    <div class="tab-bar">
+        <button id="btnManage" onclick="switchTab('MANAGE')" class="tab-btn tab-active">MANAGEMENT</button>
+        <button id="btnArchive" onclick="switchTab('ARCHIVE')" class="tab-btn">LEFT/ARCHIVE</button>
+    </div>
+
+    <div id="viewManage">
+        <div class="box">
+            <h3 id="fTitle" style="margin-top:0;">Register / Update Student</h3>
+            <input type="hidden" id="editId">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label>Full Name</label><input id="name"></div>
+                <div><label>Class</label>
+                    <select id="cl">
+                        <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+                        <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+                        <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+                    </select>
+                </div>
+                <div><label>Fees Balance (UGX)</label><input id="fBal" type="number"></div>
+                <div><label>Status</label>
+                    <select id="status">
+                        <option value="Active">Active</option>
+                        <option value="Left">Left School</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="save()" class="btn-action">CONFIRM CHANGES</button>
+            <button onclick="resetForm()" style="width:100%; margin-top:10px; background:none; border:none; color:var(--red); cursor:pointer;">Clear Form</button>
         </div>
 
-        <label>Parent Phone</label>
-        <input id="ph" placeholder="07...">
-
-        <label>Payment Code</label>
-        <input id="payCode" placeholder="Code">
-
-        <label>Balance (UGX)</label>
-        <input id="fBal" type="number" placeholder="0">
-
-        <button id="saveBtn" onclick="save()" class="btn-main">CONFIRM & SAVE RECORD</button>
-        <button onclick="resetForm()" style="width:100%; border:none; padding:10px; margin-top:10px; background:none; cursor:pointer;">Cancel</button>
+        <div class="box">
+            <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Active Students..." style="border:2px solid var(--blue); margin-bottom:15px;">
+            <div id="listActive"></div>
+        </div>
     </div>
 
-    <div class="box">
-        <input type="text" id="sBar" oninput="search()" placeholder="🔍 Search Students..." style="border:2px solid var(--blue); margin-bottom:15px;">
-        <div id="listBody"></div>
+    <div id="viewArchive" class="hidden">
+        <div class="box">
+            <h3 style="color:#6c757d;">Students Who Left</h3>
+            <div id="listLeft"></div>
+        </div>
+    </div>
+
+    <div style="text-align:center; padding:20px; font-size:11px; font-weight:bold; color:#888;">
+        DESIGNED BY EUDES MEDIA | +256762992440
     </div>
 </div>
 
 <script>
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-    let sb = null, students = [], USER_ROLE = "";
+    let sb = null, students = [];
+
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString();
+    }
+    setInterval(updateClock, 1000);
 
     function handleLogin() {
         const p = document.getElementById('passInput').value.trim().toUpperCase();
-        if (p === "JESUS CARES") USER_ROLE = "ADMIN";
-        else if (p === "FINANCE2026") USER_ROLE = "FINANCE";
-        else { alert("Access Denied"); return; }
-
-        sb = supabase.createClient(SB_URL, SB_KEY);
-        document.getElementById('loginGate').classList.add('hidden');
-        document.getElementById('mainApp').classList.remove('hidden');
-        
-        if(USER_ROLE === "FINANCE") {
-            document.getElementById('adminFields').classList.add('hidden');
-        }
-        refresh();
+        if (p === "JESUS CARES") {
+            sb = supabase.createClient(SB_URL, SB_KEY);
+            document.getElementById('loginGate').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            refresh();
+        } else { alert("Invalid Admin Key"); }
     }
 
     async function refresh() {
         const { data } = await sb.from('students').select('*').order('name', { ascending: true });
         students = data || [];
-        render(students);
+        updateStats();
+        renderLists();
     }
 
-    function render(list) {
-        let html = "";
-        list.forEach(s => {
-            html += `<div class="student-card">
-                <b>${s.name.toUpperCase()}</b>
-                <div style="font-size:11px; color:#666;">LIN: ${s.lin} | Class: ${s.class}</div>
-                <div style="color:var(--red); font-weight:bold;">BAL: UGX ${Number(s.fees_balance).toLocaleString()}</div>
-                <button onclick="editMode('${s.id}')" style="margin-top:10px; padding:5px 10px; cursor:pointer;">EDIT</button>
+    function updateStats() {
+        const total = students.length;
+        const active = students.filter(s => s.status !== 'Left').length;
+        const left = students.filter(s => s.status === 'Left').length;
+        
+        document.getElementById('statTotal').innerText = total;
+        document.getElementById('statActive').innerText = active;
+        document.getElementById('statLeft').innerText = left;
+    }
+
+    function renderLists() {
+        let activeHtml = "";
+        let leftHtml = "";
+        
+        students.forEach(s => {
+            const row = `<div class="student-row" style="border-left-color:${s.status === 'Left' ? '#6c757d' : 'var(--blue)'}">
+                <div>
+                    <b style="font-size:14px;">${s.name.toUpperCase()}</b><br>
+                    <small>${s.class} | LIN: ${s.lin || 'N/A'}</small>
+                </div>
+                <div style="text-align:right;">
+                    <span class="status-pill ${s.status === 'Left' ? 'bg-left' : 'bg-active'}">${s.status || 'Active'}</span><br>
+                    <button onclick="editMode('${s.id}')" style="margin-top:5px; font-size:10px; cursor:pointer;">EDIT</button>
+                </div>
             </div>`;
+            
+            if(s.status === 'Left') leftHtml += row;
+            else activeHtml += row;
         });
-        document.getElementById('listBody').innerHTML = html;
+
+        document.getElementById('listActive').innerHTML = activeHtml || "No active students.";
+        document.getElementById('listLeft').innerHTML = leftHtml || "No archived records.";
     }
 
     async function save() {
         const id = document.getElementById('editId').value;
-        const btn = document.getElementById('saveBtn');
-        
-        // ONLY sending columns that definitely exist in your database
         const payload = {
-            contact: document.getElementById('ph').value.trim(),
+            name: document.getElementById('name').value.trim(),
+            class: document.getElementById('cl').value,
             fees_balance: parseInt(document.getElementById('fBal').value) || 0,
-            payment_code: document.getElementById('payCode').value.trim().toUpperCase()
+            status: document.getElementById('status').value
         };
 
-        if (USER_ROLE === "ADMIN") {
-            payload.name = document.getElementById('name').value.trim();
-            payload.class = document.getElementById('cl').value;
-            if(!payload.name) { alert("Please enter a name"); return; }
+        if(!payload.name) return alert("Name required");
+
+        if(!id) {
+            payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
+            await sb.from('students').insert([payload]);
+        } else {
+            await sb.from('students').update(payload).eq('id', id);
         }
-
-        btn.innerText = "SAVING...";
-        btn.disabled = true;
-
-        try {
-            let error;
-            if (!id) {
-                payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
-                const res = await sb.from('students').insert([payload]);
-                error = res.error;
-            } else {
-                const res = await sb.from('students').update(payload).eq('id', id);
-                error = res.error;
-            }
-
-            if (error) throw error;
-            
-            alert("Record Saved Successfully!");
-            resetForm();
-            refresh();
-        } catch (err) {
-            alert("Database Error: " + err.message);
-        } finally {
-            btn.innerText = "CONFIRM & SAVE RECORD";
-            btn.disabled = false;
-        }
+        
+        alert("System Updated");
+        resetForm();
+        refresh();
     }
 
     function editMode(id) {
         const s = students.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
-        document.getElementById('ph').value = s.contact || '';
-        document.getElementById('fBal').value = s.fees_balance || 0;
-        document.getElementById('payCode').value = s.payment_code || '';
-        if(USER_ROLE === "ADMIN") {
-            document.getElementById('name').value = s.name;
-            document.getElementById('cl').value = s.class;
-        }
-        document.getElementById('fTitle').innerText = "UPDATING: " + s.name;
+        document.getElementById('name').value = s.name;
+        document.getElementById('cl').value = s.class;
+        document.getElementById('fBal').value = s.fees_balance;
+        document.getElementById('status').value = s.status || 'Active';
+        document.getElementById('fTitle').innerText = "Edit: " + s.name;
+        switchTab('MANAGE');
         window.scrollTo(0,0);
+    }
+
+    function switchTab(tab) {
+        document.getElementById('viewManage').classList.toggle('hidden', tab !== 'MANAGE');
+        document.getElementById('viewArchive').classList.toggle('hidden', tab !== 'ARCHIVE');
+        document.getElementById('btnManage').classList.toggle('tab-active', tab === 'MANAGE');
+        document.getElementById('btnArchive').classList.toggle('tab-active', tab === 'ARCHIVE');
     }
 
     function resetForm() {
         document.getElementById('editId').value = "";
         document.getElementById('name').value = "";
-        document.getElementById('fTitle').innerText = "Student Record Update";
+        document.getElementById('fBal').value = "";
+        document.getElementById('fTitle').innerText = "Register / Update Student";
     }
 
     function search() {
         const q = document.getElementById('sBar').value.toUpperCase();
-        render(students.filter(s => s.name.toUpperCase().includes(q)));
+        const filtered = students.filter(s => s.name.toUpperCase().includes(q) && s.status !== 'Left');
+        // Manual render for search
+        let html = "";
+        filtered.forEach(s => {
+            html += `<div class="student-row">
+                <div><b>${s.name.toUpperCase()}</b><br><small>${s.class}</small></div>
+                <button onclick="editMode('${s.id}')">EDIT</button>
+            </div>`;
+        });
+        document.getElementById('listActive').innerHTML = html;
     }
 </script>
 </body>
