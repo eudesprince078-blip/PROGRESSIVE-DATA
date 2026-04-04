@@ -2,166 +2,145 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V91</title>
+    <title>PROGRESSIVE PMS V92</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --blue: #002b5b; --light-blue: #eef6ff; --ug-yellow: #ffce00; --white: #ffffff; }
-        body { font-family: 'Inter', sans-serif; background: #f4f7fa; margin: 0; padding-bottom: 90px; color: #333; }
+        :root { --blue: #002b5b; --gold: #ffce00; --red: #d90000; --gray: #f4f7fa; --white: #ffffff; }
+        body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 90px; }
         
-        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 30px 20px; text-align: center; border-radius: 0 0 35px 35px; border-bottom: 4px solid var(--ug-yellow); }
-        .clock-v91 { font-size: 28px; font-weight: 900; color: var(--ug-yellow); font-family: monospace; margin-bottom: 5px; }
-        
-        .card-container { padding: 10px 15px; }
-        
-        /* THE PERFECT ARRANGEMENT - AS REQUESTED */
-        .student-card {
-            background: var(--white);
-            border-radius: 25px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 1px solid #e0e6ed;
-            position: relative;
-        }
+        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 35px 20px; text-align: center; border-radius: 0 0 35px 35px; border-bottom: 4px solid var(--gold); }
+        .clock { font-size: 30px; font-weight: 900; color: var(--gold); font-family: monospace; }
+        .status-pill { display: inline-block; background: white; color: var(--blue); padding: 6px 15px; border-radius: 50px; font-size: 11px; font-weight: 800; margin-top: 10px; }
 
-        .student-name {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--blue);
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
+        /* DASHBOARD STATS */
+        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px; margin-top: -25px; }
+        .stat-card { background: white; padding: 15px; border-radius: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); }
+        .stat-lab { font-size: 9px; font-weight: 700; color: #999; text-transform: uppercase; }
 
-        .lin-code {
-            font-size: 13px;
-            font-weight: 700;
-            color: #005bc5;
-            margin-bottom: 12px;
-        }
+        /* REGISTRATION FORM */
+        .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eee; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #eee; border-radius: 12px; font-size: 14px; box-sizing: border-box; }
+        .btn-save { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 10px; cursor: pointer; }
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .info-item b {
-            display: block;
-            font-size: 9px;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .info-item span {
-            font-size: 13px;
-            font-weight: 600;
-            color: #444;
-        }
-
-        .open-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--light-blue);
-            color: var(--blue);
-            border: none;
-            padding: 8px 18px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 11px;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        /* Input Styles */
-        .search-box {
-            padding: 15px 20px;
-            margin: 10px 15px;
-        }
-        input.main-search {
-            width: 100%;
-            padding: 15px;
-            border-radius: 20px;
-            border: 1.5px solid #ddd;
-            font-size: 15px;
-            outline: none;
-        }
+        /* STUDENT CARDS (AS PER YOUR SCREENSHOT) */
+        .student-card { background: white; border-radius: 20px; padding: 18px; margin: 10px 15px; border: 1px solid #e0e6ed; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .st-name { font-size: 17px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
+        .st-lin { font-size: 12px; color: #005bc5; font-weight: 700; margin-bottom: 10px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .info-item b { display: block; font-size: 8px; color: #aaa; text-transform: uppercase; }
+        .info-item span { font-size: 12px; font-weight: 600; }
+        .edit-btn { position: absolute; top: 15px; right: 15px; background: #f0f4f8; border: none; padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; color: var(--blue); }
 
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="loginArea" style="padding: 100px 30px; text-align: center;">
-    <h2 style="color:var(--blue)">PROGRESSIVE MOTHERS</h2>
-    <input id="sysKey" type="password" placeholder="System Key" style="width:250px; padding:15px; border-radius:15px; border:1px solid #ccc; text-align:center;">
-    <br><br>
-    <button onclick="handleLogin()" style="background:var(--blue); color:white; padding:15px 40px; border:none; border-radius:50px; font-weight:900;">SECURE LOGIN</button>
+<div id="loginGate" style="padding: 100px 30px; text-align: center;">
+    <h2 style="color:var(--blue)">PROGRESSIVE PMS</h2>
+    <input id="key" type="password" placeholder="Enter Key" style="text-align:center; width: 200px;"><br><br>
+    <button onclick="login()" class="btn-save" style="width:200px;">LOGIN</button>
 </div>
 
-<div id="appBody" class="hidden">
+<div id="app" class="hidden">
     <div class="header">
-        <div id="clock" class="clock-v91">00:00:00</div>
-        <div style="font-size:12px; font-weight:700;">PROGRESSIVE MOTHERS SYSTEM</div>
+        <div id="clock" class="clock">00:00:00</div>
+        <div id="date" style="font-size: 11px; font-weight: 700; opacity: 0.8;"></div>
+        <div id="activity" class="status-pill">LOADING...</div>
     </div>
 
-    <div class="search-box">
-        <input type="text" id="searchInput" class="main-search" oninput="renderList()" placeholder="🔍 Search name, LIN or class...">
+    <div class="dash-grid">
+        <div class="stat-card"><div id="count" class="stat-val">0</div><div class="stat-lab">Total Students</div></div>
+        <div class="stat-card"><div id="bal" class="stat-val" style="color:var(--red)">0</div><div class="stat-lab">Fees Collected</div></div>
     </div>
 
-    <div id="studentList" class="card-container">
+    <div id="formBox" class="card">
+        <h4 style="margin:0; color:var(--blue);">STUDENT DETAILS</h4>
+        <input type="hidden" id="sid">
+        <input id="inName" placeholder="Full Name">
+        <div style="display:flex; gap:10px;">
+            <input id="inAge" type="number" placeholder="Age">
+            <select id="inClass">
+                <option value="">Class</option>
+                <option>Baby</option><option>Middle</option><option>Top</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
         </div>
+        <input id="inLin" placeholder="LIN Number">
+        <input id="inContact" placeholder="Contact">
+        <input id="inLoc" placeholder="Address">
+        <textarea id="inHealth" placeholder="Health Status"></textarea>
+
+        <div id="fin" class="hidden">
+            <input id="inExp" type="number" placeholder="Expected Fees">
+            <input id="inPaid" type="number" placeholder="Paid Fees">
+        </div>
+        <button id="saveBtn" onclick="save()" class="btn-save">SAVE STUDENT DATA</button>
+    </div>
+
+    <div class="card" style="margin-top:0;">
+        <input type="text" id="search" oninput="render()" placeholder="🔍 Search students...">
+        <div id="list" style="margin-top:15px;"></div>
+    </div>
 </div>
 
 <script>
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
-    let allStudents = [];
+    let cache = [], ROLE = "";
 
-    function updateClock() {
+    function login() {
+        const k = document.getElementById('key').value.toUpperCase();
+        if(k === "JESUS CARES") ROLE = "ADMIN";
+        else if(k === "FINANCE2026") ROLE = "FINANCE";
+        else if(k === "TEACHER256") ROLE = "TEACHER";
+        else return alert("Wrong Key");
+
+        document.getElementById('loginGate').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        if(ROLE !== "TEACHER") document.getElementById('fin').classList.remove('hidden');
+        
+        fetch();
+        setInterval(tick, 1000);
+    }
+
+    function tick() {
         const now = new Date();
+        const hrs = now.getHours();
+        const day = now.getDay();
+        const time = hrs * 100 + now.getMinutes();
+        
         document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+        document.getElementById('date').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+
+        let status = "Sleeping / Lights Out";
+        if (day === 6 && time < 1900) status = "Sabbath: No Lessons ⛪";
+        else if (time >= 500 && time < 1030) status = "Morning Lessons 📚";
+        else if (time >= 1030 && time < 1100) status = "Break Time ☕";
+        else if (time >= 1300 && time < 1400) status = "Lunch Time 🍲";
+        else if (time >= 1900 && time < 2100) status = "Evening Preps 🌙";
+
+        document.getElementById('activity').innerText = status;
     }
 
-    function handleLogin() {
-        const k = document.getElementById('sysKey').value.toUpperCase();
-        if(k === "JESUS CARES" || k === "TEACHER256" || k === "FINANCE2026") {
-            document.getElementById('loginArea').classList.add('hidden');
-            document.getElementById('appBody').classList.remove('hidden');
-            fetchData();
-            setInterval(updateClock, 1000);
-        } else {
-            alert("Access Denied");
-        }
+    async function fetch() {
+        const { data } = await sb.from('students').select('*').order('name');
+        cache = data || [];
+        document.getElementById('count').innerText = cache.length;
+        render();
     }
 
-    async function fetchData() {
-        const { data, error } = await sb.from('students').select('*').order('name');
-        if (error) return console.error(error);
-        allStudents = data || [];
-        renderList();
-    }
-
-    function renderList() {
-        const q = document.getElementById('searchInput').value.toUpperCase();
-        let html = "";
-
-        const filtered = allStudents.filter(s => 
-            s.name.toUpperCase().includes(q) || 
-            (s.lin && s.lin.toUpperCase().includes(q)) ||
-            s.class.toUpperCase().includes(q)
-        );
-
-        filtered.forEach(s => {
-            html += `
+    function render() {
+        const q = document.getElementById('search').value.toUpperCase();
+        let h = "";
+        cache.filter(s => s.name.toUpperCase().includes(q) || s.class.toUpperCase().includes(q)).forEach(s => {
+            h += `
             <div class="student-card">
-                <button class="open-btn" onclick="alert('Student Info: ${s.name}')">OPEN</button>
-                <div class="student-name">${s.name}</div>
-                <div class="lin-code">LIN: ${s.lin || 'PENDING'}</div>
-                
+                <button class="edit-btn" onclick="edit('${s.id}')">EDIT</button>
+                <div class="st-name">${s.name}</div>
+                <div class="st-lin">LIN: ${s.lin || 'N/A'}</div>
                 <div class="info-grid">
                     <div class="info-item"><b>Class</b><span>${s.class}</span></div>
                     <div class="info-item"><b>Contact</b><span>${s.contact || 'N/A'}</span></div>
@@ -170,8 +149,43 @@
                 </div>
             </div>`;
         });
+        document.getElementById('list').innerHTML = h;
+    }
 
-        document.getElementById('studentList').innerHTML = html || "<p style='text-align:center; opacity:0.5;'>No records found.</p>";
+    function edit(id) {
+        if(ROLE === "TEACHER") return alert("Access Denied: Teachers cannot edit records.");
+        const s = cache.find(x => x.id == id);
+        document.getElementById('sid').value = s.id;
+        document.getElementById('inName').value = s.name;
+        document.getElementById('inClass').value = s.class;
+        document.getElementById('inLin').value = s.lin || "";
+        document.getElementById('inAge').value = s.age || "";
+        document.getElementById('inContact').value = s.contact || "";
+        document.getElementById('inLoc').value = s.physical_location || "";
+        document.getElementById('inHealth').value = s.health_status || "";
+        if(ROLE !== "TEACHER") {
+            document.getElementById('inExp').value = s.fees_expected || 0;
+            document.getElementById('inPaid').value = s.fees_paid || 0;
+        }
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    async function save() {
+        const id = document.getElementById('sid').value;
+        const payload = {
+            name: inName.value, class: inClass.value, lin: inLin.value,
+            age: inAge.value, contact: inContact.value, physical_location: inLoc.value, health_status: inHealth.value
+        };
+        if(ROLE !== "TEACHER") {
+            payload.fees_expected = parseInt(inExp.value) || 0;
+            payload.fees_paid = parseInt(inPaid.value) || 0;
+        }
+
+        if(id) await sb.from('students').update(payload).eq('id', id);
+        else await sb.from('students').insert([payload]);
+
+        alert("System Updated!");
+        location.reload();
     }
 </script>
 </body>
