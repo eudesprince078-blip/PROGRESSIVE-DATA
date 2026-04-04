@@ -1,244 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V100</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --blue: #002b5b; --gold: #ffce00; --red: #ff3b3b; --green: #2ecc71; --gray: #f4f7fa; }
-        body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 50px; }
-        
-        /* HEADER & DASHBOARD */
-        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 25px 20px; text-align: center; border-radius: 0 0 35px 35px; border-bottom: 4px solid var(--gold); position: relative; }
-        .logout-btn { position: absolute; top: 15px; right: 15px; background: var(--red); border: none; color: white; padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; }
-        
-        .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -25px; }
-        .dash-card { background: white; padding: 15px 5px; border-radius: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #eee; }
-        .dash-val { font-size: 20px; font-weight: 900; display: block; }
-        .dash-lab { font-size: 8px; font-weight: 800; color: #aaa; text-transform: uppercase; }
+<style>
+    /* New Style for the Master Switch */
+    .switch-card { border: 2px solid var(--blue); background: #f0f7ff; }
+    .status-indicator { font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 10px; margin-left: 10px; }
+    .status-auto { background: #ddd; color: #555; }
+    .status-locked { background: var(--red); color: white; }
+    .status-unlocked { background: var(--green); color: white; }
+    .btn-group { display: flex; gap: 5px; margin-top: 10px; }
+    .btn-opt { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ccc; font-size: 10px; font-weight: 800; cursor: pointer; }
+    .btn-opt.active { background: var(--blue); color: white; border-color: var(--blue); }
+</style>
 
-        /* TABS */
-        .tab-bar { display: flex; justify-content: space-around; background: white; padding: 8px; margin: 15px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .tab { padding: 10px 15px; font-size: 10px; font-weight: 800; color: #bbb; cursor: pointer; border-radius: 12px; }
-        .tab.active { background: var(--blue); color: white; }
-
-        /* CARDS & FORMS */
-        .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eef0f2; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 12px; font-size: 14px; box-sizing: border-box; font-weight: 600; }
-        input:disabled { background: #f9f9f9; color: #999; }
-
-        /* ACTION BUTTONS */
-        .action-row { display: flex; gap: 8px; margin-top: 10px; }
-        .btn-call { background: #007bff; color: white; flex: 1; padding: 10px; border-radius: 10px; text-decoration: none; text-align: center; font-size: 12px; font-weight: 700; }
-        .btn-wa { background: #25D366; color: white; flex: 1; padding: 10px; border-radius: 10px; text-decoration: none; text-align: center; font-size: 12px; font-weight: 700; }
-        
-        .btn-main { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; cursor: pointer; }
-
-        .roll-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f0f0f0; }
-        .att-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; font-weight: 800; font-size: 10px; cursor: pointer; }
-        .p-btn.active { background: var(--green); color: white; border-color: var(--green); }
-        .a-btn.active { background: var(--red); color: white; border-color: var(--red); }
-
-        #alertBox { background: #ffebeb; color: var(--red); padding: 12px; margin: 0 15px 15px; border-radius: 15px; font-size: 11px; font-weight: 700; border: 1px dashed var(--red); display: none; }
-        .hidden { display: none !important; }
-    </style>
-</head>
-<body>
-
-<div id="loginGate" style="padding: 100px 30px; text-align: center;">
-    <h1 style="color:var(--blue); font-weight:900;">PROGRESSIVE PMS</h1>
-    <div class="card" style="max-width:300px; margin:auto;">
-        <input id="sysKey" type="password" placeholder="System Key" style="text-align:center;">
-        <button onclick="login()" class="btn-main">AUTHORIZE</button>
+<div id="adminOverride" class="card switch-card hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <b style="color:var(--blue); font-size:12px;">TEACHER ACCESS CONTROL</b>
+        <span id="accessStatus" class="status-indicator status-auto">SYSTEM AUTO</span>
     </div>
-</div>
-
-<div id="mainApp" class="hidden">
-    <div class="header">
-        <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
-        <div id="clock" style="font-size:24px; font-weight:900; color:var(--gold); font-family:monospace;">00:00:00</div>
-        <div id="notice" style="font-size:10px; font-weight:800; margin-top:5px; text-transform:uppercase;">Initializing...</div>
+    <div class="btn-group">
+        <button id="optAuto" class="btn-opt active" onclick="setOverride('AUTO')">SYSTEM AUTO</button>
+        <button id="optLock" class="btn-opt" onclick="setOverride('LOCKED')">FORCE LOCK</button>
+        <button id="optUnlock" class="btn-opt" onclick="setOverride('UNLOCKED')">FORCE UNLOCK</button>
     </div>
-
-    <div class="dash-container">
-        <div class="dash-card"><span id="statTotal" class="dash-val">0</span><span class="dash-lab">Students</span></div>
-        <div class="dash-card"><span id="statPres" class="dash-val" style="color:var(--green)">0</span><span class="dash-lab">Present</span></div>
-        <div class="dash-card"><span id="statAbs" class="dash-val" style="color:var(--red)">0</span><span class="dash-lab">Absent</span></div>
-    </div>
-
-    <div id="alertBox">⚠️ ADMIN ALERT: Some students have been absent for 2+ days!</div>
-
-    <div class="tab-bar">
-        <div id="tReg" class="tab active" onclick="showTab('reg')">REGISTER</div>
-        <div id="tRoll" class="tab" onclick="showTab('roll')">ROLL CALL</div>
-        <div id="tRec" class="tab" onclick="showTab('rec')">RECORDS</div>
-    </div>
-
-    <div id="secReg" class="card">
-        <h4 id="formTitle" style="margin:0; color:var(--blue);">ENROLLMENT</h4>
-        <input type="hidden" id="editId">
-        <input id="fName" placeholder="Full Name">
-        <div style="display:flex; gap:10px;">
-            <select id="fGen"><option value="">Gender</option><option>Male</option><option>Female</option></select>
-            <input id="fAge" type="number" placeholder="Age">
-        </div>
-        <select id="fClass">
-            <option value="">Class</option>
-            <option>Baby</option><option>Middle</option><option>Top</option>
-            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
-        </select>
-        <input id="fLin" placeholder="LIN Number">
-        <input id="fCon" placeholder="Contact (WhatsApp)">
-        <textarea id="fHealth" placeholder="Health Status"></textarea>
-        <div id="fFin" class="hidden">
-            <input id="fExp" type="number" placeholder="Expected Fees">
-            <input id="fPaid" type="number" placeholder="Paid Fees">
-        </div>
-        <button id="saveBtn" onclick="save()" class="btn-main">SYNC DATA</button>
-    </div>
-
-    <div id="secRoll" class="hidden">
-        <div class="card" style="margin-bottom:5px;">
-            <select id="rollClass" onchange="loadRoll()">
-                <option value="">-- Choose Class for Roll Call --</option>
-                <option>Baby</option><option>Middle</option><option>Top</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-        </div>
-        <div id="rollArea" class="card" style="padding:0;"></div>
-    </div>
-
-    <div id="secRec" class="hidden">
-        <div class="card" style="margin-bottom:5px;"><input type="text" id="search" oninput="renderRec()" placeholder="🔍 Search records..."></div>
-        <div id="recArea"></div>
-    </div>
+    <p style="font-size:9px; color:#666; margin-top:8px;">* Force Unlock allows teachers access 24/7 (including weekends).</p>
 </div>
 
 <script>
-    const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
-    let students = [], ROLE = "", attendance = {};
+    let currentOverride = "AUTO"; // This should be fetched from Supabase settings
 
-    function login() {
-        const k = document.getElementById('sysKey').value.toUpperCase();
-        if(k === "JESUS CARES") ROLE = "ADMIN";
-        else if(k === "FINANCE2026") ROLE = "FINANCE";
-        else if(k === "TEACHER256") ROLE = "TEACHER";
-        else return alert("Access Denied");
+    async function setOverride(mode) {
+        currentOverride = mode;
+        // Update UI
+        document.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('active'));
+        if(mode === 'AUTO') document.getElementById('optAuto').classList.add('active');
+        if(mode === 'LOCKED') document.getElementById('optLock').classList.add('active');
+        if(mode === 'UNLOCKED') document.getElementById('optUnlock').classList.add('active');
+        
+        const status = document.getElementById('accessStatus');
+        status.innerText = "MODE: " + mode;
+        status.className = "status-indicator status-" + mode.toLowerCase();
 
-        document.getElementById('loginGate').classList.add('hidden');
-        document.getElementById('mainApp').classList.remove('hidden');
-        
-        if(ROLE !== "TEACHER") document.getElementById('fFin').classList.remove('hidden');
-        if(ROLE === "TEACHER") document.getElementById('tRec').classList.add('hidden');
-        if(ROLE === "FINANCE") document.getElementById('tRoll').classList.add('hidden');
-        
-        fetchData();
-        setInterval(tick, 1000);
+        // Save to Supabase so it affects all teachers immediately
+        await sb.from('settings').upsert({ id: 2, key: 'teacher_access_mode', value: mode });
     }
 
-    async function fetchData() {
-        const { data } = await sb.from('students').select('*').order('name');
-        students = data || [];
-        document.getElementById('statTotal').innerText = students.length;
-        renderRec();
-    }
-
-    function tick() {
+    async function gatekeeper() {
         const now = new Date();
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-        const h = now.getHours();
-        let m = "Normal Session";
-        if(h >= 13 && h < 14) m = "Lunch Break 🍲";
-        else if(h >= 19 && h < 21) m = "Evening Prep 🌙";
-        document.getElementById('notice').innerText = m;
-    }
+        const dateStr = now.toISOString().split('T')[0];
+        const day = now.getDay(); 
+        const time = now.getHours() * 100 + now.getMinutes();
 
-    function showTab(t) {
-        ['secReg','secRoll','secRec'].forEach(s => document.getElementById(s).classList.add('hidden'));
-        ['tReg','tRoll','tRec'].forEach(s => document.getElementById(s).classList.remove('active'));
-        document.getElementById('sec'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden');
-        document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
-    }
+        // Fetch latest override from database
+        const { data } = await sb.from('settings').select('value').eq('key', 'teacher_access_mode').single();
+        const mode = data ? data.value : "AUTO";
 
-    function loadRoll() {
-        const cls = document.getElementById('rollClass').value;
-        const list = students.filter(s => s.class === cls);
-        let h = "";
-        list.forEach(s => {
-            const st = attendance[s.id] || 'present';
-            h += `<div class="roll-item">
-                <div><b>${s.name}</b><br><small>${s.gender}</small></div>
-                <div>
-                    <button class="att-btn p-btn ${st==='present'?'active':''}" onclick="setAtt('${s.id}','present')">P</button>
-                    <button class="att-btn a-btn ${st==='absent'?'active':''}" onclick="setAtt('${s.id}','absent')">A</button>
-                </div>
-            </div>`;
-        });
-        document.getElementById('rollArea').innerHTML = h || "<p style='padding:20px; text-align:center;'>Empty.</p>";
-    }
+        if (ROLE === "TEACHER") {
+            // 1. Check Manual Force Lock
+            if (mode === "LOCKED") {
+                alert("The Admin has manually locked the system for all staff.");
+                return false;
+            }
+            
+            // 2. If Manual Force Unlock, allow access regardless of time
+            if (mode === "UNLOCKED") return true;
 
-    function setAtt(id, s) {
-        attendance[id] = s;
-        let p = 0, a = 0;
-        Object.values(attendance).forEach(v => v === 'present' ? p++ : a++);
-        document.getElementById('statPres').innerText = p;
-        document.getElementById('statAbs').innerText = a;
-        if(a >= 2 && ROLE === "ADMIN") document.getElementById('alertBox').style.display = 'block';
-        loadRoll();
-    }
-
-    async function save() {
-        const id = document.getElementById('editId').value;
-        const row = { name: fName.value, gender: fGen.value, age: fAge.value, class: fClass.value, lin: fLin.value, contact: fCon.value, health_status: fHealth.value };
-        if(ROLE !== "TEACHER") { row.fees_expected = fExp.value; row.fees_paid = fPaid.value; }
-
-        if(id) {
-            if(ROLE === "TEACHER") return alert("Denied.");
-            await sb.from('students').update(row).eq('id', id);
-        } else {
-            await sb.from('students').insert([row]);
+            // 3. Fallback to Automatic Rules (The "Auto" Agreement)
+            const isHoliday = UG_HOLIDAYS[dateStr] || SPECIAL_CALENDAR[dateStr];
+            if (day === 0 || day === 6 || isHoliday) {
+                alert("Access Denied: The system is closed for the weekend/holiday.");
+                return false;
+            }
+            if (time >= 1600 || time < 730) {
+                alert("Access Denied: System is closed. Teachers access is 7:30 AM - 4:00 PM.");
+                return false;
+            }
         }
-        alert("Success!");
-        location.reload();
+        return true;
     }
 
-    function renderRec() {
-        if(ROLE === "TEACHER") return;
-        const q = document.getElementById('search').value.toUpperCase();
-        let h = "";
-        students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
-            const cleanNum = (s.contact || "").replace(/\D/g,'');
-            h += `<div class="card" style="margin-top:10px;">
-                <div style="display:flex; justify-content:space-between;">
-                    <b>${s.name}</b>
-                    <button style="border:none; background:#eee; padding:4px 8px; border-radius:5px; font-size:10px; font-weight:800;" onclick="edit('${s.id}')">EDIT</button>
-                </div>
-                <div style="font-size:11px; color:#666; margin-bottom:10px;">${s.class} | LIN: ${s.lin || 'N/A'}</div>
-                <div class="action-row">
-                    <a href="tel:${cleanNum}" class="btn-call"><i class="fa-solid fa-phone"></i> Call</a>
-                    <a href="https://wa.me/${cleanNum.startsWith('0')?'256'+cleanNum.substring(1):cleanNum}" class="btn-wa" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
-                </div>
-            </div>`;
-        });
-        document.getElementById('recArea').innerHTML = h;
-    }
-
-    function edit(id) {
-        const s = students.find(x => x.id == id);
-        document.getElementById('editId').value = s.id;
-        document.getElementById('fName').value = s.name;
-        document.getElementById('fGen').value = s.gender;
-        document.getElementById('fAge').value = s.age;
-        document.getElementById('fClass').value = s.class;
-        document.getElementById('fLin').value = s.lin;
-        document.getElementById('fCon').value = s.contact;
-        document.getElementById('fHealth').value = s.health_status;
-        if(ROLE !== "TEACHER") { document.getElementById('fExp').value = s.fees_expected; document.getElementById('fPaid').value = s.fees_paid; }
-        if(ROLE === "FINANCE") { ['fName','fGen','fAge','fClass','fLin','fHealth'].forEach(i => document.getElementById(i).disabled = true); }
-        showTab('reg');
-    }
+    // Update the login and the 1-minute tick to include the gatekeeper check
+    setInterval(async () => {
+        if (ROLE === "TEACHER") {
+            const ok = await gatekeeper();
+            if (!ok) location.reload();
+        }
+    }, 60000); 
 </script>
-</body>
-</html>
