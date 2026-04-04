@@ -1,41 +1,44 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V64</title>
+    <title>PROGRESSIVE PMS V65</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf-autotable.min.js"></script>
     <style>
         :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f1f4f8; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; user-select: none; }
         
         .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 25px 20px; text-align: center; border-radius: 0 0 30px 30px; position: relative; }
-        .live-info { font-size: 11px; color: var(--gold); font-weight: bold; margin-top: 5px; letter-spacing: 1px; }
+        .live-info { font-size: 11px; color: var(--gold); font-weight: bold; margin-top: 5px; }
         .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 15px; border-radius: 50px; cursor: pointer; font-size: 10px; }
         
         .status-ticker { background: var(--gold); color: black; padding: 10px; text-align: center; font-size: 13px; font-weight: 900; border-bottom: 2px solid var(--dark); text-transform: uppercase; }
 
         .grid-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; margin-top: -40px; }
         .stat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .stat-card h3 { margin: 5px 0; font-size: 22px; color: var(--dark); }
-        .stat-label { font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase; }
+        .stat-card h3 { margin: 5px 0; font-size: 20px; color: var(--dark); }
+        .stat-label { font-size: 10px; color: #888; font-weight: bold; }
 
         .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .btn-pro { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 14px; }
-        .btn-del { background: var(--red); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 11px; margin-top: 10px; width: 100%; font-weight: bold; }
+        .btn-pro { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-del { background: var(--red); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 10px; font-weight: bold; }
         
-        input, select { width: 100%; padding: 14px; margin-top: 8px; border: 1.5px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; font-size: 14px; }
+        input, select { width: 100%; padding: 14px; margin-top: 8px; border: 1.5px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; }
         .hidden { display: none !important; }
         .student-row { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--blue); }
+        
+        .gender-box { display: flex; gap: 10px; margin-top: 10px; }
+        .gender-opt { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 8px; text-align: center; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .gender-opt.active { background: var(--blue); color: white; border-color: var(--blue); }
     </style>
 </head>
 <body>
 
 <div id="loginPage" style="padding: 100px 20px; text-align: center;">
-    <h2 style="color:var(--blue); letter-spacing: 2px;">PROGRESSIVE PMS PRO</h2>
+    <h2 style="color:var(--blue)">PROGRESSIVE PMS PRO</h2>
     <div class="card" style="max-width: 350px; margin: auto;">
         <input id="key" type="password" placeholder="System Key" style="text-align:center;">
         <button onclick="login()" class="btn-pro">LOGIN</button>
@@ -43,7 +46,7 @@
 </div>
 
 <div id="app" class="hidden">
-    <div class="status-ticker" id="schoolTicker">LOADING STATUS...</div>
+    <div class="status-ticker" id="schoolTicker">...</div>
     
     <div class="header">
         <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
@@ -51,38 +54,48 @@
         <div class="live-info" id="liveDateTime"></div>
     </div>
 
-    <div class="grid-stats">
-        <div class="stat-card" style="grid-column: span 2;"><div class="stat-label">Total Enrollment</div><h3 id="statTotal">0</h3></div>
+    <div class="grid-stats" id="statsContainer">
+        <div class="stat-card" style="grid-column: span 2;"><div class="stat-label">Enrollment</div><h3 id="statTotal">0</h3></div>
         <div class="stat-card"><div class="stat-label">Absent Today</div><h3 id="statAbs" style="color:var(--red);">0</h3></div>
         <div class="stat-card"><div class="stat-label">M | F Absent</div><h3 id="statGender" style="font-size:18px;">0 | 0</h3></div>
-        <div id="finStat" class="stat-card" style="grid-column: span 2;"><div class="stat-label">Outstanding Debt</div><h3 id="statDebt" style="color:var(--red);">0</h3></div>
+        <div id="finStat" class="stat-card" style="grid-column: span 2;"><div class="stat-label">Total Debt</div><h3 id="statDebt" style="color:var(--red);">0</h3></div>
     </div>
 
-    <div class="card">
-        <h4 style="margin:0; color:var(--blue);">STUDENT REGISTRY</h4>
+    <div id="teacherClassSelect" class="card hidden">
+        <label style="font-size:12px; font-weight:bold;">SELECT YOUR CLASS TO START ROLL CALL:</label>
+        <select id="activeTeacherClass" onchange="refresh()">
+            <option value="ALL">-- View All Classes --</option>
+            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+            <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+            <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+        </select>
+    </div>
+
+    <div id="regCard" class="card hidden">
+        <h4 style="margin:0; color:var(--blue);">REGISTRATION / EDITING</h4>
         <input type="hidden" id="editId">
         <input id="stName" placeholder="Full Name">
-        <select id="stGender">
-            <option value="">-- Gender --</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-        </select>
+        
+        <div class="gender-box">
+            <div id="gMale" class="gender-opt" onclick="setGender('Male')">MALE</div>
+            <div id="gFemale" class="gender-opt" onclick="setGender('Female')">FEMALE</div>
+        </div>
+        <input type="hidden" id="stGenderVal">
+
         <select id="stClass">
             <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
             <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
             <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-            <option value="Left School" id="optLeft" class="hidden">Left School</option>
+            <option value="Left School" id="optLeft" class="hidden">Archive (Left School)</option>
         </select>
+        
         <div id="finInputs" class="hidden">
             <input id="stExp" type="number" placeholder="Expected Fees">
             <input id="stPaid" type="number" placeholder="Paid Fees">
         </div>
-        <button onclick="saveStudent()" class="btn-pro">SAVE RECORD</button>
-        <button id="delBtn" class="btn-del hidden" onclick="deleteStudent()">DELETE STUDENT</button>
-    </div>
-
-    <div id="adminPanel" class="card hidden">
-        <button class="btn-pro" style="background:var(--dark)" onclick="downloadReport()">📥 DOWNLOAD DEBTOR PDF</button>
+        
+        <button id="saveBtn" onclick="saveStudent()" class="btn-pro">SAVE RECORD</button>
+        <button id="delBtn" class="btn-del hidden" onclick="deleteStudent()">DELETE PERMANENTLY</button>
     </div>
 
     <div class="card">
@@ -95,7 +108,6 @@
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     const sb = supabase.createClient(SB_URL, SB_KEY);
-    
     let students = [], ROLE = "";
 
     setInterval(() => {
@@ -105,45 +117,56 @@
     }, 1000);
 
     function updateTicker(now) {
-        const time = now.getHours() * 100 + now.getMinutes();
-        const day = now.getDay();
-        let status = "CLASS SESSIONS ONGOING";
-
-        // Logic for Sabbath + Preps
-        if (day === 6) {
-            if (time >= 1900 && time <= 2100) status = "📚 SATURDAY PREPS (EVENING LESSONS)";
-            else status = "✨ HAPPY SABBATH - NO CLASSES";
-        } 
-        else if (time >= 1030 && time < 1100) status = "☕ BREAK TIME";
-        else if (time >= 1300 && time < 1400) status = "🍴 LUNCH TIME";
-        else if (time >= 1600 && time < 1900) status = "🏡 TIME FOR GOING HOME";
-        else if (time >= 1900 && time <= 2100) status = "📚 PREPS (EVENING LESSONS)";
-        else if (time > 2100 || time < 800) status = "🌙 REST TIME / SCHOOL CLOSED";
-
+        const h = now.getHours(), m = now.getMinutes(), time = h * 100 + m, day = now.getDay();
+        let status = "CLASS ONGOING";
+        if (day === 6 && (time < 1900 || time > 2100)) status = "HAPPY SABBATH";
+        else if (time >= 1030 && time < 1100) status = "BREAK TIME";
+        else if (time >= 1300 && time < 1400) status = "LUNCH TIME";
+        else if (time >= 1600 && time < 1900) status = "GOING HOME";
+        else if (time >= 1900 && time <= 2100) status = "PREPS";
+        else if (time > 2100 || time < 700) status = "REST TIME";
         document.getElementById('schoolTicker').innerText = "STATUS: " + status;
     }
 
     function login() {
         const k = document.getElementById('key').value.toUpperCase();
+        const now = new Date();
+        const hour = now.getHours();
+
         if(k === "JESUS CARES") ROLE = "ADMIN";
         else if(k === "DIRECTOR2026") ROLE = "DIRECTOR";
         else if(k === "FINANCE2026") ROLE = "FINANCE";
-        else if(k === "TEACHER256") ROLE = "TEACHER";
-        else return alert("Wrong Key");
+        else if(k === "TEACHER256") {
+            if(hour < 7 || hour >= 21) return alert("TEACHER ACCESS BLOCKED: Outside School Hours (7AM-9PM)");
+            ROLE = "TEACHER";
+        } else return alert("Wrong Key");
 
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
 
-        if(ROLE === "ADMIN" || ROLE === "DIRECTOR") {
-            document.getElementById('adminPanel').classList.remove('hidden');
-            document.getElementById('optLeft').classList.remove('hidden');
+        // Apply Permission Logic
+        if(ROLE === "ADMIN") {
+            document.getElementById('regCard').classList.remove('hidden');
             document.getElementById('finInputs').classList.remove('hidden');
+            document.getElementById('optLeft').classList.remove('hidden');
+        } else if(ROLE === "DIRECTOR") {
+            // Director sees stats but cannot edit anything
+            document.getElementById('regCard').classList.add('hidden');
         } else if(ROLE === "FINANCE") {
+            document.getElementById('regCard').classList.remove('hidden');
             document.getElementById('finInputs').classList.remove('hidden');
         } else if(ROLE === "TEACHER") {
-            document.getElementById('finStat').classList.add('hidden');
+            document.getElementById('regCard').classList.remove('hidden');
+            document.getElementById('teacherClassSelect').classList.remove('hidden');
+            document.getElementById('statsContainer').classList.add('hidden');
         }
         refresh();
+    }
+
+    function setGender(val) {
+        document.getElementById('stGenderVal').value = val;
+        document.getElementById('gMale').className = "gender-opt " + (val === 'Male' ? 'active' : '');
+        document.getElementById('gFemale').className = "gender-opt " + (val === 'Female' ? 'active' : '');
     }
 
     async function refresh() {
@@ -153,26 +176,35 @@
     }
 
     function render() {
-        const active = students.filter(s => s.class !== 'Left School');
-        const abs = active.filter(s => s.is_absent);
         const q = document.getElementById('search').value.toUpperCase();
+        const tClass = document.getElementById('activeTeacherClass').value;
+        
+        let filtered = students.filter(s => s.class !== 'Left School');
+        if(ROLE === "TEACHER" && tClass !== "ALL") {
+            filtered = filtered.filter(s => s.class === tClass);
+        }
 
-        document.getElementById('statTotal').innerText = active.length;
+        // Stats Logic
+        const abs = filtered.filter(s => s.is_absent);
+        document.getElementById('statTotal').innerText = filtered.length;
         document.getElementById('statAbs').innerText = abs.length;
         document.getElementById('statGender').innerText = `${abs.filter(s=>s.gender==='Male').length} | ${abs.filter(s=>s.gender==='Female').length}`;
         
         if(ROLE !== "TEACHER") {
-            const debt = active.reduce((acc, s) => acc + (parseInt(s.fees_balance) || 0), 0);
+            const debt = filtered.reduce((acc, s) => acc + (parseInt(s.fees_balance) || 0), 0);
             document.getElementById('statDebt').innerText = "UGX " + debt.toLocaleString();
         }
 
         let h = "";
-        active.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
+        filtered.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
+            const canEdit = (ROLE === "ADMIN" || ROLE === "FINANCE");
             h += `<div class="student-row">
-                <div><b>${s.name}</b><br><small>${s.class} | ${s.gender || 'N/A'}</small></div>
+                <div style="font-size:13px;"><b>${s.name}</b><br><small>${s.class} | ${s.gender}</small>
+                ${ROLE !== 'TEACHER' && s.fees_balance > 0 ? `<br><span style="color:red; font-size:10px;">OWES: ${s.fees_balance.toLocaleString()}</span>` : ''}
+                </div>
                 <div>
-                    <button onclick="edit('${s.id}')" style="padding:8px; border-radius:5px; border:1px solid #ccc; background:white;">EDIT</button>
-                    <button onclick="mark('${s.id}', ${!s.is_absent})" style="background:${s.is_absent?'var(--red)':'var(--green)'}; color:white; border:none; padding:8px; margin-left:5px; border-radius:5px; font-weight:bold;">${s.is_absent?'ABSENT':'PRESENT'}</button>
+                    ${canEdit ? `<button onclick="edit('${s.id}')">EDIT</button>` : ''}
+                    <button onclick="mark('${s.id}', ${!s.is_absent})" style="background:${s.is_absent?'var(--red)':'var(--green)'}; color:white; border:none; padding:8px; border-radius:5px; margin-left:5px;">${s.is_absent?'ABSENT':'PRESENT'}</button>
                 </div>
             </div>`;
         });
@@ -181,8 +213,8 @@
 
     async function saveStudent() {
         const id = document.getElementById('editId').value;
-        const g = document.getElementById('stGender').value;
-        if(!g) return alert("Select Gender");
+        const g = document.getElementById('stGenderVal').value;
+        if(!g) return alert("Select Gender first!");
 
         const p = {
             name: document.getElementById('stName').value,
@@ -193,19 +225,14 @@
         };
         p.fees_balance = p.fees_expected - p.fees_paid;
 
-        if(id) await sb.from('students').update(p).eq('id', id);
-        else await sb.from('students').insert([p]);
+        if(id) {
+            if(ROLE === "TEACHER") return alert("Teachers cannot edit existing records!");
+            await sb.from('students').update(p).eq('id', id);
+        } else {
+            await sb.from('students').insert([p]);
+        }
         
-        alert("Saved!");
-        resetForm();
-        refresh();
-    }
-
-    async function deleteStudent() {
-        const id = document.getElementById('editId').value;
-        if(!id || !confirm("DELETE PERMANENTLY?")) return;
-        await sb.from('students').delete().eq('id', id);
-        alert("Deleted.");
+        alert("Success");
         resetForm();
         refresh();
     }
@@ -215,12 +242,12 @@
         document.getElementById('editId').value = s.id;
         document.getElementById('stName').value = s.name;
         document.getElementById('stClass').value = s.class;
-        document.getElementById('stGender').value = s.gender || "";
+        setGender(s.gender);
         document.getElementById('stExp').value = s.fees_expected || 0;
         document.getElementById('stPaid').value = s.fees_paid || 0;
-        
-        if(ROLE === "ADMIN" || ROLE === "DIRECTOR") document.getElementById('delBtn').classList.remove('hidden');
-        if(ROLE !== "ADMIN" && ROLE !== "DIRECTOR") document.getElementById('stName').disabled = true;
+
+        if(ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
+        if(ROLE === "FINANCE") document.getElementById('stName').disabled = true;
         window.scrollTo(0,0);
     }
 
@@ -233,21 +260,11 @@
         document.getElementById('editId').value = "";
         document.getElementById('stName').value = "";
         document.getElementById('stName').disabled = false;
-        document.getElementById('stGender').value = "";
-        document.getElementById('stExp').value = "";
-        document.getElementById('stPaid').value = "";
+        document.getElementById('stGenderVal').value = "";
+        document.getElementById('gMale').className = "gender-opt";
+        document.getElementById('gFemale').className = "gender-opt";
         document.getElementById('delBtn').classList.add('hidden');
-    }
-
-    function downloadReport() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("PROGRESSIVE MOTHERS - DEBTOR REPORT", 14, 15);
-        const rows = students.filter(s => s.fees_balance > 0).map(s => [s.name, s.class, s.fees_balance.toLocaleString()]);
-        doc.autoTable({ head: [['Name', 'Class', 'Balance (UGX)']], body: rows, startY: 20 });
-        doc.save("School_Debtors.pdf");
     }
 </script>
 </body>
 </html>
-```
