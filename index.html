@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PMS V83 STABLE PRO</title>
+    <title>PMS V84 DATABASE STABLE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -10,8 +10,8 @@
         :root { --primary: #002b5b; --secondary: #005bc5; --accent: #b87333; --danger: #ff3b3b; --success: #00c851; --bg: #f4f7fa; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
         
-        .app-bar { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 45px 20px; text-align: center; border-radius: 0 0 40px 40px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .logout-pill { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-size: 10px; color: white; border: none; font-weight: 800; }
+        .app-bar { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 45px 20px; text-align: center; border-radius: 0 0 40px 40px; position: relative; }
+        .logout-pill { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-size: 10px; color: white; border: none; font-weight: 800; cursor: pointer; }
 
         .nav-dock { display: flex; justify-content: space-around; background: white; margin: -20px 25px 0; padding: 12px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); position: sticky; top: 10px; z-index: 1000; }
         .nav-item { font-size: 10px; font-weight: 800; color: #aaa; cursor: pointer; padding: 10px; border-radius: 12px; text-transform: uppercase; }
@@ -23,13 +23,12 @@
         .pass-container { position: relative; }
         .pass-toggle { position: absolute; right: 15px; top: 28px; color: #999; cursor: pointer; font-size: 18px; }
 
-        .list-item { background: white; padding: 20px; border-radius: 25px; margin: 0 20px 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; transition: 0.2s; }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 20px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 15px; }
+        .list-item { background: white; padding: 20px; border-radius: 25px; margin: 0 20px 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 20px; font-weight: 800; margin-top: 15px; cursor: pointer; }
         
-        /* Attendance Buttons */
         .btn-mark { border: none; width: 50px; height: 50px; border-radius: 15px; color: white; font-weight: 900; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        .btn-p { background: var(--success); box-shadow: 0 5px 12px rgba(0,200,81,0.3); }
-        .btn-a { background: var(--danger); box-shadow: 0 5px 12px rgba(255,59,59,0.3); }
+        .btn-p { background: var(--success); box-shadow: 0 5px 12px rgba(0,200,81,0.2); }
+        .btn-a { background: var(--danger); box-shadow: 0 5px 12px rgba(255,59,59,0.2); }
         .loading-spin { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
@@ -38,23 +37,23 @@
 </head>
 <body>
 
-<div id="loginPage" style="padding: 120px 30px; text-align: center;">
+<div id="loginPage" style="padding: 100px 30px; text-align: center;">
     <h1 style="color:var(--primary); font-weight: 900; margin-bottom:5px;">PROGRESSIVE MOTHERS</h1>
-    <p style="font-size: 13px; color: #888; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Admin Control Center</p>
+    <p style="font-size: 12px; color: #888; font-weight: 700;">SYSTEM COMMAND CENTER</p>
     <div class="card" style="max-width: 350px; margin: 40px auto; padding: 35px;">
         <div class="pass-container">
-            <input id="key" type="password" placeholder="Enter System Key" style="text-align:center;">
+            <input id="key" type="password" placeholder="System Key" style="text-align:center;">
             <i class="fa-solid fa-eye pass-toggle" id="toggleEye" onclick="togglePass()"></i>
         </div>
-        <button onclick="login()" class="btn-main">AUTHORIZE ACCESS</button>
+        <button onclick="login()" class="btn-main">SECURE LOGIN</button>
     </div>
 </div>
 
 <div id="app" class="hidden">
     <div class="app-bar">
         <button class="logout-pill" onclick="location.reload()">LOGOUT</button>
-        <h3 style="margin:0; font-weight: 900; letter-spacing: 1px;">PROGRESSIVE MOTHERS</h3>
-        <div id="liveClock" style="font-size: 10px; margin-top: 8px; opacity: 0.9; font-weight: bold;"></div>
+        <h3 style="margin:0; font-weight: 900;">PROGRESSIVE MOTHERS</h3>
+        <div id="liveClock" style="font-size: 10px; margin-top: 8px; font-weight: bold;"></div>
     </div>
 
     <div class="nav-dock">
@@ -66,15 +65,15 @@
 
     <div id="dash">
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:20px;">
-            <div class="card" style="margin:0; text-align:center; border-top: 4px solid var(--primary);"><small style="font-weight:800; color:#999;">Active Students</small><div id="dTotal" style="font-size:26px; font-weight:900; color:var(--primary)">0</div></div>
-            <div class="card" style="margin:0; text-align:center; border-top: 4px solid var(--danger);"><small style="font-weight:800; color:#999;">Total Absences</small><div id="dAbs" style="font-size:26px; font-weight:900; color:var(--danger)">0</div></div>
+            <div class="card" style="margin:0; text-align:center;"><small>Total Students</small><div id="dTotal" style="font-size:26px; font-weight:900; color:var(--primary)">0</div></div>
+            <div class="card" style="margin:0; text-align:center;"><small>Absent Today</small><div id="dAbs" style="font-size:26px; font-weight:900; color:var(--danger)">0</div></div>
         </div>
     </div>
 
     <div id="stud" class="hidden">
         <div id="regForm" class="card">
-            <h4 style="margin:0; color: var(--primary);">New Enrollment</h4>
-            <input id="stName" placeholder="Full Student Name">
+            <h4 style="margin:0; color: var(--primary);">Student Enrollment</h4>
+            <input id="stName" placeholder="Full Name">
             <div style="display:flex; gap:10px;">
                 <input id="stAge" type="number" placeholder="Age">
                 <select id="stYear"><option>2026</option><option>2027</option><option>2028</option></select>
@@ -84,21 +83,20 @@
                 <option>Baby</option><option>Middle</option><option>Top</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <input id="stContact" placeholder="Contact Number">
-            <input id="stLocation" placeholder="Address/Location">
-            <textarea id="stHealth" placeholder="Health Notes"></textarea>
-            <button onclick="registerStudent()" class="btn-main">SAVE & ASSIGN LIN</button>
+            <input id="stContact" placeholder="Contact">
+            <input id="stLocation" placeholder="Location">
+            <textarea id="stHealth" placeholder="Health Info"></textarea>
+            <button onclick="registerStudent()" class="btn-main">SAVE STUDENT</button>
         </div>
         <div style="padding:0 20px;">
-            <input id="search" oninput="renderList()" placeholder="🔍 Quick Search...">
+            <input id="search" oninput="renderList()" placeholder="🔍 Search Students...">
             <div id="studentList" style="margin-top:15px;"></div>
         </div>
     </div>
 
     <div id="att" class="hidden" style="padding:20px;">
-        <p style="font-weight: 800; font-size: 12px; color: var(--primary); margin-bottom: 8px;">1. SELECT CLASS FOR ROLLCALL:</p>
-        <select id="attCls" onchange="renderAttendance(this.value)" style="border: 2px solid var(--primary); background: white;">
-            <option value="">-- Choose Class --</option>
+        <select id="attCls" onchange="renderAttendance(this.value)" style="border: 2px solid var(--primary);">
+            <option value="">-- Choose Class for Rollcall --</option>
             <option>Baby</option><option>Middle</option><option>Top</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
@@ -124,8 +122,7 @@
         if(k==="JESUS CARES") ROLE="ADMIN";
         else if(k==="FINANCE2026") ROLE="FINANCE";
         else if(k==="TEACHER256") ROLE="TEACHER";
-        else return alert("Access Key Denied");
-
+        else return alert("Invalid Key");
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
         if(ROLE !== 'ADMIN') document.getElementById('regForm').classList.add('hidden');
@@ -133,42 +130,34 @@
     }
 
     async function loadData(){
-        let {data:st} = await sb.from('students').select('*').order('name', {ascending:true});
+        let {data:st} = await sb.from('students').select('*').order('name');
         students = st || [];
-        let {data:att} = await sb.from('attendance').select('*');
+        let {data:att} = await sb.from('attendance').select('*').eq('date', new Date().toISOString().split('T')[0]);
         attendance = att || [];
         renderList();
-        document.getElementById('dTotal').innerText = students.filter(s=>s.class!=='Left School').length;
+        document.getElementById('dTotal').innerText = students.length;
         document.getElementById('dAbs').innerText = attendance.filter(a=>a.status==='Absent').length;
     }
 
     async function registerStudent(){
         let name = document.getElementById('stName').value;
         let yr = document.getElementById('stYear').value;
-        if(!name || !stClass.value) return alert("Fill Name and Class");
-        
+        if(!name || !stClass.value) return alert("Missing Info");
         let lin = `PM-${yr}-${name.charAt(0).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`;
-
         const { error } = await sb.from('students').insert([{
-            name: name, lin: lin, age: stAge.value, year: yr,
-            class: stClass.value, contact: stContact.value,
-            location: stLocation.value, health_status: stHealth.value
+            name, lin, age: stAge.value, year: yr, class: stClass.value, 
+            contact: stContact.value, location: stLocation.value, health_status: stHealth.value
         }]);
-
-        if(!error) {
-            alert("Saved Successfully! LIN: " + lin);
-            loadData();
-            document.getElementById('stName').value = "";
-        }
+        if(!error) { alert("Saved: " + lin); loadData(); document.getElementById('stName').value=""; }
     }
 
     function renderList(){
         let q = search.value.toUpperCase();
         let h = "";
-        students.filter(s => s.name.toUpperCase().includes(q) && s.class !== 'Left School').forEach(s => {
+        students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
             h += `<div class="list-item">
-                <div><b style="color:var(--primary)">${s.name}</b><br><small style="font-weight:800; color:var(--accent)">${s.class}</small></div>
-                ${ROLE==='ADMIN' ? `<button onclick="alert('LIN: ${s.lin}\\nContact: ${s.contact}\\nLocation: ${s.location}\\nHealth: ${s.health_status}')" style="background:#eee; color:#333; border:none; padding:10px; border-radius:12px; font-size:10px; font-weight:bold;">DETAILS</button>` : ''}
+                <div><b>${s.name}</b><br><small>${s.class}</small></div>
+                ${ROLE==='ADMIN' ? `<button onclick="alert('LIN: ${s.lin}\\nContact: ${s.contact}\\nLocation: ${s.location}')" style="background:#eee; border:none; padding:10px; border-radius:10px; font-size:10px;">INFO</button>` : ''}
             </div>`;
         });
         document.getElementById('studentList').innerHTML = h;
@@ -176,15 +165,11 @@
 
     function renderAttendance(cls){
         if(!cls) return document.getElementById('attBox').innerHTML = "";
-        let today = new Date().toISOString().split('T')[0];
-        let classList = students.filter(s => s.class === cls);
-        let h = `<h4 style="margin:0 0 15px; color:var(--primary)">Class: ${cls}</h4>`;
-        
-        classList.forEach(s => {
-            let record = attendance.find(a => a.student_id == s.id && a.date === today);
+        let h = `<h4 style="color:var(--primary)">Class List: ${cls}</h4>`;
+        students.filter(s => s.class === cls).forEach(s => {
+            let record = attendance.find(a => a.student_id == s.id);
             let status = record ? record.status : "Pending";
             let color = status === "Present" ? "var(--success)" : (status === "Absent" ? "var(--danger)" : "#ccc");
-
             h += `<div class="list-item">
                 <div><b>${s.name}</b><br><small id="stat-${s.id}" style="color:${color}; font-weight:900;">${status}</small></div>
                 <div style="display:flex; gap:10px;">
@@ -197,27 +182,21 @@
     }
 
     async function markAttendance(id, status){
-        // Visual Feedback - Spinner
         let btn = status === 'Present' ? document.getElementById(`p-${id}`) : document.getElementById(`a-${id}`);
-        let originalText = btn.innerText;
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch loading-spin"></i>`;
-        
+        let old = btn.innerText; btn.innerHTML = `<i class="fa-solid fa-spinner loading-spin"></i>`;
         let today = new Date().toISOString().split('T')[0];
         
-        // Delete old record for today first
-        await sb.from('attendance').delete().match({ student_id: id, date: today });
-        // Insert new mark
-        const { error } = await sb.from('attendance').insert([{ student_id: id, status: status, date: today }]);
+        // Use UPSERT to prevent database double-entry errors
+        const { error } = await sb.from('attendance').upsert({ student_id: id, status: status, date: today }, { onConflict: 'student_id,date' });
 
         if(!error) {
-            btn.innerText = originalText;
+            btn.innerText = old;
             document.getElementById(`stat-${id}`).innerText = status;
             document.getElementById(`stat-${id}`).style.color = status === 'Present' ? 'var(--success)' : 'var(--danger)';
-            // Update the master attendance list in memory
-            await loadData();
+            loadData();
         } else {
-            alert("Database Error. Please check internet.");
-            btn.innerText = originalText;
+            alert("Database Error: Check connection or table permissions.");
+            btn.innerText = old;
         }
     }
 
@@ -228,9 +207,7 @@
         e.currentTarget.classList.add('active');
     }
 
-    setInterval(() => {
-        document.getElementById('liveClock').innerText = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).toUpperCase();
-    }, 1000);
+    setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleString().toUpperCase(); }, 1000);
 </script>
 </body>
 </html>
