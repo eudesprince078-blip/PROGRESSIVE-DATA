@@ -2,252 +2,167 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V58</title>
+    <title>PROGRESSIVE PMS V59</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf-autotable.min.js"></script>
     <style>
         :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f1f4f8; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; }
         
-        .notice-bar { background: var(--dark); color: white; padding: 10px; text-align: center; font-size: 11px; border-bottom: 2px solid var(--gold); }
-        .alert-box { background: #f8d7da; color: #721c24; padding: 10px; margin: 10px; border-radius: 8px; font-size: 12px; border: 1px solid #f5c6cb; font-weight: bold; }
-
-        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; position: relative; }
-        .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 12px; border-radius: 50px; font-size: 10px; cursor: pointer; }
-
-        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 15px; margin-top: -30px; }
-        .kpi-card { background: white; padding: 10px; border-radius: 12px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; }
+        
+        /* Attendance Dashboard */
+        .attn-box { background: white; margin: 15px; padding: 15px; border-radius: 15px; border-top: 5px solid var(--red); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .attn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .attn-stat { background: #fff5f5; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #fed7d7; }
+        
+        .class-card { background: white; margin: 10px 15px; padding: 12px; border-radius: 10px; border-left: 4px solid var(--gold); font-size: 13px; }
+        .absent-name { display: inline-block; background: #fee2e2; color: #9b1c1c; padding: 2px 8px; border-radius: 4px; margin: 2px; font-size: 11px; font-weight: bold; }
+        
+        .alert-missing { background: #fffaf0; border: 1px solid #fbd38d; color: #9c4221; padding: 10px; margin: 15px; border-radius: 10px; font-size: 12px; font-weight: bold; }
         
         .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; }
         .btn-main { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-sec { background: var(--dark); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 10px; cursor: pointer; }
-
-        .student-row { background: white; padding: 12px; border-radius: 10px; margin: 8px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        
         .hidden { display: none !important; }
-        .debt-text { color: var(--red); font-weight: bold; font-size: 11px; }
     </style>
 </head>
 <body>
 
 <div id="loginGate" style="padding: 100px 20px; text-align: center;">
     <h2 style="color:var(--blue)">PROGRESSIVE PMS</h2>
-    <div class="card" style="max-width: 320px; margin: auto;">
-        <input id="passInput" type="password" placeholder="Access Key" style="text-align:center; margin-bottom:10px;">
-        <button onclick="handleLogin()" class="btn-main">LOGIN</button>
-    </div>
+    <input id="passInput" type="password" placeholder="Access Key" style="text-align:center; width: 80%; padding: 15px; border-radius: 10px; border: 1px solid #ccc;">
+    <button onclick="handleLogin()" class="btn-main" style="width: 80%;">LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
-    <div class="notice-bar"><span id="liveDate"></span> | <span id="liveTime"></span></div>
-    
-    <div id="watchdogAlert" class="alert-box hidden">
-        ⚠️ ATTENTION ADMIN: Some classes have not completed 9:00 AM Roll Call!
-    </div>
-
     <div class="header">
-        <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
-        <h3 style="margin:0;">PROGRESSIVE MOTHERS</h3>
-        <div style="font-size:10px; color:var(--gold); margin-top:5px;">"With God Everything Is Possible"</div>
+        <h3 style="margin:0;">ATTENDANCE CONTROL</h3>
+        <div id="liveClock" style="font-size:11px; color:var(--gold);"></div>
     </div>
 
-    <div id="statsRow" class="kpi-grid">
-        <div class="kpi-card"><p>TOTAL</p><h3 id="statTotal">0</h3></div>
-        <div class="kpi-card"><p>PRESENT</p><h3 id="statActive" style="color:var(--green)">0</h3></div>
-        <div id="debtCard" class="kpi-card"><p>TOTAL DEBT</p><h3 id="statMoney" style="font-size:11px; color:var(--red);">0</h3></div>
+    <div id="missingClassesAlert" class="alert-missing hidden">
+        ⚠️ NO REPORT RECEIVED FROM: <span id="pendingClassesList"></span>
     </div>
 
-    <div id="reportCard" class="card hidden">
-        <h4 style="margin:0; color:var(--red); font-size:14px;">FINANCIAL REPORTS</h4>
-        <button class="btn-sec" onclick="downloadPDF()">📥 DOWNLOAD DEBTORS (SOFT COPY)</button>
-    </div>
-
-    <div id="regForm" class="card">
-        <h4 id="formTitle" style="margin:0; color:var(--blue);">Student Registry</h4>
-        <input type="hidden" id="editId">
-        
-        <div id="bioInputs">
-            <input id="stName" placeholder="Full Name">
-            <select id="stClass">
-                <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-                <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-                <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-                <option id="optLeft" class="hidden" value="Left School">Left School</option>
-            </select>
+    <div class="attn-box">
+        <h4 style="margin:0; color:var(--dark);">School Attendance Summary</h4>
+        <div class="attn-grid">
+            <div class="attn-stat"><p style="margin:0; font-size:9px;">TOTAL ABSENT</p><h2 id="totalAbs" style="margin:5px 0; color:var(--red);">0</h2></div>
+            <div class="attn-stat"><p style="margin:0; font-size:9px;">GENDER SPLIT</p><div style="font-size:11px; font-weight:bold;">M: <span id="absM">0</span> | F: <span id="absF">0</span></div></div>
         </div>
-
-        <div id="financeInputs" class="hidden" style="background:#fff3cd; padding:12px; border-radius:8px; margin-top:10px; border:1px solid #ffeeba;">
-            <b style="font-size:11px; color:#856404;">FINANCE OFFICE ONLY</b>
-            <input id="stExpected" type="number" oninput="calcBal()" placeholder="TOTAL TO BE PAID (UGX)">
-            <input id="stPaid" type="number" oninput="calcBal()" placeholder="AMOUNT PAID (UGX)">
-            <p style="font-size:14px; margin-top:10px;"><b>BALANCE: </b> <span id="autoBal" style="color:var(--red); font-weight:900;">0</span></p>
-        </div>
-
-        <button onclick="saveStudent()" class="btn-main">SAVE RECORD</button>
     </div>
+
+    <div id="classBreakdown">
+        </div>
 
     <div class="card">
-        <input type="text" id="sBar" oninput="renderList()" placeholder="🔍 Search Name or LIN Number...">
+        <h4 style="margin:0; color:var(--blue);">Student Registry</h4>
+        <input type="hidden" id="editId">
+        <input id="stName" placeholder="Full Name">
+        <select id="stGender"><option value="Male">Male</option><option value="Female">Female</option></select>
+        <select id="stClass">
+            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+            <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+            <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+        </select>
+        <button onclick="saveStudent()" class="btn-main">SAVE STUDENT</button>
     </div>
 
-    <div id="studentList"></div>
+    <div id="studentListContainer" class="card">
+        <input type="text" id="sBar" oninput="renderApp()" placeholder="🔍 Search Students...">
+        <div id="fullList" style="margin-top:15px;"></div>
+    </div>
 </div>
 
 <script>
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
     let sb = null, students = [], USER_ROLE = "";
+    const allClasses = ["Baby", "Middle", "Top", "P.1", "P.2", "P.3", "P.4", "P.5", "P.6", "P.7"];
 
-    setInterval(() => {
-        const now = new Date();
-        document.getElementById('liveDate').innerText = now.toLocaleDateString();
-        document.getElementById('liveTime').innerText = now.toLocaleTimeString();
-        
-        // 9:00 AM Watchdog (Only for Admin)
-        if(USER_ROLE === "ADMIN" && now.getHours() >= 9) {
-            checkRollCallStatus();
-        }
-    }, 1000);
+    setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleString(); }, 1000);
 
     function handleLogin() {
         const p = document.getElementById('passInput').value.trim().toUpperCase();
         if (p === "JESUS CARES") USER_ROLE = "ADMIN";
-        else if (p === "FINANCE2026") USER_ROLE = "FINANCE";
         else if (p === "TEACHER256") USER_ROLE = "TEACHER";
-        else return alert("Invalid Access Key");
-
+        else return alert("Wrong Key");
+        
         sb = supabase.createClient(SB_URL, SB_KEY);
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-        
-        if(USER_ROLE === "ADMIN") {
-            document.getElementById('financeInputs').classList.remove('hidden');
-            document.getElementById('optLeft').classList.remove('hidden');
-            document.getElementById('reportCard').classList.remove('hidden');
-        } else if(USER_ROLE === "FINANCE") {
-            document.getElementById('financeInputs').classList.remove('hidden');
-            document.getElementById('reportCard').classList.remove('hidden');
-        } else if(USER_ROLE === "TEACHER") {
-            document.getElementById('debtCard').classList.add('hidden'); // Teachers can't see Total Debt stat
-        }
         refresh();
-    }
-
-    async function checkRollCallStatus() {
-        const classes = ["Baby", "Middle", "Top", "P.1", "P.2", "P.3", "P.4", "P.5", "P.6", "P.7"];
-        let incomplete = false;
-        // Logic: If NO student in a class is marked present or absent today, class is missing.
-        // For this demo, we check if any attendance was modified today.
-        document.getElementById('watchdogAlert').classList.remove('hidden');
-    }
-
-    function calcBal() {
-        const exp = parseInt(document.getElementById('stExpected').value) || 0;
-        const paid = parseInt(document.getElementById('stPaid').value) || 0;
-        document.getElementById('autoBal').innerText = (exp - paid).toLocaleString();
     }
 
     async function refresh() {
         const { data } = await sb.from('students').select('*').order('name', { ascending: true });
         students = data || [];
+        renderApp();
+    }
+
+    function renderApp() {
+        const absentStudents = students.filter(s => s.is_absent);
         const enrolled = students.filter(s => s.class !== 'Left School');
-        document.getElementById('statTotal').innerText = enrolled.length;
-        document.getElementById('statActive').innerText = enrolled.filter(s => !s.is_absent).length;
         
-        if(USER_ROLE !== "TEACHER") {
-            const totalDebt = enrolled.reduce((s, x) => s + (parseInt(x.fees_balance) || 0), 0);
-            document.getElementById('statMoney').innerText = totalDebt.toLocaleString();
+        // 1. Update Totals
+        document.getElementById('totalAbs').innerText = absentStudents.length;
+        document.getElementById('absM').innerText = absentStudents.filter(s => s.gender === 'Male').length;
+        document.getElementById('absF').innerText = absentStudents.filter(s => s.gender === 'Female').length;
+
+        // 2. Missing Roll Call Logic (9:00 AM Check)
+        const now = new Date();
+        const reportedClasses = [...new Set(students.filter(s => s.is_absent !== null).map(s => s.class))];
+        const missing = allClasses.filter(c => !reportedClasses.includes(c));
+        
+        if (now.getHours() >= 9 && missing.length > 0 && USER_ROLE === "ADMIN") {
+            document.getElementById('missingClassesAlert').classList.remove('hidden');
+            document.getElementById('pendingClassesList').innerText = missing.join(", ");
         }
-        renderList();
+
+        // 3. Class-wise Absentee Names
+        let classHtml = "";
+        allClasses.forEach(c => {
+            const classAbsentees = absentStudents.filter(s => s.class === c);
+            if (classAbsentees.length > 0) {
+                classHtml += `<div class="class-card">
+                    <b>${c} (${classAbsentees.length} Absent)</b><br>
+                    ${classAbsentees.map(s => `<span class="absent-name">${s.name} (${s.gender[0]})</span>`).join('')}
+                </div>`;
+            }
+        });
+        document.getElementById('classBreakdown').innerHTML = classHtml || "<p style='text-align:center; font-size:12px; color:green;'>Full Attendance Today!</p>";
+
+        // 4. Main List for Roll Call
+        const q = document.getElementById('sBar').value.toUpperCase();
+        let listHtml = "";
+        enrolled.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
+            listHtml += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; align-items:center;">
+                <span style="font-size:13px;">${s.name} (${s.class})</span>
+                <button onclick="toggleAbs('${s.id}', ${!s.is_absent})" style="background:${s.is_absent ? 'var(--red)' : '#eee'}; color:${s.is_absent ? 'white' : '#333'}; border:none; padding:5px 10px; border-radius:5px; font-size:10px;">
+                    ${s.is_absent ? 'ABSENT' : 'MARK ABSENT'}
+                </button>
+            </div>`;
+        });
+        document.getElementById('fullList').innerHTML = listHtml;
+    }
+
+    async function toggleAbs(id, val) {
+        await sb.from('students').update({ is_absent: val }).eq('id', id);
+        refresh();
     }
 
     async function saveStudent() {
-        const id = document.getElementById('editId').value;
-        let payload = {};
-
-        if (!id || USER_ROLE === "ADMIN") {
-            payload.name = document.getElementById('stName').value;
-            payload.class = document.getElementById('stClass').value;
-        }
-
-        if (USER_ROLE === "ADMIN" || USER_ROLE === "FINANCE") {
-            const exp = parseInt(document.getElementById('stExpected').value) || 0;
-            const paid = parseInt(document.getElementById('stPaid').value) || 0;
-            payload.fees_expected = exp;
-            payload.fees_paid = paid;
-            payload.fees_balance = exp - paid;
-        }
-
-        if(!id) {
-            payload.lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
-            await sb.from('students').insert([payload]);
-        } else {
-            await sb.from('students').update(payload).eq('id', id);
-        }
-        
-        alert("Record Saved");
-        resetForm();
+        const payload = {
+            name: document.getElementById('stName').value,
+            class: document.getElementById('stClass').value,
+            gender: document.getElementById('stGender').value,
+            is_absent: false
+        };
+        await sb.from('students').insert([payload]);
+        alert("Registered!");
         refresh();
-    }
-
-    function renderList() {
-        const q = document.getElementById('sBar').value.toUpperCase();
-        let h = "";
-        students.filter(s => s.name.toUpperCase().includes(q) || (s.lin && s.lin.toUpperCase().includes(q))).forEach(s => {
-            const bal = parseInt(s.fees_balance) || 0;
-            h += `<div class="student-row">
-                <div>
-                    <b>${s.name.toUpperCase()}</b><br>
-                    <small>${s.class}</small>
-                    ${USER_ROLE !== 'TEACHER' && bal > 0 ? `<br><span class="debt-text">OWES: ${bal.toLocaleString()}</span>` : ''}
-                </div>
-                <div>
-                    <button onclick="editEntry('${s.id}')">EDIT</button>
-                    <button onclick="toggleAttendance('${s.id}', ${!s.is_absent})" style="background:${s.is_absent ? 'grey' : 'var(--green)'}; color:white; border:none; margin-left:5px; border-radius:5px; padding:8px; font-size:10px;">${s.is_absent ? 'ABSENT' : 'PRESENT'}</button>
-                </div>
-            </div>`;
-        });
-        document.getElementById('studentList').innerHTML = h;
-    }
-
-    async function toggleAttendance(id, status) {
-        await sb.from('students').update({ is_absent: status }).eq('id', id);
-        refresh();
-    }
-
-    function editEntry(id) {
-        const s = students.find(x => x.id == id);
-        document.getElementById('editId').value = s.id;
-        document.getElementById('stName').value = s.name;
-        document.getElementById('stClass').value = s.class;
-        document.getElementById('stExpected').value = s.fees_expected || 0;
-        document.getElementById('stPaid').value = s.fees_paid || 0;
-        calcBal();
-
-        if(USER_ROLE !== "ADMIN") {
-            document.getElementById('stName').disabled = true;
-            document.getElementById('stClass').disabled = (USER_ROLE !== "ADMIN");
-        }
-        window.scrollTo(0,0);
-    }
-
-    function downloadPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("PROGRESSIVE MOTHERS SCHOOL - DEBTORS LIST", 14, 15);
-        const data = students.filter(s => (s.fees_balance > 0) && s.class !== 'Left School').map(s => [
-            s.name.toUpperCase(), s.class, s.fees_expected.toLocaleString(), s.fees_paid.toLocaleString(), s.fees_balance.toLocaleString()
-        ]);
-        doc.autoTable({ head: [['Name', 'Class', 'Total', 'Paid', 'Balance']], body: data, startY: 20 });
-        doc.save(`PMS_Debtors_${new Date().toLocaleDateString()}.pdf`);
-    }
-
-    function resetForm() {
-        document.getElementById('editId').value = "";
-        document.getElementById('stName').disabled = false;
-        document.getElementById('stClass').disabled = false;
     }
 </script>
 </body>
