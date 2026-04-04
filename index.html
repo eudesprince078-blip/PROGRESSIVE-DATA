@@ -2,100 +2,122 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V95</title>
+    <title>PROGRESSIVE PMS V96</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --blue: #002b5b; --gold: #ffce00; --red: #d90000; --gray: #f4f7fa; --white: #ffffff; }
+        :root { --blue: #002b5b; --gold: #ffce00; --red: #ff3b3b; --green: #2ecc71; --gray: #f4f7fa; }
         body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 90px; }
         
-        /* HEADER & CLOCK */
-        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 35px 35px; border-bottom: 4px solid var(--gold); }
-        .clock-box { font-size: 32px; font-weight: 900; color: var(--gold); font-family: 'Courier New', monospace; }
-        .status-pill { display: inline-block; background: white; color: var(--blue); padding: 6px 15px; border-radius: 50px; font-size: 10px; font-weight: 900; margin-top: 10px; text-transform: uppercase; }
+        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 30px 20px; text-align: center; border-radius: 0 0 35px 35px; border-bottom: 4px solid var(--gold); }
+        .clock-box { font-size: 28px; font-weight: 900; color: var(--gold); font-family: monospace; }
 
         /* DASHBOARD */
         .dash-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px; margin-top: -25px; }
-        .stat-card { background: white; padding: 18px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .stat-val { font-size: 22px; font-weight: 900; color: var(--blue); }
-        .stat-lab { font-size: 9px; font-weight: 800; color: #aaa; letter-spacing: 1px; }
+        .stat-card { background: white; padding: 15px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); }
 
-        /* FORM */
-        .card { background: white; padding: 22px; border-radius: 25px; margin: 20px 15px; border: 1px solid #eef0f2; }
-        input, select, textarea { width: 100%; padding: 14px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 15px; font-size: 14px; box-sizing: border-box; background: #fafafa; font-weight: 600; }
-        .btn-main { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 18px; font-weight: 900; margin-top: 15px; cursor: pointer; font-size: 14px; }
+        /* TABS */
+        .tab-bar { display: flex; justify-content: space-around; background: white; padding: 10px; margin: 15px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .tab { padding: 10px 15px; font-size: 11px; font-weight: 800; color: #aaa; cursor: pointer; border-radius: 12px; }
+        .tab.active { background: var(--blue); color: white; }
 
-        /* STUDENT CARDS */
-        .student-card { background: white; border-radius: 22px; padding: 20px; margin: 10px 15px; border: 1px solid #e0e6ed; position: relative; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .st-name { font-size: 18px; font-weight: 800; color: var(--blue); text-transform: uppercase; margin-bottom: 2px; }
-        .st-lin { font-size: 12px; color: #005bc5; font-weight: 700; margin-bottom: 12px; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .info-item b { display: block; font-size: 8px; color: #aaa; text-transform: uppercase; margin-bottom: 2px; }
-        .info-item span { font-size: 13px; font-weight: 700; color: #444; }
-        
-        .edit-btn { position: absolute; top: 18px; right: 18px; background: #f0f4f8; border: none; padding: 8px 15px; border-radius: 12px; font-size: 10px; font-weight: 900; color: var(--blue); cursor: pointer; }
+        /* FORMS & CARDS */
+        .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eef0f2; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 12px; font-size: 14px; box-sizing: border-box; font-weight: 600; }
+        .btn-main { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; cursor: pointer; }
+
+        /* ROLL CALL LIST */
+        .roll-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+        .roll-btns { display: flex; gap: 8px; }
+        .present-btn { background: #e8faf0; color: var(--green); border: 1px solid var(--green); padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
+        .absent-btn { background: #fff0f0; color: var(--red); border: 1px solid var(--red); padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
+        .active-p { background: var(--green) !important; color: white !important; }
+        .active-a { background: var(--red) !important; color: white !important; }
+
+        .student-card { background: white; border-radius: 20px; padding: 18px; margin: 10px 15px; border: 1px solid #e0e6ed; position: relative; }
+        .st-name { font-size: 16px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .info-item b { display: block; font-size: 8px; color: #aaa; text-transform: uppercase; }
+        .info-item span { font-size: 12px; font-weight: 700; }
 
         .hidden { display: none !important; }
-        .loader { text-align: center; padding: 50px; color: #888; font-weight: 700; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" style="padding: 100px 30px; text-align: center; background: white; min-height: 100vh;">
-    <h1 style="color:var(--blue); font-weight: 900; letter-spacing: -1px;">PROGRESSIVE MOTHERS</h1>
-    <p style="color:#888; font-size: 13px; margin-bottom: 40px;">MANAGEMENT SYSTEM V95</p>
-    <div style="max-width:300px; margin: auto;">
-        <input id="sysKey" type="password" placeholder="Enter System Key" style="text-align:center; border: 2px solid #eee;">
-        <button onclick="login()" class="btn-main">LOGIN TO SYSTEM</button>
-    </div>
+<div id="loginGate" style="padding: 100px 30px; text-align: center;">
+    <h2 style="color:var(--blue)">PROGRESSIVE PMS V96</h2>
+    <input id="sysKey" type="password" placeholder="System Key" style="text-align:center; width:220px;">
+    <button onclick="login()" class="btn-main" style="width:220px;">LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
         <div id="clock" class="clock-box">00:00:00</div>
-        <div id="dateText" style="font-size:11px; font-weight:700; margin-top:5px;"></div>
-        <div id="activity" class="status-pill">FETCHING TIMETABLE...</div>
+        <div id="roleDisplay" style="font-size:10px; font-weight:900; color:var(--gold); margin-top:5px;"></div>
     </div>
 
     <div class="dash-row">
-        <div class="stat-card"><div id="totalCount" class="stat-val">0</div><div class="stat-lab">STUDENTS</div></div>
-        <div class="stat-card"><div id="totalFees" class="stat-val" style="color:var(--red)">0</div><div class="stat-lab">FEES PAID (UGX)</div></div>
+        <div class="stat-card"><div id="totalCount" class="stat-val">0</div><div style="font-size:8px; font-weight:800;">STUDENTS</div></div>
+        <div class="stat-card"><div id="absentCount" class="stat-val" style="color:var(--red)">0</div><div style="font-size:8px; font-weight:800;">ABSENT TODAY</div></div>
     </div>
 
-    <div id="regForm" class="card">
+    <div class="tab-bar">
+        <div class="tab active" id="tabReg" onclick="showTab('reg')">REGISTER</div>
+        <div class="tab" id="tabRoll" onclick="showTab('roll')">ROLL CALL</div>
+        <div class="tab" id="tabList" onclick="showTab('list')">RECORDS</div>
+    </div>
+
+    <div id="secReg" class="card">
         <h4 style="margin:0; color:var(--blue);">STUDENT REGISTRATION</h4>
-        <input type="hidden" id="studentId">
+        <input type="hidden" id="editId">
         <input id="inName" placeholder="Full Name">
         <div style="display:flex; gap:10px;">
+            <select id="inGender"><option value="">Gender</option><option>Male</option><option>Female</option></select>
             <input id="inAge" type="number" placeholder="Age">
-            <select id="inClass">
-                <option value="">Class</option>
+        </div>
+        <select id="inClass">
+            <option value="">Select Class</option>
+            <option>Baby</option><option>Middle</option><option>Top</option>
+            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+        </select>
+        <input id="inLin" placeholder="LIN Number">
+        <input id="inContact" placeholder="Contact">
+        <textarea id="inHealth" placeholder="Health Status"></textarea>
+        
+        <div id="finBlock" class="hidden">
+            <input id="inExp" type="number" placeholder="Expected Fees">
+            <input id="inPaid" type="number" placeholder="Paid Fees">
+        </div>
+        <button id="saveBtn" onclick="saveData()" class="btn-main">SAVE RECORD</button>
+    </div>
+
+    <div id="secRoll" class="hidden">
+        <div class="card" style="margin-bottom:0;">
+            <select id="rollClass" onchange="loadRollCall()">
+                <option value="">-- Choose Class for Roll Call --</option>
                 <option>Baby</option><option>Middle</option><option>Top</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
         </div>
-        <input id="inLin" placeholder="LIN Number">
-        <input id="inContact" placeholder="Parent Contact Number">
-        <textarea id="inHealth" placeholder="Health Status (e.g. Normal)"></textarea>
-        
-        <div id="financeBlock" class="hidden">
-            <input id="inExp" type="number" placeholder="Expected Fees">
-            <input id="inPaid" type="number" placeholder="Paid Fees">
+        <div id="rollList" class="card" style="padding:0;">
+            <p style="text-align:center; padding:20px; color:#aaa;">Select a class to start roll call</p>
         </div>
-        <button id="saveBtn" onclick="saveData()" class="btn-main">SAVE TO DATABASE</button>
     </div>
 
-    <div style="padding: 0 15px;">
-        <input type="text" id="searchBox" oninput="renderList()" placeholder="🔍 Search by Name, LIN or Class..." style="background:white; border: 1.5px solid #ddd;">
+    <div id="secList" class="hidden">
+        <div style="padding: 0 15px;">
+            <input type="text" id="searchBox" oninput="renderRecords()" placeholder="🔍 Search records...">
+        </div>
+        <div id="recordDisplay"></div>
     </div>
-
-    <div id="displayArea"><div class="loader">Connecting...</div></div>
 </div>
 
 <script>
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
-    let students = [], ROLE = "";
+    let students = [], ROLE = "", attendance = {};
 
     function login() {
         const k = document.getElementById('sysKey').value.toUpperCase();
@@ -106,108 +128,105 @@
 
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-        if(ROLE !== "TEACHER") document.getElementById('financeBlock').classList.remove('hidden');
+        document.getElementById('roleDisplay').innerText = "AUTHORIZED AS: " + ROLE;
         
-        fetchRecords();
-        setInterval(tick, 1000);
+        if(ROLE !== "TEACHER") document.getElementById('finBlock').classList.remove('hidden');
+        
+        fetchData();
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
     }
 
-    async function fetchRecords() {
-        const { data, error } = await sb.from('students').select('*').order('name');
-        if (error) {
-            document.getElementById('displayArea').innerHTML = `<div class="loader" style="color:red">Error loading records</div>`;
-            return;
-        }
+    async function fetchData() {
+        const { data } = await sb.from('students').select('*').order('name');
         students = data || [];
-        renderList();
+        document.getElementById('totalCount').innerText = students.length;
+        renderRecords();
     }
 
-    function renderList() {
-        const q = document.getElementById('searchBox').value.toUpperCase();
-        let html = "";
-        let totalPaid = 0;
-
-        const filtered = students.filter(s => s.name.toUpperCase().includes(q) || s.class.toUpperCase().includes(q) || (s.lin && s.lin.toUpperCase().includes(q)));
+    function showTab(t) {
+        ['secReg','secRoll','secList'].forEach(s => document.getElementById(s).classList.add('hidden'));
+        ['tabReg','tabRoll','tabList'].forEach(s => document.getElementById(s).classList.remove('active'));
         
-        filtered.forEach(s => {
-            totalPaid += (s.fees_paid || 0);
-            html += `
-            <div class="student-card">
-                <button class="edit-btn" onclick="prepEdit('${s.id}')">EDIT</button>
-                <div class="st-name">${s.name}</div>
-                <div class="st-lin">LIN: ${s.lin || 'N/A'}</div>
-                <div class="info-grid">
-                    <div class="info-item"><b>Class</b><span>${s.class}</span></div>
-                    <div class="info-item"><b>Contact</b><span>${s.contact || 'N/A'}</span></div>
-                    <div class="info-item"><b>Health</b><span>${s.health_status || 'Normal'}</span></div>
+        if(t === 'reg') { document.getElementById('secReg').classList.remove('hidden'); document.getElementById('tabReg').classList.add('active'); }
+        if(t === 'roll') { document.getElementById('secRoll').classList.remove('hidden'); document.getElementById('tabRoll').classList.add('active'); }
+        if(t === 'list') { document.getElementById('secList').classList.remove('hidden'); document.getElementById('tabList').classList.add('active'); }
+    }
+
+    function loadRollCall() {
+        const cls = document.getElementById('rollClass').value;
+        const list = students.filter(s => s.class === cls);
+        let h = "";
+        list.forEach(s => {
+            const status = attendance[s.id] || 'present';
+            h += `<div class="roll-item">
+                <div><b>${s.name}</b><br><small>${s.gender || 'N/A'}</small></div>
+                <div class="roll-btns">
+                    <button class="present-btn ${status==='present'?'active-p':''}" onclick="setAtt('${s.id}','present')">P</button>
+                    <button class="absent-btn ${status==='absent'?'active-a':''}" onclick="setAtt('${s.id}','absent')">A</button>
                 </div>
             </div>`;
         });
-
-        document.getElementById('displayArea').innerHTML = html || "<div class='loader'>No records found.</div>";
-        document.getElementById('totalCount').innerText = students.length;
-        document.getElementById('totalFees').innerText = totalPaid.toLocaleString();
+        document.getElementById('rollList').innerHTML = h || "<p style='padding:20px; text-align:center;'>No students in this class.</p>";
     }
 
-    function prepEdit(id) {
-        if(ROLE === "TEACHER") return alert("Access Denied: Teachers cannot edit records.");
-        const s = students.find(x => x.id == id);
-        document.getElementById('studentId').value = s.id;
-        document.getElementById('inName').value = s.name;
-        document.getElementById('inAge').value = s.age || "";
-        document.getElementById('inClass').value = s.class;
-        document.getElementById('inLin').value = s.lin || "";
-        document.getElementById('inContact').value = s.contact || "";
-        document.getElementById('inHealth').value = s.health_status || "";
-        if(ROLE !== "TEACHER") {
-            document.getElementById('inExp').value = s.fees_expected || 0;
-            document.getElementById('inPaid').value = s.fees_paid || 0;
-        }
-        window.scrollTo({top: 0, behavior: 'smooth'});
+    function setAtt(id, status) {
+        attendance[id] = status;
+        let abs = 0;
+        Object.values(attendance).forEach(v => { if(v === 'absent') abs++; });
+        document.getElementById('absentCount').innerText = abs;
+        loadRollCall();
     }
 
     async function saveData() {
-        const id = document.getElementById('studentId').value;
-        const btn = document.getElementById('saveBtn');
-        btn.innerText = "SAVING...";
-        btn.disabled = true;
-
+        const id = document.getElementById('editId').value;
         const row = {
-            name: inName.value, age: inAge.value, class: inClass.value, lin: inLin.value,
-            contact: inContact.value, health_status: inHealth.value
+            name: inName.value, gender: inGender.value, age: inAge.value, class: inClass.value,
+            lin: inLin.value, contact: inContact.value, health_status: inHealth.value
         };
+        
         if(ROLE !== "TEACHER") {
             row.fees_expected = parseInt(inExp.value) || 0;
             row.fees_paid = parseInt(inPaid.value) || 0;
         }
 
-        let res;
-        if(id) res = await sb.from('students').update(row).eq('id', id);
-        else res = await sb.from('students').insert([row]);
-
-        if(res.error) alert("Error: " + res.error.message);
-        else {
-            alert("Success!");
-            location.reload();
+        if(id) {
+            if(ROLE === "TEACHER") return alert("Teachers cannot edit details.");
+            if(ROLE === "FINANCE") { /* Finance only updates fees logic handled by Supabase Policy or filtering */ }
+            await sb.from('students').update(row).eq('id', id);
+        } else {
+            await sb.from('students').insert([row]);
         }
+        alert("Success!");
+        location.reload();
     }
 
-    function tick() {
-        const now = new Date();
-        const hrs = now.getHours();
-        const day = now.getDay();
-        const time = hrs * 100 + now.getMinutes();
-        
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-        document.getElementById('dateText').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+    function renderRecords() {
+        const q = document.getElementById('searchBox').value.toUpperCase();
+        let h = "";
+        students.filter(s => s.name.toUpperCase().includes(q) || s.class.toUpperCase().includes(q)).forEach(s => {
+            h += `<div class="student-card">
+                ${ROLE !== 'TEACHER' ? `<button style="position:absolute; top:15px; right:15px; border:none; background:#eee; padding:5px 10px; border-radius:8px; font-size:10px; font-weight:800;" onclick="prepEdit('${s.id}')">EDIT</button>` : ''}
+                <div class="st-name">${s.name}</div>
+                <div class="info-grid">
+                    <div class="info-item"><b>Gender</b><span>${s.gender || 'N/A'}</span></div>
+                    <div class="info-item"><b>Class</b><span>${s.class}</span></div>
+                    <div class="info-item"><b>LIN</b><span>${s.lin || 'N/A'}</span></div>
+                    <div class="info-item"><b>Health</b><span>${s.health_status || 'Normal'}</span></div>
+                </div>
+            </div>`;
+        });
+        document.getElementById('recordDisplay').innerHTML = h;
+    }
 
-        let status = "Rest Time";
-        if (day === 6 && time < 1900) status = "Sabbath: No Lessons ⛪";
-        else if (time >= 500 && time < 1030) status = "Morning Lessons 📚";
-        else if (time >= 1300 && time < 1400) status = "Lunch Time 🍲";
-        else if (time >= 1900 && time < 2100) status = (day === 5) ? "Friday: Rest" : "Evening Preps 🌙";
-
-        document.getElementById('activity').innerText = status;
+    function prepEdit(id) {
+        const s = students.find(x => x.id == id);
+        document.getElementById('editId').value = s.id;
+        document.getElementById('inName').value = s.name;
+        document.getElementById('inGender').value = s.gender || "";
+        document.getElementById('inClass').value = s.class;
+        document.getElementById('inExp').value = s.fees_expected || 0;
+        document.getElementById('inPaid').value = s.fees_paid || 0;
+        showTab('reg');
     }
 </script>
 </body>
