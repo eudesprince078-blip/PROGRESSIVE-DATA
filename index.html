@@ -2,61 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PMS V82 STABLE</title>
+    <title>PMS V83 STABLE PRO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #002b5b; --secondary: #005bc5; --accent: #b87333; --danger: #ff3b3b; --success: #00c851; --bg: #f4f7fa; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: #333; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
         
-        /* App Bar */
-        .app-bar { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 40px 40px; position: relative; }
-        .logout-pill { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-size: 10px; color: white; border: none; cursor: pointer; font-weight: 800; }
+        .app-bar { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 45px 20px; text-align: center; border-radius: 0 0 40px 40px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .logout-pill { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-size: 10px; color: white; border: none; font-weight: 800; }
 
-        /* Navigation */
         .nav-dock { display: flex; justify-content: space-around; background: white; margin: -20px 25px 0; padding: 12px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); position: sticky; top: 10px; z-index: 1000; }
         .nav-item { font-size: 10px; font-weight: 800; color: #aaa; cursor: pointer; padding: 10px; border-radius: 12px; text-transform: uppercase; }
-        .nav-item.active { background: var(--primary); color: white; }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 5px 15px rgba(0,43,91,0.3); }
 
-        /* Forms & Cards */
-        .card { background: white; margin: 15px 20px; padding: 20px; border-radius: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; }
-        input, select, textarea { width: 100%; padding: 14px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 15px; box-sizing: border-box; font-size: 14px; background: #fafafa; }
+        .card { background: white; margin: 15px 20px; padding: 22px; border-radius: 28px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; }
+        input, select, textarea { width: 100%; padding: 15px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 18px; box-sizing: border-box; font-size: 14px; background: #fafafa; }
         
         .pass-container { position: relative; }
-        .pass-toggle { position: absolute; right: 15px; top: 25px; color: #999; cursor: pointer; }
+        .pass-toggle { position: absolute; right: 15px; top: 28px; color: #999; cursor: pointer; font-size: 18px; }
 
-        .list-item { background: white; padding: 18px; border-radius: 22px; margin: 0 20px 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; }
-        .btn-mark { border: none; width: 45px; height: 45px; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; }
-
-        /* Modal */
-        #detailModal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; display:none; align-items:center; justify-content:center; }
-        .modal-content { background:white; width:85%; max-width:400px; padding:30px; border-radius:35px; }
+        .list-item { background: white; padding: 20px; border-radius: 25px; margin: 0 20px 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; transition: 0.2s; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 20px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 15px; }
         
+        /* Attendance Buttons */
+        .btn-mark { border: none; width: 50px; height: 50px; border-radius: 15px; color: white; font-weight: 900; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .btn-p { background: var(--success); box-shadow: 0 5px 12px rgba(0,200,81,0.3); }
+        .btn-a { background: var(--danger); box-shadow: 0 5px 12px rgba(255,59,59,0.3); }
+        .loading-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="loginPage" style="padding: 100px 30px; text-align: center;">
-    <h1 style="color:var(--primary); font-weight: 900; margin-bottom:0;">PROGRESSIVE MOTHERS</h1>
-    <p style="font-size: 12px; color: #888; margin-bottom: 40px;">SECURE ADMINISTRATIVE PORTAL</p>
-    
-    <div class="card" style="max-width: 350px; margin: 0 auto; padding: 30px;">
+<div id="loginPage" style="padding: 120px 30px; text-align: center;">
+    <h1 style="color:var(--primary); font-weight: 900; margin-bottom:5px;">PROGRESSIVE MOTHERS</h1>
+    <p style="font-size: 13px; color: #888; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Admin Control Center</p>
+    <div class="card" style="max-width: 350px; margin: 40px auto; padding: 35px;">
         <div class="pass-container">
-            <input id="key" type="password" placeholder="System Access Key" style="text-align:center;">
+            <input id="key" type="password" placeholder="Enter System Key" style="text-align:center;">
             <i class="fa-solid fa-eye pass-toggle" id="toggleEye" onclick="togglePass()"></i>
         </div>
-        <button onclick="login()" class="btn-main">SECURE ACCESS</button>
+        <button onclick="login()" class="btn-main">AUTHORIZE ACCESS</button>
     </div>
 </div>
 
 <div id="app" class="hidden">
     <div class="app-bar">
         <button class="logout-pill" onclick="location.reload()">LOGOUT</button>
-        <h3 style="margin:0; font-weight: 900;">PROGRESSIVE MOTHERS</h3>
-        <div id="liveClock" style="font-size: 10px; margin-top: 8px; opacity: 0.8; font-weight: bold;"></div>
+        <h3 style="margin:0; font-weight: 900; letter-spacing: 1px;">PROGRESSIVE MOTHERS</h3>
+        <div id="liveClock" style="font-size: 10px; margin-top: 8px; opacity: 0.9; font-weight: bold;"></div>
     </div>
 
     <div class="nav-dock">
@@ -68,15 +66,15 @@
 
     <div id="dash">
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:20px;">
-            <div class="card" style="margin:0; text-align:center;"><small>Active Students</small><div id="dTotal" style="font-size:24px; font-weight:900; color:var(--primary)">0</div></div>
-            <div class="card" style="margin:0; text-align:center;"><small>Absent Today</small><div id="dAbs" style="font-size:24px; font-weight:900; color:var(--danger)">0</div></div>
+            <div class="card" style="margin:0; text-align:center; border-top: 4px solid var(--primary);"><small style="font-weight:800; color:#999;">Active Students</small><div id="dTotal" style="font-size:26px; font-weight:900; color:var(--primary)">0</div></div>
+            <div class="card" style="margin:0; text-align:center; border-top: 4px solid var(--danger);"><small style="font-weight:800; color:#999;">Total Absences</small><div id="dAbs" style="font-size:26px; font-weight:900; color:var(--danger)">0</div></div>
         </div>
     </div>
 
     <div id="stud" class="hidden">
         <div id="regForm" class="card">
-            <h4 style="margin:0; color: var(--primary);">Register Student</h4>
-            <input id="stName" placeholder="Full Name">
+            <h4 style="margin:0; color: var(--primary);">New Enrollment</h4>
+            <input id="stName" placeholder="Full Student Name">
             <div style="display:flex; gap:10px;">
                 <input id="stAge" type="number" placeholder="Age">
                 <select id="stYear"><option>2026</option><option>2027</option><option>2028</option></select>
@@ -86,41 +84,28 @@
                 <option>Baby</option><option>Middle</option><option>Top</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <input id="stContact" placeholder="Guardian Contact">
-            <input id="stLocation" placeholder="Physical Location">
-            <textarea id="stHealth" placeholder="Health Status"></textarea>
-            <button onclick="registerStudent()" class="btn-main">SAVE STUDENT RECORD</button>
+            <input id="stContact" placeholder="Contact Number">
+            <input id="stLocation" placeholder="Address/Location">
+            <textarea id="stHealth" placeholder="Health Notes"></textarea>
+            <button onclick="registerStudent()" class="btn-main">SAVE & ASSIGN LIN</button>
         </div>
         <div style="padding:0 20px;">
-            <input id="search" oninput="renderList()" placeholder="🔍 Search Students...">
+            <input id="search" oninput="renderList()" placeholder="🔍 Quick Search...">
             <div id="studentList" style="margin-top:15px;"></div>
         </div>
     </div>
 
     <div id="att" class="hidden" style="padding:20px;">
-        <label style="font-weight: 800; font-size: 11px; color: var(--primary);">SELECT CLASS FOR ROLLCALL:</label>
-        <select id="attCls" onchange="renderAttendanceList(this.value)" style="border: 2px solid var(--primary);">
-            <option value="">-- Click to Choose Class --</option>
+        <p style="font-weight: 800; font-size: 12px; color: var(--primary); margin-bottom: 8px;">1. SELECT CLASS FOR ROLLCALL:</p>
+        <select id="attCls" onchange="renderAttendance(this.value)" style="border: 2px solid var(--primary); background: white;">
+            <option value="">-- Choose Class --</option>
             <option>Baby</option><option>Middle</option><option>Top</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
         <div id="attBox" style="margin-top:20px;"></div>
     </div>
 
-    <div id="fin" class="hidden" style="padding:20px;">
-        <div id="finBox"></div>
-    </div>
-</div>
-
-<div id="detailModal">
-    <div class="modal-content">
-        <h3 id="mName" style="color:var(--primary); margin-top:0;"></h3>
-        <p><b>LIN:</b> <span id="mLin" style="color:var(--accent); font-weight:bold;"></span></p>
-        <p><b>Contact:</b> <span id="mContact"></span></p>
-        <p><b>Address:</b> <span id="mLoc"></span></p>
-        <p><b>Health:</b> <span id="mHealth"></span></p>
-        <button onclick="closeModal()" class="btn-main">CLOSE</button>
-    </div>
+    <div id="fin" class="hidden" style="padding:20px;"><div id="finBox"></div></div>
 </div>
 
 <script>
@@ -130,13 +115,8 @@
     function togglePass() {
         const input = document.getElementById('key');
         const eye = document.getElementById('toggleEye');
-        if (input.type === "password") {
-            input.type = "text";
-            eye.classList.replace('fa-eye', 'fa-eye-slash');
-        } else {
-            input.type = "password";
-            eye.classList.replace('fa-eye-slash', 'fa-eye');
-        }
+        if (input.type === "password") { input.type = "text"; eye.classList.replace('fa-eye', 'fa-eye-slash'); }
+        else { input.type = "password"; eye.classList.replace('fa-eye-slash', 'fa-eye'); }
     }
 
     function login(){
@@ -157,27 +137,26 @@
         students = st || [];
         let {data:att} = await sb.from('attendance').select('*');
         attendance = att || [];
-        
         renderList();
         document.getElementById('dTotal').innerText = students.filter(s=>s.class!=='Left School').length;
+        document.getElementById('dAbs').innerText = attendance.filter(a=>a.status==='Absent').length;
     }
 
     async function registerStudent(){
         let name = document.getElementById('stName').value;
+        let yr = document.getElementById('stYear').value;
         if(!name || !stClass.value) return alert("Fill Name and Class");
         
-        // Auto-generate LIN: PM + First Letter + 4 Numbers
-        let lin = "PM" + name.charAt(0).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+        let lin = `PM-${yr}-${name.charAt(0).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`;
 
         const { error } = await sb.from('students').insert([{
-            name: name, lin: lin, age: stAge.value, year: stYear.value,
+            name: name, lin: lin, age: stAge.value, year: yr,
             class: stClass.value, contact: stContact.value,
             location: stLocation.value, health_status: stHealth.value
         }]);
 
         if(!error) {
-            alert("Saved! LIN: " + lin);
-            // Re-load data instead of reloading page to prevent logout
+            alert("Saved Successfully! LIN: " + lin);
             loadData();
             document.getElementById('stName').value = "";
         }
@@ -188,18 +167,18 @@
         let h = "";
         students.filter(s => s.name.toUpperCase().includes(q) && s.class !== 'Left School').forEach(s => {
             h += `<div class="list-item">
-                <div><b>${s.name}</b><br><small>${s.class}</small></div>
-                ${ROLE==='ADMIN' ? `<button onclick="view('${s.id}')" style="background:var(--accent); color:white; border:none; padding:8px 15px; border-radius:10px; font-weight:bold;">DETAILS</button>` : ''}
+                <div><b style="color:var(--primary)">${s.name}</b><br><small style="font-weight:800; color:var(--accent)">${s.class}</small></div>
+                ${ROLE==='ADMIN' ? `<button onclick="alert('LIN: ${s.lin}\\nContact: ${s.contact}\\nLocation: ${s.location}\\nHealth: ${s.health_status}')" style="background:#eee; color:#333; border:none; padding:10px; border-radius:12px; font-size:10px; font-weight:bold;">DETAILS</button>` : ''}
             </div>`;
         });
         document.getElementById('studentList').innerHTML = h;
     }
 
-    function renderAttendanceList(cls){
+    function renderAttendance(cls){
         if(!cls) return document.getElementById('attBox').innerHTML = "";
         let today = new Date().toISOString().split('T')[0];
         let classList = students.filter(s => s.class === cls);
-        let h = `<h4 style="margin:0 0 15px; color:var(--primary)">Class List: ${cls}</h4>`;
+        let h = `<h4 style="margin:0 0 15px; color:var(--primary)">Class: ${cls}</h4>`;
         
         classList.forEach(s => {
             let record = attendance.find(a => a.student_id == s.id && a.date === today);
@@ -207,10 +186,10 @@
             let color = status === "Present" ? "var(--success)" : (status === "Absent" ? "var(--danger)" : "#ccc");
 
             h += `<div class="list-item">
-                <div><b>${s.name}</b><br><small style="color:${color}; font-weight:900;">${status}</small></div>
-                <div style="display:flex; gap:8px;">
-                    <button onclick="markAttendance('${s.id}','Present')" class="btn-mark" style="background:var(--success)">P</button>
-                    <button onclick="markAttendance('${s.id}','Absent')" class="btn-mark" style="background:var(--danger)">A</button>
+                <div><b>${s.name}</b><br><small id="stat-${s.id}" style="color:${color}; font-weight:900;">${status}</small></div>
+                <div style="display:flex; gap:10px;">
+                    <button id="p-${s.id}" onclick="markAttendance('${s.id}','Present')" class="btn-mark btn-p">P</button>
+                    <button id="a-${s.id}" onclick="markAttendance('${s.id}','Absent')" class="btn-mark btn-a">A</button>
                 </div>
             </div>`;
         });
@@ -218,26 +197,29 @@
     }
 
     async function markAttendance(id, status){
-        let today = new Date().toISOString().split('T')[0];
-        await sb.from('attendance').delete().match({ student_id: id, date: today });
-        await sb.from('attendance').insert([{ student_id: id, status: status, date: today }]);
+        // Visual Feedback - Spinner
+        let btn = status === 'Present' ? document.getElementById(`p-${id}`) : document.getElementById(`a-${id}`);
+        let originalText = btn.innerText;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch loading-spin"></i>`;
         
-        // Refresh local data then refresh UI
-        await loadData();
-        renderAttendanceList(document.getElementById('attCls').value);
-    }
+        let today = new Date().toISOString().split('T')[0];
+        
+        // Delete old record for today first
+        await sb.from('attendance').delete().match({ student_id: id, date: today });
+        // Insert new mark
+        const { error } = await sb.from('attendance').insert([{ student_id: id, status: status, date: today }]);
 
-    function view(id){
-        let s = students.find(x => x.id == id);
-        document.getElementById('mName').innerText = s.name;
-        document.getElementById('mLin').innerText = s.lin || "N/A";
-        document.getElementById('mContact').innerText = s.contact || "N/A";
-        document.getElementById('mLoc').innerText = s.location || "N/A";
-        document.getElementById('mHealth').innerText = s.health_status || "Good";
-        document.getElementById('detailModal').style.display = 'flex';
+        if(!error) {
+            btn.innerText = originalText;
+            document.getElementById(`stat-${id}`).innerText = status;
+            document.getElementById(`stat-${id}`).style.color = status === 'Present' ? 'var(--success)' : 'var(--danger)';
+            // Update the master attendance list in memory
+            await loadData();
+        } else {
+            alert("Database Error. Please check internet.");
+            btn.innerText = originalText;
+        }
     }
-
-    function closeModal(){ document.getElementById('detailModal').style.display = 'none'; }
 
     function tab(e, id){
         ['dash','stud','att','fin'].forEach(t => document.getElementById(t).classList.add('hidden'));
@@ -247,7 +229,7 @@
     }
 
     setInterval(() => {
-        document.getElementById('liveClock').innerText = new Date().toLocaleString().toUpperCase();
+        document.getElementById('liveClock').innerText = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).toUpperCase();
     }, 1000);
 </script>
 </body>
