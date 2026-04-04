@@ -2,96 +2,135 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V66</title>
+    <title>PROGRESSIVE PMS V87</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f1f4f8; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; }
+        :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f4f7fa; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding-bottom: 50px; }
         
-        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 25px 20px; text-align: center; border-radius: 0 0 30px 30px; position: relative; }
-        .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 15px; border-radius: 50px; cursor: pointer; font-size: 10px; }
+        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 35px 20px; text-align: center; border-radius: 0 0 35px 35px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .logout-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 8px 15px; border-radius: 50px; cursor: pointer; font-size: 10px; font-weight: 800; }
         
-        .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .btn-pro { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .status-pill { display: inline-block; background: var(--gold); color: var(--dark); padding: 5px 15px; border-radius: 20px; font-size: 11px; font-weight: 900; margin-top: 10px; text-transform: uppercase; }
+
+        .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #eee; }
+        .btn-pro { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 15px; }
         
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 14px; margin-top: 10px; border: 1.5px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; font-size: 14px; background: #fafafa; }
+        
+        .pass-container { position: relative; width: 100%; max-width: 320px; margin: auto; }
+        .eye-icon { position: absolute; right: 15px; top: 25px; color: #999; cursor: pointer; font-size: 18px; }
+
+        .student-row { background: white; padding: 18px; border-radius: 22px; margin-bottom: 12px; border: 1px solid #eee; transition: 0.3s; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; font-size: 11px; color: #555; }
+        .data-label { font-weight: 800; color: var(--blue); text-transform: uppercase; font-size: 9px; display: block; margin-bottom: 2px; }
+        
         .hidden { display: none !important; }
-        
-        .student-row { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--blue); }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; font-size: 11px; color: #555; }
-        .data-label { font-weight: bold; color: var(--blue); text-transform: uppercase; font-size: 9px; }
+        .loading { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div id="loginPage" style="padding: 100px 20px; text-align: center;">
-    <h2 style="color:var(--blue)">PROGRESSIVE PMS PRO</h2>
-    <div class="card" style="max-width: 350px; margin: auto;">
-        <input id="key" type="password" placeholder="System Key" style="text-align:center;">
-        <button onclick="login()" class="btn-pro">LOGIN</button>
+<div id="loginPage" style="padding: 120px 20px; text-align: center;">
+    <h1 style="color:var(--blue); font-weight: 900; margin-bottom: 5px;">PROGRESSIVE PMS</h1>
+    <p style="font-size: 12px; color: #888; font-weight: 700; text-transform: uppercase;">Secure Management System</p>
+    <div class="card" style="max-width: 350px; margin: 30px auto;">
+        <div class="pass-container">
+            <input id="key" type="password" placeholder="System Key" style="text-align:center;">
+            <i class="fa-solid fa-eye eye-icon" id="toggleEye" onclick="togglePass()"></i>
+        </div>
+        <button onclick="login()" class="btn-pro">AUTHORIZE ACCESS</button>
     </div>
 </div>
 
 <div id="app" class="hidden">
     <div class="header">
         <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
-        <h3 style="margin:0;">STUDENT MASTER LIST</h3>
-        <div id="liveDateTime" style="font-size:11px; color:var(--gold); margin-top:5px;"></div>
+        <h3 style="margin:0; font-weight: 900; letter-spacing: 1px;">MANAGEMENT PANEL</h3>
+        <div id="liveTime" style="font-size:12px; font-weight:bold; margin-top:10px;"></div>
+        <div id="schoolStatus" class="status-pill">CHECKING STATUS...</div>
     </div>
 
     <div id="regCard" class="card">
-        <h4 style="margin:0; color:var(--blue);">NEW REGISTRATION</h4>
+        <h4 style="margin:0; color:var(--blue);">STUDENT REGISTRATION</h4>
         <input type="hidden" id="editId">
         
-        <input id="stName" placeholder="Full Name">
-        <input id="stLin" placeholder="Official LIN Number">
-        <input id="stContact" placeholder="Parent Contact Number">
-        
+        <input id="stName" placeholder="Full Student Name">
         <div style="display:flex; gap:10px;">
             <input id="stAge" type="number" placeholder="Age">
-            <input id="stDob" type="date" title="Date of Birth">
+            <input id="stDob" type="date" title="DOB">
         </div>
 
         <select id="stGender">
-            <option value="">-- Select Gender --</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
+            <option value="">-- Gender --</option>
+            <option>Male</option><option>Female</option>
         </select>
 
         <select id="stClass">
-            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-            <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-            <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+            <option value="">-- Select Class --</option>
+            <option>Baby</option><option>Middle</option><option>Top</option>
+            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+            <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
 
-        <input id="stLoc" placeholder="Physical Location (Address)">
-        <textarea id="stHealth" placeholder="Health Status / Conditions"></textarea>
+        <input id="stContact" placeholder="Guardian Contact">
+        <input id="stLoc" placeholder="Physical Residence (Location)">
+        <textarea id="stHealth" placeholder="Health Status / Allergies"></textarea>
 
-        <div id="finSection" class="hidden">
+        <div id="finSection" class="hidden" style="background: #f0f7ff; padding: 15px; border-radius: 15px; margin-top:15px;">
+            <b style="font-size: 11px; color: var(--blue);">FINANCIALS (UGX)</b>
             <input id="stExp" type="number" placeholder="Expected Fees">
-            <input id="stPaid" type="number" placeholder="Paid Fees">
+            <input id="stPaid" type="number" placeholder="Paid Amount">
         </div>
 
         <button id="saveBtn" onclick="saveStudent()" class="btn-pro">SAVE STUDENT DATA</button>
     </div>
 
     <div class="card">
-        <input type="text" id="search" oninput="render()" placeholder="🔍 Search LIN or Name...">
-        <div id="list" style="margin-top:15px;"></div>
+        <input type="text" id="search" oninput="render()" placeholder="🔍 Quick Search Name or LIN...">
+        <div id="list" style="margin-top:20px;"></div>
     </div>
 </div>
 
 <script>
-    const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
-    const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-    const sb = supabase.createClient(SB_URL, SB_KEY);
+    const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
     let students = [], ROLE = "";
+
+    function togglePass() {
+        const p = document.getElementById('key');
+        const e = document.getElementById('toggleEye');
+        if (p.type === "password") { p.type = "text"; e.classList.replace('fa-eye', 'fa-eye-slash'); }
+        else { p.type = "password"; e.classList.replace('fa-eye-slash', 'fa-eye'); }
+    }
+
+    function updateSchoolStatus() {
+        const now = new Date();
+        const hr = now.getHours();
+        const min = now.getMinutes();
+        const time = hr * 100 + min;
+        let status = "School Closed";
+
+        if (time >= 400 && time < 730) status = "Early Morning Preps";
+        else if (time >= 730 && time < 800) status = "Assembly / Arrival";
+        else if (time >= 800 && time < 1030) status = "Classroom Sessions";
+        else if (time >= 1030 && time < 1100) status = "Break Time";
+        else if (time >= 1100 && time < 1300) status = "Classroom Sessions";
+        else if (time >= 1300 && time < 1400) status = "Lunch Break";
+        else if (time >= 1400 && time < 1630) status = "Afternoon Lessons";
+        else if (time >= 1630 && time < 1730) status = "Games & Sports";
+        else if (time >= 1730 && time < 1830) status = "Time for going Home";
+        else if (time >= 1900 && time < 2130) status = "Evening Preps";
+
+        document.getElementById('schoolStatus').innerText = status;
+        document.getElementById('liveTime').innerText = now.toLocaleString('en-GB', { dateStyle: 'full', timeStyle: 'short' }).toUpperCase();
+    }
 
     function login() {
         const k = document.getElementById('key').value.toUpperCase();
         if(k === "JESUS CARES") ROLE = "ADMIN";
-        else if(k === "DIRECTOR2026") ROLE = "DIRECTOR";
         else if(k === "FINANCE2026") ROLE = "FINANCE";
         else if(k === "TEACHER256") ROLE = "TEACHER";
         else return alert("Invalid Key");
@@ -100,9 +139,10 @@
         document.getElementById('app').classList.remove('hidden');
 
         if(ROLE === "ADMIN" || ROLE === "FINANCE") document.getElementById('finSection').classList.remove('hidden');
-        if(ROLE === "DIRECTOR") document.getElementById('regCard').classList.add('hidden');
         
         refresh();
+        setInterval(updateSchoolStatus, 1000);
+        updateSchoolStatus();
     }
 
     async function refresh() {
@@ -114,76 +154,89 @@
     function render() {
         const q = document.getElementById('search').value.toUpperCase();
         let h = "";
-        
-        students.filter(s => s.name.toUpperCase().includes(q) || (s.lin && s.lin.includes(q))).forEach(s => {
+        students.filter(s => s.name.toUpperCase().includes(q) || (s.lin && s.lin.toUpperCase().includes(q))).forEach(s => {
             h += `<div class="student-row">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div>
-                        <b style="font-size:16px;">${s.name}</b><br>
-                        <span style="color:var(--blue); font-weight:bold; font-size:12px;">LIN: ${s.lin || 'N/A'}</span>
+                        <b style="font-size:16px; color:var(--dark)">${s.name}</b><br>
+                        <span style="color:var(--blue); font-weight:bold; font-size:11px;">LIN: ${s.lin || 'ASSIGNING...'}</span>
                     </div>
-                    <button onclick="edit('${s.id}')" style="font-size:10px; padding:5px 10px;">VIEW/EDIT</button>
+                    <button onclick="edit('${s.id}')" style="background:var(--gray); border:none; padding:8px 12px; border-radius:10px; font-size:10px; font-weight:bold; color:var(--blue);">OPEN</button>
                 </div>
                 
                 <div class="info-grid">
-                    <div><span class="data-label">Class:</span> ${s.class}</div>
-                    <div><span class="data-label">Gender:</span> ${s.gender}</div>
-                    <div><span class="data-label">Contact:</span> ${s.contact || 'N/A'}</div>
-                    <div><span class="data-label">Age:</span> ${s.age || 'N/A'}</div>
-                    <div><span class="data-label">Location:</span> ${s.physical_location || 'N/A'}</div>
-                    <div><span class="data-label">Health:</span> ${s.health_status || 'Normal'}</div>
+                    <div><span class="data-label">Class</span> ${s.class}</div>
+                    <div><span class="data-label">Contact</span> ${s.contact || 'N/A'}</div>
+                    <div><span class="data-label">Health</span> ${s.health_status || 'Normal'}</div>
+                    <div><span class="data-label">Address</span> ${s.physical_location || 'N/A'}</div>
                 </div>
             </div>`;
         });
-        document.getElementById('list').innerHTML = h;
+        document.getElementById('list').innerHTML = h || "<p style='text-align:center; color:#888;'>No students found.</p>";
     }
 
     async function saveStudent() {
+        const saveBtn = document.getElementById('saveBtn');
+        const originalText = saveBtn.innerText;
+        saveBtn.innerHTML = '<i class="fa-solid fa-spinner loading"></i> SYNCING...';
+        
         const id = document.getElementById('editId').value;
         const payload = {
             name: document.getElementById('stName').value,
-            lin: document.getElementById('stLin').value,
-            contact: document.getElementById('stContact').value,
-            gender: document.getElementById('stGender').value,
-            class: document.getElementById('stClass').value,
             age: document.getElementById('stAge').value,
             dob: document.getElementById('stDob').value,
+            gender: document.getElementById('stGender').value,
+            class: document.getElementById('stClass').value,
+            contact: document.getElementById('stContact').value,
             physical_location: document.getElementById('stLoc').value,
             health_status: document.getElementById('stHealth').value,
             fees_expected: parseInt(document.getElementById('stExp').value) || 0,
             fees_paid: parseInt(document.getElementById('stPaid').value) || 0
         };
-        payload.fees_balance = payload.fees_expected - payload.fees_paid;
 
+        let error;
         if(id) {
-            if(ROLE === "TEACHER") return alert("Teacher cannot edit existing records!");
-            await sb.from('students').update(payload).eq('id', id);
+            if(ROLE === "TEACHER") { 
+                saveBtn.innerText = originalText;
+                return alert("Security: Teachers cannot edit existing records!"); 
+            }
+            const res = await sb.from('students').update(payload).eq('id', id);
+            error = res.error;
         } else {
-            await sb.from('students').insert([payload]);
+            const res = await sb.from('students').insert([payload]);
+            error = res.error;
         }
-        
-        alert("Data Synchronized with Supabase");
-        location.reload(); 
+
+        if(!error) {
+            alert("Database Updated Successfully!");
+            document.getElementById('editId').value = "";
+            document.getElementById('stName').value = "";
+            await refresh(); // Background refresh - no logout!
+        } else {
+            alert("Error: " + error.message);
+        }
+        saveBtn.innerText = originalText;
     }
 
     function edit(id) {
         const s = students.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
         document.getElementById('stName').value = s.name;
-        document.getElementById('stLin').value = s.lin || "";
-        document.getElementById('stContact').value = s.contact || "";
-        document.getElementById('stGender').value = s.gender || "";
-        document.getElementById('stClass').value = s.class;
         document.getElementById('stAge').value = s.age || "";
         document.getElementById('stDob').value = s.dob || "";
+        document.getElementById('stGender').value = s.gender || "";
+        document.getElementById('stClass').value = s.class;
+        document.getElementById('stContact').value = s.contact || "";
         document.getElementById('stLoc').value = s.physical_location || "";
         document.getElementById('stHealth').value = s.health_status || "";
-        
-        if(ROLE === "TEACHER" || ROLE === "DIRECTOR") {
-            document.getElementById('saveBtn').classList.add('hidden');
-        }
-        window.scrollTo(0,0);
+        document.getElementById('stExp').value = s.fees_expected || "";
+        document.getElementById('stPaid').value = s.fees_paid || "";
+
+        if(ROLE === "TEACHER") document.getElementById('saveBtn').classList.add('hidden');
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 </script>
+
+<script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
 </body>
 </html>
