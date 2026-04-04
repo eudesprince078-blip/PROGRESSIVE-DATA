@@ -2,63 +2,120 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V120 MASTER</title>
+    <title>PROGRESSIVE PMS - V121</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #002b5b; --gold: #ffce00; --red: #ff3b3b; --green: #2ecc71; --gray: #f4f7fa; }
-        body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 80px; }
+        body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 80px; overflow-x: hidden; }
         
-        /* BRANDED HEADER */
-        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 30px 20px 70px; text-align: center; border-radius: 0 0 45px 45px; border-bottom: 6px solid var(--gold); position: relative; }
-        .school-name { font-size: 14px; font-weight: 900; letter-spacing: 1px; color: white; margin-bottom: 10px; text-transform: uppercase; }
-        .clock-box { font-size: 38px; font-weight: 900; color: var(--gold); margin: 5px 0; }
-        .date-box { font-size: 14px; font-weight: 700; color: #fff; opacity: 0.9; margin-bottom: 15px; }
-        .auto-notice { display: inline-block; background: white; color: var(--blue); padding: 8px 20px; border-radius: 50px; font-size: 11px; font-weight: 900; border: 2px solid var(--gold); }
+        /* FIXED HEADER LAYOUT */
+        .header { 
+            background: linear-gradient(135deg, #001a33, var(--blue)); 
+            color: white; 
+            padding: 20px 15px 80px; /* More bottom padding for dashboard space */
+            text-align: center; 
+            border-radius: 0 0 40px 40px; 
+            border-bottom: 5px solid var(--gold); 
+            position: relative; 
+        }
+
+        /* MOVED LOGOUT TO TOP RIGHT */
+        .logout-btn { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            background: rgba(255,59,59,0.2); 
+            border: 1px solid var(--red); 
+            color: white; 
+            border-radius: 8px; 
+            padding: 5px 10px; 
+            font-size: 10px; 
+            font-weight: 800; 
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .school-name { 
+            font-size: 12px; 
+            font-weight: 800; 
+            color: var(--gold); 
+            margin-top: 10px;
+            text-transform: uppercase;
+            max-width: 80%; /* Keeps it away from logout button */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .clock-box { font-size: 36px; font-weight: 900; color: white; margin: 5px 0; }
+        .date-box { font-size: 13px; font-weight: 600; opacity: 0.8; margin-bottom: 10px; }
         
-        .logout-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.1); border: 1px solid white; color: white; border-radius: 10px; padding: 6px 12px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .auto-notice { 
+            display: inline-block; 
+            background: white; 
+            color: var(--blue); 
+            padding: 6px 18px; 
+            border-radius: 50px; 
+            font-size: 10px; 
+            font-weight: 900; 
+            border: 2px solid var(--gold); 
+        }
 
-        /* DASHBOARD BOXES */
-        .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 15px; margin-top: -40px; }
-        .dash-card { background: white; padding: 20px 5px; border-radius: 25px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1.5px solid #eee; }
-        .dash-card span { display: block; font-size: 22px; font-weight: 900; color: var(--blue); margin-bottom: 2px; }
-        .dash-card small { font-size: 9px; font-weight: 800; color: #999; text-transform: uppercase; }
+        /* DASHBOARD BOXES - FIXED VISIBILITY */
+        .dash-container { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            padding: 0 15px; 
+            margin-top: -50px; /* Pulls boxes up into the header curve */
+            position: relative;
+            z-index: 5;
+        }
+        .dash-card { 
+            background: white; 
+            padding: 15px 5px; 
+            border-radius: 20px; 
+            text-align: center; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12); 
+            border: 1px solid #ddd;
+        }
+        .dash-card span { display: block; font-size: 20px; font-weight: 900; color: var(--blue); }
+        .dash-card small { font-size: 8px; font-weight: 800; color: #999; text-transform: uppercase; }
 
-        /* TABS & CARDS */
-        .tab-bar { display: flex; justify-content: space-around; background: white; padding: 10px; margin: 25px 15px; border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .tab { padding: 12px 18px; font-size: 11px; font-weight: 900; color: #bbb; cursor: pointer; transition: 0.3s; }
-        .tab.active { background: var(--blue); color: white; border-radius: 18px; }
+        /* TABS */
+        .tab-bar { display: flex; justify-content: space-around; background: white; padding: 8px; margin: 20px 15px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .tab { padding: 10px 15px; font-size: 11px; font-weight: 900; color: #bbb; cursor: pointer; }
+        .tab.active { background: var(--blue); color: white; border-radius: 15px; }
 
-        .card { background: white; padding: 20px; border-radius: 30px; margin: 15px; border: 1.5px solid #f0f0f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        input, select, textarea { width: 100%; padding: 16px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 18px; font-weight: 600; box-sizing: border-box; font-size: 15px; }
-        .btn-main { background: var(--blue); color: white; border: none; padding: 20px; width: 100%; border-radius: 20px; font-weight: 900; margin-top: 15px; cursor: pointer; box-shadow: 0 8px 20px rgba(0,43,91,0.2); }
-        
-        .footer-brand { text-align: center; font-size: 10px; color: #bbb; font-weight: 800; margin-top: 40px; }
+        /* CONTENT */
+        .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eee; }
+        input, select, textarea { width: 100%; padding: 14px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 12px; font-weight: 600; box-sizing: border-box; }
+        .btn-main { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; cursor: pointer; }
+        .footer-brand { text-align: center; font-size: 10px; color: #bbb; font-weight: 800; margin-top: 30px; padding-bottom: 20px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" style="padding: 120px 30px; text-align: center;">
-    <h2 style="color:var(--blue); font-weight:900; margin-bottom:5px;">PROGRESSIVE PMS</h2>
-    <p style="color:#aaa; font-weight:800; font-size:12px; margin-bottom:40px;">SECURE LOGON SYSTEM</p>
-    <div class="card" style="max-width:340px; margin:auto; border: 2.5px solid var(--blue);">
-        <input id="sysKey" type="password" placeholder="SYSTEM ACCESS KEY" style="text-align:center;">
-        <button onclick="login()" class="btn-main">AUTHORIZE SESSION</button>
+<div id="loginGate" style="padding: 100px 30px; text-align: center;">
+    <h2 style="color:var(--blue); font-weight:900;">PROGRESSIVE PMS</h2>
+    <div class="card" style="max-width:320px; margin:auto; border: 2px solid var(--blue);">
+        <input id="sysKey" type="password" placeholder="ACCESS KEY" style="text-align:center;">
+        <button onclick="login()" class="btn-main">AUTHORIZE</button>
     </div>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
         <button class="logout-btn" onclick="logout()">LOGOUT</button>
-        <div class="school-name">Progressive Mothers Nursery & Primary School</div>
+        <div class="school-name">Progressive Mothers Nursery & Primary</div>
         <div id="clock" class="clock-box">00:00:00</div>
-        <div id="fullDate" class="date-box">Day, Date Month Year</div>
-        <div id="autoMsg" class="auto-notice">SYSTEM INITIALIZING...</div>
+        <div id="fullDate" class="date-box">Loading date...</div>
+        <div id="autoMsg" class="auto-notice">SYNCING...</div>
     </div>
 
     <div class="dash-container">
-        <div class="dash-card"><span id="statTotal">...</span><small>Students</small></div>
+        <div class="dash-card"><span id="statTotal">0</span><small>Students</small></div>
         <div class="dash-card"><span id="statPres" style="color:var(--green)">0</span><small>Present</small></div>
         <div class="dash-card"><span id="statAbs" style="color:var(--red)">0</span><small>Absent</small></div>
     </div>
@@ -70,32 +127,31 @@
     </div>
 
     <div id="secReg" class="card">
-        <h4 id="formTitle" style="margin:0; color:var(--blue); font-weight:900;">STUDENT ENROLLMENT</h4>
+        <h4 style="margin:0; color:var(--blue);">STUDENT ENROLLMENT</h4>
         <input type="hidden" id="editId">
         <input id="fName" placeholder="Full Name">
-        <select id="fClass"><option value="">Select Class</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-        <input id="fCon" placeholder="Parent Contact">
-        <input id="fLin" placeholder="Student LIN Number">
-        <textarea id="fHealth" placeholder="Health Condition / Medical Notes"></textarea>
-        
+        <select id="fClass"><option value="">Class</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+        <input id="fCon" placeholder="Contact">
+        <input id="fLin" placeholder="LIN Number">
+        <textarea id="fHealth" placeholder="Health Status"></textarea>
         <div id="fFin" class="hidden">
-            <input id="fExp" type="number" placeholder="Agreed Fees (UGX)">
-            <input id="fPaid" type="number" placeholder="Fees Paid So Far (UGX)">
+            <input id="fExp" type="number" placeholder="Fees Amount">
+            <input id="fPaid" type="number" placeholder="Paid">
         </div>
-        <button id="saveBtn" onclick="save()" class="btn-main">SAVE TO CLOUD</button>
+        <button onclick="save()" class="btn-main">SAVE DATA</button>
     </div>
 
     <div id="secRoll" class="hidden">
-        <div class="card"><select id="rollClass" onchange="loadRoll()"><option value="">-- Choose a Class --</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
+        <div class="card"><select id="rollClass" onchange="loadRoll()"><option value="">-- Choose Class --</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
         <div id="rollArea"></div>
     </div>
 
     <div id="secRec" class="hidden">
-        <div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="🔍 Start typing student name..."></div>
+        <div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="🔍 Search name..."></div>
         <div id="recArea"></div>
     </div>
 
-    <div class="footer-brand">POWERED BY EUDES MEDIA | +256762992440</div>
+    <div class="footer-brand">EUDES MEDIA | +256762992440</div>
 </div>
 
 <script>
@@ -107,12 +163,10 @@
         if(k === "JESUS CARES") ROLE = "ADMIN";
         else if(k === "FINANCE2026") ROLE = "FINANCE";
         else if(k === "TEACHER256") ROLE = "TEACHER";
-        else return alert("Invalid Access Key");
-
+        else return alert("Invalid Key");
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         if(ROLE !== "TEACHER") document.getElementById('fFin').classList.remove('hidden');
-        
         fetchData();
         setInterval(engine, 1000);
     }
@@ -125,32 +179,27 @@
         const min = now.getMinutes();
         const time = hr * 100 + min;
         const day = now.getDay();
-        
-        // UPDATE CLOCK AND DATE
         document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('fullDate').innerText = now.toLocaleDateString('en-GB', options);
+        document.getElementById('fullDate').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-        let msg = "SCHOOL ACTIVITY";
-        if (day === 6) { // Saturday logic
+        let msg = "CLASS SESSION";
+        if (day === 6) { 
             if (time >= 2130 || time < 500) msg = "🌙 SLEEPING TIME";
             else if (time >= 1900) msg = "🌙 EVENING LESSONS";
             else msg = "⛪ HAPPY SABBATH";
-        } else { // Sunday & Weekdays
+        } else {
             if (time >= 2130 || time < 500) msg = "🌙 SLEEPING TIME";
             else if (time >= 1600 && time < 1700) msg = "🏠 DEPARTURE & PREP";
-            else if (time >= 1300 && time < 1400) msg = "🍲 LUNCH TIME";
-            else if (time >= 1030 && time < 1100) msg = "☕ BREAK TIME";
-            else msg = "📖 CLASS IN SESSION";
+            else msg = "📖 STUDY TIME";
         }
         document.getElementById('autoMsg').innerText = msg;
     }
 
     async function fetchData() {
-        const { data, error } = await sb.from('students').select('*').order('name');
+        const { data } = await sb.from('students').select('*').order('name');
         if(data) {
             students = data;
-            document.getElementById('statTotal').innerText = students.length; // DASHBOARD FIXED
+            document.getElementById('statTotal').innerText = students.length;
             renderRec();
         }
     }
@@ -168,16 +217,8 @@
             row.fees_expected = parseInt(document.getElementById('fExp').value) || 0;
             row.fees_paid = parseInt(document.getElementById('fPaid').value) || 0;
         }
-        
-        document.getElementById('saveBtn').innerText = "SYNCING...";
-        const { error } = id ? await sb.from('students').update(row).eq('id', id) : await sb.from('students').insert([row]);
-        
-        if(!error) {
-            alert("Database Updated!");
-            clearForm();
-            fetchData();
-        }
-        document.getElementById('saveBtn').innerText = "SAVE TO CLOUD";
+        await (id ? sb.from('students').update(row).eq('id', id) : sb.from('students').insert([row]));
+        alert("Saved!"); fetchData(); clearForm();
     }
 
     function renderRec() {
@@ -186,22 +227,16 @@
         students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
             const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
             h += `<div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <b style="color:var(--blue); font-size:16px;">${s.name}</b>
-                    <span style="font-size:10px; font-weight:900; background:#eee; padding:5px 10px; border-radius:10px;">${s.class}</span>
-                </div>
-                <div style="font-size:12px; color:#555; line-height:1.6;">
-                    <b>LIN:</b> ${s.lin || 'No LIN'}<br>
-                    <b>HEALTH:</b> ${s.health_status || 'Stable'}<br>
-                    ${ROLE !== "TEACHER" ? `<b style="color:${bal > 0 ? 'var(--red)' : 'var(--green)'}">BAL: UGX ${bal.toLocaleString()}</b>` : ''}
-                </div>
-                <div style="display:flex; gap:10px; margin-top:15px;">
-                    <button onclick="edit('${s.id}')" style="flex:1; background:#f5f5f5; border:none; padding:12px; border-radius:15px; font-weight:800; font-size:12px;">EDIT</button>
-                    <a href="tel:${s.contact}" style="flex:1; background:var(--blue); color:white; padding:12px; border-radius:15px; text-align:center; text-decoration:none; font-size:12px; font-weight:800;">CALL</a>
+                <b>${s.name}</b> <small style="float:right;">${s.class}</small><br>
+                <small>LIN: ${s.lin || '-'}</small><br>
+                ${ROLE !== "TEACHER" ? `<b style="color:${bal > 0 ? 'var(--red)' : 'var(--green)'}">BAL: UGX ${bal.toLocaleString()}</b>` : ''}
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button onclick="edit('${s.id}')" style="flex:1; padding:8px; border-radius:10px; border:none;">EDIT</button>
+                    <a href="tel:${s.contact}" style="flex:1; background:var(--blue); color:white; padding:8px; border-radius:10px; text-align:center; text-decoration:none;">CALL</a>
                 </div>
             </div>`;
         });
-        document.getElementById('recArea').innerHTML = h || "<p style='text-align:center; color:#999;'>No students found.</p>";
+        document.getElementById('recArea').innerHTML = h;
     }
 
     function edit(id) {
@@ -218,7 +253,6 @@
             document.getElementById('fPaid').value = s.fees_paid;
         }
         showTab('reg');
-        document.getElementById('formTitle').innerText = "EDITING: " + s.name;
     }
 
     function loadRoll() {
@@ -227,15 +261,15 @@
         let h = "";
         list.forEach(s => {
             const st = att[s.id] || 'present';
-            h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:18px; border-bottom:1px solid #f0f0f0;">
-                <b style="font-size:14px;">${s.name}</b>
-                <div style="display:flex; gap:12px;">
-                    <button onclick="setAtt('${s.id}','present')" style="padding:10px 15px; border-radius:12px; border:1.5px solid #eee; font-weight:900; ${st==='present'?'background:var(--green); color:white;':''}">P</button>
-                    <button onclick="setAtt('${s.id}','absent')" style="padding:10px 15px; border-radius:12px; border:1.5px solid #eee; font-weight:900; ${st==='absent'?'background:var(--red); color:white;':''}">A</button>
+            h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #eee;">
+                <b>${s.name}</b>
+                <div style="display:flex; gap:8px;">
+                    <button onclick="setAtt('${s.id}','present')" style="padding:10px; border-radius:8px; border:1px solid #eee; ${st==='present'?'background:var(--green); color:white;':''}">P</button>
+                    <button onclick="setAtt('${s.id}','absent')" style="padding:10px; border-radius:8px; border:1px solid #eee; ${st==='absent'?'background:var(--red); color:white;':''}">A</button>
                 </div>
             </div>`;
         });
-        document.getElementById('rollArea').innerHTML = h || "<p style='padding:40px; text-align:center; color:#ccc;'>Select a class to start roll call.</p>";
+        document.getElementById('rollArea').innerHTML = h;
     }
 
     function setAtt(id, s) { 
@@ -256,7 +290,6 @@
 
     function clearForm() {
         ['fName','fCon','fHealth','fExp','fPaid','editId','fLin'].forEach(i => document.getElementById(i).value = "");
-        document.getElementById('formTitle').innerText = "STUDENT ENROLLMENT";
     }
 </script>
 </body>
