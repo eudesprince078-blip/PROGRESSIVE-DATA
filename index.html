@@ -2,168 +2,132 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V59</title>
+    <title>PROGRESSIVE PMS V60</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f1f4f8; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; }
         
+        /* Dashboard Stats */
         .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; }
-        
-        /* Attendance Dashboard */
-        .attn-box { background: white; margin: 15px; padding: 15px; border-radius: 15px; border-top: 5px solid var(--red); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .attn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .attn-stat { background: #fff5f5; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #fed7d7; }
-        
-        .class-card { background: white; margin: 10px 15px; padding: 12px; border-radius: 10px; border-left: 4px solid var(--gold); font-size: 13px; }
-        .absent-name { display: inline-block; background: #fee2e2; color: #9b1c1c; padding: 2px 8px; border-radius: 4px; margin: 2px; font-size: 11px; font-weight: bold; }
-        
-        .alert-missing { background: #fffaf0; border: 1px solid #fbd38d; color: #9c4221; padding: 10px; margin: 15px; border-radius: 10px; font-size: 12px; font-weight: bold; }
-        
-        .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; }
-        .btn-main { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
+        .dash-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; margin-top: -30px; }
+        .stat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .stat-card h2 { margin: 5px 0; font-size: 24px; }
+        .stat-label { font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase; }
+
+        /* Missing Report Watchdog */
+        .watchdog-alert { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 12px; margin: 15px; border-radius: 12px; font-size: 12px; animation: blink 2s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        /* Class-wise Absentee List */
+        .class-group { background: white; margin: 10px 15px; padding: 15px; border-radius: 12px; border-left: 5px solid var(--blue); }
+        .class-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px; }
+        .tag-name { display: inline-block; background: #edf2f7; color: #2d3748; padding: 4px 10px; border-radius: 20px; font-size: 11px; margin: 3px; border: 1px solid #cbd5e0; }
+        .tag-name.female { border-color: #fbb6ce; background: #fff5f7; }
+        .tag-name.male { border-color: #bee3f8; background: #ebf8ff; }
+
+        .btn-main { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" style="padding: 100px 20px; text-align: center;">
-    <h2 style="color:var(--blue)">PROGRESSIVE PMS</h2>
-    <input id="passInput" type="password" placeholder="Access Key" style="text-align:center; width: 80%; padding: 15px; border-radius: 10px; border: 1px solid #ccc;">
-    <button onclick="handleLogin()" class="btn-main" style="width: 80%;">LOGIN</button>
-</div>
-
-<div id="mainApp" class="hidden">
+<div id="mainApp">
     <div class="header">
-        <h3 style="margin:0;">ATTENDANCE CONTROL</h3>
-        <div id="liveClock" style="font-size:11px; color:var(--gold);"></div>
+        <h3 style="margin:0;">PROGRESSIVE MOTHERS</h3>
+        <div id="clock" style="font-size:11px; color:var(--gold); margin-top:5px;"></div>
     </div>
 
-    <div id="missingClassesAlert" class="alert-missing hidden">
-        ⚠️ NO REPORT RECEIVED FROM: <span id="pendingClassesList"></span>
+    <div id="watchdog" class="watchdog-alert hidden">
+        <strong>⚠️ MISSING REPORTS:</strong> <span id="missingList">Checking...</span>
     </div>
 
-    <div class="attn-box">
-        <h4 style="margin:0; color:var(--dark);">School Attendance Summary</h4>
-        <div class="attn-grid">
-            <div class="attn-stat"><p style="margin:0; font-size:9px;">TOTAL ABSENT</p><h2 id="totalAbs" style="margin:5px 0; color:var(--red);">0</h2></div>
-            <div class="attn-stat"><p style="margin:0; font-size:9px;">GENDER SPLIT</p><div style="font-size:11px; font-weight:bold;">M: <span id="absM">0</span> | F: <span id="absF">0</span></div></div>
+    <div class="dash-container">
+        <div class="stat-card" style="grid-column: span 2;">
+            <div class="stat-label">Total Students in School</div>
+            <h2 id="totalSchool">0</h2>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Absent Today</div>
+            <h2 id="totalAbs" style="color:var(--red);">0</h2>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Gender (M | F)</div>
+            <h2 style="font-size:18px;"><span id="absM" style="color:#3182ce;">0</span> | <span id="absF" style="color:#d53f8c;">0</span></h2>
         </div>
     </div>
 
-    <div id="classBreakdown">
+    <div id="absenteeBreakdown">
         </div>
 
-    <div class="card">
-        <h4 style="margin:0; color:var(--blue);">Student Registry</h4>
-        <input type="hidden" id="editId">
-        <input id="stName" placeholder="Full Name">
-        <select id="stGender"><option value="Male">Male</option><option value="Female">Female</option></select>
-        <select id="stClass">
-            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-            <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-            <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-        </select>
-        <button onclick="saveStudent()" class="btn-main">SAVE STUDENT</button>
-    </div>
-
-    <div id="studentListContainer" class="card">
-        <input type="text" id="sBar" oninput="renderApp()" placeholder="🔍 Search Students...">
-        <div id="fullList" style="margin-top:15px;"></div>
+    <div style="padding:15px;">
+        <button class="btn-main" onclick="location.reload()">REFRESH DATA</button>
     </div>
 </div>
 
 <script>
     const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
     const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-    let sb = null, students = [], USER_ROLE = "";
+    const sb = supabase.createClient(SB_URL, SB_KEY);
+    
     const allClasses = ["Baby", "Middle", "Top", "P.1", "P.2", "P.3", "P.4", "P.5", "P.6", "P.7"];
 
-    setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleString(); }, 1000);
+    async function loadDashboard() {
+        const { data: students } = await sb.from('students').select('*');
+        if(!students) return;
 
-    function handleLogin() {
-        const p = document.getElementById('passInput').value.trim().toUpperCase();
-        if (p === "JESUS CARES") USER_ROLE = "ADMIN";
-        else if (p === "TEACHER256") USER_ROLE = "TEACHER";
-        else return alert("Wrong Key");
-        
-        sb = supabase.createClient(SB_URL, SB_KEY);
-        document.getElementById('loginGate').classList.add('hidden');
-        document.getElementById('mainApp').classList.remove('hidden');
-        refresh();
-    }
+        const activeStudents = students.filter(s => s.class !== 'Left School');
+        const absentees = activeStudents.filter(s => s.is_absent === true);
 
-    async function refresh() {
-        const { data } = await sb.from('students').select('*').order('name', { ascending: true });
-        students = data || [];
-        renderApp();
-    }
+        // 1. Set Totals
+        document.getElementById('totalSchool').innerText = activeStudents.length;
+        document.getElementById('totalAbs').innerText = absentees.length;
+        document.getElementById('absM').innerText = absentees.filter(s => s.gender === 'Male').length;
+        document.getElementById('absF').innerText = absentees.filter(s => s.gender === 'Female').length;
 
-    function renderApp() {
-        const absentStudents = students.filter(s => s.is_absent);
-        const enrolled = students.filter(s => s.class !== 'Left School');
-        
-        // 1. Update Totals
-        document.getElementById('totalAbs').innerText = absentStudents.length;
-        document.getElementById('absM').innerText = absentStudents.filter(s => s.gender === 'Male').length;
-        document.getElementById('absF').innerText = absentStudents.filter(s => s.gender === 'Female').length;
-
-        // 2. Missing Roll Call Logic (9:00 AM Check)
+        // 2. Watchdog: Find classes with ZERO activity today
+        // (If no student in the class has been toggled to true OR false, it's missing)
         const now = new Date();
-        const reportedClasses = [...new Set(students.filter(s => s.is_absent !== null).map(s => s.class))];
-        const missing = allClasses.filter(c => !reportedClasses.includes(c));
-        
-        if (now.getHours() >= 9 && missing.length > 0 && USER_ROLE === "ADMIN") {
-            document.getElementById('missingClassesAlert').classList.remove('hidden');
-            document.getElementById('pendingClassesList').innerText = missing.join(", ");
+        if(now.getHours() >= 9) {
+            const reportedClasses = [...new Set(students.filter(s => s.is_absent !== null).map(s => s.class))];
+            const missing = allClasses.filter(c => !reportedClasses.includes(c));
+            if(missing.length > 0) {
+                document.getElementById('watchdog').classList.remove('hidden');
+                document.getElementById('missingList').innerText = missing.join(", ");
+            }
         }
 
-        // 3. Class-wise Absentee Names
-        let classHtml = "";
-        allClasses.forEach(c => {
-            const classAbsentees = absentStudents.filter(s => s.class === c);
-            if (classAbsentees.length > 0) {
-                classHtml += `<div class="class-card">
-                    <b>${c} (${classAbsentees.length} Absent)</b><br>
-                    ${classAbsentees.map(s => `<span class="absent-name">${s.name} (${s.gender[0]})</span>`).join('')}
-                </div>`;
+        // 3. Detailed Class Breakdown
+        let html = "";
+        allClasses.forEach(cls => {
+            const list = absentees.filter(s => s.class === cls);
+            if(list.length > 0) {
+                html += `
+                    <div class="class-group">
+                        <div class="class-header">
+                            <strong style="color:var(--blue)">${cls} Class</strong>
+                            <span style="font-size:11px; color:var(--red)">${list.length} Absent</span>
+                        </div>
+                        <div>
+                            ${list.map(s => `
+                                <span class="tag-name ${s.gender.toLowerCase()}">
+                                    ${s.name.toUpperCase()} (${s.gender[0]})
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
             }
         });
-        document.getElementById('classBreakdown').innerHTML = classHtml || "<p style='text-align:center; font-size:12px; color:green;'>Full Attendance Today!</p>";
-
-        // 4. Main List for Roll Call
-        const q = document.getElementById('sBar').value.toUpperCase();
-        let listHtml = "";
-        enrolled.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
-            listHtml += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; align-items:center;">
-                <span style="font-size:13px;">${s.name} (${s.class})</span>
-                <button onclick="toggleAbs('${s.id}', ${!s.is_absent})" style="background:${s.is_absent ? 'var(--red)' : '#eee'}; color:${s.is_absent ? 'white' : '#333'}; border:none; padding:5px 10px; border-radius:5px; font-size:10px;">
-                    ${s.is_absent ? 'ABSENT' : 'MARK ABSENT'}
-                </button>
-            </div>`;
-        });
-        document.getElementById('fullList').innerHTML = listHtml;
+        document.getElementById('absenteeBreakdown').innerHTML = html || "<p style='text-align:center; color:gray; font-size:12px;'>No absentees reported yet.</p>";
     }
 
-    async function toggleAbs(id, val) {
-        await sb.from('students').update({ is_absent: val }).eq('id', id);
-        refresh();
-    }
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleString('en-GB');
+    }, 1000);
 
-    async function saveStudent() {
-        const payload = {
-            name: document.getElementById('stName').value,
-            class: document.getElementById('stClass').value,
-            gender: document.getElementById('stGender').value,
-            is_absent: false
-        };
-        await sb.from('students').insert([payload]);
-        alert("Registered!");
-        refresh();
-    }
+    loadDashboard();
 </script>
 </body>
 </html>
