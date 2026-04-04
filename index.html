@@ -1,270 +1,291 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V65</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PMS V71 PROFESSIONAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf-autotable.min.js"></script>
     <style>
-        :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f1f4f8; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; user-select: none; }
-        
-        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 25px 20px; text-align: center; border-radius: 0 0 30px 30px; position: relative; }
-        .live-info { font-size: 11px; color: var(--gold); font-weight: bold; margin-top: 5px; }
-        .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 15px; border-radius: 50px; cursor: pointer; font-size: 10px; }
-        
-        .status-ticker { background: var(--gold); color: black; padding: 10px; text-align: center; font-size: 13px; font-weight: 900; border-bottom: 2px solid var(--dark); text-transform: uppercase; }
-
-        .grid-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; margin-top: -40px; }
-        .stat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .stat-card h3 { margin: 5px 0; font-size: 20px; color: var(--dark); }
-        .stat-label { font-size: 10px; color: #888; font-weight: bold; }
-
-        .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .btn-pro { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-del { background: var(--red); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 10px; font-weight: bold; }
-        
-        input, select { width: 100%; padding: 14px; margin-top: 8px; border: 1.5px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f4f6f9; user-select: none; }
+        .header { background: #001a33; color: white; padding: 15px; text-align: center; border-bottom: 3px solid #ffc107; }
+        .tabs { display: flex; background: white; justify-content: space-around; padding: 10px; border-bottom: 1px solid #ddd; }
+        .tab { cursor: pointer; font-weight: bold; font-size: 13px; color: #666; }
+        .active { color: #004085; border-bottom: 2px solid #004085; }
+        .card { background: white; margin: 10px; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat { padding: 15px; border-radius: 10px; color: white; font-weight: bold; text-align: center; }
+        .blue { background: #004085; } .green { background: #28a745; }
+        .red { background: #dc3545; } .gold { background: #ffc107; color: black; }
+        .btn { background: #004085; color: white; padding: 12px; border: none; width: 100%; margin-top: 10px; border-radius: 5px; font-weight: bold; }
+        .btn-mark { padding: 8px; border: none; border-radius: 5px; color: white; font-weight: bold; margin-left: 5px; cursor: pointer; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .student { padding: 15px; border-bottom: 1px solid #eee; position: relative; }
         .hidden { display: none !important; }
-        .student-row { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--blue); }
-        
-        .gender-box { display: flex; gap: 10px; margin-top: 10px; }
-        .gender-opt { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 8px; text-align: center; cursor: pointer; font-size: 12px; font-weight: bold; }
-        .gender-opt.active { background: var(--blue); color: white; border-color: var(--blue); }
+        #routine { font-size: 12px; color: #ffc107; font-weight: bold; margin-top: 5px; }
     </style>
 </head>
+
 <body>
 
-<div id="loginPage" style="padding: 100px 20px; text-align: center;">
-    <h2 style="color:var(--blue)">PROGRESSIVE PMS PRO</h2>
+<div id="loginPage" style="padding: 80px 20px; text-align: center;">
+    <h2 style="color:#001a33">PROGRESSIVE PMS PRO</h2>
     <div class="card" style="max-width: 350px; margin: auto;">
-        <input id="key" type="password" placeholder="System Key" style="text-align:center;">
-        <button onclick="login()" class="btn-pro">LOGIN</button>
+        <input id="key" type="password" placeholder="Enter System Key" style="text-align:center;">
+        <button onclick="login()" class="btn">SECURE LOGIN</button>
     </div>
 </div>
 
 <div id="app" class="hidden">
-    <div class="status-ticker" id="schoolTicker">...</div>
-    
     <div class="header">
-        <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
         <h3 style="margin:0;">PROGRESSIVE MOTHERS</h3>
-        <div class="live-info" id="liveDateTime"></div>
+        <div id="time" style="font-size:12px; opacity:0.8;"></div>
+        <div id="routine">STATUS: INITIALIZING...</div>
     </div>
 
-    <div class="grid-stats" id="statsContainer">
-        <div class="stat-card" style="grid-column: span 2;"><div class="stat-label">Enrollment</div><h3 id="statTotal">0</h3></div>
-        <div class="stat-card"><div class="stat-label">Absent Today</div><h3 id="statAbs" style="color:var(--red);">0</h3></div>
-        <div class="stat-card"><div class="stat-label">M | F Absent</div><h3 id="statGender" style="font-size:18px;">0 | 0</h3></div>
-        <div id="finStat" class="stat-card" style="grid-column: span 2;"><div class="stat-label">Total Debt</div><h3 id="statDebt" style="color:var(--red);">0</h3></div>
+    <div class="tabs">
+        <div id="tabDash" class="tab active" onclick="openTab(event,'dash')">Dashboard</div>
+        <div id="tabStud" class="tab" onclick="openTab(event,'students')">Students</div>
+        <div id="tabAtt" class="tab" onclick="openTab(event,'attendance')">Attendance</div>
+        <div id="tabFin" class="tab" onclick="openTab(event,'finance')">Finance</div>
     </div>
 
-    <div id="teacherClassSelect" class="card hidden">
-        <label style="font-size:12px; font-weight:bold;">SELECT YOUR CLASS TO START ROLL CALL:</label>
-        <select id="activeTeacherClass" onchange="refresh()">
-            <option value="ALL">-- View All Classes --</option>
-            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-            <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-            <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-        </select>
-    </div>
+    <div id="dash" class="card"></div>
 
-    <div id="regCard" class="card hidden">
-        <h4 style="margin:0; color:var(--blue);">REGISTRATION / EDITING</h4>
-        <input type="hidden" id="editId">
-        <input id="stName" placeholder="Full Name">
-        
-        <div class="gender-box">
-            <div id="gMale" class="gender-opt" onclick="setGender('Male')">MALE</div>
-            <div id="gFemale" class="gender-opt" onclick="setGender('Female')">FEMALE</div>
+    <div id="students" class="card hidden">
+        <div id="studentForm">
+            <h4 style="margin-top:0;">Register New Student</h4>
+            <input id="stName" placeholder="Full Name">
+            <input id="stLin" placeholder="LIN Number">
+            <div class="grid">
+                <input id="stAge" placeholder="Age">
+                <select id="stGender">
+                    <option value="">-- Gender --</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            <select id="stClass">
+                <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+                <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+                <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+            </select>
+            <input id="stContact" placeholder="Parent Contact">
+            <button onclick="saveStudent()" class="btn">Register Student</button>
         </div>
-        <input type="hidden" id="stGenderVal">
-
-        <select id="stClass">
-            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-            <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-            <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-            <option value="Left School" id="optLeft" class="hidden">Archive (Left School)</option>
-        </select>
-        
-        <div id="finInputs" class="hidden">
-            <input id="stExp" type="number" placeholder="Expected Fees">
-            <input id="stPaid" type="number" placeholder="Paid Fees">
-        </div>
-        
-        <button id="saveBtn" onclick="saveStudent()" class="btn-pro">SAVE RECORD</button>
-        <button id="delBtn" class="btn-del hidden" onclick="deleteStudent()">DELETE PERMANENTLY</button>
+        <hr>
+        <input type="text" id="stSearch" oninput="render()" placeholder="🔍 Search by Name or LIN...">
+        <div id="list"></div>
     </div>
 
-    <div class="card">
-        <input type="text" id="search" oninput="render()" placeholder="🔍 Search Students...">
-        <div id="list" style="margin-top:15px;"></div>
+    <div id="attendance" class="card hidden">
+        <label><b>Select Class for Roll Call:</b></label>
+        <select id="attClassSelect" onchange="renderAttendance(this.value)">
+            <option value="">-- Choose Class --</option>
+            <option>Baby</option><option>Middle</option><option>Top</option>
+            <option>P.1</option><option>P.2</option><option>P.3</option>
+            <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+        </select>
+        <div id="attendanceList" style="margin-top:15px;"></div>
+    </div>
+
+    <div id="finance" class="card hidden">
+        <div id="financeSummary" class="stat red" style="margin-bottom:10px; background:#800000"></div>
+        <div id="financeList"></div>
     </div>
 </div>
 
 <script>
-    const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
-    const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
-    const sb = supabase.createClient(SB_URL, SB_KEY);
-    let students = [], ROLE = "";
+const sb = supabase.createClient(
+    "https://kjftrwuucjdnhfwesrup.supabase.co",
+    "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO"
+);
 
-    setInterval(() => {
-        const now = new Date();
-        document.getElementById('liveDateTime').innerText = now.toLocaleString('en-GB');
-        updateTicker(now);
-    }, 1000);
+let students = [], attendance = [], ROLE = "";
 
-    function updateTicker(now) {
-        const h = now.getHours(), m = now.getMinutes(), time = h * 100 + m, day = now.getDay();
-        let status = "CLASS ONGOING";
-        if (day === 6 && (time < 1900 || time > 2100)) status = "HAPPY SABBATH";
-        else if (time >= 1030 && time < 1100) status = "BREAK TIME";
-        else if (time >= 1300 && time < 1400) status = "LUNCH TIME";
-        else if (time >= 1600 && time < 1900) status = "GOING HOME";
-        else if (time >= 1900 && time <= 2100) status = "PREPS";
-        else if (time > 2100 || time < 700) status = "REST TIME";
-        document.getElementById('schoolTicker').innerText = "STATUS: " + status;
+function login(){
+    let k = document.getElementById('key').value.trim().toUpperCase();
+    const now = new Date();
+    const hour = now.getHours();
+
+    if(k === "JESUS CARES") ROLE = "ADMIN";
+    else if(k === "DIRECTOR2026") ROLE = "DIRECTOR";
+    else if(k === "TEACHER256") {
+        if(hour < 7 || hour >= 21) return alert("TEACHERS: Login only 7AM - 9PM");
+        ROLE = "TEACHER";
     }
+    else if(k === "FINANCE2026") ROLE = "FINANCE";
+    else return alert("Invalid Password");
 
-    function login() {
-        const k = document.getElementById('key').value.toUpperCase();
-        const now = new Date();
-        const hour = now.getHours();
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
 
-        if(k === "JESUS CARES") ROLE = "ADMIN";
-        else if(k === "DIRECTOR2026") ROLE = "DIRECTOR";
-        else if(k === "FINANCE2026") ROLE = "FINANCE";
-        else if(k === "TEACHER256") {
-            if(hour < 7 || hour >= 21) return alert("TEACHER ACCESS BLOCKED: Outside School Hours (7AM-9PM)");
-            ROLE = "TEACHER";
-        } else return alert("Wrong Key");
+    applyPermissions();
+    load();
+}
 
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
+function applyPermissions(){
+    if(ROLE === "TEACHER") {
+        document.getElementById('tabFin').classList.add('hidden');
+        document.getElementById('studentForm').classList.add('hidden');
+    }
+    if(ROLE === "FINANCE") {
+        document.getElementById('tabAtt').classList.add('hidden');
+    }
+    if(ROLE === "DIRECTOR") {
+        document.getElementById('studentForm').classList.add('hidden');
+    }
+}
 
-        // Apply Permission Logic
-        if(ROLE === "ADMIN") {
-            document.getElementById('regCard').classList.remove('hidden');
-            document.getElementById('finInputs').classList.remove('hidden');
-            document.getElementById('optLeft').classList.remove('hidden');
-        } else if(ROLE === "DIRECTOR") {
-            // Director sees stats but cannot edit anything
-            document.getElementById('regCard').classList.add('hidden');
-        } else if(ROLE === "FINANCE") {
-            document.getElementById('regCard').classList.remove('hidden');
-            document.getElementById('finInputs').classList.remove('hidden');
-        } else if(ROLE === "TEACHER") {
-            document.getElementById('regCard').classList.remove('hidden');
-            document.getElementById('teacherClassSelect').classList.remove('hidden');
-            document.getElementById('statsContainer').classList.add('hidden');
+async function load(){
+    let { data: stData } = await sb.from('students').select('*').order('name', { ascending: true });
+    students = stData || [];
+    
+    let { data: attData } = await sb.from('attendance').select('*');
+    attendance = attData || [];
+
+    dashboard();
+    render();
+    financeView();
+}
+
+function dashboard(){
+    let total = students.length;
+    let boys = students.filter(s => s.gender === "Male").length;
+    let girls = students.filter(s => s.gender === "Female").length;
+    let today = new Date().toISOString().split('T')[0];
+    let absToday = attendance.filter(a => a.date === today && a.status === "Absent").length;
+
+    let alerts = "";
+    students.forEach(s => {
+        let rec = attendance.filter(a => a.student_id == s.id).sort((a,b) => new Date(b.date) - new Date(a.date));
+        if(rec.length >= 2 && rec[0].status === "Absent" && rec[1].status === "Absent") {
+            alerts += `🚨 ${s.name} (${s.class}) absent 2 days<br>`;
         }
-        refresh();
-    }
+    });
 
-    function setGender(val) {
-        document.getElementById('stGenderVal').value = val;
-        document.getElementById('gMale').className = "gender-opt " + (val === 'Male' ? 'active' : '');
-        document.getElementById('gFemale').className = "gender-opt " + (val === 'Female' ? 'active' : '');
-    }
+    document.getElementById('dash').innerHTML = `
+        <div class="grid">
+            <div class="stat blue">Total: ${total}</div>
+            <div class="stat green">Boys: ${boys}</div>
+            <div class="stat gold">Girls: ${girls}</div>
+            <div class="stat red">Absent Today: ${absToday}</div>
+        </div>
+        <div style="margin-top:15px; color:red; font-weight:bold;">${alerts}</div>
+    `;
+}
 
-    async function refresh() {
-        const { data } = await sb.from('students').select('*').order('name', { ascending: true });
-        students = data || [];
-        render();
-    }
+function render(){
+    let q = document.getElementById('stSearch').value.toUpperCase();
+    let html = "";
+    students.filter(s => s.name.toUpperCase().includes(q) || (s.lin && s.lin.includes(q))).forEach(s => {
+        html += `
+        <div class="student">
+            <b>${s.name}</b> [${s.gender}]<br>
+            <small>LIN: ${s.lin || 'N/A'} | Class: ${s.class}</small><br>
+            ${ROLE === "ADMIN" ? `<button onclick="del('${s.id}')" style="background:red; color:white; border:none; padding:5px; font-size:10px; border-radius:3px;">Delete</button>` : ""}
+        </div>`;
+    });
+    document.getElementById('list').innerHTML = html;
+}
 
-    function render() {
-        const q = document.getElementById('search').value.toUpperCase();
-        const tClass = document.getElementById('activeTeacherClass').value;
-        
-        let filtered = students.filter(s => s.class !== 'Left School');
-        if(ROLE === "TEACHER" && tClass !== "ALL") {
-            filtered = filtered.filter(s => s.class === tClass);
-        }
+async function saveStudent(){
+    const p = {
+        name: document.getElementById('stName').value,
+        lin: document.getElementById('stLin').value,
+        age: document.getElementById('stAge').value,
+        gender: document.getElementById('stGender').value,
+        class: document.getElementById('stClass').value,
+        contact: document.getElementById('stContact').value
+    };
 
-        // Stats Logic
-        const abs = filtered.filter(s => s.is_absent);
-        document.getElementById('statTotal').innerText = filtered.length;
-        document.getElementById('statAbs').innerText = abs.length;
-        document.getElementById('statGender').innerText = `${abs.filter(s=>s.gender==='Male').length} | ${abs.filter(s=>s.gender==='Female').length}`;
-        
-        if(ROLE !== "TEACHER") {
-            const debt = filtered.reduce((acc, s) => acc + (parseInt(s.fees_balance) || 0), 0);
-            document.getElementById('statDebt').innerText = "UGX " + debt.toLocaleString();
-        }
+    if(!p.name || !p.gender) return alert("Fill Name and Gender!");
 
-        let h = "";
-        filtered.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
-            const canEdit = (ROLE === "ADMIN" || ROLE === "FINANCE");
-            h += `<div class="student-row">
-                <div style="font-size:13px;"><b>${s.name}</b><br><small>${s.class} | ${s.gender}</small>
-                ${ROLE !== 'TEACHER' && s.fees_balance > 0 ? `<br><span style="color:red; font-size:10px;">OWES: ${s.fees_balance.toLocaleString()}</span>` : ''}
-                </div>
-                <div>
-                    ${canEdit ? `<button onclick="edit('${s.id}')">EDIT</button>` : ''}
-                    <button onclick="mark('${s.id}', ${!s.is_absent})" style="background:${s.is_absent?'var(--red)':'var(--green)'}; color:white; border:none; padding:8px; border-radius:5px; margin-left:5px;">${s.is_absent?'ABSENT':'PRESENT'}</button>
-                </div>
-            </div>`;
-        });
-        document.getElementById('list').innerHTML = h;
-    }
+    await sb.from('students').insert([p]);
+    alert("Saved Successfully!");
+    load(); // Refresh without logout
+}
 
-    async function saveStudent() {
-        const id = document.getElementById('editId').value;
-        const g = document.getElementById('stGenderVal').value;
-        if(!g) return alert("Select Gender first!");
+async function del(id){
+    if(!confirm("Delete this student?")) return;
+    await sb.from('students').delete().eq('id', id);
+    load();
+}
 
-        const p = {
-            name: document.getElementById('stName').value,
-            class: document.getElementById('stClass').value,
-            gender: g,
-            fees_expected: parseInt(document.getElementById('stExp').value) || 0,
-            fees_paid: parseInt(document.getElementById('stPaid').value) || 0
-        };
-        p.fees_balance = p.fees_expected - p.fees_paid;
+function renderAttendance(cls){
+    if(!cls) return document.getElementById('attendanceList').innerHTML = "";
+    let list = students.filter(s => s.class === cls);
+    let html = `<h4>Roll Call: ${cls}</h4>`;
+    list.forEach(s => {
+        html += `
+        <div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+            <span>${s.name}</span>
+            <div>
+                <button onclick="mark('${s.id}','Present')" class="btn-mark green">✅</button>
+                <button onclick="mark('${s.id}','Absent')" class="btn-mark red">❌</button>
+            </div>
+        </div>`;
+    });
+    document.getElementById('attendanceList').innerHTML = html;
+}
 
-        if(id) {
-            if(ROLE === "TEACHER") return alert("Teachers cannot edit existing records!");
-            await sb.from('students').update(p).eq('id', id);
-        } else {
-            await sb.from('students').insert([p]);
-        }
-        
-        alert("Success");
-        resetForm();
-        refresh();
-    }
+async function mark(id, status){
+    await sb.from('attendance').insert([{
+        student_id: id,
+        status: status,
+        date: new Date().toISOString().split('T')[0]
+    }]);
+    alert("Marked " + status);
+    load();
+}
 
-    function edit(id) {
-        const s = students.find(x => x.id == id);
-        document.getElementById('editId').value = s.id;
-        document.getElementById('stName').value = s.name;
-        document.getElementById('stClass').value = s.class;
-        setGender(s.gender);
-        document.getElementById('stExp').value = s.fees_expected || 0;
-        document.getElementById('stPaid').value = s.fees_paid || 0;
+function financeView(){
+    if(ROLE === "TEACHER") return;
+    let debt = students.reduce((a, b) => a + (b.fees_balance || 0), 0);
+    document.getElementById('financeSummary').innerText = "TOTAL OUTSTANDING DEBT: UGX " + debt.toLocaleString();
 
-        if(ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
-        if(ROLE === "FINANCE") document.getElementById('stName').disabled = true;
-        window.scrollTo(0,0);
-    }
+    let html = "";
+    students.forEach(s => {
+        html += `
+        <div class="student">
+            <b>${s.name}</b><br>
+            Balance: <span style="color:red">UGX ${ (s.fees_balance || 0).toLocaleString() }</span><br>
+            ${ROLE !== "DIRECTOR" ? `<button onclick="updateFees('${s.id}')" style="font-size:10px; padding:5px;">Update Payment</button>` : ""}
+        </div>`;
+    });
+    document.getElementById('financeList').innerHTML = html;
+}
 
-    async function mark(id, status) {
-        await sb.from('students').update({ is_absent: status }).eq('id', id);
-        refresh();
-    }
+async function updateFees(id){
+    let exp = parseInt(prompt("Total Fees Expected?")) || 0;
+    let paid = parseInt(prompt("Amount Paid?")) || 0;
+    await sb.from('students').update({
+        fees_expected: exp,
+        fees_paid: paid,
+        fees_balance: exp - paid
+    }).eq('id', id);
+    load();
+}
 
-    function resetForm() {
-        document.getElementById('editId').value = "";
-        document.getElementById('stName').value = "";
-        document.getElementById('stName').disabled = false;
-        document.getElementById('stGenderVal').value = "";
-        document.getElementById('gMale').className = "gender-opt";
-        document.getElementById('gFemale').className = "gender-opt";
-        document.getElementById('delBtn').classList.add('hidden');
-    }
+function openTab(evt, tab) {
+    document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+    document.getElementById(tab).classList.remove('hidden');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    evt.currentTarget.classList.add('active');
+}
+
+setInterval(() => {
+    let now = new Date();
+    document.getElementById('time').innerText = now.toLocaleString();
+    let h = now.getHours(), m = now.getMinutes(), time = h * 100 + m, day = now.getDay();
+    let status = "CLASS TIME";
+    if (day === 6) status = "HAPPY SABBATH";
+    else if (time >= 1030 && time < 1100) status = "BREAK TIME";
+    else if (time >= 1300 && time < 1400) status = "LUNCH TIME";
+    else if (time >= 1600 && time < 1900) status = "GOING HOME";
+    else if (time >= 1900 && time <= 2100) status = "PREPS";
+    document.getElementById('routine').innerText = "STATUS: " + status;
+}, 1000);
 </script>
+
 </body>
 </html>
