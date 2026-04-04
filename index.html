@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS PRO</title>
+    <title>PROGRESSIVE PMS V62</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -11,39 +11,31 @@
         :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f1f4f8; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; }
         
-        /* Layout */
         .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; position: relative; }
         .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 15px; border-radius: 50px; cursor: pointer; font-size: 11px; }
         
-        /* Dashboard Stats */
         .grid-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
         .stat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
         .stat-card h3 { margin: 5px 0; font-size: 20px; color: var(--dark); }
         .stat-label { font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase; }
 
-        /* Security Alert */
-        .watchdog { background: #fff5f5; border-left: 5px solid var(--red); color: #c53030; padding: 12px; margin: 15px; border-radius: 8px; font-size: 12px; font-weight: bold; }
-
-        /* UI Elements */
         .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .btn-pro { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-sec { background: var(--dark); color: var(--gold); border: 1px solid var(--gold); padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        .btn-del { background: var(--red); color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-size: 10px; margin-top: 5px; width: 100%; }
         
         input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; }
-        
         .role-tag { font-size: 10px; background: var(--gold); color: black; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
         .hidden { display: none !important; }
-
-        @media print { .no-print { display: none; } }
+        .student-row { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
 
-<div id="loginPage" style="padding: 80px 20px; text-align: center;">
-    <h1 style="color:var(--blue)">PROGRESSIVE PMS PRO</h1>
+<div id="loginPage" style="padding: 100px 20px; text-align: center;">
+    <h2 style="color:var(--blue)">PROGRESSIVE PMS PRO</h2>
     <div class="card" style="max-width: 350px; margin: auto;">
-        <input id="key" type="password" placeholder="System Access Key" style="text-align:center;">
-        <button onclick="login()" class="btn-pro">ENTER SYSTEM</button>
+        <input id="key" type="password" placeholder="Access Key" style="text-align:center;">
+        <button onclick="login()" class="btn-pro">LOGIN</button>
     </div>
 </div>
 
@@ -51,61 +43,42 @@
     <div class="header">
         <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
         <h3 style="margin:0;">PROGRESSIVE MOTHERS</h3>
-        <span id="displayRole" class="role-tag">ROLE</span>
-    </div>
-
-    <div id="watchdog" class="watchdog hidden">
-        ⚠️ MISSING REPORTS: <span id="missingClasses"></span>
+        <span id="displayRole" class="role-tag"></span>
     </div>
 
     <div class="grid-stats">
-        <div class="stat-card" style="grid-column: span 2;">
-            <div class="stat-label">Total Enrollment</div>
-            <h3 id="statTotal">0</h3>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Absent Today</div>
-            <h3 id="statAbs" style="color:var(--red);">0</h3>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Gender (M|F)</div>
-            <h3 id="statGender" style="font-size:16px;">0 | 0</h3>
-        </div>
-        <div id="finStat" class="stat-card" style="grid-column: span 2;">
-            <div class="stat-label">Total Outstanding Debt</div>
-            <h3 id="statDebt" style="color:var(--red);">UGX 0</h3>
-        </div>
+        <div class="stat-card" style="grid-column: span 2;"><div class="stat-label">Total Enrollment</div><h3 id="statTotal">0</h3></div>
+        <div class="stat-card"><div class="stat-label">Absent Today</div><h3 id="statAbs" style="color:var(--red);">0</h3></div>
+        <div class="stat-card"><div class="stat-label">M | F Absent</div><h3 id="statGender" style="font-size:16px;">0 | 0</h3></div>
+        <div id="finStat" class="stat-card" style="grid-column: span 2;"><div class="stat-label">Total Outstanding Debt</div><h3 id="statDebt" style="color:var(--red);">0</h3></div>
     </div>
 
-    <div id="adminPanel" class="card hidden">
-        <h4 style="margin:0; color:var(--blue);">MASTER CONTROLS</h4>
-        <button class="btn-sec" onclick="promoteStudents()">🚀 AUTO-PROMOTE ALL STUDENTS (End of Year)</button>
-        <button class="btn-sec" onclick="downloadReport()">📥 DOWNLOAD FULL DEBTOR SOFT COPY (PDF)</button>
-    </div>
-
-    <div id="regCard" class="card">
-        <h4 style="margin:0; color:var(--blue);">STUDENT MANAGEMENT</h4>
+    <div class="card">
+        <h4 style="margin:0; color:var(--blue);">STUDENT RECORD</h4>
         <input type="hidden" id="editId">
-        <input id="stName" placeholder="Student Full Name">
+        <input id="stName" placeholder="Full Name">
         <select id="stGender"><option value="Male">Male</option><option value="Female">Female</option></select>
         <select id="stClass">
             <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
             <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
             <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-            <option value="Left School" id="optLeft" class="hidden">Left School (Archive)</option>
+            <option value="Left School" id="optLeft" class="hidden">Left School</option>
         </select>
-        
-        <div id="finInputs" class="hidden" style="margin-top:10px; padding:10px; border:1px dashed var(--gold); border-radius:8px;">
-            <label style="font-size:11px; font-weight:bold;">FINANCIAL RECORD</label>
+        <div id="finInputs" class="hidden">
             <input id="stExp" type="number" placeholder="Total Fees (UGX)">
             <input id="stPaid" type="number" placeholder="Amount Paid (UGX)">
         </div>
-        <button onclick="saveStudent()" class="btn-pro">SAVE RECORD</button>
+        <button onclick="saveStudent()" class="btn-pro">SAVE STUDENT</button>
+        <button id="delBtn" class="btn-del hidden" onclick="deleteStudent()">DELETE STUDENT PERMANENTLY</button>
+    </div>
+
+    <div id="adminPanel" class="card hidden">
+        <button class="btn-pro" style="background:var(--dark)" onclick="downloadReport()">📥 DOWNLOAD DEBTOR PDF</button>
     </div>
 
     <div class="card">
-        <input type="text" id="search" oninput="render()" placeholder="🔍 Search Name or LIN...">
-        <div id="list" style="margin-top:10px;"></div>
+        <input type="text" id="search" oninput="render()" placeholder="🔍 Search Students...">
+        <div id="list" style="margin-top:15px;"></div>
     </div>
 </div>
 
@@ -115,7 +88,6 @@
     const sb = supabase.createClient(SB_URL, SB_KEY);
     
     let students = [], ROLE = "";
-    const classes = ["Baby", "Middle", "Top", "P.1", "P.2", "P.3", "P.4", "P.5", "P.6", "P.7"];
 
     function login() {
         const k = document.getElementById('key').value.toUpperCase();
@@ -123,13 +95,12 @@
         else if(k === "DIRECTOR2026") ROLE = "DIRECTOR";
         else if(k === "FINANCE2026") ROLE = "FINANCE";
         else if(k === "TEACHER256") ROLE = "TEACHER";
-        else return alert("Access Denied");
+        else return alert("Invalid Key");
 
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
         document.getElementById('displayRole').innerText = ROLE;
 
-        // Apply Security Limits
         if(ROLE === "ADMIN" || ROLE === "DIRECTOR") {
             document.getElementById('adminPanel').classList.remove('hidden');
             document.getElementById('optLeft').classList.remove('hidden');
@@ -162,24 +133,13 @@
             document.getElementById('statDebt').innerText = "UGX " + debt.toLocaleString();
         }
 
-        // Watchdog (9 AM)
-        const reported = [...new Set(students.filter(s => s.is_absent !== null).map(s => s.class))];
-        const missing = classes.filter(c => !reported.includes(c));
-        if(new Date().getHours() >= 9 && missing.length > 0 && (ROLE === "ADMIN" || ROLE === "DIRECTOR")) {
-            document.getElementById('watchdog').classList.remove('hidden');
-            document.getElementById('missingClasses').innerText = missing.join(", ");
-        }
-
         let h = "";
         active.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
-            h += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
+            h += `<div class="student-row">
+                <div style="font-size:13px;"><b>${s.name}</b><br><small>${s.class}</small></div>
                 <div>
-                    <b>${s.name}</b><br><small>${s.class} | ${s.gender}</small>
-                    ${ROLE !== 'TEACHER' && s.fees_balance > 0 ? `<br><span style="color:red; font-size:10px;">Bal: ${s.fees_balance.toLocaleString()}</span>` : ''}
-                </div>
-                <div>
-                    <button onclick="edit('${s.id}')" style="padding:5px;">EDIT</button>
-                    <button onclick="mark('${s.id}', ${!s.is_absent})" style="background:${s.is_absent?'red':'green'}; color:white; border:none; padding:5px; margin-left:5px;">${s.is_absent?'ABSENT':'PRESENT'}</button>
+                    <button onclick="edit('${s.id}')">EDIT</button>
+                    <button onclick="mark('${s.id}', ${!s.is_absent})" style="background:${s.is_absent?'var(--red)':'var(--green)'}; color:white; border:none; padding:5px; margin-left:5px; border-radius:4px;">${s.is_absent?'ABSENT':'PRESENT'}</button>
                 </div>
             </div>`;
         });
@@ -188,39 +148,30 @@
 
     async function saveStudent() {
         const id = document.getElementById('editId').value;
-        let p = {
+        const payload = {
             name: document.getElementById('stName').value,
             class: document.getElementById('stClass').value,
             gender: document.getElementById('stGender').value,
             fees_expected: parseInt(document.getElementById('stExp').value) || 0,
             fees_paid: parseInt(document.getElementById('stPaid').value) || 0
         };
-        p.fees_balance = p.fees_expected - p.fees_paid;
+        payload.fees_balance = payload.fees_expected - payload.fees_paid;
 
-        if(id) await sb.from('students').update(p).eq('id', id);
-        else await sb.from('students').insert([p]);
+        if(id) await sb.from('students').update(payload).eq('id', id);
+        else await sb.from('students').insert([payload]);
         
-        alert("Success");
-        location.reload();
-    }
-
-    async function promoteStudents() {
-        if(!confirm("Are you sure? This will move ALL students to the next class (e.g. P.1 to P.2).")) return;
-        for(let s of students) {
-            let next = classes[classes.indexOf(s.class) + 1] || "Left School";
-            await sb.from('students').update({ class: next, is_absent: null, fees_paid: 0 }).eq('id', s.id);
-        }
-        alert("Promotion Complete!");
+        alert("Success!");
+        resetForm(); // Use resetForm instead of location.reload() to stay logged in
         refresh();
     }
 
-    function downloadReport() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("PROGRESSIVE MOTHERS - DEBTOR REPORT", 14, 15);
-        const rows = students.filter(s => s.fees_balance > 0).map(s => [s.name, s.class, s.fees_balance.toLocaleString()]);
-        doc.autoTable({ head: [['Student Name', 'Class', 'Balance (UGX)']], body: rows, startY: 20 });
-        doc.save("School_Debtors.pdf");
+    async function deleteStudent() {
+        const id = document.getElementById('editId').value;
+        if(!id || !confirm("PERMANENTLY DELETE this student? This cannot be undone.")) return;
+        await sb.from('students').delete().eq('id', id);
+        alert("Deleted.");
+        resetForm();
+        refresh();
     }
 
     function edit(id) {
@@ -229,17 +180,39 @@
         document.getElementById('stName').value = s.name;
         document.getElementById('stClass').value = s.class;
         document.getElementById('stGender').value = s.gender;
-        document.getElementById('stExp').value = s.fees_expected;
-        document.getElementById('stPaid').value = s.fees_paid;
+        document.getElementById('stExp').value = s.fees_expected || 0;
+        document.getElementById('stPaid').value = s.fees_paid || 0;
         
-        if(ROLE === "TEACHER" || ROLE === "FINANCE") {
+        if(ROLE === "ADMIN" || ROLE === "DIRECTOR") document.getElementById('delBtn').classList.remove('hidden');
+        if(ROLE !== "ADMIN" && ROLE !== "DIRECTOR") {
             document.getElementById('stName').disabled = true;
+            document.getElementById('stClass').disabled = (ROLE === "TEACHER");
         }
+        window.scrollTo(0,0);
     }
 
     async function mark(id, status) {
         await sb.from('students').update({ is_absent: status }).eq('id', id);
         refresh();
+    }
+
+    function resetForm() {
+        document.getElementById('editId').value = "";
+        document.getElementById('stName').value = "";
+        document.getElementById('stName').disabled = false;
+        document.getElementById('stClass').disabled = false;
+        document.getElementById('stExp').value = "";
+        document.getElementById('stPaid').value = "";
+        document.getElementById('delBtn').classList.add('hidden');
+    }
+
+    function downloadReport() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("PROGRESSIVE MOTHERS - DEBTOR REPORT", 14, 15);
+        const rows = students.filter(s => s.fees_balance > 0).map(s => [s.name, s.class, s.fees_balance.toLocaleString()]);
+        doc.autoTable({ head: [['Name', 'Class', 'Balance (UGX)']], body: rows, startY: 20 });
+        doc.save("Debtors.pdf");
     }
 </script>
 </body>
