@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V124 MASTER</title>
+    <title>PROGRESSIVE PMS - V125 FINANCE SECURE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -10,15 +10,14 @@
         body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 90px; }
         
         .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 15px 15px 85px; text-align: center; border-radius: 0 0 45px 45px; border-bottom: 5px solid var(--gold); position: relative; }
-        .logout-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: 1.5px solid white; color: white; border-radius: 8px; padding: 6px 12px; font-size: 10px; font-weight: 800; cursor: pointer; }
-        .school-name { font-size: 11px; font-weight: 800; color: var(--gold); margin-top: 5px; text-transform: uppercase; max-width: 70%; margin-left: auto; margin-right: auto; }
+        .logout-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: 1px solid white; color: white; border-radius: 8px; padding: 6px 12px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .school-name { font-size: 11px; font-weight: 800; color: var(--gold); margin-top: 5px; text-transform: uppercase; }
         .clock-box { font-size: 38px; font-weight: 900; color: white; margin: 5px 0; }
         .date-box { font-size: 13px; opacity: 0.8; margin-bottom: 12px; }
-        .auto-notice { display: inline-block; background: white; color: var(--blue); padding: 6px 20px; border-radius: 50px; font-size: 10px; font-weight: 900; border: 2px solid var(--gold); }
 
         .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -55px; position: relative; z-index: 5; }
         .dash-card { background: white; padding: 15px 5px; border-radius: 22px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1.5px solid #eee; }
-        .dash-card span { display: block; font-size: 22px; font-weight: 900; color: var(--blue); }
+        .dash-card span { display: block; font-size: 20px; font-weight: 900; color: var(--blue); }
         .dash-card small { font-size: 8px; font-weight: 800; color: #999; text-transform: uppercase; }
 
         .tab-bar { display: flex; justify-content: space-around; background: white; padding: 8px; margin: 25px 15px 15px; border-radius: 20px; }
@@ -26,14 +25,10 @@
         .tab.active { background: var(--blue); color: white; border-radius: 15px; }
 
         .card { background: white; padding: 20px; border-radius: 28px; margin: 15px; border: 1px solid #eee; }
-        
-        /* ALERTS */
-        .critical-alert { background: #fff1f1; border: 2px solid var(--red); padding: 15px; border-radius: 18px; margin-bottom: 10px; }
-        .normal-absent { background: #fdfdfd; border-left: 5px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 12px; display: flex; justify-content: space-between; align-items:center; }
-        
-        .btn-call { background: var(--blue); color: white; padding: 10px 15px; border-radius: 10px; text-decoration: none; font-size: 11px; font-weight: 800; }
+        input, select { width: 100%; padding: 15px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 15px; font-weight: 600; box-sizing: border-box; }
         .btn-main { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 18px; font-weight: 900; margin-top: 15px; cursor: pointer; }
         
+        .bal-box { background: #f8f9fa; border: 2px dashed var(--blue); padding: 15px; border-radius: 15px; margin-top: 10px; text-align: center; }
         .hidden { display: none !important; }
         .footer-brand { text-align: center; font-size: 10px; color: #bbb; font-weight: 800; margin-top: 30px; }
     </style>
@@ -43,8 +38,8 @@
 <div id="loginGate" style="padding: 100px 30px; text-align: center;">
     <h2 style="color:var(--blue); font-weight:900;">PROGRESSIVE PMS</h2>
     <div class="card" style="max-width:320px; margin:auto; border: 2px solid var(--blue);">
-        <input id="sysKey" type="password" placeholder="SYSTEM KEY" style="text-align:center; width:100%; padding:15px; border-radius:15px; border:1px solid #eee; margin-bottom:10px;">
-        <button onclick="login()" class="btn-main">LOGIN</button>
+        <input id="sysKey" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center;">
+        <button onclick="login()" class="btn-main">AUTHORIZE</button>
     </div>
 </div>
 
@@ -54,7 +49,6 @@
         <div class="school-name">Progressive Mothers Nursery & Primary</div>
         <div id="clock" class="clock-box">00:00:00</div>
         <div id="fullDate" class="date-box">...</div>
-        <div id="autoMsg" class="auto-notice">SYNCING...</div>
     </div>
 
     <div class="dash-container">
@@ -67,51 +61,81 @@
         <div id="tReg" class="tab active" onclick="showTab('reg')">REGISTER</div>
         <div id="tRoll" class="tab" onclick="showTab('roll')">ROLL CALL</div>
         <div id="tRec" class="tab" onclick="showTab('rec')">RECORDS</div>
-        <div id="tAbs" class="tab" onclick="showTab('abs')" style="color:var(--red)">ABSENTEES</div>
+        <div id="tFin" class="tab hidden" onclick="showTab('fin')">FINANCES</div>
     </div>
 
     <div id="secReg" class="card">
-        <h4 style="margin:0; color:var(--blue);">NEW STUDENT</h4>
-        <input id="fName" placeholder="Full Name" style="width:100%; padding:14px; margin-top:10px; border-radius:12px; border:1px solid #eee;">
-        <select id="fClass" style="width:100%; padding:14px; margin-top:10px; border-radius:12px; border:1px solid #eee;"><option value="">Class</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-        <input id="fCon" placeholder="Parent Contact" style="width:100%; padding:14px; margin-top:10px; border-radius:12px; border:1px solid #eee;">
-        <input id="fLin" placeholder="LIN Number" style="width:100%; padding:14px; margin-top:10px; border-radius:12px; border:1px solid #eee;">
-        <button onclick="save()" class="btn-main">SAVE STUDENT</button>
+        <h4 style="margin:0; color:var(--blue);">STUDENT DETAILS</h4>
+        <input id="fName" placeholder="Full Name">
+        <select id="fClass"><option value="">Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+        <input id="fCon" placeholder="Parent Contact">
+        <button onclick="saveStudent()" class="btn-main">SAVE STUDENT</button>
+    </div>
+
+    <div id="secFin" class="hidden">
+        <div class="card">
+            <h4 style="margin:0; color:var(--blue);">FEES MANAGEMENT</h4>
+            <input type="text" id="finSearch" oninput="renderFinList()" placeholder="🔍 Search student to edit fees...">
+            <div id="finList" style="margin-top:15px;"></div>
+        </div>
+    </div>
+
+    <div id="finModal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; padding:20px; box-sizing:border-box;">
+        <div class="card" style="max-width:400px; margin:50px auto;">
+            <h3 id="editStudentName" style="color:var(--blue); margin:0;">Student Name</h3>
+            <label style="font-size:10px; font-weight:800; color:#999;">FEES EXPECTED (UGX)</label>
+            <input type="number" id="mExp" oninput="calcBal()">
+            <label style="font-size:10px; font-weight:800; color:#999; margin-top:10px; display:block;">AMOUNT PAID (UGX)</label>
+            <input type="number" id="mPaid" oninput="calcBal()">
+            
+            <div class="bal-box">
+                <small style="font-weight:800;">AUTO-CALCULATED BALANCE</small><br>
+                <b id="mBal" style="font-size:20px; color:var(--red);">UGX 0</b>
+            </div>
+            
+            <button onclick="updateFees()" class="btn-main" style="background:var(--green)">UPDATE CLOUD</button>
+            <button onclick="closeModal()" class="btn-main" style="background:#eee; color:#333;">CANCEL</button>
+        </div>
     </div>
 
     <div id="secRoll" class="hidden">
-        <div class="card"><select id="rollClass" onchange="loadRoll()" style="width:100%; padding:14px; border-radius:12px; border:1px solid #eee;"><option value="">-- Choose Class --</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
+        <div class="card"><select id="rollClass" onchange="loadRoll()"><option value="">-- Choose Class --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
         <div id="rollArea"></div>
     </div>
 
     <div id="secRec" class="hidden">
-        <div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="🔍 Search name..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #eee;"></div>
-        <div id="recArea"></div>
+        <div class="card" id="recArea"></div>
     </div>
 
-    <div id="secAbs" class="hidden">
-        <div class="card">
-            <h4 style="margin:0; color:var(--red);">ATTENDANCE WATCH</h4>
-            <p style="font-size:11px; color:#666; margin-bottom:15px;">Red borders indicate students absent for 2+ days.</p>
-            <div id="absArea"></div>
-        </div>
-    </div>
-
-    <div class="footer-brand">EUDES MEDIA SOLUTIONS | +256762992440</div>
+    <div class="footer-brand">EUDES MEDIA | +256762992440</div>
 </div>
 
 <script>
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
-    let students = [], attData = {}; 
+    let ROLE = "", students = [], currentEditId = null;
 
     function login() {
         const k = document.getElementById('sysKey').value.toUpperCase();
-        if(["JESUS CARES", "FINANCE2026", "TEACHER256"].includes(k)) {
-            document.getElementById('loginGate').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            fetchData();
-            setInterval(updateTime, 1000);
-        } else alert("Access Denied");
+        if(k === "FINANCE2026") ROLE = "FINANCE";
+        else if(k === "JESUS CARES") ROLE = "ADMIN";
+        else if(k === "TEACHER256") ROLE = "TEACHER";
+        else return alert("Invalid Key");
+
+        document.getElementById('loginGate').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+
+        // FINANCE LOCK LOGIC
+        if(ROLE === "FINANCE") {
+            document.getElementById('tReg').classList.add('hidden');
+            document.getElementById('tRoll').classList.add('hidden');
+            document.getElementById('tFin').classList.remove('hidden');
+            showTab('fin');
+        } else {
+            document.getElementById('tFin').classList.add('hidden');
+        }
+
+        fetchData();
+        setInterval(updateClock, 1000);
     }
 
     async function fetchData() {
@@ -119,87 +143,61 @@
         if(data) {
             students = data;
             document.getElementById('statTotal').innerText = students.length;
-            // Initialize everyone as present (0 days absent)
-            students.forEach(s => { if(!attData[s.id]) attData[s.id] = { status: 'present', daysCount: 0 }; });
-            refreshStats();
+            renderFinList();
         }
     }
 
-    function updateTime() {
+    function renderFinList() {
+        const q = document.getElementById('finSearch').value.toUpperCase();
+        let h = "";
+        students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
+            const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
+            h += `<div onclick="openFinModal('${s.id}')" style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                <b>${s.name}</b>
+                <b style="color:var(--red)">Bal: ${bal.toLocaleString()}</b>
+            </div>`;
+        });
+        document.getElementById('finList').innerHTML = h;
+    }
+
+    function openFinModal(id) {
+        const s = students.find(x => x.id == id);
+        currentEditId = id;
+        document.getElementById('editStudentName').innerText = s.name;
+        document.getElementById('mExp').value = s.fees_expected || 0;
+        document.getElementById('mPaid').value = s.fees_paid || 0;
+        calcBal();
+        document.getElementById('finModal').classList.remove('hidden');
+    }
+
+    function calcBal() {
+        const exp = parseInt(document.getElementById('mExp').value) || 0;
+        const paid = parseInt(document.getElementById('mPaid').value) || 0;
+        const bal = exp - paid;
+        document.getElementById('mBal').innerText = "UGX " + bal.toLocaleString();
+        document.getElementById('mBal').style.color = bal > 0 ? "var(--red)" : "var(--green)";
+    }
+
+    async function updateFees() {
+        const exp = parseInt(document.getElementById('mExp').value) || 0;
+        const paid = parseInt(document.getElementById('mPaid').value) || 0;
+        await sb.from('students').update({ fees_expected: exp, fees_paid: paid }).eq('id', currentEditId);
+        alert("Finance Updated!");
+        closeModal();
+        fetchData();
+    }
+
+    function closeModal() { document.getElementById('finModal').classList.add('hidden'); }
+
+    function updateClock() {
         const now = new Date();
         document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
         document.getElementById('fullDate').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
     }
 
-    async function save() {
-        const row = { name: document.getElementById('fName').value, class: document.getElementById('fClass').value, contact: document.getElementById('fCon').value, lin: document.getElementById('fLin').value };
-        await sb.from('students').insert([row]);
-        alert("Saved!"); fetchData();
-    }
-
-    function loadRoll() {
-        const cls = document.getElementById('rollClass').value;
-        const list = students.filter(s => s.class === cls);
-        let h = "";
-        list.forEach(s => {
-            const isAbs = attData[s.id].status === 'absent';
-            h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:18px; border-bottom:1px solid #eee; background:white; margin:0 15px;">
-                <b>${s.name}</b>
-                <button onclick="toggleAtt('${s.id}')" style="padding:10px 15px; border-radius:12px; border:none; font-weight:900; background:${isAbs ? 'var(--red)' : '#f0f0f0'}; color:${isAbs ? 'white' : '#333'};">
-                    ${isAbs ? 'ABSENT' : 'PRESENT'}
-                </button>
-            </div>`;
-        });
-        document.getElementById('rollArea').innerHTML = h;
-    }
-
-    function toggleAtt(id) {
-        if(attData[id].status === 'present') {
-            attData[id].status = 'absent';
-            attData[id].daysCount = 2; // Simulating "Day 2" for demonstration/reporting
-        } else {
-            attData[id].status = 'present';
-            attData[id].daysCount = 0;
-        }
-        loadRoll();
-        refreshStats();
-    }
-
-    function refreshStats() {
-        let p = 0, a = 0;
-        let absH = "";
-        students.forEach(s => {
-            const info = attData[s.id];
-            if(info.status === 'present') p++;
-            else {
-                a++;
-                const isCritical = info.daysCount >= 2;
-                absH += `<div class="${isCritical ? 'critical-alert' : 'normal-absent'}">
-                    <div>
-                        <b style="color:${isCritical ? 'var(--red)' : '#333'}">${s.name} (${s.class})</b><br>
-                        <small style="font-weight:800;">${isCritical ? '⚠️ CRITICAL: 2 DAYS ABSENT' : 'Absent Today'}</small>
-                    </div>
-                    <a href="tel:${s.contact}" class="btn-call">CALL</a>
-                </div>`;
-            }
-        });
-        document.getElementById('statPres').innerText = p;
-        document.getElementById('statAbs').innerText = a;
-        document.getElementById('absArea').innerHTML = absH || "<p style='text-align:center; color:green;'>All students accounted for.</p>";
-    }
-
-    function renderRec() {
-        const q = document.getElementById('search').value.toUpperCase();
-        let h = "";
-        students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
-            h += `<div class="card"><b>${s.name}</b> - ${s.class}</div>`;
-        });
-        document.getElementById('recArea').innerHTML = h;
-    }
-
     function showTab(t) {
-        ['secReg','secRoll','secRec','secAbs'].forEach(s => document.getElementById(s).classList.add('hidden'));
-        ['tReg','tRoll','tRec','tAbs'].forEach(s => document.getElementById(s).classList.remove('active'));
+        ['secReg','secRoll','secRec','secFin'].forEach(s => document.getElementById(s).classList.add('hidden'));
+        ['tReg','tRoll','tRec','tFin'].forEach(s => document.getElementById(s).classList.remove('active'));
         document.getElementById('sec'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden');
         document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
     }
