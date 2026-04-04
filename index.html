@@ -2,240 +2,188 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PMS V85 - STABLE CORE</title>
+    <title>PROGRESSIVE PMS V66</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #002b5b; --secondary: #005bc5; --accent: #b87333; --danger: #ff3b3b; --success: #00c851; --bg: #f4f7fa; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-bottom: 60px; }
+        :root { --blue: #004085; --dark: #001a33; --white: #ffffff; --green: #218838; --red: #c82333; --gold: #ffc107; --gray: #f1f4f8; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; padding: 0; }
         
-        /* App Header */
-        .app-bar { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 45px 20px; text-align: center; border-radius: 0 0 35px 35px; position: relative; }
-        .logout-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 15px; font-size: 10px; color: white; border: none; font-weight: 800; cursor: pointer; }
-
-        /* Modern Navigation */
-        .nav-dock { display: flex; justify-content: space-around; background: white; margin: -20px 20px 0; padding: 10px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.08); position: sticky; top: 10px; z-index: 1000; }
-        .nav-item { font-size: 10px; font-weight: 800; color: #aaa; cursor: pointer; padding: 12px; border-radius: 12px; text-transform: uppercase; }
-        .nav-item.active { background: var(--primary); color: white; }
-
-        /* UI Elements */
-        .card { background: white; margin: 15px; padding: 20px; border-radius: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #eee; }
-        input, select, textarea { width: 100%; padding: 15px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 15px; box-sizing: border-box; font-size: 14px; }
+        .header { background: linear-gradient(135deg, var(--dark), var(--blue)); color: white; padding: 25px 20px; text-align: center; border-radius: 0 0 30px 30px; position: relative; }
+        .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 15px; border-radius: 50px; cursor: pointer; font-size: 10px; }
         
-        .pass-box { position: relative; width: 100%; max-width: 300px; margin: 0 auto; }
-        .eye-icon { position: absolute; right: 15px; top: 25px; color: #999; cursor: pointer; font-size: 18px; }
-
-        .list-row { background: white; padding: 18px; border-radius: 20px; margin: 0 15px 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
-        .btn-action { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 18px; font-weight: 800; cursor: pointer; margin-top: 10px; }
+        .card { background: white; padding: 15px; border-radius: 12px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .btn-pro { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
-        /* Attendance Buttons */
-        .btn-att { border: none; width: 48px; height: 48px; border-radius: 14px; color: white; font-weight: 900; cursor: pointer; font-size: 16px; }
-        .p-btn { background: var(--success); }
-        .a-btn { background: var(--danger); }
-        .loading { animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; font-size: 14px; }
         .hidden { display: none !important; }
+        
+        .student-row { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--blue); }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; font-size: 11px; color: #555; }
+        .data-label { font-weight: bold; color: var(--blue); text-transform: uppercase; font-size: 9px; }
     </style>
 </head>
 <body>
 
-<div id="loginSection" style="padding: 100px 20px; text-align: center;">
-    <h2 style="color:var(--primary); font-weight: 900;">PROGRESSIVE MOTHERS</h2>
-    <p style="color: #888; font-size: 12px; margin-bottom: 30px;">SECURE ACCESS PORTAL</p>
-    <div class="card" style="max-width: 320px; margin: 0 auto;">
-        <div class="pass-box">
-            <input id="sysKey" type="password" placeholder="System Key" style="text-align:center;">
-            <i class="fa-solid fa-eye eye-icon" id="eyeToggle" onclick="toggleView()"></i>
-        </div>
-        <button onclick="handleLogin()" class="btn-action">LOGIN</button>
+<div id="loginPage" style="padding: 100px 20px; text-align: center;">
+    <h2 style="color:var(--blue)">PROGRESSIVE PMS PRO</h2>
+    <div class="card" style="max-width: 350px; margin: auto;">
+        <input id="key" type="password" placeholder="System Key" style="text-align:center;">
+        <button onclick="login()" class="btn-pro">LOGIN</button>
     </div>
 </div>
 
-<div id="mainApp" class="hidden">
-    <div class="app-bar">
+<div id="app" class="hidden">
+    <div class="header">
         <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
-        <h4 style="margin:0; font-weight: 900; letter-spacing: 1px;">PROGRESSIVE MOTHERS</h4>
-        <div id="clockDisplay" style="font-size: 10px; margin-top: 5px; opacity: 0.8;"></div>
+        <h3 style="margin:0;">STUDENT MASTER LIST</h3>
+        <div id="liveDateTime" style="font-size:11px; color:var(--gold); margin-top:5px;"></div>
     </div>
 
-    <div class="nav-dock">
-        <div id="tDash" class="nav-item active" onclick="switchTab(event,'dashArea')">Dash</div>
-        <div id="tStud" class="nav-item" onclick="switchTab(event,'studArea')">Students</div>
-        <div id="tRoll" class="nav-item" onclick="switchTab(event,'rollArea')">Rollcall</div>
-        <div id="tFin" class="nav-item" onclick="switchTab(event,'finArea')">Finance</div>
-    </div>
-
-    <div id="dashArea">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:15px;">
-            <div class="card" style="margin:0; text-align:center;"><small>Active Students</small><div id="countTotal" style="font-size:22px; font-weight:900; color:var(--primary)">0</div></div>
-            <div class="card" style="margin:0; text-align:center;"><small>Absent Today</small><div id="countAbs" style="font-size:22px; font-weight:900; color:var(--danger)">0</div></div>
+    <div id="regCard" class="card">
+        <h4 style="margin:0; color:var(--blue);">NEW REGISTRATION</h4>
+        <input type="hidden" id="editId">
+        
+        <input id="stName" placeholder="Full Name">
+        <input id="stLin" placeholder="Official LIN Number">
+        <input id="stContact" placeholder="Parent Contact Number">
+        
+        <div style="display:flex; gap:10px;">
+            <input id="stAge" type="number" placeholder="Age">
+            <input id="stDob" type="date" title="Date of Birth">
         </div>
-    </div>
 
-    <div id="studArea" class="hidden">
-        <div id="adminOnlyForm" class="card">
-            <h5 style="margin:0; color:var(--primary)">Register New Student</h5>
-            <input id="nameInput" placeholder="Full Student Name">
-            <div style="display:flex; gap:8px;">
-                <input id="ageInput" type="number" placeholder="Age">
-                <select id="yearInput"><option>2026</option><option>2027</option></select>
-            </div>
-            <select id="classInput">
-                <option value="">Choose Class</option>
-                <option>Baby</option><option>Middle</option><option>Top</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-            <input id="phoneInput" placeholder="Guardian Contact">
-            <input id="locInput" placeholder="Physical Location">
-            <textarea id="healthInput" placeholder="Health Status/Notes"></textarea>
-            <button onclick="saveStudentData()" class="btn-action">SAVE RECORD</button>
-        </div>
-        <div style="padding:0 15px;">
-            <input id="searchBar" oninput="drawStudentList()" placeholder="🔍 Search students...">
-            <div id="listDisplay" style="margin-top:15px;"></div>
-        </div>
-    </div>
-
-    <div id="rollArea" class="hidden" style="padding:15px;">
-        <label style="font-weight: 800; font-size: 11px; color: var(--primary);">SELECT CLASS:</label>
-        <select id="rollSelect" onchange="drawRollcall(this.value)" style="border: 2px solid var(--primary); background:white;">
-            <option value="">-- Choose Class --</option>
-            <option>Baby</option><option>Middle</option><option>Top</option>
-            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+        <select id="stGender">
+            <option value="">-- Select Gender --</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
         </select>
-        <div id="rollContainer" style="margin-top:15px;"></div>
+
+        <select id="stClass">
+            <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+            <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+            <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+        </select>
+
+        <input id="stLoc" placeholder="Physical Location (Address)">
+        <textarea id="stHealth" placeholder="Health Status / Conditions"></textarea>
+
+        <div id="finSection" class="hidden">
+            <input id="stExp" type="number" placeholder="Expected Fees">
+            <input id="stPaid" type="number" placeholder="Paid Fees">
+        </div>
+
+        <button id="saveBtn" onclick="saveStudent()" class="btn-pro">SAVE STUDENT DATA</button>
     </div>
 
-    <div id="finArea" class="hidden" style="padding:20px;">Finance data loading...</div>
+    <div class="card">
+        <input type="text" id="search" oninput="render()" placeholder="🔍 Search LIN or Name...">
+        <div id="list" style="margin-top:15px;"></div>
+    </div>
 </div>
 
 <script>
-    const client = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
-    let studentCache = [], attendanceCache = [], CURRENT_ROLE = "";
+    const SB_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
+    const SB_KEY = "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO";
+    const sb = supabase.createClient(SB_URL, SB_KEY);
+    let students = [], ROLE = "";
 
-    function toggleView() {
-        const field = document.getElementById('sysKey');
-        const icon = document.getElementById('eyeToggle');
-        if (field.type === "password") { field.type = "text"; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
-        else { field.type = "password"; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
-    }
+    function login() {
+        const k = document.getElementById('key').value.toUpperCase();
+        if(k === "JESUS CARES") ROLE = "ADMIN";
+        else if(k === "DIRECTOR2026") ROLE = "DIRECTOR";
+        else if(k === "FINANCE2026") ROLE = "FINANCE";
+        else if(k === "TEACHER256") ROLE = "TEACHER";
+        else return alert("Invalid Key");
 
-    function handleLogin(){
-        let val = document.getElementById('sysKey').value.trim().toUpperCase();
-        if(val === "JESUS CARES") CURRENT_ROLE = "ADMIN";
-        else if(val === "TEACHER256") CURRENT_ROLE = "STAFF";
-        else return alert("Access Denied");
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
 
-        document.getElementById('loginSection').classList.add('hidden');
-        document.getElementById('mainApp').classList.remove('hidden');
-        if(CURRENT_ROLE !== 'ADMIN') document.getElementById('adminOnlyForm').classList.add('hidden');
-        syncData();
-    }
-
-    async function syncData(){
-        const { data: st } = await client.from('students').select('*').order('name');
-        studentCache = st || [];
-        const { data: att } = await client.from('attendance').select('*').eq('date', new Date().toISOString().split('T')[0]);
-        attendanceCache = att || [];
+        if(ROLE === "ADMIN" || ROLE === "FINANCE") document.getElementById('finSection').classList.remove('hidden');
+        if(ROLE === "DIRECTOR") document.getElementById('regCard').classList.add('hidden');
         
-        drawStudentList();
-        document.getElementById('countTotal').innerText = studentCache.length;
-        document.getElementById('countAbs').innerText = attendanceCache.filter(a => a.status === 'Absent').length;
+        refresh();
     }
 
-    async function saveStudentData(){
-        let n = document.getElementById('nameInput').value;
-        let c = document.getElementById('classInput').value;
-        let y = document.getElementById('yearInput').value;
-        if(!n || !c) return alert("Please enter Name and Class");
+    async function refresh() {
+        const { data } = await sb.from('students').select('*').order('name', { ascending: true });
+        students = data || [];
+        render();
+    }
+
+    function render() {
+        const q = document.getElementById('search').value.toUpperCase();
+        let h = "";
         
-        let lin = `PM-${y}-${n.charAt(0).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`;
-
-        const { error } = await client.from('students').insert([{
-            name: n, lin: lin, age: ageInput.value, year: y, class: c,
-            contact: phoneInput.value, location: locInput.value, health_status: healthInput.value
-        }]);
-
-        if(!error) {
-            alert("Success! LIN: " + lin);
-            await syncData();
-            document.getElementById('nameInput').value = "";
-        } else {
-            alert("Save Failed: Database connection error.");
-        }
-    }
-
-    function drawStudentList(){
-        let term = searchBar.value.toUpperCase();
-        let html = "";
-        studentCache.filter(s => s.name.toUpperCase().includes(term)).forEach(s => {
-            html += `<div class="list-row">
-                <div><b style="color:var(--primary)">${s.name}</b><br><small>${s.class}</small></div>
-                <button onclick="alert('LIN: ${s.lin}\\nContact: ${s.contact}\\nHealth: ${s.health_status}')" style="background:#f0f0f0; border:none; padding:8px; border-radius:10px; font-size:10px; font-weight:bold;">INFO</button>
-            </div>`;
-        });
-        document.getElementById('listDisplay').innerHTML = html;
-    }
-
-    function drawRollcall(cls){
-        if(!cls) return rollContainer.innerHTML = "";
-        let html = `<h5 style="color:var(--primary); margin-bottom:15px;">Class: ${cls}</h5>`;
-        studentCache.filter(s => s.class === cls).forEach(s => {
-            let record = attendanceCache.find(a => a.student_id == s.id);
-            let state = record ? record.status : "Pending";
-            let color = state === "Present" ? "var(--success)" : (state === "Absent" ? "var(--danger)" : "#aaa");
-
-            html += `<div class="list-row">
-                <div><b>${s.name}</b><br><small id="lbl-${s.id}" style="color:${color}; font-weight:900;">${state}</small></div>
-                <div style="display:flex; gap:8px;">
-                    <button id="p-${s.id}" onclick="submitAttendance('${s.id}','Present')" class="btn-att p-btn">P</button>
-                    <button id="a-${s.id}" onclick="submitAttendance('${s.id}','Absent')" class="btn-att a-btn">A</button>
+        students.filter(s => s.name.toUpperCase().includes(q) || (s.lin && s.lin.includes(q))).forEach(s => {
+            h += `<div class="student-row">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <b style="font-size:16px;">${s.name}</b><br>
+                        <span style="color:var(--blue); font-weight:bold; font-size:12px;">LIN: ${s.lin || 'N/A'}</span>
+                    </div>
+                    <button onclick="edit('${s.id}')" style="font-size:10px; padding:5px 10px;">VIEW/EDIT</button>
+                </div>
+                
+                <div class="info-grid">
+                    <div><span class="data-label">Class:</span> ${s.class}</div>
+                    <div><span class="data-label">Gender:</span> ${s.gender}</div>
+                    <div><span class="data-label">Contact:</span> ${s.contact || 'N/A'}</div>
+                    <div><span class="data-label">Age:</span> ${s.age || 'N/A'}</div>
+                    <div><span class="data-label">Location:</span> ${s.physical_location || 'N/A'}</div>
+                    <div><span class="data-label">Health:</span> ${s.health_status || 'Normal'}</div>
                 </div>
             </div>`;
         });
-        rollContainer.innerHTML = html;
+        document.getElementById('list').innerHTML = h;
     }
 
-    async function submitAttendance(sid, stat){
-        const btn = stat === 'Present' ? document.getElementById(`p-${sid}`) : document.getElementById(`a-${sid}`);
-        const original = btn.innerText;
-        btn.innerHTML = `<i class="fa-solid fa-sync loading"></i>`;
-        
-        let day = new Date().toISOString().split('T')[0];
+    async function saveStudent() {
+        const id = document.getElementById('editId').value;
+        const payload = {
+            name: document.getElementById('stName').value,
+            lin: document.getElementById('stLin').value,
+            contact: document.getElementById('stContact').value,
+            gender: document.getElementById('stGender').value,
+            class: document.getElementById('stClass').value,
+            age: document.getElementById('stAge').value,
+            dob: document.getElementById('stDob').value,
+            physical_location: document.getElementById('stLoc').value,
+            health_status: document.getElementById('stHealth').value,
+            fees_expected: parseInt(document.getElementById('stExp').value) || 0,
+            fees_paid: parseInt(document.getElementById('stPaid').value) || 0
+        };
+        payload.fees_balance = payload.fees_expected - payload.fees_paid;
 
-        // This uses a direct upsert logic to bypass common RLS table lock errors
-        const { error } = await client.from('attendance').upsert({ 
-            student_id: sid, 
-            status: stat, 
-            date: day 
-        }, { onConflict: 'student_id,date' });
-
-        if(!error) {
-            btn.innerText = original;
-            document.getElementById(`lbl-${sid}`).innerText = stat;
-            document.getElementById(`lbl-${sid}`).style.color = stat === 'Present' ? 'var(--success)' : 'var(--danger)';
-            // Update counts in dash without refreshing
-            const { data: updatedAtt } = await client.from('attendance').select('*').eq('date', day);
-            attendanceCache = updatedAtt || [];
-            document.getElementById('countAbs').innerText = attendanceCache.filter(a => a.status === 'Absent').length;
+        if(id) {
+            if(ROLE === "TEACHER") return alert("Teacher cannot edit existing records!");
+            await sb.from('students').update(payload).eq('id', id);
         } else {
-            alert("Update Blocked: Please ensure the database allows 'Upsert' permissions.");
-            btn.innerText = original;
+            await sb.from('students').insert([payload]);
         }
+        
+        alert("Data Synchronized with Supabase");
+        location.reload(); 
     }
 
-    function switchTab(e, id){
-        ['dashArea','studArea','rollArea','finArea'].forEach(v => document.getElementById(v).classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        e.currentTarget.classList.add('active');
+    function edit(id) {
+        const s = students.find(x => x.id == id);
+        document.getElementById('editId').value = s.id;
+        document.getElementById('stName').value = s.name;
+        document.getElementById('stLin').value = s.lin || "";
+        document.getElementById('stContact').value = s.contact || "";
+        document.getElementById('stGender').value = s.gender || "";
+        document.getElementById('stClass').value = s.class;
+        document.getElementById('stAge').value = s.age || "";
+        document.getElementById('stDob').value = s.dob || "";
+        document.getElementById('stLoc').value = s.physical_location || "";
+        document.getElementById('stHealth').value = s.health_status || "";
+        
+        if(ROLE === "TEACHER" || ROLE === "DIRECTOR") {
+            document.getElementById('saveBtn').classList.add('hidden');
+        }
+        window.scrollTo(0,0);
     }
-
-    setInterval(() => {
-        document.getElementById('clockDisplay').innerText = new Date().toLocaleString().toUpperCase();
-    }, 1000);
 </script>
 </body>
 </html>
