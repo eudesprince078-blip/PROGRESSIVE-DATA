@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V115 PLATINUM</title>
+    <title>PROGRESSIVE PMS - V118 PLATINUM</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -11,36 +11,40 @@
         body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 80px; color: #333; }
         
         /* HEADER & ROUTINE */
-        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 40px 20px 65px; text-align: center; border-radius: 0 0 45px 45px; border-bottom: 6px solid var(--gold); position: relative; }
-        .clock-box { font-size: 34px; font-weight: 900; color: var(--gold); }
-        .auto-notice { display: inline-block; background: white; color: var(--blue); padding: 10px 20px; border-radius: 50px; font-size: 11px; font-weight: 900; margin-top: 12px; border: 2px solid var(--gold); }
+        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 40px 20px 65px; text-align: center; border-radius: 0 0 45px 45px; border-bottom: 6px solid var(--gold); position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .clock-box { font-size: 34px; font-weight: 900; color: var(--gold); text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .auto-notice { display: inline-block; background: white; color: var(--blue); padding: 10px 24px; border-radius: 50px; font-size: 11px; font-weight: 900; margin-top: 12px; border: 2px solid var(--gold); text-transform: uppercase; }
 
-        /* NEW LOGOUT BUTTON */
-        .logout-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.15); border: 1px solid white; color: white; border-radius: 12px; padding: 8px 15px; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .logout-btn:hover { background: var(--red); border-color: var(--red); }
+        /* LOGOUT */
+        .logout-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.15); border: 1px solid white; color: white; border-radius: 12px; padding: 8px 15px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .logout-btn:hover { background: var(--red); }
 
-        /* DASHBOARD & LAYOUT */
+        /* DASHBOARD */
         .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -35px; }
         .dash-card { background: white; padding: 18px 5px; border-radius: 25px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.06); border: 1px solid #eee; }
         
-        .tab-bar { display: flex; justify-content: space-around; background: white; padding: 10px; margin: 20px 15px; border-radius: 25px; }
-        .tab { padding: 12px 15px; font-size: 11px; font-weight: 900; color: #ccc; cursor: pointer; border-radius: 15px; transition: 0.3s; }
+        /* TABS */
+        .tab-bar { display: flex; justify-content: space-around; background: white; padding: 10px; margin: 20px 15px; border-radius: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .tab { padding: 12px 15px; font-size: 11px; font-weight: 900; color: #ccc; cursor: pointer; border-radius: 15px; }
         .tab.active { background: var(--blue); color: white; }
 
-        .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eef0f2; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-        input, select, textarea { width: 100%; padding: 15px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 15px; font-weight: 600; box-sizing: border-box; }
-        input:disabled, select:disabled { background: #f9f9f9; color: #bbb; }
+        /* FORMS */
+        .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eef0f2; }
+        input, select, textarea { width: 100%; padding: 15px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 15px; font-weight: 600; box-sizing: border-box; font-size: 14px; }
+        input:disabled { background: #f9f9f9; color: #aaa; }
         
-        .btn-main { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 20px; font-weight: 900; margin-top: 15px; cursor: pointer; font-size: 14px; }
-        .footer-brand { text-align: center; font-size: 10px; color: #aaa; font-weight: 800; margin-top: 30px; }
+        .balance-box { background: #fffde7; border: 2px solid var(--gold); padding: 15px; border-radius: 20px; margin-top: 15px; text-align: center; }
+        .btn-main { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 20px; font-weight: 900; margin-top: 15px; cursor: pointer; font-size: 14px; box-shadow: 0 5px 15px rgba(0,43,91,0.2); }
+        
+        .footer-brand { text-align: center; font-size: 10px; color: #aaa; font-weight: 800; margin-top: 30px; letter-spacing: 1px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div id="loginGate" style="padding: 100px 30px; text-align: center;">
-    <h1 style="color:var(--blue); font-weight:900; margin-bottom: 5px;">PROGRESSIVE PMS</h1>
-    <p style="color:#888; font-size:12px; font-weight:800; margin-bottom:30px;">EUDES MEDIA MANAGEMENT</p>
+    <h1 style="color:var(--blue); font-weight:900; margin-bottom:5px;">PROGRESSIVE PMS</h1>
+    <p style="color:#888; font-size:12px; font-weight:800; margin-bottom:30px;">EUDES MEDIA SOLUTIONS</p>
     <div class="card" style="max-width:320px; margin:auto; border: 2px solid var(--blue);">
         <input id="sysKey" type="password" placeholder="ENTER SYSTEM KEY" style="text-align:center;">
         <button onclick="login()" class="btn-main">AUTHORIZE ACCESS</button>
@@ -51,17 +55,11 @@
     <div class="header">
         <button class="logout-btn" onclick="logout()">Logout</button>
         <div id="clock" class="clock-box">00:00:00</div>
-        <div id="autoMsg" class="auto-notice">SYNCING CALENDAR...</div>
-    </div>
-
-    <div id="adminPanel" class="card hidden" style="border: 2px solid var(--blue); background: #f0f7ff;">
-        <b style="color:var(--blue); font-size:11px;">DIRECTOR'S BROADCAST</b>
-        <input id="newAnnouncement" placeholder="Update the noticeboard...">
-        <button onclick="postBroadcast()" style="background:var(--gold); color:var(--blue); border:none; padding:10px; border-radius:10px; font-weight:900; margin-top:8px; width:100%;">POST TO ALL STAFF</button>
+        <div id="autoMsg" class="auto-notice">SYNCING...</div>
     </div>
 
     <div class="dash-container">
-        <div class="dash-card"><span id="statTotal" style="font-weight:900;">0</span><br><small style="font-size:8px;">TOTAL</small></div>
+        <div class="dash-card"><span id="statTotal" style="font-weight:900;">0</span><br><small style="font-size:8px;">STUDENTS</small></div>
         <div class="dash-card"><span id="statPres" style="font-weight:900; color:var(--green)">0</span><br><small style="font-size:8px;">PRESENT</small></div>
         <div class="dash-card"><span id="statAbs" style="font-weight:900; color:var(--red)">0</span><br><small style="font-size:8px;">ABSENT</small></div>
     </div>
@@ -73,7 +71,7 @@
     </div>
 
     <div id="secReg" class="card">
-        <h4 id="formTitle" style="margin:0; color:var(--blue); text-transform:uppercase;">Student Entry</h4>
+        <h4 id="formTitle" style="margin:0; color:var(--blue); text-transform:uppercase;">Student Enrollment</h4>
         <input type="hidden" id="editId">
         <input id="fName" placeholder="Full Name">
         <select id="fClass">
@@ -82,15 +80,18 @@
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
         <input id="fCon" placeholder="Parent Contact">
-        <input id="fLin" placeholder="LIN Code">
-        <textarea id="fHealth" placeholder="Health Condition / Medical Status" style="height:80px;"></textarea>
+        <textarea id="fHealth" placeholder="Health & Physical Status" style="height:70px;"></textarea>
         
         <div id="fFin" class="hidden">
-            <input id="fExp" type="number" placeholder="Fees Expected (UGX)">
-            <input id="fPaid" type="number" placeholder="Fees Paid (UGX)">
+            <input id="fExp" type="number" oninput="calcBal()" placeholder="Amount to be Paid (UGX)">
+            <input id="fPaid" type="number" oninput="calcBal()" placeholder="Amount Paid (UGX)">
+            <div class="balance-box">
+                <small style="font-weight:800; color:#856404;">CALCULATED BALANCE:</small><br>
+                <span id="fBal" style="font-size:22px; font-weight:900; color:var(--red);">0</span>
+            </div>
         </div>
         <button id="saveBtn" onclick="save()" class="btn-main">SAVE & SYNC</button>
-        <button id="cancelBtn" onclick="clearForm()" class="hidden" style="width:100%; border:none; background:none; color:var(--red); font-weight:800; margin-top:10px; cursor:pointer;">Cancel Editing</button>
+        <button id="cancelBtn" onclick="clearForm()" class="hidden" style="width:100%; border:none; background:none; color:var(--red); font-weight:800; margin-top:10px;">Cancel Editing</button>
     </div>
 
     <div id="secRoll" class="hidden">
@@ -99,7 +100,7 @@
     </div>
 
     <div id="secRec" class="hidden">
-        <div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="🔍 Search by name..."></div>
+        <div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="🔍 Search student name..."></div>
         <div id="recArea"></div>
     </div>
 
@@ -117,19 +118,59 @@
         if(k === "JESUS CARES") ROLE = "ADMIN";
         else if(k === "FINANCE2026") ROLE = "FINANCE";
         else if(k === "TEACHER256") ROLE = "TEACHER";
-        else return alert("Invalid Access Key");
+        else return alert("Access Key Denied");
 
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-        if(ROLE === "ADMIN") document.getElementById('adminPanel').classList.remove('hidden');
         if(ROLE !== "TEACHER") document.getElementById('fFin').classList.remove('hidden');
         
         fetchData();
         setInterval(engine, 1000);
     }
 
-    function logout() {
-        if(confirm("Log out of the system?")) location.reload();
+    function logout() { if(confirm("Logout of Progressive PMS?")) location.reload(); }
+
+    function calcBal() {
+        const exp = parseInt(document.getElementById('fExp').value) || 0;
+        const paid = parseInt(document.getElementById('fPaid').value) || 0;
+        const bal = exp - paid;
+        const el = document.getElementById('fBal');
+        el.innerText = bal.toLocaleString();
+        el.style.color = bal > 0 ? "var(--red)" : "var(--green)";
+    }
+
+    async function engine() {
+        const now = new Date();
+        const hr = now.getHours();
+        const min = now.getMinutes();
+        const time = hr * 100 + min;
+        const day = now.getDay();
+        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
+
+        let msg = "SCHOOL TRANSITION";
+        
+        if (day === 6) { // Saturday
+            msg = (time >= 1900 && time < 2100) ? "🌙 SATURDAY EVENING LESSONS" : "⛪ HAPPY SABBATH";
+        } else if (day === 0) { // Sunday
+            msg = (time >= 800 && time < 1700) ? "📚 UPPER CLASS CLASSES" : "🎨 SKILLING ACTIVITIES";
+        } else { // Weekdays
+            if (time >= 500 && time < 730) msg = "🌅 MORNING PREPS";
+            else if (time >= 730 && time < 1030) msg = "📖 MORNING CLASSES";
+            else if (time >= 1030 && time < 1100) msg = "☕ BREAK TIME";
+            else if (time >= 1100 && time < 1300) msg = "📖 MID-DAY CLASSES";
+            else if (time >= 1300 && time < 1400) msg = "🍲 LUNCH TIME";
+            else if (time >= 1400 && time < 1600) msg = "📖 AFTERNOON CLASSES";
+            else if (time >= 1600 && time < 1700) msg = "🏠 DEPARTURE & PREP";
+            else if (time >= 1700 && time < 1900) msg = "🏠 PERSONAL REVISION";
+            else if (time >= 1900 && time < 2100) msg = "🌙 EVENING LESSONS";
+            else if (time >= 2130 || time < 500) msg = "🌙 SLEEPING TIME";
+        }
+        document.getElementById('autoMsg').innerText = msg;
+
+        // Auto-Logout Teachers at 4:00 PM (1600)
+        if(ROLE === "TEACHER" && (time >= 1600 || day === 0 || day === 6)) {
+            location.reload(); 
+        }
     }
 
     async function fetchData() {
@@ -139,20 +180,17 @@
         renderRec();
     }
 
-    // FIXED: Save function no longer reloads the page!
     async function save() {
         const id = document.getElementById('editId').value;
         const btn = document.getElementById('saveBtn');
-        
         const row = {
             name: document.getElementById('fName').value,
             class: document.getElementById('fClass').value,
             contact: document.getElementById('fCon').value,
-            lin: document.getElementById('fLin').value,
             health_status: document.getElementById('fHealth').value
         };
 
-        if(ROLE === "ADMIN" || ROLE === "FINANCE") {
+        if(ROLE !== "TEACHER") {
             row.fees_expected = parseInt(document.getElementById('fExp').value) || 0;
             row.fees_paid = parseInt(document.getElementById('fPaid').value) || 0;
         }
@@ -160,35 +198,25 @@
         btn.disabled = true;
         btn.innerText = "SAVING...";
 
-        let res;
-        if(id) res = await sb.from('students').update(row).eq('id', id);
-        else res = await sb.from('students').insert([row]);
+        let res = id ? await sb.from('students').update(row).eq('id', id) : await sb.from('students').insert([row]);
 
         if(!res.error) {
-            alert("Record Saved Successfully!");
-            clearForm(); // Reset form but stay in the app
-            await fetchData(); // Refresh data in background
+            alert("Success! Cloud Synchronized.");
+            clearForm();
+            await fetchData();
         } else {
             alert("Error: " + res.error.message);
         }
-        
         btn.disabled = false;
         btn.innerText = "SAVE & SYNC";
     }
 
     function clearForm() {
-        document.getElementById('editId').value = "";
-        document.getElementById('fName').value = "";
-        document.getElementById('fCon').value = "";
-        document.getElementById('fLin').value = "";
-        document.getElementById('fHealth').value = "";
-        document.getElementById('fExp').value = "";
-        document.getElementById('fPaid').value = "";
-        document.getElementById('formTitle').innerText = "Student Entry";
+        ['fName','fCon','fHealth','fExp','fPaid','editId'].forEach(i => document.getElementById(i).value = "");
+        document.getElementById('fBal').innerText = "0";
+        document.getElementById('formTitle').innerText = "STUDENT ENROLLMENT";
         document.getElementById('cancelBtn').classList.add('hidden');
-        
-        // Re-enable fields if they were locked by Finance
-        ['fName','fClass','fLin','fHealth'].forEach(i => document.getElementById(i).disabled = false);
+        ['fName','fClass','fHealth'].forEach(i => document.getElementById(i).disabled = false);
     }
 
     function edit(id) {
@@ -198,58 +226,44 @@
         document.getElementById('fName').value = s.name;
         document.getElementById('fClass').value = s.class;
         document.getElementById('fCon').value = s.contact;
-        document.getElementById('fLin').value = s.lin;
         document.getElementById('fHealth').value = s.health_status;
         
         if(ROLE !== "TEACHER") {
             document.getElementById('fExp').value = s.fees_expected || 0;
             document.getElementById('fPaid').value = s.fees_paid || 0;
+            calcBal();
         }
 
         if(ROLE === "FINANCE") {
-            ['fName','fClass','fLin','fHealth'].forEach(i => document.getElementById(i).disabled = true);
+            ['fName','fClass','fHealth'].forEach(i => document.getElementById(i).disabled = true);
+        } else {
+            ['fName','fClass','fHealth'].forEach(i => document.getElementById(i).disabled = false);
         }
-        
-        document.getElementById('formTitle').innerText = "EDIT: " + s.name;
+
+        document.getElementById('formTitle').innerText = "EDITING: " + s.name;
         document.getElementById('cancelBtn').classList.remove('hidden');
         showTab('reg');
         window.scrollTo(0,0);
-    }
-
-    function engine() {
-        const now = new Date();
-        const hr = now.getHours();
-        const time = hr * 100 + now.getMinutes();
-        const day = now.getDay();
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-
-        // Routine
-        let msg = "SCHOOL IN SESSION";
-        if(day === 6) msg = (time >= 1900) ? "🌙 SATURDAY LESSONS" : "⛪ HAPPY SABBATH";
-        else if(day === 0) msg = "📚 UPPER CLASS LESSONS";
-        document.getElementById('autoMsg').innerText = msg;
-
-        // Auto-lock for Teachers
-        if(ROLE === "TEACHER" && (time >= 1600 || day === 0 || day === 6)) logout();
     }
 
     function renderRec() {
         const q = document.getElementById('search').value.toUpperCase();
         let h = "";
         students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
-            const num = (s.contact || "").replace(/\D/g,'');
+            const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
             h += `<div class="card">
-                <div style="display:flex; justify-content:space-between;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
                     <b style="color:var(--blue)">${s.name}</b>
-                    <span style="font-size:10px; font-weight:900; background:#eee; padding:3px 8px; border-radius:5px;">${s.class}</span>
+                    <span style="font-size:10px; font-weight:900; background:#eee; padding:3px 8px; border-radius:8px;">${s.class}</span>
                 </div>
+                ${ROLE !== "TEACHER" ? `<div style="font-size:11px; margin-top:8px; font-weight:800; color:${bal > 0 ? 'var(--red)' : 'var(--green)'}">BAL: UGX ${bal.toLocaleString()}</div>` : ''}
                 <div style="display:flex; gap:10px; margin-top:15px;">
-                    <a href="tel:${num}" style="flex:1; background:#007bff; color:white; padding:10px; border-radius:10px; text-align:center; text-decoration:none; font-size:11px; font-weight:800;">CALL</a>
-                    <button onclick="edit('${s.id}')" style="flex:1; background:#f0f0f0; border:none; padding:10px; border-radius:10px; font-weight:800; font-size:11px; cursor:pointer;">EDIT</button>
+                    <button onclick="edit('${s.id}')" style="flex:1; background:#f0f0f0; border:none; padding:10px; border-radius:12px; font-weight:900; font-size:11px; cursor:pointer;">EDIT</button>
+                    <a href="tel:${s.contact}" style="flex:1; background:var(--blue); color:white; padding:10px; border-radius:12px; text-align:center; text-decoration:none; font-size:11px; font-weight:900;">CALL</a>
                 </div>
             </div>`;
         });
-        document.getElementById('recArea').innerHTML = h;
+        document.getElementById('recArea').innerHTML = h || "<p style='text-align:center; color:#ccc; padding:20px;'>No students found.</p>";
     }
 
     function loadRoll() {
@@ -258,24 +272,24 @@
         let h = "";
         list.forEach(s => {
             const st = att[s.id] || 'present';
-            h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #eee;">
+            h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:18px; border-bottom:1px solid #eee;">
                 <b style="font-size:13px;">${s.name}</b>
-                <div style="display:flex; gap:8px;">
-                    <button onclick="setAtt('${s.id}','present')" style="padding:8px 12px; border-radius:8px; border:1px solid #eee; font-weight:900; ${st==='present'?'background:var(--green); color:white;':''}">P</button>
-                    <button onclick="setAtt('${s.id}','absent')" style="padding:8px 12px; border-radius:8px; border:1px solid #eee; font-weight:900; ${st==='absent'?'background:var(--red); color:white;':''}">A</button>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="setAtt('${s.id}','present')" style="padding:10px 15px; border-radius:10px; border:1px solid #eee; font-weight:900; ${st==='present'?'background:var(--green); color:white;':''}">P</button>
+                    <button onclick="setAtt('${s.id}','absent')" style="padding:10px 15px; border-radius:10px; border:1px solid #eee; font-weight:900; ${st==='absent'?'background:var(--red); color:white;':''}">A</button>
                 </div>
             </div>`;
         });
-        document.getElementById('rollArea').innerHTML = h || "<p style='padding:20px; text-align:center;'>Pick a class.</p>";
+        document.getElementById('rollArea').innerHTML = h || "<p style='padding:40px; text-align:center; color:#ccc;'>Select a class above.</p>";
     }
 
-    function setAtt(id, s) {
-        att[id] = s;
+    function setAtt(id, s) { 
+        att[id] = s; 
         let p = 0, a = 0;
         Object.values(att).forEach(v => v==='present'?p++:a++);
         document.getElementById('statPres').innerText = p;
         document.getElementById('statAbs').innerText = a;
-        loadRoll();
+        loadRoll(); 
     }
 
     function showTab(t) {
