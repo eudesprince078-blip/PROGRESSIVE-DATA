@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V129 MASTER SECURITY</title>
+    <title>PROGRESSIVE PMS - V130 FINANCE FIX</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -10,8 +10,7 @@
         body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 90px; }
         
         .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 15px 15px 85px; text-align: center; border-radius: 0 0 45px 45px; border-bottom: 5px solid var(--gold); position: relative; }
-        .holiday-banner { background: var(--gold); color: var(--blue); font-size: 10px; font-weight: 900; padding: 5px; text-transform: uppercase; border-radius: 10px; margin-bottom: 10px; display: none; }
-        .logout-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: 1.5px solid white; color: white; border-radius: 8px; padding: 6px 12px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .logout-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: 1px solid white; color: white; border-radius: 8px; padding: 6px 12px; font-size: 10px; font-weight: 800; cursor: pointer; }
         .school-name { font-size: 11px; font-weight: 800; color: var(--gold); text-transform: uppercase; }
         .clock-box { font-size: 38px; font-weight: 900; color: white; margin: 5px 0; }
         .date-box { font-size: 13px; opacity: 0.8; margin-bottom: 12px; }
@@ -28,7 +27,7 @@
         .card { background: white; padding: 20px; border-radius: 28px; margin: 15px; border: 1px solid #eee; }
         input, select { width: 100%; padding: 15px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 15px; font-weight: 600; box-sizing: border-box; }
         .btn-main { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 18px; font-weight: 900; margin-top: 15px; cursor: pointer; }
-        .btn-del { background: var(--red); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 11px; width: 100%; margin-top: 5px; }
+        .bal-display { background: #f9f9f9; padding: 15px; border-radius: 15px; margin-top: 10px; text-align: center; border: 1px dashed var(--blue); }
 
         .hidden { display: none !important; }
         .footer-brand { text-align: center; font-size: 10px; color: #bbb; font-weight: 800; margin-top: 30px; }
@@ -46,7 +45,6 @@
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div id="holidayMsg" class="holiday-banner"></div>
         <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
         <div class="school-name">Progressive Mothers Nursery & Primary</div>
         <div id="clock" class="clock-box">00:00:00</div>
@@ -70,14 +68,22 @@
         <h4 id="regTitle" style="margin:0; color:var(--blue);">STUDENT REGISTRATION</h4>
         <input type="hidden" id="editId">
         <input id="fName" placeholder="Full Name">
-        <select id="fClass"><option value="">Class</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-        <input id="fCon" placeholder="Contact">
-        <div id="adminFin" class="hidden">
-            <input type="number" id="fExp" placeholder="Fees Expected">
-            <input type="number" id="fPaid" placeholder="Amount Paid">
+        <select id="fClass"><option value="">Select Class</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+        <input id="fCon" placeholder="Parent Contact">
+        
+        <div id="financePanel" class="hidden">
+            <hr style="border:0.5px solid #eee; margin:20px 0;">
+            <label style="font-size:10px; font-weight:800; color:var(--blue)">FEES MANAGEMENT</label>
+            <input type="number" id="fExp" oninput="calcBal()" placeholder="Total Expected Fees">
+            <input type="number" id="fPaid" oninput="calcBal()" placeholder="Amount Paid">
+            <div class="bal-display">
+                <small style="font-weight:800">AUTOMATIC BALANCE</small><br>
+                <b id="balValue" style="color:var(--red); font-size:18px;">UGX 0</b>
+            </div>
         </div>
-        <button onclick="saveData()" class="btn-main">SAVE STUDENT</button>
-        <button id="delBtn" onclick="deleteStudent()" class="btn-del hidden">DELETE PERMANENTLY</button>
+
+        <button onclick="saveData()" class="btn-main">SAVE & SYNC CLOUD</button>
+        <button id="delBtn" onclick="deleteStudent()" class="btn-main hidden" style="background:var(--red)">DELETE STUDENT</button>
     </div>
 
     <div id="secRoll" class="hidden">
@@ -92,7 +98,7 @@
 
     <div id="secFin" class="hidden">
         <div class="card">
-            <h4 style="margin:0; color:var(--blue);">FINANCE DESK</h4>
+            <h4 style="margin:0; color:var(--blue);">FINANCE LEDGER</h4>
             <div id="finArea" style="margin-top:15px;"></div>
         </div>
     </div>
@@ -104,8 +110,6 @@
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
     let ROLE = "", students = [], att = {};
 
-    const holidays = { "01-01": "New Year's Day", "26-01": "NRM Day", "16-02": "Archbishop Luwum Day", "08-03": "Women's Day", "01-05": "Labour Day", "03-06": "Martyrs' Day", "09-06": "Heroes' Day", "09-10": "Independence Day", "25-12": "Christmas", "26-12": "Boxing Day" };
-
     function login() {
         const k = document.getElementById('sysKey').value.toUpperCase();
         const now = new Date();
@@ -114,21 +118,29 @@
         if (k === "JESUS CARES") ROLE = "ADMIN";
         else if (k === "FINANCE2026") ROLE = "FINANCE";
         else if (k === "TEACHER256") {
-            if (time < 630 || time >= 1600) return alert("TEACHER SYSTEM LOCKED. Access: 6:30 AM - 4:00 PM.");
+            if (time < 630 || time >= 1600) return alert("TEACHER ACCESS LOCKED (6:30AM - 4:00PM)");
             ROLE = "TEACHER";
         } else return alert("Invalid Access Key");
 
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
 
-        if(ROLE !== "TEACHER") document.getElementById('adminFin').classList.remove('hidden');
-        if(ROLE !== "ROLL") { 
-            document.getElementById('tFin').classList.toggle('hidden', ROLE === "TEACHER"); 
-            if(ROLE === "FINANCE") { showTab('fin'); document.getElementById('tRoll').classList.add('hidden'); }
+        // FINANCE ACCESS FIX: Unhide panel for Admin OR Finance
+        if (ROLE === "ADMIN" || ROLE === "FINANCE") {
+            document.getElementById('financePanel').classList.remove('hidden');
+            document.getElementById('tFin').classList.remove('hidden');
+            if (ROLE === "FINANCE") {
+                showTab('fin');
+                document.getElementById('tRoll').classList.add('hidden');
+            }
         }
         
         fetchData();
-        setInterval(updateEngine, 1000);
+        setInterval(() => {
+            const n = new Date();
+            document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
+            document.getElementById('fullDate').innerText = n.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+        }, 1000);
     }
 
     async function fetchData() {
@@ -137,49 +149,77 @@
             students = data;
             document.getElementById('statTotal').innerText = students.length;
             renderRec();
-            if(ROLE !== "TEACHER") renderFinance();
+            renderFinance();
         }
+    }
+
+    function calcBal() {
+        const exp = parseInt(document.getElementById('fExp').value) || 0;
+        const paid = parseInt(document.getElementById('fPaid').value) || 0;
+        const bal = exp - paid;
+        document.getElementById('balValue').innerText = "UGX " + bal.toLocaleString();
+        document.getElementById('balValue').style.color = bal > 0 ? "var(--red)" : "var(--green)";
     }
 
     async function saveData() {
         const id = document.getElementById('editId').value;
-        if(id && ROLE !== "ADMIN") return alert("Only Administrator can edit existing records.");
-        
-        const row = { name: document.getElementById('fName').value, class: document.getElementById('fClass').value, contact: document.getElementById('fCon').value };
-        if(ROLE !== "TEACHER") {
+        // Teachers cannot edit existing records
+        if(id && ROLE === "TEACHER") return alert("Teachers cannot edit existing records.");
+
+        const row = {
+            name: document.getElementById('fName').value,
+            class: document.getElementById('fClass').value,
+            contact: document.getElementById('fCon').value
+        };
+
+        // Admin and Finance can save fees
+        if(ROLE === "ADMIN" || ROLE === "FINANCE") {
             row.fees_expected = parseInt(document.getElementById('fExp').value) || 0;
             row.fees_paid = parseInt(document.getElementById('fPaid').value) || 0;
         }
 
         if(id) await sb.from('students').update(row).eq('id', id);
         else await sb.from('students').insert([row]);
-        
-        alert("Success!"); clearForm(); fetchData();
+
+        alert("Data Saved Successfully!"); clearForm(); fetchData();
     }
 
-    function renderRec() {
-        const q = document.getElementById('search').value.toUpperCase();
-        let h = "";
-        students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
-            h += `<div class="card">
-                <b>${s.name}</b> <small style="float:right;">${s.class}</small><br>
-                ${ROLE === "ADMIN" ? `<button onclick="setEdit('${s.id}')" style="margin-top:10px; width:100%; border:none; padding:8px; border-radius:8px; background:#eee; font-weight:800;">ADMIN MANAGE</button>` : ''}
-            </div>`;
-        });
-        document.getElementById('recArea').innerHTML = h;
+    function setEdit(id) {
+        const s = students.find(x => x.id == id);
+        document.getElementById('editId').value = s.id;
+        document.getElementById('fName').value = s.name;
+        document.getElementById('fClass').value = s.class;
+        document.getElementById('fCon').value = s.contact;
+        document.getElementById('fExp').value = s.fees_expected || 0;
+        document.getElementById('fPaid').value = s.fees_paid || 0;
+        calcBal();
+        document.getElementById('regTitle').innerText = "EDITING: " + s.name;
+        if(ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
+        showTab('reg');
     }
 
     function renderFinance() {
         let h = "";
         students.forEach(s => {
             const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
-            h += `<div class="card" style="padding:15px; border-left:5px solid ${bal > 0 ? 'var(--red)' : 'var(--green)'}">
+            h += `<div class="card" onclick="setEdit('${s.id}')" style="cursor:pointer; border-left:6px solid ${bal > 0 ? 'var(--red)' : 'var(--green)'}">
                 <b>${s.name}</b><br>
-                <small>Paid: ${s.fees_paid} | Bal: <b>${bal}</b></small>
-                ${ROLE === "FINANCE" || ROLE === "ADMIN" ? `<button onclick="setEdit('${s.id}')" style="float:right; margin-top:-20px; font-size:10px; padding:5px 10px; border-radius:5px; border:none; background:var(--blue); color:white;">EDIT FEES</button>` : ''}
+                <small>Class: ${s.class} | Bal: <b style="color:var(--red)">${bal.toLocaleString()}</b></small>
             </div>`;
         });
         document.getElementById('finArea').innerHTML = h;
+    }
+
+    function renderRec() {
+        const q = document.getElementById('search').value.toUpperCase();
+        let h = "";
+        students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
+            h += `<div class="card" ${ROLE === "ADMIN" ? `onclick="setEdit('${s.id}')"` : ''}>
+                <b>${s.name}</b> <small style="float:right;">${s.class}</small>
+                ${ROLE === "ADMIN" ? `<br><small style="color:var(--blue)">Tap to manage record</small>` : ''}
+            </div>`;
+        });
+        document.getElementById('recArea').innerHTML = h;
     }
 
     function loadRoll() {
@@ -204,38 +244,6 @@
         loadRoll();
     }
 
-    function setEdit(id) {
-        const s = students.find(x => x.id == id);
-        document.getElementById('editId').value = s.id;
-        document.getElementById('fName').value = s.name;
-        document.getElementById('fClass').value = s.class;
-        document.getElementById('fCon').value = s.contact;
-        document.getElementById('fExp').value = s.fees_expected || 0;
-        document.getElementById('fPaid').value = s.fees_paid || 0;
-        document.getElementById('regTitle').innerText = "EDITING RECORD";
-        if(ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
-        showTab('reg');
-    }
-
-    async function deleteStudent() {
-        if(confirm("DELETE THIS STUDENT FOREVER?")) {
-            await sb.from('students').delete().eq('id', document.getElementById('editId').value);
-            alert("Deleted."); clearForm(); fetchData();
-        }
-    }
-
-    function updateEngine() {
-        const now = new Date();
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-        document.getElementById('fullDate').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-        
-        const d = ("0" + now.getDate()).slice(-2) + "-" + ("0" + (now.getMonth() + 1)).slice(-2);
-        if(holidays[d]) {
-            document.getElementById('holidayMsg').innerText = "📅 PUBLIC HOLIDAY: " + holidays[d];
-            document.getElementById('holidayMsg').style.display = "block";
-        }
-    }
-
     function showTab(t) {
         ['secReg','secRoll','secRec','secFin'].forEach(s => document.getElementById(s).classList.add('hidden'));
         ['tReg','tRoll','tRec','tFin'].forEach(s => document.getElementById(s).classList.remove('active'));
@@ -247,6 +255,14 @@
         ['fName','fCon','fExp','fPaid','editId'].forEach(i => document.getElementById(i).value = "");
         document.getElementById('regTitle').innerText = "STUDENT REGISTRATION";
         document.getElementById('delBtn').classList.add('hidden');
+        document.getElementById('balValue').innerText = "UGX 0";
+    }
+
+    async function deleteStudent() {
+        if(confirm("DELETE PERMANENTLY?")) {
+            await sb.from('students').delete().eq('id', document.getElementById('editId').value);
+            alert("Deleted."); clearForm(); fetchData();
+        }
     }
 </script>
 </body>
