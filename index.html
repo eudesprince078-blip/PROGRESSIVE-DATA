@@ -2,88 +2,97 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS V92</title>
+    <title>PROGRESSIVE PMS V93</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --blue: #002b5b; --gold: #ffce00; --red: #d90000; --gray: #f4f7fa; --white: #ffffff; }
+        :root { --blue: #002b5b; --gold: #ffce00; --red: #d90000; --gray: #f4f7fa; }
         body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 90px; }
+        
+        /* LOGIN SCREEN WITH LOGO */
+        .login-container { padding: 60px 30px; text-align: center; background: white; min-height: 100vh; }
+        .school-logo { width: 150px; height: 150px; margin-bottom: 20px; object-fit: contain; }
         
         .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 35px 20px; text-align: center; border-radius: 0 0 35px 35px; border-bottom: 4px solid var(--gold); }
         .clock { font-size: 30px; font-weight: 900; color: var(--gold); font-family: monospace; }
-        .status-pill { display: inline-block; background: white; color: var(--blue); padding: 6px 15px; border-radius: 50px; font-size: 11px; font-weight: 800; margin-top: 10px; }
 
-        /* DASHBOARD STATS */
+        /* DASHBOARD */
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px; margin-top: -25px; }
         .stat-card { background: white; padding: 15px; border-radius: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); }
-        .stat-lab { font-size: 9px; font-weight: 700; color: #999; text-transform: uppercase; }
 
-        /* REGISTRATION FORM */
-        .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eee; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border: 1.5px solid #eee; border-radius: 12px; font-size: 14px; box-sizing: border-box; }
-        .btn-save { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 10px; cursor: pointer; }
-
-        /* STUDENT CARDS (AS PER YOUR SCREENSHOT) */
-        .student-card { background: white; border-radius: 20px; padding: 18px; margin: 10px 15px; border: 1px solid #e0e6ed; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-        .st-name { font-size: 17px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
-        .st-lin { font-size: 12px; color: #005bc5; font-weight: 700; margin-bottom: 10px; }
+        /* REFINED STUDENT CARD LAYOUT */
+        .student-card { background: white; border-radius: 20px; padding: 20px; margin: 10px 15px; border: 1px solid #e0e6ed; position: relative; }
+        .st-name { font-size: 17px; font-weight: 800; color: var(--blue); text-transform: uppercase; margin-bottom: 2px; }
+        .st-lin { font-size: 12px; color: #005bc5; font-weight: 700; margin-bottom: 12px; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .info-item b { display: block; font-size: 8px; color: #aaa; text-transform: uppercase; }
-        .info-item span { font-size: 12px; font-weight: 600; }
-        .edit-btn { position: absolute; top: 15px; right: 15px; background: #f0f4f8; border: none; padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; color: var(--blue); }
+        .info-item b { display: block; font-size: 8px; color: #aaa; text-transform: uppercase; margin-bottom: 2px; }
+        .info-item span { font-size: 12px; font-weight: 600; color: #444; }
+        
+        .action-btn { position: absolute; top: 15px; right: 15px; background: #eef6ff; border: none; padding: 8px 15px; border-radius: 12px; font-size: 10px; font-weight: 800; color: var(--blue); cursor: pointer; }
+
+        .form-card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eee; }
+        input, select, textarea { width: 100%; padding: 14px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 12px; font-size: 14px; box-sizing: border-box; }
+        .btn-save { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; cursor: pointer; }
 
         .hidden { display: none !important; }
+        .loading-text { text-align: center; padding: 40px; color: #888; font-weight: 700; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" style="padding: 100px 30px; text-align: center;">
-    <h2 style="color:var(--blue)">PROGRESSIVE PMS</h2>
-    <input id="key" type="password" placeholder="Enter Key" style="text-align:center; width: 200px;"><br><br>
-    <button onclick="login()" class="btn-save" style="width:200px;">LOGIN</button>
+<div id="loginGate" class="login-container">
+    <img src="https://i.postimg.cc/0jXyX0Ym/MOTHER-S-PRIDE.jpg" class="school-logo" alt="Progressive Mothers Logo">
+    <h2 style="color:var(--blue); margin-top:0;">PROGRESSIVE MOTHERS</h2>
+    <p style="font-size:12px; color:#666; margin-bottom:30px;">System Command Center</p>
+    
+    <div style="max-width:300px; margin:auto;">
+        <input id="sysKey" type="password" placeholder="Enter System Key" style="text-align:center;">
+        <button onclick="doLogin()" class="btn-save">SECURE ACCESS</button>
+    </div>
 </div>
 
-<div id="app" class="hidden">
+<div id="appBody" class="hidden">
     <div class="header">
         <div id="clock" class="clock">00:00:00</div>
-        <div id="date" style="font-size: 11px; font-weight: 700; opacity: 0.8;"></div>
-        <div id="activity" class="status-pill">LOADING...</div>
+        <div id="statusPill" style="font-size:11px; font-weight:800; margin-top:5px; color:var(--gold);">CHECKING SYSTEM...</div>
     </div>
 
     <div class="dash-grid">
-        <div class="stat-card"><div id="count" class="stat-val">0</div><div class="stat-lab">Total Students</div></div>
-        <div class="stat-card"><div id="bal" class="stat-val" style="color:var(--red)">0</div><div class="stat-lab">Fees Collected</div></div>
+        <div class="stat-card"><div id="count" style="font-size:22px; font-weight:900;">0</div><div style="font-size:9px; color:#999; font-weight:700;">STUDENTS</div></div>
+        <div class="stat-card"><div id="financeBox" style="font-size:22px; font-weight:900; color:var(--red);">UGX 0</div><div style="font-size:9px; color:#999; font-weight:700;">FEES PAID</div></div>
     </div>
 
-    <div id="formBox" class="card">
-        <h4 style="margin:0; color:var(--blue);">STUDENT DETAILS</h4>
-        <input type="hidden" id="sid">
-        <input id="inName" placeholder="Full Name">
+    <div class="form-card">
+        <h4 style="margin:0; color:var(--blue);">STUDENT REGISTRATION</h4>
+        <input type="hidden" id="editId">
+        <input id="fName" placeholder="Full Name">
         <div style="display:flex; gap:10px;">
-            <input id="inAge" type="number" placeholder="Age">
-            <select id="inClass">
+            <input id="fAge" type="number" placeholder="Age">
+            <select id="fClass">
                 <option value="">Class</option>
                 <option>Baby</option><option>Middle</option><option>Top</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
         </div>
-        <input id="inLin" placeholder="LIN Number">
-        <input id="inContact" placeholder="Contact">
-        <input id="inLoc" placeholder="Address">
-        <textarea id="inHealth" placeholder="Health Status"></textarea>
-
-        <div id="fin" class="hidden">
-            <input id="inExp" type="number" placeholder="Expected Fees">
-            <input id="inPaid" type="number" placeholder="Paid Fees">
+        <input id="fLin" placeholder="LIN Number">
+        <input id="fContact" placeholder="Parent Contact">
+        <input id="fLoc" placeholder="Home Address">
+        <textarea id="fHealth" placeholder="Health Info"></textarea>
+        
+        <div id="financeFields" class="hidden">
+            <input id="fExp" type="number" placeholder="Expected Fees">
+            <input id="fPaid" type="number" placeholder="Paid Fees">
         </div>
-        <button id="saveBtn" onclick="save()" class="btn-save">SAVE STUDENT DATA</button>
+        <button id="saveBtn" onclick="handleSave()" class="btn-save">SAVE RECORD</button>
     </div>
 
-    <div class="card" style="margin-top:0;">
-        <input type="text" id="search" oninput="render()" placeholder="🔍 Search students...">
-        <div id="list" style="margin-top:15px;"></div>
+    <div style="padding: 0 15px;">
+        <input type="text" id="searchIn" oninput="render()" placeholder="🔍 Search records..." style="background:white;">
+    </div>
+
+    <div id="recordList">
+        <div class="loading-text">Fetching records...</div>
     </div>
 </div>
 
@@ -91,56 +100,45 @@
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
     let cache = [], ROLE = "";
 
-    function login() {
-        const k = document.getElementById('key').value.toUpperCase();
+    function doLogin() {
+        const k = document.getElementById('sysKey').value.toUpperCase();
         if(k === "JESUS CARES") ROLE = "ADMIN";
         else if(k === "FINANCE2026") ROLE = "FINANCE";
         else if(k === "TEACHER256") ROLE = "TEACHER";
-        else return alert("Wrong Key");
+        else return alert("Invalid Access Key");
 
         document.getElementById('loginGate').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        if(ROLE !== "TEACHER") document.getElementById('fin').classList.remove('hidden');
+        document.getElementById('appBody').classList.remove('hidden');
+        if(ROLE !== "TEACHER") document.getElementById('financeFields').classList.remove('hidden');
         
-        fetch();
-        setInterval(tick, 1000);
+        fetchData();
+        setInterval(updateClock, 1000);
     }
 
-    function tick() {
-        const now = new Date();
-        const hrs = now.getHours();
-        const day = now.getDay();
-        const time = hrs * 100 + now.getMinutes();
-        
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-        document.getElementById('date').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-
-        let status = "Sleeping / Lights Out";
-        if (day === 6 && time < 1900) status = "Sabbath: No Lessons ⛪";
-        else if (time >= 500 && time < 1030) status = "Morning Lessons 📚";
-        else if (time >= 1030 && time < 1100) status = "Break Time ☕";
-        else if (time >= 1300 && time < 1400) status = "Lunch Time 🍲";
-        else if (time >= 1900 && time < 2100) status = "Evening Preps 🌙";
-
-        document.getElementById('activity').innerText = status;
-    }
-
-    async function fetch() {
-        const { data } = await sb.from('students').select('*').order('name');
+    async function fetchData() {
+        const { data, error } = await sb.from('students').select('*').order('name', { ascending: true });
+        if (error) {
+            document.getElementById('recordList').innerHTML = `<div class="loading-text" style="color:red;">Error: ${error.message}</div>`;
+            return;
+        }
         cache = data || [];
-        document.getElementById('count').innerText = cache.length;
         render();
     }
 
     function render() {
-        const q = document.getElementById('search').value.toUpperCase();
-        let h = "";
-        cache.filter(s => s.name.toUpperCase().includes(q) || s.class.toUpperCase().includes(q)).forEach(s => {
-            h += `
+        const q = document.getElementById('searchIn').value.toUpperCase();
+        let html = "";
+        let totalPaid = 0;
+
+        const filtered = cache.filter(s => s.name.toUpperCase().includes(q) || s.class.toUpperCase().includes(q));
+        
+        filtered.forEach(s => {
+            totalPaid += (s.fees_paid || 0);
+            html += `
             <div class="student-card">
-                <button class="edit-btn" onclick="edit('${s.id}')">EDIT</button>
+                <button class="action-btn" onclick="prepareEdit('${s.id}')">EDIT</button>
                 <div class="st-name">${s.name}</div>
-                <div class="st-lin">LIN: ${s.lin || 'N/A'}</div>
+                <div class="st-lin">LIN: ${s.lin || 'No LIN'}</div>
                 <div class="info-grid">
                     <div class="info-item"><b>Class</b><span>${s.class}</span></div>
                     <div class="info-item"><b>Contact</b><span>${s.contact || 'N/A'}</span></div>
@@ -149,43 +147,65 @@
                 </div>
             </div>`;
         });
-        document.getElementById('list').innerHTML = h;
+
+        document.getElementById('recordList').innerHTML = html || "<div class='loading-text'>No records found.</div>";
+        document.getElementById('count').innerText = cache.length;
+        document.getElementById('financeBox').innerText = "UGX " + totalPaid.toLocaleString();
     }
 
-    function edit(id) {
-        if(ROLE === "TEACHER") return alert("Access Denied: Teachers cannot edit records.");
+    function prepareEdit(id) {
+        if(ROLE === "TEACHER") return alert("Teachers are not permitted to edit records.");
         const s = cache.find(x => x.id == id);
-        document.getElementById('sid').value = s.id;
-        document.getElementById('inName').value = s.name;
-        document.getElementById('inClass').value = s.class;
-        document.getElementById('inLin').value = s.lin || "";
-        document.getElementById('inAge').value = s.age || "";
-        document.getElementById('inContact').value = s.contact || "";
-        document.getElementById('inLoc').value = s.physical_location || "";
-        document.getElementById('inHealth').value = s.health_status || "";
+        document.getElementById('editId').value = s.id;
+        document.getElementById('fName').value = s.name;
+        document.getElementById('fAge').value = s.age || "";
+        document.getElementById('fClass').value = s.class;
+        document.getElementById('fLin').value = s.lin || "";
+        document.getElementById('fContact').value = s.contact || "";
+        document.getElementById('fLoc').value = s.physical_location || "";
+        document.getElementById('fHealth').value = s.health_status || "";
         if(ROLE !== "TEACHER") {
-            document.getElementById('inExp').value = s.fees_expected || 0;
-            document.getElementById('inPaid').value = s.fees_paid || 0;
+            document.getElementById('fExp').value = s.fees_expected || 0;
+            document.getElementById('fPaid').value = s.fees_paid || 0;
         }
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    async function save() {
-        const id = document.getElementById('sid').value;
-        const payload = {
-            name: inName.value, class: inClass.value, lin: inLin.value,
-            age: inAge.value, contact: inContact.value, physical_location: inLoc.value, health_status: inHealth.value
+    async function handleSave() {
+        const id = document.getElementById('editId').value;
+        const btn = document.getElementById('saveBtn');
+        btn.innerText = "PROCESSING...";
+        btn.disabled = true;
+
+        const row = {
+            name: fName.value, age: fAge.value, class: fClass.value, lin: fLin.value,
+            contact: fContact.value, physical_location: fLoc.value, health_status: fHealth.value
         };
         if(ROLE !== "TEACHER") {
-            payload.fees_expected = parseInt(inExp.value) || 0;
-            payload.fees_paid = parseInt(inPaid.value) || 0;
+            row.fees_expected = parseInt(fExp.value) || 0;
+            row.fees_paid = parseInt(fPaid.value) || 0;
         }
 
-        if(id) await sb.from('students').update(payload).eq('id', id);
-        else await sb.from('students').insert([payload]);
+        let error;
+        if(id) {
+            const res = await sb.from('students').update(row).eq('id', id);
+            error = res.error;
+        } else {
+            const res = await sb.from('students').insert([row]);
+            error = res.error;
+        }
 
-        alert("System Updated!");
-        location.reload();
+        if(error) {
+            alert("Error: " + error.message);
+        } else {
+            alert("Record Saved Successfully!");
+            location.reload();
+        }
+    }
+
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
     }
 </script>
 </body>
