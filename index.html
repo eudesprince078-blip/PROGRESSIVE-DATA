@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V130 FINANCE FIX</title>
+    <title>PROGRESSIVE PMS - V131 MASTER SECURITY</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -11,7 +11,6 @@
         
         .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 15px 15px 85px; text-align: center; border-radius: 0 0 45px 45px; border-bottom: 5px solid var(--gold); position: relative; }
         .logout-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: 1px solid white; color: white; border-radius: 8px; padding: 6px 12px; font-size: 10px; font-weight: 800; cursor: pointer; }
-        .school-name { font-size: 11px; font-weight: 800; color: var(--gold); text-transform: uppercase; }
         .clock-box { font-size: 38px; font-weight: 900; color: white; margin: 5px 0; }
         .date-box { font-size: 13px; opacity: 0.8; margin-bottom: 12px; }
 
@@ -25,7 +24,9 @@
         .tab.active { background: var(--blue); color: white; border-radius: 15px; }
 
         .card { background: white; padding: 20px; border-radius: 28px; margin: 15px; border: 1px solid #eee; }
-        input, select { width: 100%; padding: 15px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 15px; font-weight: 600; box-sizing: border-box; }
+        input, select { width: 100%; padding: 15px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 15px; font-weight: 600; box-sizing: border-box; font-size: 14px; }
+        input:disabled, select:disabled { background: #f0f0f0; color: #888; cursor: not-allowed; }
+        
         .btn-main { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 18px; font-weight: 900; margin-top: 15px; cursor: pointer; }
         .bal-display { background: #f9f9f9; padding: 15px; border-radius: 15px; margin-top: 10px; text-align: center; border: 1px dashed var(--blue); }
 
@@ -58,32 +59,33 @@
     </div>
 
     <div class="tab-bar">
-        <div id="tReg" class="tab active" onclick="showTab('reg')">REGISTER</div>
+        <div id="tReg" class="tab active" onclick="showTab('reg')">REGISTRATION</div>
         <div id="tRoll" class="tab" onclick="showTab('roll')">ROLL CALL</div>
         <div id="tRec" class="tab" onclick="showTab('rec')">RECORDS</div>
         <div id="tFin" class="tab hidden" onclick="showTab('fin')">FINANCES</div>
     </div>
 
     <div id="secReg" class="card">
-        <h4 id="regTitle" style="margin:0; color:var(--blue);">STUDENT REGISTRATION</h4>
+        <h4 id="regTitle" style="margin:0; color:var(--blue);">STUDENT DETAILS</h4>
         <input type="hidden" id="editId">
+        
+        <label style="font-size:10px; font-weight:800;">PERSONAL INFO (Admin Only to Edit)</label>
         <input id="fName" placeholder="Full Name">
         <select id="fClass"><option value="">Select Class</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         <input id="fCon" placeholder="Parent Contact">
         
         <div id="financePanel" class="hidden">
             <hr style="border:0.5px solid #eee; margin:20px 0;">
-            <label style="font-size:10px; font-weight:800; color:var(--blue)">FEES MANAGEMENT</label>
+            <label style="font-size:10px; font-weight:800; color:var(--blue)">FEES MANAGEMENT (Finance/Admin Only)</label>
             <input type="number" id="fExp" oninput="calcBal()" placeholder="Total Expected Fees">
             <input type="number" id="fPaid" oninput="calcBal()" placeholder="Amount Paid">
             <div class="bal-display">
-                <small style="font-weight:800">AUTOMATIC BALANCE</small><br>
                 <b id="balValue" style="color:var(--red); font-size:18px;">UGX 0</b>
             </div>
         </div>
 
-        <button onclick="saveData()" class="btn-main">SAVE & SYNC CLOUD</button>
-        <button id="delBtn" onclick="deleteStudent()" class="btn-main hidden" style="background:var(--red)">DELETE STUDENT</button>
+        <button onclick="saveData()" class="btn-main">SAVE CHANGES</button>
+        <button id="delBtn" onclick="deleteStudent()" class="btn-main hidden" style="background:var(--red)">PERMANENTLY DELETE</button>
     </div>
 
     <div id="secRoll" class="hidden">
@@ -98,7 +100,7 @@
 
     <div id="secFin" class="hidden">
         <div class="card">
-            <h4 style="margin:0; color:var(--blue);">FINANCE LEDGER</h4>
+            <h4 style="margin:0; color:var(--blue);">FEES COLLECTION</h4>
             <div id="finArea" style="margin-top:15px;"></div>
         </div>
     </div>
@@ -118,21 +120,23 @@
         if (k === "JESUS CARES") ROLE = "ADMIN";
         else if (k === "FINANCE2026") ROLE = "FINANCE";
         else if (k === "TEACHER256") {
-            if (time < 630 || time >= 1600) return alert("TEACHER ACCESS LOCKED (6:30AM - 4:00PM)");
+            if (time < 630 || time >= 1600) return alert("TEACHER SYSTEM LOCKED (6:30AM - 4:00PM)");
             ROLE = "TEACHER";
         } else return alert("Invalid Access Key");
 
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
 
-        // FINANCE ACCESS FIX: Unhide panel for Admin OR Finance
-        if (ROLE === "ADMIN" || ROLE === "FINANCE") {
-            document.getElementById('financePanel').classList.remove('hidden');
+        // SECURITY LOCKDOWN LOGIC
+        if (ROLE === "FINANCE") {
+            // Finance only sees Finance tab, Roll Call is HIDDEN
             document.getElementById('tFin').classList.remove('hidden');
-            if (ROLE === "FINANCE") {
-                showTab('fin');
-                document.getElementById('tRoll').classList.add('hidden');
-            }
+            document.getElementById('tRoll').classList.add('hidden');
+            document.getElementById('financePanel').classList.remove('hidden');
+            showTab('fin');
+        } else if (ROLE === "ADMIN") {
+            document.getElementById('tFin').classList.remove('hidden');
+            document.getElementById('financePanel').classList.remove('hidden');
         }
         
         fetchData();
@@ -156,32 +160,7 @@
     function calcBal() {
         const exp = parseInt(document.getElementById('fExp').value) || 0;
         const paid = parseInt(document.getElementById('fPaid').value) || 0;
-        const bal = exp - paid;
-        document.getElementById('balValue').innerText = "UGX " + bal.toLocaleString();
-        document.getElementById('balValue').style.color = bal > 0 ? "var(--red)" : "var(--green)";
-    }
-
-    async function saveData() {
-        const id = document.getElementById('editId').value;
-        // Teachers cannot edit existing records
-        if(id && ROLE === "TEACHER") return alert("Teachers cannot edit existing records.");
-
-        const row = {
-            name: document.getElementById('fName').value,
-            class: document.getElementById('fClass').value,
-            contact: document.getElementById('fCon').value
-        };
-
-        // Admin and Finance can save fees
-        if(ROLE === "ADMIN" || ROLE === "FINANCE") {
-            row.fees_expected = parseInt(document.getElementById('fExp').value) || 0;
-            row.fees_paid = parseInt(document.getElementById('fPaid').value) || 0;
-        }
-
-        if(id) await sb.from('students').update(row).eq('id', id);
-        else await sb.from('students').insert([row]);
-
-        alert("Data Saved Successfully!"); clearForm(); fetchData();
+        document.getElementById('balValue').innerText = "UGX " + (exp - paid).toLocaleString();
     }
 
     function setEdit(id) {
@@ -192,10 +171,47 @@
         document.getElementById('fCon').value = s.contact;
         document.getElementById('fExp').value = s.fees_expected || 0;
         document.getElementById('fPaid').value = s.fees_paid || 0;
+        
+        // PHYSICAL LOCK: Finance cannot touch personal details
+        const isFinance = (ROLE === "FINANCE");
+        document.getElementById('fName').disabled = isFinance;
+        document.getElementById('fClass').disabled = isFinance;
+        document.getElementById('fCon').disabled = isFinance;
+
+        // Teachers cannot edit anything existing
+        if(ROLE === "TEACHER") {
+            document.getElementById('fName').disabled = true;
+            document.getElementById('fClass').disabled = true;
+            document.getElementById('fCon').disabled = true;
+        }
+
         calcBal();
-        document.getElementById('regTitle').innerText = "EDITING: " + s.name;
+        document.getElementById('regTitle').innerText = "MANAGING: " + s.name;
         if(ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
         showTab('reg');
+    }
+
+    async function saveData() {
+        const id = document.getElementById('editId').value;
+        const row = {};
+
+        // Only Admin can update personal info for existing students
+        if (!id || ROLE === "ADMIN") {
+            row.name = document.getElementById('fName').value;
+            row.class = document.getElementById('fClass').value;
+            row.contact = document.getElementById('fCon').value;
+        }
+
+        // Admin and Finance can update fees
+        if (ROLE === "ADMIN" || ROLE === "FINANCE") {
+            row.fees_expected = parseInt(document.getElementById('fExp').value) || 0;
+            row.fees_paid = parseInt(document.getElementById('fPaid').value) || 0;
+        }
+
+        if(id) await sb.from('students').update(row).eq('id', id);
+        else await sb.from('students').insert([row]);
+
+        alert("Database Updated!"); clearForm(); fetchData();
     }
 
     function renderFinance() {
@@ -214,9 +230,8 @@
         const q = document.getElementById('search').value.toUpperCase();
         let h = "";
         students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
-            h += `<div class="card" ${ROLE === "ADMIN" ? `onclick="setEdit('${s.id}')"` : ''}>
+            h += `<div class="card" onclick="setEdit('${s.id}')">
                 <b>${s.name}</b> <small style="float:right;">${s.class}</small>
-                ${ROLE === "ADMIN" ? `<br><small style="color:var(--blue)">Tap to manage record</small>` : ''}
             </div>`;
         });
         document.getElementById('recArea').innerHTML = h;
@@ -252,14 +267,17 @@
     }
 
     function clearForm() {
-        ['fName','fCon','fExp','fPaid','editId'].forEach(i => document.getElementById(i).value = "");
-        document.getElementById('regTitle').innerText = "STUDENT REGISTRATION";
+        ['fName','fCon','fExp','fPaid','editId'].forEach(i => {
+            document.getElementById(i).value = "";
+            document.getElementById(i).disabled = false;
+        });
+        document.getElementById('regTitle').innerText = "STUDENT DETAILS";
         document.getElementById('delBtn').classList.add('hidden');
         document.getElementById('balValue').innerText = "UGX 0";
     }
 
     async function deleteStudent() {
-        if(confirm("DELETE PERMANENTLY?")) {
+        if(confirm("PERMANENTLY DELETE STUDENT?")) {
             await sb.from('students').delete().eq('id', document.getElementById('editId').value);
             alert("Deleted."); clearForm(); fetchData();
         }
