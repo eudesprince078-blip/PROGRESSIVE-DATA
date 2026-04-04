@@ -2,60 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE PMS - V134 ADMIN MASTER</title>
+    <title>PROGRESSIVE MOTHERS PMS - V135</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #002b5b; --gold: #ffce00; --red: #ff3b3b; --green: #2ecc71; --gray: #f4f7fa; }
         body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 100px; }
         
-        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 15px 15px 85px; text-align: center; border-radius: 0 0 45px 45px; border-bottom: 5px solid var(--gold); position: relative; }
-        .logout-mini { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: 1px solid white; color: white; border-radius: 8px; padding: 6px 12px; font-size: 10px; font-weight: 800; cursor: pointer; }
-        .clock-box { font-size: 42px; font-weight: 900; color: var(--gold); margin: 5px 0; }
+        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 20px 15px 90px; text-align: center; border-radius: 0 0 45px 45px; border-bottom: 5px solid var(--gold); position: relative; }
+        .school-title { font-size: 13px; font-weight: 900; color: var(--gold); text-transform: uppercase; line-height: 1.4; margin-bottom: 5px; }
+        .school-loc { font-size: 10px; font-weight: 700; opacity: 0.9; letter-spacing: 1px; }
+        .clock-box { font-size: 40px; font-weight: 900; margin: 10px 0; color: white; }
         
-        .audit-alert { background: var(--red); color: white; padding: 10px; margin: 10px 15px; border-radius: 12px; font-size: 11px; font-weight: 800; text-align: center; animation: blink 1s infinite; display: none; }
-        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
-
-        .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -55px; position: relative; z-index: 5; }
+        .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -65px; position: relative; z-index: 5; }
         .dash-card { background: white; padding: 15px 5px; border-radius: 22px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #eee; }
         .dash-card span { display: block; font-size: 22px; font-weight: 900; color: var(--blue); }
         .dash-card small { font-size: 8px; font-weight: 800; color: #999; text-transform: uppercase; }
 
-        .tab-bar { display: flex; justify-content: space-around; background: white; padding: 8px; margin: 25px 15px 15px; border-radius: 20px; }
+        .tab-bar { display: flex; justify-content: space-around; background: white; padding: 8px; margin: 25px 15px 15px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .tab { padding: 12px 5px; font-size: 10px; font-weight: 900; color: #bbb; cursor: pointer; text-align: center; flex: 1; }
         .tab.active { background: var(--blue); color: white; border-radius: 15px; }
 
         .card { background: white; padding: 20px; border-radius: 28px; margin: 15px; border: 1px solid #eee; }
-        .absent-card { border-left: 8px solid var(--red); margin-bottom: 10px; padding: 15px; background: white; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .critical { border: 2.5px solid var(--red) !important; background: #fff5f5; }
+        label { font-size: 10px; font-weight: 800; color: var(--blue); margin-top: 15px; display: block; text-transform: uppercase; }
+        input, select { width: 100%; padding: 16px; margin-top: 5px; border: 1.5px solid #eee; border-radius: 15px; font-weight: 600; box-sizing: border-box; font-size: 15px; }
+        input:disabled { background: #f0f3f7; color: #888; }
         
-        input, select { width: 100%; padding: 16px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 15px; font-weight: 600; box-sizing: border-box; font-size: 15px; }
-        .btn-main { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 18px; font-weight: 900; margin-top: 15px; cursor: pointer; }
-        .btn-call { background: var(--green); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 800; font-size: 10px; text-decoration: none; display: inline-block; margin-top: 10px; }
+        .bal-box { background: var(--gray); padding: 15px; border-radius: 15px; margin-top: 15px; text-align: center; border: 2px dashed #ddd; }
+        .status-pill { display: inline-block; padding: 5px 15px; border-radius: 50px; font-size: 10px; font-weight: 900; margin-top: 10px; }
+        .paid { background: var(--green); color: white; }
+        .pending { background: var(--red); color: white; }
+
+        .btn-main { background: var(--blue); color: white; border: none; padding: 20px; width: 100%; border-radius: 18px; font-weight: 900; margin-top: 15px; cursor: pointer; font-size: 16px; box-shadow: 0 5px 15px rgba(0,43,91,0.3); }
+        .logout-btn { background: none; border: 1px solid white; color: white; padding: 5px 10px; border-radius: 8px; font-size: 9px; font-weight: 800; position: absolute; top: 15px; right: 15px; }
 
         .hidden { display: none !important; }
-        .footer-brand { text-align: center; font-size: 10px; color: #bbb; font-weight: 800; margin-top: 30px; }
+        .footer-brand { text-align: center; font-size: 10px; color: #bbb; font-weight: 800; margin-top: 40px; padding-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <div id="loginGate" style="padding: 120px 30px; text-align: center;">
-    <h1 style="color:var(--blue); font-weight:900;">PROGRESSIVE</h1>
-    <div class="card" style="max-width:340px; margin:auto; border: 3px solid var(--blue);">
-        <input id="sysKey" type="password" placeholder="ACCESS KEY" style="text-align:center;">
+    <div class="school-title" style="color:var(--blue); font-size:16px;">PROGRESSIVE MOTHERS<br>NURSERY & PRIMARY SCHOOL</div>
+    <div class="card" style="max-width:340px; margin:40px auto; border: 3px solid var(--blue);">
+        <input id="sysKey" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center;">
         <button onclick="login()" class="btn-main">AUTHORIZE</button>
     </div>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <button class="logout-mini" onclick="location.reload()">LOGOUT</button>
-        <div style="font-size: 11px; font-weight: 800;">PROGRESSIVE MOTHERS</div>
+        <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
+        <div class="school-title">PROGRESSIVE MOTHERS NURSERY AND PRIMARY SCHOOL</div>
+        <div class="school-loc">GAYAZA-KIJABIJJO</div>
         <div id="clock" class="clock-box">00:00:00</div>
-        <div id="activityStatus" style="font-size: 12px; font-weight: 700; color: var(--gold);">CHECKING STATUS...</div>
+        <div id="activityStatus" style="font-weight:800; color:var(--gold); font-size:12px;">SYSTEM SYNCED</div>
     </div>
-
-    <div id="auditBox" class="audit-alert"></div>
 
     <div class="dash-container">
         <div class="dash-card"><span id="statTotal">0</span><small>Students</small></div>
@@ -64,49 +66,59 @@
     </div>
 
     <div class="tab-bar">
-        <div id="tReg" class="tab active" onclick="showTab('reg')">REGISTRATION</div>
+        <div id="tReg" class="tab active" onclick="showTab('reg')">ADMISSION</div>
         <div id="tRoll" class="tab" onclick="showTab('roll')">ROLL CALL</div>
         <div id="tRec" class="tab" onclick="showTab('rec')">RECORDS</div>
-        <div id="tAbs" class="tab hidden" onclick="showTab('abs')">ABSENTEES</div>
         <div id="tFin" class="tab hidden" onclick="showTab('fin')">FINANCE</div>
     </div>
 
-    <div id="secAbs" class="hidden" style="padding: 0 15px;">
-        <h4 style="color:var(--blue); margin-left: 5px;">ABSENTEE FOLLOW-UP</h4>
-        <div id="absentArea"></div>
-    </div>
-
     <div id="secReg" class="card">
-        <h4 id="regTitle" style="margin:0; color:var(--blue);">STUDENT ENROLLMENT</h4>
+        <h3 id="regTitle" style="margin:0; color:var(--blue); font-size:18px;">NEW ADMISSION</h3>
         <input type="hidden" id="editId">
-        <input id="fName" placeholder="Full Name">
+        
+        <label>Full Student Name</label>
+        <input id="fName" placeholder="Enter names">
+        
+        <label>Assigned Class</label>
         <select id="fClass">
-            <option value="">-- Select Class --</option>
+            <option value="">-- Choose --</option>
             <option>Baby</option><option>Middle</option><option>Top</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
             <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
-        <input id="fCon" placeholder="Parent Contact Number">
+        
+        <label>Parent/Guardian Contact</label>
+        <input id="fCon" placeholder="e.g. 07xx xxx xxx">
+        
         <div id="financePanel" class="hidden">
-            <input type="number" id="fExp" placeholder="Fees Required">
-            <input type="number" id="fPaid" placeholder="Amount Paid">
+            <div style="border-top: 2px solid var(--gray); margin-top: 25px; padding-top: 15px;">
+                <h4 style="color:var(--blue); margin:0;">FINANCE ENTRY</h4>
+                
+                <label>Write Fees Required (UGX)</label>
+                <input type="number" id="fExp" oninput="calcStatus()" placeholder="0">
+                
+                <label>Write Amount Paid (UGX)</label>
+                <input type="number" id="fPaid" oninput="calcStatus()" placeholder="0">
+                
+                <div class="bal-box">
+                    <small style="font-weight:800; color:#888;">BALANCE CALCULATION</small><br>
+                    <b id="balDisp" style="font-size:20px; color:var(--red);">UGX 0</b><br>
+                    <span id="statusLabel" class="status-pill">PENDING</span>
+                </div>
+            </div>
         </div>
-        <button onclick="saveData()" class="btn-main">SYNC STUDENT</button>
-        <button id="delBtn" onclick="deleteStudent()" class="btn-main hidden" style="background:var(--red)">DELETE STUDENT</button>
+
+        <button onclick="saveData()" class="btn-main">SAVE & UPDATE CLOUD</button>
+        <button id="delBtn" onclick="deleteStudent()" class="btn-main hidden" style="background:var(--red)">REMOVE STUDENT</button>
     </div>
 
     <div id="secRoll" class="hidden">
-        <div class="card">
-            <select id="rollClass" onchange="loadRoll()"><option value="">-- Choose Class --</option>
-            <option>Baby</option><option>Middle</option><option>Top</option>
-            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-            <option>P.5</option><option>P.6</option><option>P.7</option></select>
-        </div>
+        <div class="card"><select id="rollClass" onchange="loadRoll()"><option value="">-- Select Class for Roll Call --</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
         <div id="rollArea"></div>
     </div>
 
     <div id="secRec" class="hidden">
-        <div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="🔍 Find Student..."></div>
+        <div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="🔍 Search student name..."></div>
         <div id="recArea"></div>
     </div>
 
@@ -119,105 +131,53 @@
 
 <script>
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
-    let ROLE = "", students = [], att = {}, classDone = {};
+    let ROLE = "", students = [], att = {};
 
     function login() {
         const k = document.getElementById('sysKey').value.toUpperCase();
-        const now = new Date();
-        const time = now.getHours() * 100 + now.getMinutes();
-
         if (k === "JESUS CARES") ROLE = "ADMIN";
         else if (k === "FINANCE2026") ROLE = "FINANCE";
-        else if (k === "TEACHER256") {
-            if (time < 630 || time >= 1600) return alert("System Locked for Teachers (4PM-6:30AM)");
-            ROLE = "TEACHER";
-        } else return alert("Denied");
+        else if (k === "TEACHER256") ROLE = "TEACHER";
+        else return alert("Wrong Access Key");
 
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
 
-        if (ROLE === "ADMIN") {
-            document.getElementById('tAbs').classList.remove('hidden');
-            document.getElementById('tFin').classList.remove('hidden');
+        if (ROLE !== "TEACHER") {
             document.getElementById('financePanel').classList.remove('hidden');
-        } else if (ROLE === "FINANCE") {
             document.getElementById('tFin').classList.remove('hidden');
+        }
+        if (ROLE === "FINANCE") {
             document.getElementById('tRoll').classList.add('hidden');
-            document.getElementById('financePanel').classList.remove('hidden');
             showTab('fin');
         }
-        
         fetchData();
-        setInterval(tick, 1000);
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB');
+        }, 1000);
     }
 
     async function fetchData() {
         const { data } = await sb.from('students').select('*').order('name');
-        if(data) { 
-            students = data; 
-            document.getElementById('statTotal').innerText = students.length; 
-            renderRec(); 
-            renderFinance(); 
-            renderAbsentees();
-        }
+        if(data) { students = data; document.getElementById('statTotal').innerText = students.length; renderRec(); renderFinance(); }
     }
 
-    function tick() {
-        const n = new Date();
-        const hr = n.getHours();
-        const min = n.getMinutes();
-        const time = hr * 100 + min;
-        document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
-
-        // Activity Logic
-        let act = "🌙 SCHOOL CLOSED";
-        if (time >= 630 && time < 800) act = "🌅 ARRIVAL & ASSEMBLY";
-        else if (time >= 800 && time < 1030) act = "📚 MORNING LESSONS";
-        else if (time >= 1300 && time < 1400) act = "🍲 LUNCH BREAK";
-        else if (time >= 1400 && time < 1600) act = "📖 AFTERNOON LESSONS";
-        document.getElementById('activityStatus').innerText = act;
-
-        // 9:20 AM Audit Logic
-        if (time >= 920 && time < 1600) {
-            let pending = [];
-            ["Baby","Middle","Top","P.1","P.2","P.3","P.4","P.5","P.6","P.7"].forEach(c => {
-                if(!classDone[c]) pending.push(c);
-            });
-            if(pending.length > 0) {
-                document.getElementById('auditBox').innerText = "⚠️ OVERDUE ROLL CALL: " + pending.join(", ");
-                document.getElementById('auditBox').style.display = "block";
-            } else {
-                document.getElementById('auditBox').style.display = "none";
-            }
-        }
-    }
-
-    function renderAbsentees() {
-        let h = "";
-        students.forEach(s => {
-            if(att[s.id] === 'absent') {
-                // Check for 2-day logic (Simulated here: if name contains '!!' or a flag in DB)
-                const isCritical = s.absent_days >= 2; 
-                h += `<div class="absent-card ${isCritical ? 'critical' : ''}">
-                    <b>${s.name}</b> <small style="float:right;">${s.class}</small><br>
-                    <small>Status: ${isCritical ? '🚨 CRITICAL (2+ Days Absent)' : 'Absent Today'}</small><br>
-                    <a href="tel:${s.contact}" class="btn-call">📞 CALL PARENT</a>
-                </div>`;
-            }
-        });
-        document.getElementById('absentArea').innerHTML = h || "<p>No absentees reported yet.</p>";
-    }
-
-    function toggleAtt(id) {
-        att[id] = (att[id] === 'absent') ? 'present' : 'absent';
-        const cls = document.getElementById('rollClass').value;
-        classDone[cls] = true; // Mark class as done for audit
+    function calcStatus() {
+        const exp = parseInt(document.getElementById('fExp').value) || 0;
+        const paid = parseInt(document.getElementById('fPaid').value) || 0;
+        const bal = exp - paid;
+        document.getElementById('balDisp').innerText = "UGX " + bal.toLocaleString();
         
-        let a = 0; Object.values(att).forEach(v => { if(v === 'absent') a++; });
-        document.getElementById('statAbs').innerText = a;
-        document.getElementById('statPres').innerText = students.length - a;
-        loadRoll();
-        renderAbsentees();
+        const label = document.getElementById('statusLabel');
+        if (exp > 0 && bal <= 0) {
+            label.innerText = "FULLY PAID";
+            label.className = "status-pill paid";
+            document.getElementById('balDisp').style.color = "var(--green)";
+        } else {
+            label.innerText = "PENDING";
+            label.className = "status-pill pending";
+            document.getElementById('balDisp').style.color = "var(--red)";
+        }
     }
 
     function setEdit(id) {
@@ -229,12 +189,13 @@
         document.getElementById('fExp').value = s.fees_expected || 0;
         document.getElementById('fPaid').value = s.fees_paid || 0;
         
-        const isRestricted = (ROLE === "FINANCE" || ROLE === "TEACHER");
-        document.getElementById('fName').disabled = isRestricted;
-        document.getElementById('fClass').disabled = isRestricted;
-        document.getElementById('fCon').disabled = isRestricted;
+        const isFin = (ROLE === "FINANCE");
+        document.getElementById('fName').disabled = isFin;
+        document.getElementById('fClass').disabled = isFin;
+        document.getElementById('fCon').disabled = isFin;
 
-        document.getElementById('regTitle').innerText = "MANAGE STUDENT";
+        calcStatus();
+        document.getElementById('regTitle').innerText = "EDIT STUDENT";
         if(ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
         showTab('reg');
     }
@@ -253,7 +214,32 @@
         }
         if(id) await sb.from('students').update(row).eq('id', id);
         else await sb.from('students').insert([row]);
-        alert("Success."); clearForm(); fetchData();
+        alert("System Updated Successfully"); clearForm(); fetchData();
+    }
+
+    function renderFinance() {
+        let h = "";
+        students.forEach(s => {
+            const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
+            const isPaid = (s.fees_expected > 0 && bal <= 0);
+            h += `<div class="card" onclick="setEdit('${s.id}')" style="border-left:8px solid ${isPaid ? 'var(--green)' : 'var(--red)'}">
+                <b>${s.name}</b><br>
+                <small>Class: ${s.class}</small><br>
+                <b style="color:${isPaid ? 'var(--green)' : 'var(--red)'}">${isPaid ? 'FULLY PAID' : 'BAL: UGX ' + bal.toLocaleString()}</b>
+            </div>`;
+        });
+        document.getElementById('finArea').innerHTML = h;
+    }
+
+    function renderRec() {
+        const q = document.getElementById('search').value.toUpperCase();
+        let h = "";
+        students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
+            h += `<div class="card" onclick="setEdit('${s.id}')">
+                <b>${s.name}</b> <small style="float:right;">${s.class}</small>
+            </div>`;
+        });
+        document.getElementById('recArea').innerHTML = h;
     }
 
     function loadRoll() {
@@ -270,29 +256,17 @@
         document.getElementById('rollArea').innerHTML = h;
     }
 
-    function renderFinance() {
-        let h = "";
-        students.forEach(s => {
-            const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
-            h += `<div class="card" onclick="setEdit('${s.id}')" style="border-left:8px solid ${bal > 0 ? 'var(--red)' : 'var(--green)'}">
-                <b>${s.name}</b><br><small>Bal: UGX ${bal.toLocaleString()}</small>
-            </div>`;
-        });
-        document.getElementById('finArea').innerHTML = h;
-    }
-
-    function renderRec() {
-        const q = document.getElementById('search').value.toUpperCase();
-        let h = "";
-        students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => {
-            h += `<div class="card" onclick="setEdit('${s.id}')"><b>${s.name}</b> <small style="float:right;">${s.class}</small></div>`;
-        });
-        document.getElementById('recArea').innerHTML = h;
+    function toggleAtt(id) {
+        att[id] = (att[id] === 'absent') ? 'present' : 'absent';
+        let a = 0; Object.values(att).forEach(v => { if(v === 'absent') a++; });
+        document.getElementById('statAbs').innerText = a;
+        document.getElementById('statPres').innerText = students.length - a;
+        loadRoll();
     }
 
     function showTab(t) {
-        ['secReg','secRoll','secRec','secFin','secAbs'].forEach(s => document.getElementById(s).classList.add('hidden'));
-        ['tReg','tRoll','tRec','tFin','tAbs'].forEach(s => document.getElementById(s).classList.remove('active'));
+        ['secReg','secRoll','secRec','secFin'].forEach(s => document.getElementById(s).classList.add('hidden'));
+        ['tReg','tRoll','tRec','tFin'].forEach(s => document.getElementById(s).classList.remove('active'));
         document.getElementById('sec'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden');
         document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
     }
@@ -302,11 +276,13 @@
             document.getElementById(i).value = "";
             document.getElementById(i).disabled = false;
         });
+        document.getElementById('regTitle').innerText = "NEW ADMISSION";
         document.getElementById('delBtn').classList.add('hidden');
+        document.getElementById('balDisp').innerText = "UGX 0";
     }
 
     async function deleteStudent() {
-        if(confirm("Delete permanently?")) {
+        if(confirm("DELETE STUDENT PERMANENTLY?")) {
             await sb.from('students').delete().eq('id', document.getElementById('editId').value);
             fetchData(); clearForm();
         }
