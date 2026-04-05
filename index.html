@@ -3,168 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMS - Eudes Media Solutions</title>
+    <title>PMS - Progressive Mothers School</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --pms-red: #e63946; --pms-dark: #001a33; --pms-bg: #f2f5f8; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--pms-bg); color: var(--pms-dark); overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--pms-bg); color: var(--pms-dark); }
 
-        /* TOP NAVIGATION */
+        /* HEADER IMAGE 1 & 2 */
         .top-red-bar { background: var(--pms-red); color: white; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; height: 50px; }
-        .school-data-tag { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 14px; letter-spacing: 1px; }
-        .plus-icon { background: white; color: var(--pms-red); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .school-tag { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 14px; }
+        .plus-btn { background: white; color: var(--pms-red); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
 
-        /* DASHBOARD SECTION */
-        .dashboard-blue { background: var(--pms-dark); color: white; padding: 35px 20px 60px 20px; text-align: center; position: relative; }
-        .logout-btn { position: absolute; top: 15px; left: 15px; border: 1.5px solid #ffc107; color: #ffc107; padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        /* DASHBOARD SECTION IMAGE 2 */
+        .dashboard-header { background: var(--pms-dark); color: white; padding: 35px 20px 60px 20px; text-align: center; position: relative; }
+        .logout-btn { position: absolute; top: 15px; left: 15px; border: 1.5px solid #ffc107; color: #ffc107; padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: bold; }
         .date-text { position: absolute; top: 18px; right: 15px; font-size: 11px; font-weight: bold; }
-        .school-title { font-size: 15px; font-weight: bold; margin-bottom: 2px; }
-        .location-sub { font-size: 10px; color: #ffc107; letter-spacing: 1.5px; margin-bottom: 15px; }
         .big-clock { font-size: 55px; font-weight: bold; margin: 10px 0; }
+        .school-loc { font-size: 10px; color: #ffc107; letter-spacing: 1.5px; text-transform: uppercase; }
 
-        /* STAT CARDS (Dashboard Stats) */
+        /* STAT CARDS IMAGE 2 */
         .stats-row { display: flex; justify-content: center; gap: 10px; margin-top: -35px; padding: 0 15px; }
         .s-card { background: white; border-radius: 20px; padding: 15px 5px; width: 32%; text-align: center; box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-bottom: 4px solid #ffc107; }
         .s-val { font-size: 26px; font-weight: bold; color: var(--pms-dark); display: block; }
         .s-label { font-size: 9px; color: #999; text-transform: uppercase; font-weight: bold; margin-top: 4px; }
 
-        /* NAVIGATION MENU (Pills) */
-        .nav-scroll { display: flex; overflow-x: auto; padding: 25px 10px; gap: 10px; justify-content: center; scrollbar-width: none; }
-        .pill { padding: 10px 20px; border-radius: 25px; border: 1px solid #ddd; background: white; font-size: 11px; font-weight: bold; color: #888; white-space: nowrap; cursor: pointer; transition: 0.3s; }
+        /* NAVIGATION PILLS IMAGE 2 */
+        .nav-pills { display: flex; overflow-x: auto; padding: 25px 10px; gap: 10px; justify-content: center; scrollbar-width: none; }
+        .pill { padding: 10px 20px; border-radius: 25px; border: 1px solid #ddd; background: white; font-size: 11px; font-weight: bold; color: #888; white-space: nowrap; cursor: pointer; }
         .pill.active { background: var(--pms-dark); color: white; border-color: var(--pms-dark); }
 
-        /* ORGANIZED TABLE VIEW */
+        /* DATA TABLE IMAGE 1 */
         .table-header { background: #003366; color: white; display: grid; grid-template-columns: 1.2fr 1.5fr 1fr 0.8fr; padding: 15px 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-top: 10px; }
         .record-row { display: grid; grid-template-columns: 1.2fr 1.5fr 1fr 0.8fr; padding: 15px 10px; background: white; border-bottom: 1px solid #eee; font-size: 12px; align-items: center; }
         .no-records { padding: 40px; text-align: center; color: #003366; background: white; font-weight: bold; }
 
-        /* ADMISSION FORM (Card-based layout) */
-        .form-container { background: white; border-radius: 20px; margin: 15px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .input-group { margin-bottom: 12px; }
-        input, select { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ddd; background: #fafafa; box-sizing: border-box; font-size: 14px; outline: none; }
-        .btn-green { background: #28a745; color: white; padding: 16px; border: none; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; }
+        /* ADMISSION FORM IMAGE 1 */
+        .admission-form { background: white; border-radius: 20px; margin: 15px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        input, select { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ddd; background: #fafafa; margin-bottom: 12px; box-sizing: border-box; }
+        .btn-save { background: #28a745; color: white; padding: 16px; border: none; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; }
 
-        /* FOOTER BRANDING */
-        .footer-text { text-align: center; padding: 30px; font-size: 11px; color: #aaa; font-weight: bold; letter-spacing: 0.5px; }
+        .footer { text-align: center; padding: 30px; font-size: 11px; color: #aaa; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="top-red-bar">
-    <div class="school-data-tag">
-        <img src="https://via.placeholder.com/35" style="border-radius:50%; background:white;">
-        SCHOOL DATA <div class="plus-icon">+</div>
-    </div>
+    <div class="school-tag"><img src="https://via.placeholder.com/35" style="border-radius:50%; background:white;"> SCHOOL DATA <div class="plus-btn">+</div></div>
     <div style="font-size:24px;">🔔</div>
 </div>
 
-<div class="dashboard-blue">
+<div class="dashboard-header">
     <div class="logout-btn">LOGOUT</div>
-    <div class="date-text" id="headerDate">06 APRIL 2026</div>
-    <div class="school-title">PROGRESSIVE MOTHERS SCHOOL</div>
-    <div class="location-sub">GAYAZA-KIJABIJJO</div>
-    <div class="big-clock" id="clockDisplay">01:38:56</div>
+    <div class="date-text" id="headerDate">-- ----- ----</div>
+    <div style="font-weight:bold; font-size:15px;">PROGRESSIVE MOTHERS SCHOOL</div>
+    <div class="school-loc">GAYAZA-KIJABIJJO</div>
+    <div class="big-clock" id="bigClock">00:00:00</div>
     <div style="font-size:20px;">...</div>
 </div>
 
 <div class="stats-row">
-    <div class="s-card"><span class="s-val" id="totalStudents">0</span><span class="s-label">Students</span></div>
-    <div class="s-card"><span class="s-val" style="color:#28a745;" id="presentCount">0</span><span class="s-label">Present</span></div>
-    <div class="s-card"><span class="s-val" style="color:#e63946;" id="absentCount">0</span><span class="s-label">Absent</span></div>
+    <div class="s-card"><span class="s-val" id="count-all">0</span><span class="s-label">Students</span></div>
+    <div class="s-card"><span class="s-val" style="color:#28a745;">0</span><span class="s-label">Present</span></div>
+    <div class="s-card"><span class="s-val" style="color:#e63946;">0</span><span class="s-label">Absent</span></div>
 </div>
 
-<div class="nav-scroll">
-    <div class="pill" id="pill-admission" onclick="switchPortal('admission')">ADMISSION</div>
-    <div class="pill active" id="pill-rollcall" onclick="switchPortal('rollcall')">ROLL CALL</div>
-    <div class="pill" id="pill-records" onclick="switchPortal('records')">RECORDS</div>
+<div class="nav-pills">
+    <div class="pill" id="btn-adm" onclick="view('adm')">ADMISSION</div>
+    <div class="pill active" id="btn-rec" onclick="view('rec')">ROLL CALL / RECORDS</div>
     <div class="pill">ABSENTEES</div>
     <div class="pill">FINANCE</div>
 </div>
 
-<div id="view-admission" style="display:none;">
-    <div class="form-container">
-        <h3 style="margin-top:0;">Student Admission</h3>
-        <div class="input-group"><input id="regName" placeholder="Full Name"></div>
-        <div class="input-group"><input id="regAge" placeholder="Age / Date of Birth"></div>
-        <div class="input-group"><input id="regLoc" placeholder="Physical Location (Stay)"></div>
-        <div class="input-group">
-            <select id="regHealth">
-                <option value="Normal">Health: Normal</option>
-                <option value="Special Care">Health: Special Care</option>
-            </select>
-        </div>
-        <div class="input-group">
-            <select id="regClass">
-                <option value="P.1">Class: P.1</option>
-                <option value="P.7">Class: P.7</option>
-            </select>
-        </div>
-        <button class="btn-green" onclick="saveStudent()">Register & Generate LIN</button>
+<div id="view-adm" style="display:none;">
+    <div class="admission-form">
+        <input id="inName" placeholder="Full Name">
+        <input id="inAge" placeholder="Age / Date of Birth">
+        <input id="inLoc" placeholder="Physical Location (Stay)">
+        <select id="inHealth"><option>Health: Normal</option><option>Health: Special Care</option></select>
+        <select id="inClass"><option value="P.1">Class: P.1</option><option value="P.7">Class: P.7</option></select>
+        <button class="btn-save" onclick="handleSave()">Register & Generate LIN</button>
     </div>
 </div>
 
-<div id="view-records">
-    <div class="table-header">
-        <div>Age/DOB</div>
-        <div>Location/Health</div>
-        <div>Attendance</div>
-        <div>Action</div>
-    </div>
-    <div id="recordList">
-        <div class="no-records">Loading database...</div>
-    </div>
+<div id="view-rec">
+    <div class="table-header"><div>Age/DOB</div><div>Location/Health</div><div>Attendance</div><div>Action</div></div>
+    <div id="dataList"><div class="no-records">Syncing with Supabase...</div></div>
 </div>
 
-<div class="footer-text">EUDES MEDIA SOLUTIONS | +256762992440</div>
+<div class="footer">EUDES MEDIA SOLUTIONS | +256762992440</div>
 
 <script>
-    // CRITICAL: Updated Supabase Connection
-    const supabaseUrl = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-    const supabaseKey = 'sbp_publishable_1PetUo8klWCLfupRq52CVg_Y_Y';
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    // FIXED SUPABASE INITIALIZATION
+    const URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+    const KEY = 'sbp_publishable_1PetUo8klWCLfupRq52CVg_Y_Y';
+    const client = supabase.createClient(URL, KEY);
 
-    // Organize Dashboards (Switching logic)
-    function switchPortal(type) {
-        document.getElementById('view-admission').style.display = (type === 'admission') ? 'block' : 'none';
-        document.getElementById('view-records').style.display = (type === 'rollcall' || type === 'records') ? 'block' : 'none';
-        
+    function view(v) {
+        document.getElementById('view-adm').style.display = (v === 'adm') ? 'block' : 'none';
+        document.getElementById('view-rec').style.display = (v === 'rec') ? 'block' : 'none';
         document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-        document.getElementById('pill-' + type).classList.add('active');
+        document.getElementById('btn-' + v).classList.add('active');
     }
 
-    async function saveStudent() {
-        const lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
-        const { error } = await _supabase.from('students').insert([{
-            name: document.getElementById('regName').value,
+    async function handleSave() {
+        const lin = "PMA-" + Math.floor(Math.random() * 9000 + 1000);
+        const { error } = await client.from('students').insert([{
+            name: document.getElementById('inName').value,
             lin: lin,
-            age: document.getElementById('regAge').value,
-            location: document.getElementById('regLoc').value,
-            health: document.getElementById('regHealth').value,
-            class: document.getElementById('regClass').value
+            age: document.getElementById('inAge').value,
+            location: document.getElementById('inLoc').value,
+            health: document.getElementById('inHealth').value,
+            class: document.getElementById('inClass').value
         }]);
-
-        if (error) {
-            alert("Database Error: " + error.message);
-        } else {
-            alert("Success! Student Registered.");
-            loadData();
-            switchPortal('records');
-        }
+        if(error) alert(error.message); else { alert("Saved!"); load(); view('rec'); }
     }
 
-    async function loadData() {
-        const { data, error } = await _supabase.from('students').select('*').order('name');
-        const listContainer = document.getElementById('recordList');
+    async function load() {
+        const { data, error } = await client.from('students').select('*').order('name');
+        const list = document.getElementById('dataList');
         
         if (error) {
-            listContainer.innerHTML = `<div class="no-records" style="color:red;">Database Error: ${error.message}</div>`;
+            list.innerHTML = `<div class="no-records" style="color:red;">Error: ${error.message}</div>`;
             return;
         }
 
-        document.getElementById('totalStudents').innerText = data.length;
-
+        document.getElementById('count-all').innerText = data.length;
         if (data.length === 0) {
-            listContainer.innerHTML = '<div class="no-records">No records found.</div>';
+            list.innerHTML = '<div class="no-records">No records found.</div>';
             return;
         }
 
@@ -174,30 +139,28 @@
                 <div class="record-row">
                     <div><b>${s.name}</b><br><small>${s.age || 'N/A'}</small></div>
                     <div>${s.location || 'N/A'}<br><small>${s.health || 'Normal'}</small></div>
-                    <div><button style="font-size:10px; padding:5px 8px; cursor:pointer;">Mark</button></div>
-                    <div><button onclick="deleteStudent('${s.id}')" style="background:red; color:white; border:none; border-radius:4px; padding:5px 8px; cursor:pointer;">DEL</button></div>
+                    <div><button style="font-size:10px; padding:4px;">Mark</button></div>
+                    <div><button onclick="del('${s.id}')" style="background:red; color:white; border:none; padding:4px 8px; border-radius:4px;">DEL</button></div>
                 </div>
             `;
         });
-        listContainer.innerHTML = html;
+        list.innerHTML = html;
     }
 
-    async function deleteStudent(id) {
-        if(confirm("Permanently delete this student?")) {
-            await _supabase.from('students').delete().eq('id', id);
-            loadData();
+    async function del(id) {
+        if(confirm("Delete student?")) {
+            await client.from('students').delete().eq('id', id);
+            load();
         }
     }
 
-    // REAL-TIME CLOCK
     setInterval(() => {
-        const n = new Date();
-        document.getElementById('clockDisplay').innerText = n.toLocaleTimeString('en-GB');
-        document.getElementById('headerDate').innerText = n.toLocaleDateString('en-GB', { day: '2-digit', month: 'LONG', year: 'numeric' });
+        const d = new Date();
+        document.getElementById('bigClock').innerText = d.toLocaleTimeString('en-GB');
+        document.getElementById('headerDate').innerText = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'LONG', year: 'numeric' });
     }, 1000);
 
-    // Initial Load
-    loadData();
+    load();
 </script>
 </body>
 </html>
