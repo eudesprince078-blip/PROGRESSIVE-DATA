@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE MOTHERS PMS - V141 MASTER</title>
+    <title>PROGRESSIVE MOTHERS PMS - V142 SMART SELECT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -11,7 +11,6 @@
         
         #holidayBanner { background: linear-gradient(90deg, var(--gold), #ffaa00); color: var(--blue); padding: 12px; text-align: center; font-weight: 900; font-size: 13px; display: none; border-bottom: 3px solid #fff; position: sticky; top: 0; z-index: 1001; }
 
-        /* FIXED TOP NAV FOR LOGOUT & DATE */
         .top-nav { background: #001326; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; }
         .logout-link { color: var(--gold); text-decoration: none; border: 1px solid var(--gold); padding: 4px 10px; border-radius: 6px; }
 
@@ -38,7 +37,6 @@
         .card { background: white; padding: 22px; border-radius: 28px; margin: 15px; border: 1px solid #eee; }
         label { font-size: 10px; font-weight: 800; color: var(--blue); margin-top: 15px; display: block; text-transform: uppercase; }
         input, select { width: 100%; padding: 15px; margin-top: 5px; border: 1.5px solid #eee; border-radius: 15px; font-weight: 600; box-sizing: border-box; font-size: 14px; outline: none; }
-        input:focus { border-color: var(--blue); }
         
         .btn-main { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 18px; font-weight: 900; margin-top: 15px; font-size: 15px; cursor: pointer; }
         .hidden { display: none !important; }
@@ -84,6 +82,21 @@
         <div id="tFin" class="tab" onclick="showTab('fin')">FINANCE</div>
     </div>
 
+    <div id="secRoll" class="hidden">
+        <div class="card" style="background:var(--blue); border:none;">
+            <label style="color:white; margin-top:0;">SELECT YOUR CLASS TO BEGIN:</label>
+            <select id="rollClass" onchange="loadFilteredRoll()" style="border:none; background:white;">
+                <option value="">-- Choose Class --</option>
+                <option>Baby</option><option>Middle</option><option>Top</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option>
+                <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
+        </div>
+        <div id="rollArea">
+            <p style="text-align:center; color:#999; margin-top:20px; font-weight:800;">Please select a class above.</p>
+        </div>
+    </div>
+
     <div id="secReg" class="card hidden">
         <h3 id="regTitle" style="margin:0; color:var(--blue);">STUDENT DATA</h3>
         <input type="hidden" id="editId">
@@ -91,15 +104,14 @@
         <label>Class</label><select id="fClass"><option value="">-- Pick --</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         <label>Contact</label><input id="fCon">
         <div id="financePanel" class="hidden">
-            <label>Fees Required</label><input type="number" id="fExp" oninput="calcFinance()">
-            <label>Amount Paid</label><input type="number" id="fPaid" oninput="calcFinance()">
+            <label>Fees Required</label><input type="number" id="fExp">
+            <label>Amount Paid</label><input type="number" id="fPaid">
         </div>
         <button onclick="saveData()" class="btn-main">SAVE RECORD</button>
         <button id="delBtn" onclick="deleteStudent()" class="btn-main hidden" style="background:var(--red)">DELETE</button>
     </div>
 
-    <div id="secRoll" class="hidden"><div id="rollArea"></div></div>
-    <div id="secRec" class="hidden"><div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="Search..."></div><div id="recArea"></div></div>
+    <div id="secRec" class="hidden"><div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="Search Name..."></div><div id="recArea"></div></div>
     <div id="secAbs" class="hidden"><div id="absentArea" style="padding:15px;"></div></div>
     <div id="secFin" class="hidden"><div id="finArea"></div></div>
 
@@ -110,59 +122,38 @@
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
     let ROLE = "", students = [], att = {};
 
-    const holidays = {
-        "1-1": "HAPPY NEW YEAR!", "1-26": "NRM LIBERATION DAY", "2-16": "ARCHBISHOP JANAN LUWUM DAY",
-        "3-8": "INT. WOMEN'S DAY", "4-3": "GOOD FRIDAY", "4-5": "HAPPY EASTER SUNDAY! ✨",
-        "4-6": "EASTER MONDAY", "5-1": "LABOUR DAY", "6-3": "MARTYRS' DAY", "6-9": "HEROES' DAY",
-        "10-9": "INDEPENDENCE DAY 🇺🇬", "12-25": "MERRY CHRISTMAS!", "12-26": "BOXING DAY"
-    };
+    const holidays = { "1-1": "NEW YEAR", "1-26": "NRM DAY", "2-16": "JANAN LUWUM", "3-8": "WOMEN'S DAY", "4-3": "GOOD FRIDAY", "4-5": "EASTER SUNDAY ✨", "4-6": "EASTER MONDAY", "10-9": "INDEPENDENCE 🇺🇬", "12-25": "CHRISTMAS" };
 
     function login() {
         const k = document.getElementById('sysKey').value.toUpperCase();
         if (k === "JESUS CARES") ROLE = "ADMIN";
         else if (k === "FINANCE2026") ROLE = "FINANCE";
         else if (k === "TEACHER256") ROLE = "TEACHER";
-        else return alert("Invalid Access Key");
+        else return alert("Invalid Key");
 
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
 
-        if (ROLE === "ADMIN") { 
-            ['tReg','tRoll','tRec','tAbs','tFin'].forEach(id => document.getElementById(id).style.display = "block"); 
-            document.getElementById('financePanel').classList.remove('hidden'); showTab('reg'); 
-        } else if (ROLE === "FINANCE") { 
-            ['tReg','tFin'].forEach(id => document.getElementById(id).style.display = "block"); 
-            document.getElementById('financePanel').classList.remove('hidden'); showTab('fin'); 
-        } else { 
-            document.getElementById('tRoll').style.display = "block"; showTab('roll'); 
-        }
+        if (ROLE === "ADMIN") { ['tReg','tRoll','tRec','tAbs','tFin'].forEach(id => document.getElementById(id).style.display = "block"); document.getElementById('financePanel').classList.remove('hidden'); showTab('reg'); }
+        else if (ROLE === "FINANCE") { ['tReg','tFin'].forEach(id => document.getElementById(id).style.display = "block"); document.getElementById('financePanel').classList.remove('hidden'); showTab('fin'); }
+        else { document.getElementById('tRoll').style.display = "block"; showTab('roll'); }
 
         fetchData(); setInterval(tick, 1000);
     }
 
     async function fetchData() {
         const { data } = await sb.from('students').select('*').order('name');
-        if(data) { students = data; document.getElementById('statTotal').innerText = students.length; renderRec(); renderFinance(); loadRoll(); }
+        if(data) { students = data; document.getElementById('statTotal').innerText = students.length; renderRec(); renderFinance(); }
     }
 
     function tick() {
         const n = new Date();
         const mD = (n.getMonth()+1) + "-" + n.getDate();
         const time = n.getHours() * 100 + n.getMinutes();
-        
         document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
         document.getElementById('currDate').innerText = n.toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
-
         const hb = document.getElementById('holidayBanner');
-        if(holidays[mD]) { hb.style.display = "block"; hb.innerText = "✨ " + holidays[mD] + " ✨"; } 
-        else { hb.style.display = "none"; }
-
-        const el = document.getElementById('activityStatus');
-        el.className = 'activity-banner';
-        if (time >= 800 && time < 1300) { el.innerText = "📚 LESSONS"; el.classList.add('act-lessons'); }
-        else if (time >= 1300 && time < 1400) { el.innerText = "🍲 LUNCH"; el.classList.add('act-break'); }
-        else if (time >= 1600 || time < 700) { el.innerText = "🌙 CLOSED"; el.classList.add('act-closed'); }
-        else { el.innerText = "📖 SCHOOL OPEN"; el.classList.add('act-arrival'); }
+        if(holidays[mD]) { hb.style.display = "block"; hb.innerText = "✨ HAPPY " + holidays[mD] + " ✨"; } else hb.style.display = "none";
     }
 
     function showTab(t) {
@@ -170,6 +161,29 @@
         ['tReg','tRoll','tRec','tFin','tAbs'].forEach(s => document.getElementById(s).classList.remove('active'));
         document.getElementById('sec' + t.charAt(0).toUpperCase() + t.slice(1)).classList.remove('hidden');
         document.getElementById('t' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('active');
+    }
+
+    function loadFilteredRoll() {
+        const selCls = document.getElementById('rollClass').value;
+        if (!selCls) { document.getElementById('rollArea').innerHTML = "<p style='text-align:center; color:#999; margin-top:20px;'>Please select a class above.</p>"; return; }
+        
+        const filtered = students.filter(s => s.class === selCls);
+        let h = "";
+        filtered.forEach(s => {
+            const isAbs = att[s.id] === 'absent';
+            h += `<div style="background:white; margin:10px 15px; border-radius:15px; display:flex; justify-content:space-between; align-items:center; padding:15px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+                <b>${s.name}</b>
+                <button onclick="toggleAtt('${s.id}')" style="padding:10px 18px; border-radius:12px; border:none; background:${isAbs ? 'var(--red)' : 'var(--green)'}; color:white; font-weight:900;">${isAbs ? 'ABS' : 'PRES'}</button>
+            </div>`;
+        });
+        document.getElementById('rollArea').innerHTML = h || `<p style='text-align:center; color:var(--red); padding:20px;'>No students found in ${selCls}</p>`;
+    }
+
+    function toggleAtt(id) {
+        att[id] = (att[id] === 'absent') ? 'present' : 'absent';
+        let a = 0; Object.values(att).forEach(v => { if(v === 'absent') a++; });
+        document.getElementById('statAbs').innerText = a; document.getElementById('statPres').innerText = students.length - a;
+        loadFilteredRoll(); renderAbs();
     }
 
     async function saveData() {
@@ -191,24 +205,8 @@
         showTab('reg'); if(ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
     }
 
-    function loadRoll() {
-        let h = ""; 
-        students.forEach(s => {
-            const isAbs = att[s.id] === 'absent';
-            h += `<div style="background:white; margin:10px 15px; border-radius:15px; display:flex; justify-content:space-between; align-items:center; padding:15px; box-shadow:0 2px 5px rgba(0,0,0,0.05);"><div><b>${s.name}</b><br><small>${s.class}</small></div><button onclick="toggleAtt('${s.id}')" style="padding:10px 18px; border-radius:12px; border:none; background:${isAbs ? 'var(--red)' : 'var(--green)'}; color:white; font-weight:900;">${isAbs ? 'ABS' : 'PRES'}</button></div>`;
-        });
-        document.getElementById('rollArea').innerHTML = h || "<p style='text-align:center;'>No Students Loaded</p>";
-    }
-
-    function toggleAtt(id) {
-        att[id] = (att[id] === 'absent') ? 'present' : 'absent';
-        let a = 0; Object.values(att).forEach(v => { if(v === 'absent') a++; });
-        document.getElementById('statAbs').innerText = a; document.getElementById('statPres').innerText = students.length - a;
-        loadRoll(); renderAbs();
-    }
-
     function renderAbs() {
-        let h = ""; students.forEach(s => { if(att[s.id] === 'absent') h += `<div class="card" style="border-left:8px solid var(--red)"><b>${s.name}</b><br><a href="tel:${s.contact}" style="color:var(--green); font-weight:800;">📞 CALL PARENT</a></div>`; });
+        let h = ""; students.forEach(s => { if(att[s.id] === 'absent') h += `<div class="card" style="border-left:8px solid var(--red)"><b>${s.name}</b> (${s.class})<br><a href="tel:${s.contact}" style="color:var(--green); font-weight:800;">📞 CALL PARENT</a></div>`; });
         document.getElementById('absentArea').innerHTML = h || "<p style='text-align:center;'>Everyone Present</p>";
     }
 
