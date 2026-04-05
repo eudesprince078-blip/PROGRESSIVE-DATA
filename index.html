@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE MOTHERS PMS - V143 FULL DASHBOARD</title>
+    <title>PROGRESSIVE MOTHERS PMS - V144 STABLE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #002b5b; --gold: #ffce00; --red: #ff3b3b; --green: #2ecc71; --orange: #f39c12; --gray: #f4f7fa; }
-        body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--gray); margin: 0; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
         
         #holidayBanner { background: linear-gradient(90deg, var(--gold), #ffaa00); color: var(--blue); padding: 12px; text-align: center; font-weight: 900; font-size: 13px; display: none; border-bottom: 3px solid #fff; position: sticky; top: 0; z-index: 1001; }
 
@@ -19,64 +19,57 @@
         .school-loc { font-size: 10px; font-weight: 800; color: var(--gold); letter-spacing: 1.5px; display: block; margin-bottom: 15px; }
         .clock-box { font-size: 48px; font-weight: 900; margin: 5px 0; letter-spacing: -1px; }
         
-        .activity-banner { font-size: 12px; font-weight: 900; padding: 8px 20px; border-radius: 50px; display: inline-block; border: 2px solid white; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background: var(--blue); }
+        .activity-banner { font-size: 11px; font-weight: 900; padding: 8px 15px; border-radius: 50px; display: inline-block; border: 2px solid white; text-transform: uppercase; background: var(--blue); }
 
         .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -60px; position: relative; z-index: 5; }
         .dash-card { background: white; padding: 15px 5px; border-radius: 22px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #eee; }
-        .dash-card span { display: block; font-size: 22px; font-weight: 900; color: var(--blue); }
+        .dash-card span { display: block; font-size: 20px; font-weight: 900; color: var(--blue); }
         .dash-card small { font-size: 8px; font-weight: 800; color: #999; text-transform: uppercase; }
 
-        /* SCROLLABLE TAB BAR FOR MORE OPTIONS */
         .tab-bar { display: flex; overflow-x: auto; background: white; padding: 8px; margin: 25px 15px 15px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); white-space: nowrap; scrollbar-width: none; }
-        .tab-bar::-webkit-scrollbar { display: none; }
         .tab { flex: 0 0 auto; padding: 12px 15px; font-size: 10px; font-weight: 900; color: #bbb; cursor: pointer; text-align: center; display: none; }
         .tab.active { background: var(--blue); color: white; border-radius: 15px; }
 
         .card { background: white; padding: 22px; border-radius: 28px; margin: 15px; border: 1px solid #eee; }
-        label { font-size: 10px; font-weight: 800; color: var(--blue); margin-top: 15px; display: block; text-transform: uppercase; }
         input, select { width: 100%; padding: 15px; margin-top: 5px; border: 1.5px solid #eee; border-radius: 15px; font-weight: 600; box-sizing: border-box; font-size: 14px; outline: none; }
         
         .btn-main { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 18px; font-weight: 900; margin-top: 15px; font-size: 15px; cursor: pointer; }
         .hidden { display: none !important; }
 
-        /* FINANCE DASHBOARD UI */
         .fin-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px; }
-        .fin-box { background: white; padding: 15px 5px; text-align: center; border-radius: 15px; border: 1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .fin-box span { display: block; font-size: 9px; font-weight: 800; color: #777; text-transform: uppercase; margin-bottom: 5px; }
-        .fin-box b { font-size: 12px; font-weight: 900; }
+        .fin-box { background: white; padding: 15px 5px; text-align: center; border-radius: 15px; border: 1px solid #ddd; }
+        .fin-box b { font-size: 11px; display: block; }
 
-        /* SCHEDULE TIMELINE UI */
-        .time-slot { display: flex; align-items: center; padding: 15px; border-left: 4px solid #ddd; margin: 0 15px 10px; background: white; border-radius: 0 15px 15px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .time-slot { display: flex; align-items: center; padding: 15px; border-left: 4px solid #ddd; margin: 0 15px 10px; background: white; border-radius: 0 15px 15px 0; }
         .time-slot.active { border-left-color: var(--blue); background: #eef5ff; }
-        .time-slot b { width: 75px; font-size: 11px; color: var(--blue); font-weight: 900; }
-        .time-slot span { font-size: 13px; font-weight: 700; color: #333; }
 
-        .footer-brand { text-align: center; font-size: 10px; color: #bbb; font-weight: 800; margin-top: 30px; padding-bottom: 20px; }
+        .footer-brand { text-align: center; font-size: 10px; color: #bbb; font-weight: 800; margin-top: 30px; }
     </style>
 </head>
 <body>
 
 <div id="holidayBanner"></div>
 
-<div id="loginGate" style="padding: 120px 30px; text-align: center;">
+<div id="loginGate" style="padding: 100px 30px; text-align: center;">
     <h2 style="color:var(--blue); font-weight:900;">PROGRESSIVE MOTHERS</h2>
     <div class="card" style="max-width:340px; margin:auto; border: 3px solid var(--blue);">
-        <input id="sysKey" type="password" placeholder="ACCESS KEY" style="text-align:center;">
-        <button onclick="login()" class="btn-main">LOGIN</button>
+        <p style="font-size: 11px; font-weight: 800; color: var(--blue);">ENTER ACCESS KEY</p>
+        <input id="sysKey" type="text" placeholder="Key..." style="text-align:center; text-transform: uppercase;">
+        <button id="loginBtn" onclick="login()" class="btn-main">LOGIN NOW</button>
     </div>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="top-nav">
         <a href="#" class="logout-link" onclick="location.reload()">LOGOUT</a>
-        <div id="currDate">SYNCING DATE...</div>
+        <div id="currDate">...</div>
     </div>
 
     <div class="header">
         <span class="school-title">PROGRESSIVE MOTHERS NURSERY AND PRIMARY SCHOOL</span>
         <span class="school-loc">GAYAZA-KIJABIJJO</span>
         <div id="clock" class="clock-box">00:00:00</div>
-        <div id="activityStatus" class="activity-banner">SYNC...</div>
+        <div id="activityStatus" class="activity-banner">SYNCING...</div>
     </div>
 
     <div class="dash-container">
@@ -94,47 +87,20 @@
         <div id="tFin" class="tab" onclick="showTab('fin')">FINANCE</div>
     </div>
 
-    <div id="secSched" class="hidden">
-        <h3 style="margin:20px 15px 10px; color:var(--blue); font-size:14px; font-weight:900; text-transform:uppercase;">Daily Updates & Routine</h3>
-        <div id="scheduleArea"></div>
-    </div>
-
-    <div id="secRoll" class="hidden">
-        <div class="card" style="background:var(--blue); border:none;">
-            <label style="color:white; margin-top:0;">SELECT YOUR CLASS TO BEGIN:</label>
-            <select id="rollClass" onchange="loadFilteredRoll()" style="border:none; background:white;">
-                <option value="">-- Choose Class --</option>
-                <option>Baby</option><option>Middle</option><option>Top</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option>
-                <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-        </div>
-        <div id="rollArea"><p style="text-align:center; color:#999; margin-top:20px; font-weight:800;">Please select a class above.</p></div>
-    </div>
-
+    <div id="secSched" class="hidden"><div id="scheduleArea"></div></div>
+    <div id="secRoll" class="hidden"><div class="card" style="background:var(--blue);"><select id="rollClass" onchange="loadFilteredRoll()"><option value="">-- Choose Class --</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div><div id="rollArea"></div></div>
     <div id="secReg" class="card hidden">
-        <h3 id="regTitle" style="margin:0; color:var(--blue);">STUDENT DATA</h3>
         <input type="hidden" id="editId">
         <label>Student Name</label><input id="fName">
-        <label>Class</label><select id="fClass"><option value="">-- Pick --</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+        <label>Class</label><select id="fClass"><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         <label>Contact</label><input id="fCon">
-        <div id="financePanel" class="hidden">
-            <label>Fees Required</label><input type="number" id="fExp">
-            <label>Amount Paid</label><input type="number" id="fPaid">
-        </div>
-        <button onclick="saveData()" class="btn-main">SAVE RECORD</button>
-        <button id="delBtn" onclick="deleteStudent()" class="btn-main hidden" style="background:var(--red)">DELETE</button>
+        <div id="financePanel" class="hidden"><label>Fees Req.</label><input type="number" id="fExp"><label>Paid</label><input type="number" id="fPaid"></div>
+        <button onclick="saveData()" class="btn-main">SAVE DATA</button>
     </div>
-
-    <div id="secRec" class="hidden"><div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="Search Name..."></div><div id="recArea"></div></div>
-    <div id="secAbs" class="hidden"><div id="absentArea" style="padding:15px;"></div></div>
-    
+    <div id="secRec" class="hidden"><div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="Search..."></div><div id="recArea"></div></div>
+    <div id="secAbs" class="hidden"><div id="absentArea"></div></div>
     <div id="secFin" class="hidden">
-        <div class="fin-grid">
-            <div class="fin-box"><span>Expected</span><b id="dashExp">0</b></div>
-            <div class="fin-box"><span>Collected</span><b id="dashPaid" style="color:var(--green)">0</b></div>
-            <div class="fin-box"><span>Balance</span><b id="dashBal" style="color:var(--red)">0</b></div>
-        </div>
+        <div class="fin-grid"><div class="fin-box"><span>Goal</span><b id="dashExp">0</b></div><div class="fin-box"><span>Paid</span><b id="dashPaid" style="color:var(--green)">0</b></div><div class="fin-box"><span>Bal</span><b id="dashBal" style="color:var(--red)">0</b></div></div>
         <div id="finArea"></div>
     </div>
 
@@ -145,26 +111,107 @@
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
     let ROLE = "", students = [], att = {};
 
-    const holidays = { "1-1": "NEW YEAR", "1-26": "NRM DAY", "2-16": "JANAN LUWUM", "3-8": "WOMEN'S DAY", "4-3": "GOOD FRIDAY", "4-5": "EASTER SUNDAY ✨", "4-6": "EASTER MONDAY", "10-9": "INDEPENDENCE 🇺🇬", "12-25": "CHRISTMAS" };
-
-    const schedule = [
-        { start: 630, end: 800, text: "🌅 Arrival & Breakfast" },
-        { start: 800, end: 1030, text: "📚 Morning Lessons" },
-        { start: 1030, end: 1100, text: "☕ Break Time" },
-        { start: 1100, end: 1230, text: "📖 Mid-Morning Lessons" },
-        { start: 1230, end: 1330, text: "🍲 Lunch Time" },
-        { start: 1330, end: 1500, text: "💤 Sleeping Time (Nursery) / Lessons (Primary)" },
-        { start: 1500, end: 1600, text: "⚽ Play & Departure" }
-    ];
-
     function login() {
-        const k = document.getElementById('sysKey').value.toUpperCase();
+        const btn = document.getElementById('loginBtn');
+        // .trim() removes any accidental spaces from your phone's keyboard
+        const k = document.getElementById('sysKey').value.trim().toUpperCase();
+        
+        btn.innerText = "CHECKING...";
+        
         if (k === "JESUS CARES") ROLE = "ADMIN";
         else if (k === "FINANCE2026") ROLE = "FINANCE";
         else if (k === "TEACHER256") ROLE = "TEACHER";
-        else return alert("Invalid Key");
+        else {
+            btn.innerText = "LOGIN NOW";
+            return alert("Invalid Access Key. Check spelling & try again!");
+        }
 
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
 
-        if (ROLE === "ADMIN") { ['tSched','tReg','tRoll','tRec','tAbs','tFin'].forEach(id => document.getElementById(
+        if (ROLE === "ADMIN") { ['tSched','tReg','tRoll','tRec','tAbs','tFin'].forEach(id => document.getElementById(id).style.display = "block"); document.getElementById('financePanel').classList.remove('hidden'); showTab('sched'); }
+        else if (ROLE === "FINANCE") { ['tSched','tReg','tFin'].forEach(id => document.getElementById(id).style.display = "block"); document.getElementById('financePanel').classList.remove('hidden'); showTab('fin'); }
+        else { ['tSched','tRoll'].forEach(id => document.getElementById(id).style.display = "block"); showTab('sched'); }
+
+        fetchData(); setInterval(tick, 1000); tick();
+    }
+
+    async function fetchData() {
+        const { data } = await sb.from('students').select('*').order('name');
+        if(data) { students = data; document.getElementById('statTotal').innerText = students.length; renderRec(); renderFinance(); }
+    }
+
+    function tick() {
+        const n = new Date();
+        const mD = (n.getMonth()+1) + "-" + n.getDate();
+        const time = n.getHours() * 100 + n.getMinutes();
+        document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
+        document.getElementById('currDate').innerText = n.toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
+        
+        // Schedule highlight logic
+        const sch = [ {s:630, e:800, t:"🌅 ARRIVAL"}, {s:800, e:1030, t:"📚 LESSONS"}, {s:1030, e:1100, t:"☕ BREAK"}, {s:1100, e:1230, t:"📖 LESSONS"}, {s:1230, e:1330, t:"🍲 LUNCH"}, {s:1330, e:1500, t:"💤 SLEEP/NAP"}, {s:1500, e:1600, t:"⚽ PLAY"} ];
+        let cur = "🌙 CLOSED";
+        let h = "";
+        sch.forEach(s => {
+            const act = (time >= s.s && time < s.e);
+            if(act) cur = s.t;
+            h += `<div class="time-slot ${act ? 'active' : ''}"><b>${s.s}</b> <span>${s.t}</span></div>`;
+        });
+        document.getElementById('scheduleArea').innerHTML = h;
+        document.getElementById('activityStatus').innerText = cur;
+    }
+
+    function showTab(t) {
+        ['secSched','secReg','secRoll','secRec','secFin','secAbs'].forEach(s => document.getElementById(s).classList.add('hidden'));
+        ['tSched','tReg','tRoll','tRec','tFin','tAbs'].forEach(s => document.getElementById(s).classList.remove('active'));
+        document.getElementById('sec' + t.charAt(0).toUpperCase() + t.slice(1)).classList.remove('hidden');
+        document.getElementById('t' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('active');
+    }
+
+    function loadFilteredRoll() {
+        const sel = document.getElementById('rollClass').value;
+        const filtered = students.filter(s => s.class === sel);
+        let h = "";
+        filtered.forEach(s => {
+            const isAbs = att[s.id] === 'absent';
+            h += `<div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:15px;"><b>${s.name}</b><button onclick="toggleAtt('${s.id}')" style="padding:10px; border-radius:10px; border:none; background:${isAbs ? 'var(--red)' : 'var(--green)'}; color:white;">${isAbs ? 'ABS' : 'PRES'}</button></div>`;
+        });
+        document.getElementById('rollArea').innerHTML = h || "<p style='text-align:center;'>No students.</p>";
+    }
+
+    function toggleAtt(id) {
+        att[id] = (att[id] === 'absent') ? 'present' : 'absent';
+        let a = 0; Object.values(att).forEach(v => { if(v === 'absent') a++; });
+        document.getElementById('statAbs').innerText = a; document.getElementById('statPres').innerText = students.length - a;
+        loadFilteredRoll();
+    }
+
+    async function saveData() {
+        const id = document.getElementById('editId').value;
+        const row = { name: document.getElementById('fName').value, class: document.getElementById('fClass').value, contact: document.getElementById('fCon').value, fees_expected: parseInt(document.getElementById('fExp').value) || 0, fees_paid: parseInt(document.getElementById('fPaid').value) || 0 };
+        if(id) await sb.from('students').update(row).eq('id', id); else await sb.from('students').insert([row]);
+        alert("Saved!"); fetchData();
+    }
+
+    function renderFinance() {
+        let e = 0, p = 0;
+        let h = ""; 
+        students.forEach(s => {
+            e += (s.fees_expected || 0); p += (s.fees_paid || 0);
+            const b = (s.fees_expected || 0) - (s.fees_paid || 0);
+            h += `<div class="card" style="border-left:8px solid ${b <= 0 ? 'var(--green)' : 'var(--red)'}"><b>${s.name}</b><br><small>BAL: UGX ${b.toLocaleString()}</small></div>`;
+        });
+        document.getElementById('dashExp').innerText = (e/1000).toFixed(0) + "k";
+        document.getElementById('dashPaid').innerText = (p/1000).toFixed(0) + "k";
+        document.getElementById('dashBal').innerText = ((e-p)/1000).toFixed(0) + "k";
+        document.getElementById('finArea').innerHTML = h;
+    }
+
+    function renderRec() {
+        const q = document.getElementById('search').value.toUpperCase();
+        let h = ""; students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => { h += `<div class="card"><b>${s.name}</b> <small style="float:right;">${s.class}</small></div>`; });
+        document.getElementById('recArea').innerHTML = h;
+    }
+</script>
+</body>
+</html>
