@@ -3,101 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMS MASTER - 3 SECTION SYSTEM</title>
+    <title>Progressive Mothers - Master System</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --admin-blue: #001a33; --teacher-green: #28a745; --finance-gold: #ffc107; --white: #ffffff; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: #f4f6f9; }
-        
-        /* AUTH GATE */
-        #login-screen { display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--admin-blue); }
-        .login-box { background: white; padding: 40px; border-radius: 15px; width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        :root { --pms-red: #e63946; --pms-blue: #001a33; --pms-light: #f4f7f6; --white: #ffffff; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--pms-light); color: var(--pms-blue); }
 
-        /* HEADER */
-        header { background: var(--admin-blue); color: white; padding: 20px; text-align: center; border-bottom: 5px solid #004085; }
-        .user-badge { background: var(--finance-gold); color: black; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 12px; }
+        /* LOGIN STYLE */
+        #login-gate { display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--pms-blue); }
+        .login-card { background: white; padding: 40px; border-radius: 20px; width: 340px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
 
-        /* TAB NAVIGATION */
-        .nav-bar { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; }
-        .nav-item { flex: 1; text-align: center; padding: 15px; cursor: pointer; font-weight: bold; color: #666; transition: 0.3s; }
-        .nav-item.active { border-bottom: 4px solid var(--admin-blue); color: var(--admin-blue); background: #f0f7ff; }
+        /* HEADER & NAV */
+        header { background: var(--pms-red); color: white; padding: 15px; text-align: center; border-bottom: 5px solid var(--pms-blue); }
+        .nav-tabs { display: flex; background: white; justify-content: space-around; padding: 12px; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 100; }
+        .tab { cursor: pointer; font-weight: bold; color: #666; padding: 5px 15px; }
+        .tab.active { color: var(--pms-red); border-bottom: 3px solid var(--pms-red); }
 
-        .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
         
-        /* SECTION VISIBILITY */
-        .portal-section { display: none; }
-        
-        /* TABLES & FORMS */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background: #eee; padding: 12px; text-align: left; font-size: 13px; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        /* DASHBOARD GRID */
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { padding: 25px; border-radius: 15px; color: white; text-align: center; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .bg-blue { background: #004085; } .bg-green { background: #28a745; } .bg-gold { background: #ffc107; color: black; } .bg-red { background: var(--pms-red); }
+
+        /* FORM & TABLE */
+        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #dee2e6; }
         input, select, button { padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
-        .btn-save { background: var(--teacher-green); color: white; border: none; font-weight: bold; cursor: pointer; }
+        button { background: var(--pms-blue); color: white; border: none; font-weight: bold; cursor: pointer; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: var(--pms-blue); color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
-    <div class="login-box">
+<div id="login-gate">
+    <div class="login-card">
         <h2 style="margin:0;">PMS SYSTEM</h2>
-        <p style="font-size:12px; color:#666;">Enter your specialized access key</p>
-        <input type="password" id="accessKey" placeholder="Password">
-        <button onclick="handleLogin()" style="background:var(--admin-blue); color:white; margin-top:20px; cursor:pointer; padding:12px; border:none; border-radius:8px; width:100%;">ACCESS PORTAL</button>
+        <p style="color:#666; font-size:13px;">Eudes Media Digital Partner</p>
+        <input type="password" id="passInput" placeholder="Enter Access Key">
+        <button onclick="authenticate()" style="margin-top:15px;">LOGIN TO PORTAL</button>
     </div>
 </div>
 
-<div id="main-system" style="display:none;">
+<div id="main-app" style="display:none;">
     <header>
-        <h2 style="margin:0;">PROGRESSIVE MOTHERS SCHOOL</h2>
-        <div id="roleDisplay" class="user-badge" style="margin-top:10px; display:inline-block;"></div>
-        <p style="font-size:12px; margin:10px 0 0 0;">Branding: EUDES MEDIA | +256762992440</p>
+        <h1 style="margin:0; font-size: 22px;">PROGRESSIVE MOTHERS NURSERY & PRIMARY SCHOOL</h1>
+        <p style="margin:5px 0; font-size: 13px;">📞 +256762992440 | Gayaza - Kijabijo</p>
     </header>
 
-    <div class="nav-bar">
-        <div id="tab-teachers" class="nav-item active" onclick="switchPortal('teachers')">TEACHERS PORTAL</div>
-        <div id="tab-finance" class="nav-item" onclick="switchPortal('finance')">FINANCE PORTAL</div>
-        <div id="tab-admin" class="nav-item" onclick="switchPortal('admin')">ADMIN PORTAL</div>
+    <div class="nav-tabs">
+        <div id="t-dash" class="tab active" onclick="showTab('dash')">Dashboard</div>
+        <div id="t-teachers" class="tab" onclick="showTab('teachers')">Teachers</div>
+        <div id="t-finance" class="tab" onclick="showTab('finance')">Finance</div>
+        <div id="t-admin" class="tab" onclick="showTab('admin')">Admin</div>
     </div>
 
     <div class="container">
-        <div id="section-teachers" class="portal-section" style="display:block;">
+        <div id="sec-dash" class="portal-section">
+            <div class="dash-grid" id="dashStats">
+                <div class="stat-card bg-blue">Loading...</div>
+            </div>
+            <div class="card" style="border-left: 10px solid var(--pms-red);">
+                <h4 style="margin:0; color:var(--pms-red);">📢 HOLIDAY NOTIFICATION</h4>
+                <p>Next: Easter Monday. School is closed for all students.</p>
+            </div>
+        </div>
+
+        <div id="sec-teachers" class="portal-section" style="display:none;">
             <div class="card">
                 <h3>Student Registration</h3>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <input id="regName" placeholder="Full Name">
-                    <input id="regLin" placeholder="LIN (Auto-generated)">
+                    <input id="regLin" placeholder="LIN (Auto-gen)">
                     <input id="regAge" placeholder="Age">
-                    <input id="regClass" placeholder="Class">
+                    <input id="regClass" placeholder="Class (e.g., P.1)">
                     <input id="regLoc" placeholder="Location">
-                    <select id="regHealth">
-                        <option>Normal</option><option>Special Care</option>
-                    </select>
+                    <select id="regHealth"><option>Normal</option><option>Special Care</option></select>
                 </div>
-                <button class="btn-save" onclick="registerStudent()">Save Student to Database</button>
+                <button onclick="saveStudent()" style="background:#28a745; margin-top:20px;">REGISTER STUDENT</button>
             </div>
             <div class="card">
-                <h3>Daily Attendance</h3>
-                <select id="classFilter" onchange="loadStudentsByClass()" style="margin-bottom:15px;">
-                    <option value="">Select Class</option>
-                    <option>P.1</option><option>P.7</option><option>Baby</option>
+                <h3>Class Rollcall</h3>
+                <select id="classView" onchange="fetchData()">
+                    <option value="P.1">P.1</option><option value="P.7">P.7</option><option value="Baby">Baby</option>
                 </select>
                 <div id="attendanceList"></div>
             </div>
         </div>
 
-        <div id="section-finance" class="portal-section">
+        <div id="sec-finance" class="portal-section" style="display:none;">
             <div class="card">
                 <h3>Fees Management</h3>
                 <div id="financeList"></div>
             </div>
         </div>
 
-        <div id="section-admin" class="portal-section">
-            <div class="card" style="border-left: 8px solid var(--red);">
-                <h3>Master Records Control</h3>
-                <p>Authorized Admin access to delete or modify records.</p>
-                <div id="adminMasterList"></div>
+        <div id="sec-admin" class="portal-section" style="display:none;">
+            <div class="card">
+                <h3>Master Delete (Danger Zone)</h3>
+                <div id="adminList"></div>
             </div>
         </div>
     </div>
@@ -105,55 +111,71 @@
 
 <script>
     const _supabase = supabase.createClient('https://kjftrwuucjdnhfwesrup.supabase.co', 'sbp_publishable_1PetUo8klWCLfupRq52CVg_Y_Y');
-    let CURRENT_ROLE = "";
+    let ROLE = "";
     let students = [];
 
-    async function handleLogin() {
-        const key = document.getElementById('accessKey').value.trim().toUpperCase();
+    function authenticate() {
+        const key = document.getElementById('passInput').value.trim().toUpperCase();
+        if(key === "JESUS CARES") ROLE = "ADMIN";
+        else if(key === "TEACHER256") ROLE = "TEACHER";
+        else if(key === "FINANCE2026") ROLE = "FINANCE";
+        else return alert("Wrong Password");
+
+        document.getElementById('login-gate').style.display = "none";
+        document.getElementById('main-app').style.display = "block";
         
-        if (key === "JESUS CARES") CURRENT_ROLE = "ADMIN";
-        else if (key === "TEACHER256") CURRENT_ROLE = "TEACHER";
-        else if (key === "FINANCE2026") CURRENT_ROLE = "FINANCE";
-        else return alert("Invalid Password");
-
-        document.getElementById('login-screen').style.display = "none";
-        document.getElementById('main-system').style.display = "block";
-        document.getElementById('roleDisplay').innerText = "LOGGED IN AS: " + CURRENT_ROLE;
-
-        restrictUI();
-        await fetchAllData();
+        // Hide tabs based on role
+        if(ROLE === "TEACHER") { document.getElementById('t-finance').style.display = "none"; document.getElementById('t-admin').style.display = "none"; }
+        if(ROLE === "FINANCE") { document.getElementById('t-teachers').style.display = "none"; document.getElementById('t-admin').style.display = "none"; showTab('finance'); }
+        
+        fetchData();
     }
 
-    function restrictUI() {
-        // Teachers can't see Finance/Admin tabs
-        if (CURRENT_ROLE === "TEACHER") {
-            document.getElementById('tab-finance').style.display = "none";
-            document.getElementById('tab-admin').style.display = "none";
-        }
-        // Finance can't see Teacher registration or Admin tabs
-        if (CURRENT_ROLE === "FINANCE") {
-            document.getElementById('tab-teachers').style.display = "none";
-            document.getElementById('tab-admin').style.display = "none";
-            switchPortal('finance');
-        }
-    }
-
-    function switchPortal(portal) {
+    function showTab(id) {
         document.querySelectorAll('.portal-section').forEach(s => s.style.display = "none");
-        document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
-        
-        document.getElementById('section-' + portal).style.display = "block";
-        document.getElementById('tab-' + portal).classList.add('active');
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('sec-' + id).style.display = "block";
+        document.getElementById('t-' + id).classList.add('active');
     }
 
-    async function fetchAllData() {
-        const { data } = await _supabase.from('students').select('*').order('name');
+    async function fetchData() {
+        const { data } = await _supabase.from('students').select('*');
         students = data || [];
-        renderFinance();
-        renderAdmin();
+        updateUI();
     }
 
-    async function registerStudent() {
+    function updateUI() {
+        // Dashboard Stats
+        document.getElementById('dashStats').innerHTML = `
+            <div class="stat-card bg-blue">Total: ${students.length}</div>
+            <div class="stat-card bg-green">Boys: ${students.filter(s=>s.gender==='Male').length}</div>
+            <div class="stat-card bg-gold">Girls: ${students.filter(s=>s.gender==='Female').length}</div>
+            <div class="stat-card bg-red">P.7: ${students.filter(s=>s.class==='P.7').length}</div>
+        `;
+
+        // Attendance/Teacher List
+        let attHtml = "<table><tr><th>LIN</th><th>Name</th><th>Action</th></tr>";
+        students.filter(s => s.class === document.getElementById('classView').value).forEach(s => {
+            attHtml += `<tr><td>${s.lin}</td><td>${s.name}</td><td><button style="width:auto; padding:5px 10px;">Mark</button></td></tr>`;
+        });
+        document.getElementById('attendanceList').innerHTML = attHtml + "</table>";
+
+        // Finance List
+        let finHtml = "<table><tr><th>Name</th><th>Balance</th><th>Update</th></tr>";
+        students.forEach(s => {
+            finHtml += `<tr><td>${s.name}</td><td>${s.fees_balance || 0}</td><td><button style="width:auto; padding:5px 10px;">Update</button></td></tr>`;
+        });
+        document.getElementById('financeList').innerHTML = finHtml + "</table>";
+
+        // Admin List
+        let admHtml = "<table><tr><th>Name</th><th>Action</th></tr>";
+        students.forEach(s => {
+            admHtml += `<tr><td>${s.name}</td><td><button onclick="delRec('${s.id}')" style="background:red; width:auto; padding:5px 10px;">Delete</button></td></tr>`;
+        });
+        document.getElementById('adminList').innerHTML = admHtml + "</table>";
+    }
+
+    async function saveStudent() {
         const lin = document.getElementById('regLin').value || "LIN-" + Math.floor(1000 + Math.random() * 9000);
         const { error } = await _supabase.from('students').insert([{
             name: document.getElementById('regName').value,
@@ -163,29 +185,13 @@
             location: document.getElementById('regLoc').value,
             health: document.getElementById('regHealth').value
         }]);
-        if(error) alert(error.message); else { alert("Student Added!"); fetchAllData(); }
+        if(error) alert(error.message); else { alert("Saved!"); fetchData(); }
     }
 
-    function renderFinance() {
-        let html = "<table><tr><th>Name</th><th>Balance</th><th>Action</th></tr>";
-        students.forEach(s => {
-            html += `<tr><td>${s.name}</td><td>${s.fees_balance || 0} UGX</td><td><button onclick="updateFees('${s.id}')">Update</button></td></tr>`;
-        });
-        document.getElementById('financeList').innerHTML = html + "</table>";
-    }
-
-    function renderAdmin() {
-        let html = "<table><tr><th>LIN</th><th>Name</th><th>Action</th></tr>";
-        students.forEach(s => {
-            html += `<tr><td>${s.lin}</td><td>${s.name}</td><td><button style="background:red; color:white; border:none;" onclick="deleteRec('${s.id}')">DELETE</button></td></tr>`;
-        });
-        document.getElementById('adminMasterList').innerHTML = html + "</table>";
-    }
-
-    async function deleteRec(id) {
-        if(confirm("Admin: Permanently delete this record?")) {
+    async function delRec(id) {
+        if(confirm("Admin: Delete record?")) {
             await _supabase.from('students').delete().eq('id', id);
-            fetchAllData();
+            fetchData();
         }
     }
 </script>
