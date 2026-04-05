@@ -3,197 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progressive Mothers - Master System</title>
+    <title>PMS - Eudes Media Solutions</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --pms-red: #e63946; --pms-blue: #001a33; --pms-light: #f4f7f6; --white: #ffffff; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--pms-light); color: var(--pms-blue); }
+        :root { --pms-red: #e63946; --pms-dark: #001a33; --pms-bg: #f8f9fc; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--pms-bg); }
 
-        /* LOGIN STYLE */
-        #login-gate { display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--pms-blue); }
-        .login-card { background: white; padding: 40px; border-radius: 20px; width: 340px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        /* TOP RED BAR */
+        .top-nav { background: var(--pms-red); color: white; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; }
+        .school-logo { height: 35px; background: white; border-radius: 50%; padding: 3px; }
+        .top-icons { font-size: 22px; display: flex; gap: 15px; }
 
-        /* HEADER & NAV */
-        header { background: var(--pms-red); color: white; padding: 15px; text-align: center; border-bottom: 5px solid var(--pms-blue); }
-        .nav-tabs { display: flex; background: white; justify-content: space-around; padding: 12px; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 100; }
-        .tab { cursor: pointer; font-weight: bold; color: #666; padding: 5px 15px; }
-        .tab.active { color: var(--pms-red); border-bottom: 3px solid var(--pms-red); }
-
-        .container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
+        /* DASHBOARD SECTION (Image 2) */
+        .dashboard-header { background: var(--pms-dark); color: white; padding: 40px 20px; text-align: center; position: relative; }
+        .logout-btn { position: absolute; top: 15px; left: 15px; border: 1px solid gold; color: gold; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+        .current-date { position: absolute; top: 15px; right: 15px; font-size: 12px; text-transform: uppercase; }
+        .school-name { font-size: 16px; font-weight: bold; color: white; margin-bottom: 2px; }
+        .school-loc { font-size: 11px; color: #ffc107; text-transform: uppercase; letter-spacing: 1px; }
+        .digital-clock { font-size: 52px; font-weight: bold; margin: 15px 0; letter-spacing: 2px; }
         
-        /* DASHBOARD GRID */
-        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { padding: 25px; border-radius: 15px; color: white; text-align: center; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .bg-blue { background: #004085; } .bg-green { background: #28a745; } .bg-gold { background: #ffc107; color: black; } .bg-red { background: var(--pms-red); }
+        /* STAT CARDS (Image 2) */
+        .stats-container { display: flex; justify-content: center; gap: 10px; margin-top: -30px; padding: 0 10px; }
+        .stat-card { background: white; border-radius: 20px; padding: 15px 5px; width: 30%; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-bottom: 4px solid #ffc107; }
+        .stat-val { font-size: 24px; font-weight: bold; color: var(--pms-dark); display: block; }
+        .stat-label { font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; margin-top: 5px; }
 
-        /* FORM & TABLE */
-        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #dee2e6; }
-        input, select, button { padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
-        button { background: var(--pms-blue); color: white; border: none; font-weight: bold; cursor: pointer; }
+        /* NAV BUTTONS (Image 2) */
+        .main-nav { display: flex; overflow-x: auto; padding: 25px 15px; gap: 10px; justify-content: center; }
+        .nav-pill { padding: 10px 18px; border-radius: 25px; border: 1px solid #eee; background: white; font-size: 12px; font-weight: bold; color: #999; cursor: pointer; white-space: nowrap; transition: 0.3s; }
+        .nav-pill.active { background: var(--pms-dark); color: white; border-color: var(--pms-dark); }
+
+        /* STUDENT CARDS (Image 3) */
+        .student-list { padding: 0 15px 100px 15px; }
+        .student-card { background: white; border-radius: 15px; margin-bottom: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--pms-dark); }
+        .student-info b { font-size: 15px; text-transform: uppercase; color: #333; }
+        .student-sub { font-size: 13px; color: #666; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background: var(--pms-blue); color: white; padding: 12px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
+        /* ADMISSION FORM (Image 1) */
+        .form-card { background: white; border-radius: 15px; padding: 20px; margin: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 15px; }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; box-sizing: border-box; }
+        .btn-gen { background: #28a745; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer; }
+
+        /* FOOTER */
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: #999; text-transform: uppercase; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="login-gate">
-    <div class="login-card">
-        <h2 style="margin:0;">PMS SYSTEM</h2>
-        <p style="color:#666; font-size:13px;">Eudes Media Digital Partner</p>
-        <input type="password" id="passInput" placeholder="Enter Access Key">
-        <button onclick="authenticate()" style="margin-top:15px;">LOGIN TO PORTAL</button>
+<div id="login-gate" style="display:flex; justify-content:center; align-items:center; height:100vh; background:var(--pms-dark);">
+    <div style="background:white; padding:30px; border-radius:20px; text-align:center; width:280px;">
+        <h3>SYSTEM LOGIN</h3>
+        <input type="password" id="sysPass" placeholder="Enter Password">
+        <button onclick="checkLogin()" class="btn-gen" style="background:var(--pms-dark)">LOGIN</button>
     </div>
 </div>
 
-<div id="main-app" style="display:none;">
-    <header>
-        <h1 style="margin:0; font-size: 22px;">PROGRESSIVE MOTHERS NURSERY & PRIMARY SCHOOL</h1>
-        <p style="margin:5px 0; font-size: 13px;">📞 +256762992440 | Gayaza - Kijabijo</p>
-    </header>
-
-    <div class="nav-tabs">
-        <div id="t-dash" class="tab active" onclick="showTab('dash')">Dashboard</div>
-        <div id="t-teachers" class="tab" onclick="showTab('teachers')">Teachers</div>
-        <div id="t-finance" class="tab" onclick="showTab('finance')">Finance</div>
-        <div id="t-admin" class="tab" onclick="showTab('admin')">Admin</div>
+<div id="app" style="display:none;">
+    <div class="top-nav">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img src="https://via.placeholder.com/40" class="school-logo">
+            <span style="font-weight:bold; letter-spacing:1px; font-size:14px;">SCHOOL DATA <span style="font-size:20px; color:white;">⊕</span></span>
+        </div>
+        <div class="top-icons"><span>🔗</span><span>🔔</span></div>
     </div>
 
-    <div class="container">
-        <div id="sec-dash" class="portal-section">
-            <div class="dash-grid" id="dashStats">
-                <div class="stat-card bg-blue">Loading...</div>
-            </div>
-            <div class="card" style="border-left: 10px solid var(--pms-red);">
-                <h4 style="margin:0; color:var(--pms-red);">📢 HOLIDAY NOTIFICATION</h4>
-                <p>Next: Easter Monday. School is closed for all students.</p>
-            </div>
-        </div>
+    <div class="dashboard-header">
+        <div class="logout-btn">LOGOUT</div>
+        <div class="current-date" id="headerDate">05 APRIL 2026</div>
+        <div class="school-name">PROGRESSIVE MOTHERS SCHOOL</div>
+        <div class="school-loc">GAYAZA-KIJABIJJO</div>
+        <div class="digital-clock" id="clock">22:19:05</div>
+        <div style="color:white; font-size:18px;">...</div>
+    </div>
 
-        <div id="sec-teachers" class="portal-section" style="display:none;">
-            <div class="card">
-                <h3>Student Registration</h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <input id="regName" placeholder="Full Name">
-                    <input id="regLin" placeholder="LIN (Auto-gen)">
-                    <input id="regAge" placeholder="Age">
-                    <input id="regClass" placeholder="Class (e.g., P.1)">
-                    <input id="regLoc" placeholder="Location">
-                    <select id="regHealth"><option>Normal</option><option>Special Care</option></select>
-                </div>
-                <button onclick="saveStudent()" style="background:#28a745; margin-top:20px;">REGISTER STUDENT</button>
+    <div class="stats-container">
+        <div class="stat-card"><span class="stat-val" id="count-total">0</span><span class="stat-label">Students</span></div>
+        <div class="stat-card"><span class="stat-val" style="color:#28a745;">0</span><span class="stat-label">Present</span></div>
+        <div class="stat-card"><span class="stat-val" style="color:#e63946;">0</span><span class="stat-label">Absent</span></div>
+    </div>
+
+    <div class="main-nav">
+        <div class="nav-pill" onclick="showPortal('admission')">ADMISSION</div>
+        <div class="nav-pill active" onclick="showPortal('rollcall')">ROLL CALL</div>
+        <div class="nav-pill" onclick="showPortal('records')">RECORDS</div>
+        <div class="nav-pill">ABSENTEES</div>
+        <div class="nav-pill">FINANCE</div>
+    </div>
+
+    <div id="portal-rollcall" class="portal">
+        <div class="student-list" id="studentCards">
             </div>
-            <div class="card">
-                <h3>Class Rollcall</h3>
-                <select id="classView" onchange="fetchData()">
-                    <option value="P.1">P.1</option><option value="P.7">P.7</option><option value="Baby">Baby</option>
+    </div>
+
+    <div id="portal-admission" class="portal" style="display:none;">
+        <div class="form-card">
+            <h3 style="margin-top:0;">Registration</h3>
+            <div class="form-group"><input id="regName" placeholder="Full Name"></div>
+            <div class="form-group"><input id="regAge" placeholder="Age"></div>
+            <div class="form-group"><input id="regLoc" placeholder="Physical Location (Stay)"></div>
+            <div class="form-group">
+                <select id="regHealth">
+                    <option>Health: Normal</option>
+                    <option>Health: Special Care</option>
                 </select>
-                <div id="attendanceList"></div>
             </div>
+            <div class="form-group">
+                <select id="regClass">
+                    <option>Class: P.1</option><option>Class: P.7</option>
+                </select>
+            </div>
+            <button class="btn-gen" onclick="saveStudent()">Register & Generate LIN</button>
         </div>
+    </div>
 
-        <div id="sec-finance" class="portal-section" style="display:none;">
-            <div class="card">
-                <h3>Fees Management</h3>
-                <div id="financeList"></div>
-            </div>
-        </div>
-
-        <div id="sec-admin" class="portal-section" style="display:none;">
-            <div class="card">
-                <h3>Master Delete (Danger Zone)</h3>
-                <div id="adminList"></div>
-            </div>
-        </div>
+    <div class="footer">
+        EUDES MEDIA SOLUTIONS | +256762992440
     </div>
 </div>
 
 <script>
     const _supabase = supabase.createClient('https://kjftrwuucjdnhfwesrup.supabase.co', 'sbp_publishable_1PetUo8klWCLfupRq52CVg_Y_Y');
-    let ROLE = "";
-    let students = [];
-
-    function authenticate() {
-        const key = document.getElementById('passInput').value.trim().toUpperCase();
-        if(key === "JESUS CARES") ROLE = "ADMIN";
-        else if(key === "TEACHER256") ROLE = "TEACHER";
-        else if(key === "FINANCE2026") ROLE = "FINANCE";
-        else return alert("Wrong Password");
-
-        document.getElementById('login-gate').style.display = "none";
-        document.getElementById('main-app').style.display = "block";
-        
-        // Hide tabs based on role
-        if(ROLE === "TEACHER") { document.getElementById('t-finance').style.display = "none"; document.getElementById('t-admin').style.display = "none"; }
-        if(ROLE === "FINANCE") { document.getElementById('t-teachers').style.display = "none"; document.getElementById('t-admin').style.display = "none"; showTab('finance'); }
-        
-        fetchData();
+    
+    function checkLogin() {
+        if(document.getElementById('sysPass').value === "JESUS CARES") {
+            document.getElementById('login-gate').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            loadData();
+        } else { alert("Try Again"); }
     }
 
-    function showTab(id) {
-        document.querySelectorAll('.portal-section').forEach(s => s.style.display = "none");
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('sec-' + id).style.display = "block";
-        document.getElementById('t-' + id).classList.add('active');
-    }
-
-    async function fetchData() {
-        const { data } = await _supabase.from('students').select('*');
-        students = data || [];
-        updateUI();
-    }
-
-    function updateUI() {
-        // Dashboard Stats
-        document.getElementById('dashStats').innerHTML = `
-            <div class="stat-card bg-blue">Total: ${students.length}</div>
-            <div class="stat-card bg-green">Boys: ${students.filter(s=>s.gender==='Male').length}</div>
-            <div class="stat-card bg-gold">Girls: ${students.filter(s=>s.gender==='Female').length}</div>
-            <div class="stat-card bg-red">P.7: ${students.filter(s=>s.class==='P.7').length}</div>
-        `;
-
-        // Attendance/Teacher List
-        let attHtml = "<table><tr><th>LIN</th><th>Name</th><th>Action</th></tr>";
-        students.filter(s => s.class === document.getElementById('classView').value).forEach(s => {
-            attHtml += `<tr><td>${s.lin}</td><td>${s.name}</td><td><button style="width:auto; padding:5px 10px;">Mark</button></td></tr>`;
-        });
-        document.getElementById('attendanceList').innerHTML = attHtml + "</table>";
-
-        // Finance List
-        let finHtml = "<table><tr><th>Name</th><th>Balance</th><th>Update</th></tr>";
-        students.forEach(s => {
-            finHtml += `<tr><td>${s.name}</td><td>${s.fees_balance || 0}</td><td><button style="width:auto; padding:5px 10px;">Update</button></td></tr>`;
-        });
-        document.getElementById('financeList').innerHTML = finHtml + "</table>";
-
-        // Admin List
-        let admHtml = "<table><tr><th>Name</th><th>Action</th></tr>";
-        students.forEach(s => {
-            admHtml += `<tr><td>${s.name}</td><td><button onclick="delRec('${s.id}')" style="background:red; width:auto; padding:5px 10px;">Delete</button></td></tr>`;
-        });
-        document.getElementById('adminList').innerHTML = admHtml + "</table>";
+    function showPortal(p) {
+        document.querySelectorAll('.portal').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
+        document.getElementById('portal-' + p).style.display = 'block';
+        event.currentTarget.classList.add('active');
     }
 
     async function saveStudent() {
-        const lin = document.getElementById('regLin').value || "LIN-" + Math.floor(1000 + Math.random() * 9000);
+        const lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
         const { error } = await _supabase.from('students').insert([{
             name: document.getElementById('regName').value,
             lin: lin,
             age: document.getElementById('regAge').value,
-            class: document.getElementById('regClass').value,
             location: document.getElementById('regLoc').value,
-            health: document.getElementById('regHealth').value
+            health: document.getElementById('regHealth').value,
+            class: document.getElementById('regClass').value,
+            contact: "+2567..." // Default or prompted
         }]);
-        if(error) alert(error.message); else { alert("Saved!"); fetchData(); }
+        if(!error) { alert("Success! LIN: " + lin); loadData(); }
     }
 
-    async function delRec(id) {
-        if(confirm("Admin: Delete record?")) {
-            await _supabase.from('students').delete().eq('id', id);
-            fetchData();
-        }
+    async function loadData() {
+        const { data } = await _supabase.from('students').select('*');
+        const container = document.getElementById('studentCards');
+        document.getElementById('count-total').innerText = data.length;
+        container.innerHTML = "";
+
+        data.forEach(s => {
+            container.innerHTML += `
+                <div class="student-card">
+                    <div class="student-info">
+                        <b>${s.name}</b>
+                        <div class="student-sub">
+                            ${s.lin} | ${s.class} | 📞 ${s.contact || '+256...'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
     }
+
+    // CLOCK LOGIC
+    setInterval(() => {
+        const n = new Date();
+        document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
+        document.getElementById('headerDate').innerText = n.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+    }, 1000);
 </script>
 </body>
 </html>
