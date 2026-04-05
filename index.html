@@ -6,74 +6,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #0056b3; --white: #ffffff; --green: #28a745; --red: #dc3545; --gold: #ffc107; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding: 10px; }
-        .box { background: var(--white); padding: 20px; border-radius: 12px; max-width: 1100px; margin: 10px auto; border: 1.5px solid var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, var(--blue), #003366); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
-        .dash { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .stat { background: white; padding: 10px; border-radius: 10px; text-align: center; border-bottom: 3px solid var(--blue); }
-        .stat b { font-size: 18px; color: var(--blue); display: block; }
-        .stat span { font-size: 9px; font-weight: bold; color: #666; text-transform: uppercase; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        label { font-size: 11px; font-weight: bold; color: var(--blue); display: block; margin-bottom: 3px; }
-        input, select { width: 100%; padding: 10px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none; }
-        .btn { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .table-wrap { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 12px; }
-        th { background: #f8f9fa; color: var(--blue); padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
-        td { padding: 12px; border-bottom: 1px solid #eee; background: white; }
-        .footer { text-align: center; margin-top: 20px; font-size: 12px; font-weight: bold; color: #444; }
+        :root { --blue: #0056b3; --white: #ffffff; --green: #28a745; --red: #dc3545; --gold: #ffc107; --dark: #001a33; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding-bottom: 20px; }
+        .box { background: var(--white); padding: 15px; border-radius: 12px; margin: 10px; border: 1.5px solid var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header-red { background: #e63946; color: white; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .dash-blue { background: var(--dark); color: white; padding: 25px 15px 45px 15px; text-align: center; }
+        .big-clock { font-size: 45px; font-weight: bold; margin: 5px 0; }
+        .stats-row { display: flex; justify-content: center; gap: 8px; margin-top: -30px; padding: 0 10px; }
+        .s-card { background: white; border-radius: 12px; padding: 12px 5px; width: 32%; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-bottom: 4px solid var(--gold); }
+        .s-val { font-size: 22px; font-weight: bold; color: var(--dark); display: block; }
+        .s-label { font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; }
+        .nav-tabs { display: flex; overflow-x: auto; padding: 15px 10px; gap: 8px; justify-content: center; }
+        .pill { padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd; background: white; font-size: 11px; font-weight: bold; color: #888; cursor: pointer; white-space: nowrap; }
+        .pill.active { background: var(--dark); color: white; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        label { font-size: 10px; font-weight: bold; color: var(--blue); display: block; margin-top: 5px; }
+        input, select { width: 100%; padding: 10px; border: 1.2px solid #ccc; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
+        .btn { background: var(--blue); color: white; padding: 12px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 11px; }
+        th { background: #003366; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .badge { padding: 3px 6px; border-radius: 4px; font-size: 10px; color: white; font-weight: bold; }
         .hidden { display: none !important; }
+        .footer { text-align: center; font-size: 10px; color: #aaa; padding: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" class="box" style="max-width:350px; margin-top:80px; text-align:center;">
-    <h2 style="color:var(--blue)">PMS LOGIN</h2>
-    <input id="u" placeholder="USERNAME" autocomplete="off">
-    <input id="p" type="password" placeholder="PASSWORD" style="margin-top:10px;">
-    <button onclick="login()" class="btn" style="margin-top:20px;">ENTER SYSTEM</button>
+<div id="loginGate" class="box" style="max-width:300px; margin: 80px auto; text-align:center;">
+    <h3 style="color:var(--blue)">PMS LOGIN</h3>
+    <input id="u" placeholder="USERNAME" style="margin-bottom:8px;">
+    <input id="p" type="password" placeholder="PASSWORD">
+    <button onclick="login()" class="btn">LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
-    <div class="header">
-        <h2 style="margin:0;">PROGRESSIVE SCHOOL DATA</h2>
-        <p style="margin:0; font-size:11px;">Official Management System | Eudes Media</p>
+    <div class="header-red">
+        <div style="font-weight:bold;">SCHOOL DATA <span style="background:white; color:#e63946; border-radius:50%; padding:0 5px;">+</span></div>
+        <div style="font-size:18px;">🔔</div>
     </div>
 
-    <div class="dash">
-        <div class="stat"><span>Students</span><b id="tCnt">0</b></div>
-        <div class="stat"><span>Present</span><b id="pCnt" style="color:var(--green)">0</b></div>
-        <div class="stat"><span>Absent</span><b id="bCnt" style="color:var(--red)">0</b></div>
+    <div class="dash-blue">
+        <div style="font-size:14px; font-weight:bold;">PROGRESSIVE MOTHERS SCHOOL</div>
+        <div class="big-clock" id="clock">00:00:00</div>
+        <div id="date" style="font-size:10px; font-weight:bold;">-- --- ----</div>
     </div>
 
-    <div class="box">
-        <h3 style="color:var(--blue); margin-top:0;">Student Registration</h3>
+    <div class="stats-row">
+        <div class="s-card"><span class="s-val" id="tCnt">0</span><span class="s-label">Total</span></div>
+        <div class="s-card"><span class="s-val" id="pCnt" style="color:var(--green)">0</span><span class="s-label">Paid</span></div>
+        <div class="s-card"><span class="s-val" id="aCnt" style="color:var(--red)">0</span><span class="s-label">Absentees</span></div>
+    </div>
+
+    <div class="nav-tabs">
+        <div class="pill active" id="t-rec" onclick="tab('rec')">RECORDS</div>
+        <div class="pill" id="t-adm" onclick="tab('adm')">ADMISSION</div>
+        <div class="pill" id="t-fin" onclick="tab('fin')">FINANCE</div>
+    </div>
+
+    <div id="v-adm" class="box hidden">
+        <h4 style="margin:0 0 10px 0; color:var(--blue);">Student Registration</h4>
         <div class="grid">
-            <div><label>Full Name</label><input id="name"></div>
-            <div><label>Official LIN</label><input id="olin" placeholder="Auto-gen"></div>
-            <div><label>Date of Birth</label><input id="dob" type="date" onchange="calcAge()"></div>
-            <div><label>Age (Auto)</label><input id="age" readonly style="background:#f0f0f0;"></div>
-            <div><label>Contact Number</label><input id="ph" value="+256"></div>
+            <div style="grid-column: span 2;"><label>Name</label><input id="name"></div>
+            <div><label>Official LIN (Manual)</label><input id="o_lin" placeholder="e.g. PMS-001"></div>
+            <div><label>Gender</label><select id="gen"><option>Male</option><option>Female</option></select></div>
+            <div><label>DOB</label><input id="dob" type="date"></div>
+            <div><label>Class</label><select id="cls"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
             <div><label>Location</label><input id="loc"></div>
-            <div><label>Class</label>
-                <select id="cls">
-                    <option>P.1</option><option>P.2</option><option>P.7</option>
-                </select>
-            </div>
             <div><label>Health Status</label><input id="health" value="Normal"></div>
+            <div><label>Contact</label><input id="ph" value="+256"></div>
+            <div><label>Fees Expected</label><input id="f_exp" type="number"></div>
+            <div><label>Fees Paid</label><input id="f_paid" type="number" value="0"></div>
         </div>
-        <button class="btn" onclick="saveData()">SAVE RECORD</button>
+        <button class="btn" onclick="save()">SAVE STUDENT</button>
     </div>
 
-    <div class="box table-wrap">
-        <table id="dataTable">
+    <div id="v-rec" class="box table-wrap">
+        <table>
             <thead>
                 <tr>
-                    <th>LIN</th><th>Name</th><th>Age</th><th>Location</th><th>Health</th><th>Class</th><th>Action</th>
+                    <th>Official LIN</th><th>Auto LIN</th><th>Name</th><th>Class</th><th>Status</th><th>Health</th><th>Action</th>
                 </tr>
             </thead>
             <tbody id="resList"></tbody>
+        </table>
+    </div>
+
+    <div id="v-fin" class="box table-wrap hidden">
+        <table>
+            <thead>
+                <tr><th>Name</th><th>Code</th><th>Paid</th><th>Expected</th><th>Balance</th><th>Status</th></tr>
+            </thead>
+            <tbody id="finList"></tbody>
         </table>
     </div>
 
@@ -81,59 +106,90 @@
 </div>
 
 <script>
-    // THE KEYS YOU WERE MISSING
     const URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const KEY = 'sbp_publishable_1PetUo8klWCLfupRq52CVg_Y_Y';
     const _supabase = supabase.createClient(URL, KEY);
 
     function login() {
-        const user = document.getElementById('u').value;
-        const pass = document.getElementById('p').value;
-        if(user === "Admin" && pass === "JESUS CARES") {
+        if(document.getElementById('u').value === "Admin" && document.getElementById('p').value === "JESUS CARES") {
             document.getElementById('loginGate').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
-            loadData();
-        } else { alert("Access Denied"); }
+            load();
+        } else { alert("Wrong Login"); }
     }
 
-    function calcAge() {
-        const dob = new Date(document.getElementById('dob').value);
-        const diff = Date.now() - dob.getTime();
-        const age = new Date(diff).getUTCFullYear() - 1970;
-        document.getElementById('age').value = age > 0 ? age : 0;
+    function tab(t) {
+        ['v-adm','v-rec','v-fin'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById('v-'+t).classList.remove('hidden');
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        document.getElementById('t-'+t).classList.add('active');
     }
 
-    async function saveData() {
-        const lin = document.getElementById('olin').value || "PMA-" + Math.floor(Math.random()*9000+1000);
+    async function save() {
+        // Automatic LIN generation
+        const auto_lin = "PMA-" + Math.floor(Math.random()*9000+1000); 
+        
         const { error } = await _supabase.from('students').insert([{
             name: document.getElementById('name').value,
-            lin: lin,
-            age: document.getElementById('age').value,
-            location: document.getElementById('loc').value,
-            health: document.getElementById('health').value,
+            official_lin: document.getElementById('o_lin').value, // Manual field
+            lin: auto_lin, // Automatic field
+            gender: document.getElementById('gen').value,
+            dob: document.getElementById('dob').value,
             class: document.getElementById('cls').value,
-            contact: document.getElementById('ph').value
+            location: document.getElementById('loc').value,
+            health_status: document.getElementById('health').value,
+            contact: document.getElementById('ph').value,
+            fees_expected: document.getElementById('f_exp').value || 0,
+            fees_paid: document.getElementById('f_paid').value || 0,
+            payment_code: "TX-" + Math.floor(Math.random()*9000),
+            status: "Active",
+            is_absent: false
         }]);
-        if(error) alert(error.message); else { alert("Saved!"); loadData(); }
+        
+        if(error) alert(error.message); else { alert("Saved!"); load(); tab('rec'); }
     }
 
-    async function loadData() {
+    async function load() {
         const { data, error } = await _supabase.from('students').select('*').order('name');
+        if (error) return;
+
+        document.getElementById('tCnt').innerText = data.length;
+        document.getElementById('pCnt').innerText = data.filter(s => parseFloat(s.fees_paid) >= parseFloat(s.fees_expected)).length;
+        document.getElementById('aCnt').innerText = data.filter(s => s.is_absent).length;
+
         const list = document.getElementById('resList');
-        document.getElementById('tCnt').innerText = data ? data.length : 0;
-        list.innerHTML = "";
+        const fList = document.getElementById('finList');
+        list.innerHTML = ""; fList.innerHTML = "";
+
         data.forEach(s => {
+            // Displays both LINs in the table
             list.innerHTML += `<tr>
-                <td>${s.lin}</td><td>${s.name}</td><td>${s.age}</td>
-                <td>${s.location}</td><td>${s.health}</td><td>${s.class}</td>
-                <td><button onclick="del('${s.id}')" style="color:red; border:none; background:none; cursor:pointer;">DEL</button></td>
+                <td><b>${s.official_lin || '---'}</b></td>
+                <td><small>${s.lin}</small></td>
+                <td>${s.name}</td><td>${s.class}</td>
+                <td><span class="badge" style="background:${s.status=='Active'?'green':'gray'}">${s.status}</span></td>
+                <td>${s.health_status}</td>
+                <td><button onclick="del('${s.id}')" style="color:red; border:none; background:none;">DEL</button></td>
+            </tr>`;
+
+            const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
+            fList.innerHTML += `<tr>
+                <td>${s.name}</td><td>${s.payment_code}</td><td>${s.fees_paid}</td>
+                <td>${s.fees_expected}</td><td>${bal}</td>
+                <td><span class="badge" style="background:${bal<=0?'green':'red'}">${bal<=0?'Paid':'Debt'}</span></td>
             </tr>`;
         });
     }
 
     async function del(id) {
-        if(confirm("Delete?")) { await _supabase.from('students').delete().eq('id', id); loadData(); }
+        if(confirm("Delete?")) { await _supabase.from('students').delete().eq('id', id); load(); }
     }
+
+    setInterval(() => {
+        const d = new Date();
+        document.getElementById('clock').innerText = d.toLocaleTimeString('en-GB');
+        document.getElementById('date').innerText = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'LONG', year: 'numeric' }).toUpperCase();
+    }, 1000);
 </script>
 </body>
 </html>
