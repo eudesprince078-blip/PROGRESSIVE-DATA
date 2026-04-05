@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE MOTHERS PMS - V160</title>
+    <title>PROGRESSIVE MOTHERS PMS - V161</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -15,38 +15,40 @@
 
         .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 20px 15px 90px; text-align: center; border-bottom: 6px solid var(--gold); position: relative; border-radius: 0 0 40px 40px; }
         .clock-box { font-size: 42px; font-weight: 900; margin: 5px 0; }
-        .activity-banner { font-size: 10px; font-weight: 900; padding: 8px 20px; border-radius: 50px; display: inline-block; border: 2px solid var(--gold); background: rgba(255,255,255,0.1); color: var(--gold); text-transform: uppercase; }
+        .activity-banner { font-size: 11px; font-weight: 900; padding: 10px 25px; border-radius: 50px; display: inline-block; border: 2px solid var(--gold); background: rgba(0,0,0,0.4); color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
 
         .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -45px; z-index: 100; position: relative; }
         .dash-card { background: white; padding: 15px 5px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid #eee; }
         .dash-card span { display: block; font-size: 18px; font-weight: 900; color: var(--blue); }
 
-        .tab-bar { display: flex; background: white; padding: 8px; margin: 20px 15px; border-radius: 15px; overflow-x: auto; gap: 5px; }
-        .tab { flex: 1; padding: 12px 5px; font-size: 9px; font-weight: 900; color: #bbb; text-align: center; display: none; cursor: pointer; white-space: nowrap; border-radius: 10px; }
+        .tab-bar { display: flex; background: white; padding: 8px; margin: 20px 15px; border-radius: 15px; overflow-x: auto; gap: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .tab { flex: 1; padding: 12px 5px; font-size: 9px; font-weight: 900; color: #bbb; text-align: center; display: none; cursor: pointer; white-space: nowrap; border-radius: 10px; transition: 0.3s; }
         .tab.active { background: var(--blue); color: white; }
 
-        .list-item { border-left: 6px solid var(--blue); padding: 15px; margin: 10px 15px; background: white; border-radius: 15px; position: relative; border: 1px solid #eee; }
-        .list-item b { font-size: 14px; display: block; text-transform: uppercase; color: var(--blue); }
-        .lin-display { font-size: 10px; font-weight: 800; color: var(--blue); background: #eef2f7; padding: 2px 6px; border-radius: 5px; margin-top: 5px; display: inline-block; }
+        .list-item { border-left: 6px solid var(--blue); padding: 15px; margin: 10px 15px; background: white; border-radius: 15px; position: relative; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .list-item b { font-size: 15px; display: block; text-transform: uppercase; color: var(--blue); }
+        .lin-tag { font-size: 11px; font-weight: 800; color: white; background: var(--blue); padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 5px; }
 
         .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eee; }
-        label { font-size: 10px; font-weight: 800; color: var(--blue); margin-top: 10px; display: block; text-transform: uppercase; }
-        input, select { width: 100%; padding: 14px; margin-top: 5px; border: 1.5px solid #eee; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-weight: 600; }
-        
-        .notif-item { background: #f0f4f8; padding: 15px; border-radius: 15px; margin-bottom: 10px; border-left: 5px solid var(--gold); }
-        .btn-main { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; cursor: pointer; }
+        label { font-size: 10px; font-weight: 800; color: var(--blue); margin-top: 12px; display: block; text-transform: uppercase; }
+        input, select { width: 100%; padding: 14px; margin-top: 5px; border: 1.5px solid #eee; border-radius: 12px; font-size: 14px; box-sizing: border-box; font-weight: 600; outline: none; }
+        input:focus { border-color: var(--blue); }
+
+        .notif-card { background: #fdfdfd; border: 1px solid #eef; padding: 15px; border-radius: 15px; margin-bottom: 12px; border-left: 6px solid var(--gold); }
+        .btn-main { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; cursor: pointer; font-size: 14px; }
         .hidden { display: none !important; }
-        .footer-brand { text-align: center; font-size: 10px; color: #bbb; padding: 20px; font-weight: 800; }
+        .footer-brand { text-align: center; font-size: 10px; color: #bbb; padding: 30px 20px; font-weight: 800; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" style="max-width: 340px; margin: 100px auto; text-align: center;">
-    <h2 style="color:var(--blue); font-weight:900;">PROGRESSIVE MOTHERS</h2>
+<div id="loginGate" style="max-width: 340px; margin: 80px auto; text-align: center;">
+    <h1 style="color:var(--blue); font-weight:900; margin-bottom:5px;">PROGRESSIVE</h1>
+    <p style="font-size:12px; font-weight:700; color:#666; margin-top:0;">MOTHERS NURSERY & PRIMARY</p>
     <div class="card">
-        <label>SYSTEM ACCESS KEY</label>
-        <input id="sysKey" type="password" placeholder="••••••••" style="text-align:center; width:100%; padding:14px; border-radius:10px; border:1px solid #eee;">
-        <button onclick="login()" class="btn-main">LOG IN</button>
+        <label>SYSTEM KEY</label>
+        <input id="sysKey" type="password" placeholder="ENTER ACCESS CODE" style="text-align:center;">
+        <button onclick="login()" class="btn-main">AUTHORIZE ACCESS</button>
     </div>
 </div>
 
@@ -58,11 +60,11 @@
 
     <div class="header">
         <div id="clock" class="clock-box">00:00:00</div>
-        <div id="activityStatus" class="activity-banner">...</div>
+        <div id="activityStatus" class="activity-banner">INITIALIZING...</div>
     </div>
 
     <div class="dash-container">
-        <div class="dash-card"><span id="statTotal">0</span><small>STUDENTS</small></div>
+        <div class="dash-card"><span id="statTotal">0</span><small>TOTAL</small></div>
         <div class="dash-card"><span id="statPres" style="color:var(--green)">0</span><small>PRESENT</small></div>
         <div class="dash-card"><span id="statAbs" style="color:var(--red)">0</span><small>ABSENT</small></div>
     </div>
@@ -76,25 +78,27 @@
     </div>
 
     <div id="secNotif" class="card hidden">
-        <h4 style="margin:0 0 15px; color:var(--blue); font-size:12px;"><i class="fa-solid fa-bell"></i> APPROVAL VAULT</h4>
+        <h3 style="margin:0 0 15px; color:var(--blue);"><i class="fa-solid fa-shield-check"></i> APPROVAL VAULT</h3>
         <div id="notifList"></div>
     </div>
 
-    <div id="searchWrapper" class="search-container hidden" style="padding:0 15px;">
-        <input type="text" id="globalSearch" oninput="runGlobalSearch()" placeholder="Search Name or LIN..." style="width:100%; padding:14px; border-radius:12px; border:2px solid #ddd; font-weight:600;">
+    <div id="searchWrapper" class="hidden" style="padding:0 15px;">
+        <input type="text" id="globalSearch" oninput="runGlobalSearch()" placeholder="Search Name or LIN Number..." style="width:100%; padding:15px; border-radius:15px; border:2px solid #ddd; font-weight:700;">
     </div>
 
     <div id="secReg" class="card hidden">
-        <label>LIN</label><input id="fLin" disabled style="background:#f9f9f9;">
+        <label>STUDENT LIN</label><input id="fLin" disabled style="background:#f0f0f0; border:none; font-weight:900; color:var(--blue);">
         <label>Full Name</label><input id="fName">
         <label>Age</label><input type="number" id="fAge">
+        <label>Date of Birth</label><input type="date" id="fDob">
         <label>Physical Location</label><input id="fLoc">
-        <label>Health Status</label><input id="fHealth">
+        <label>Health Status</label><input id="fHealth" placeholder="Any medical conditions?">
         <label>Class</label><select id="fClass"><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         <label>Parent Contact</label><input id="fCon">
         <label>Total Fees</label><input type="number" id="fExp">
         <label>Amount Paid</label><input type="number" id="fPaid">
-        <button onclick="saveData()" class="btn-main">SAVE STUDENT</button>
+        <button onclick="saveData()" class="btn-main">SYNC TO CLOUD</button>
+        <button onclick="clearForm()" class="btn-main" style="background:#999">RESET FORM</button>
     </div>
 
     <div id="secList" class="hidden"></div>
@@ -111,7 +115,7 @@
         if (k === "JESUS CARES") ROLE = "ADMIN";
         else if (k === "FINANCE2026") ROLE = "FINANCE";
         else if (k === "TEACHER256") ROLE = "TEACHER";
-        else return alert("Access Denied");
+        else return alert("Invalid Key");
         
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
@@ -138,15 +142,15 @@
         
         const day = n.getDate(); const mon = n.getMonth() + 1;
         const t = n.getHours() * 100 + n.getMinutes();
-        let routine = "🏫 CLASS IN SESSION";
+        let routine = "🏫 NORMAL OPERATIONS";
 
-        // HOLIDAYS
+        // HOLIDAYS 2026
         if(day===5 && mon===4) routine = "🐣 HAPPY EASTER 2026";
         else if(day===6 && mon===4) routine = "🐣 EASTER MONDAY";
         else if(day===1 && mon===5) routine = "👷 LABOUR DAY";
         else if(day===3 && mon===6) routine = "⛪ MARTYRS DAY";
         else {
-            // BOARDING ROUTINE
+            // YOUR BOARDING SCHEDULE
             if(t >= 500 && t < 1030) routine = "📚 MORNING LESSONS";
             else if(t >= 1030 && t < 1100) routine = "☕ BREAK TIME";
             else if(t >= 1100 && t < 1300) routine = "📖 MID-DAY LESSONS";
@@ -179,9 +183,9 @@
         const filtered = students.filter(s => s.name.toUpperCase().includes(q) || (s.lin_number||"").includes(q));
         let h = "";
         filtered.forEach(s => {
-            h += `<div class="list-item" onclick="setEdit('${s.id}')"><b>${s.name}</b><br><span class="lin-display">LIN: ${s.lin_number||'N/A'}</span><br><small>${s.class} | Health: ${s.health_status||'OK'}</small></div>`;
+            h += `<div class="list-item" onclick="setEdit('${s.id}')"><b>${s.name}</b><span class="lin-tag">${s.lin_number||'LIN: PENDING'}</span><br><small>${s.class} | Health: ${s.health_status||'Good'}</small></div>`;
         });
-        document.getElementById('secList').innerHTML = h || "<p style='text-align:center;padding:20px;color:#999;'>No results found.</p>";
+        document.getElementById('secList').innerHTML = h || "<p style='text-align:center;padding:20px;'>No students found.</p>";
     }
 
     async function saveData() {
@@ -190,17 +194,21 @@
         const exp = parseInt(document.getElementById('fExp').value) || 0;
         const paid = parseInt(document.getElementById('fPaid').value) || 0;
         const con = document.getElementById('fCon').value;
-        const cls = document.getElementById('fClass').value;
         
-        const row = { name, class: cls, contact: con, fees_expected: exp, fees_paid: paid, age: document.getElementById('fAge').value, location: document.getElementById('fLoc').value, health_status: document.getElementById('fHealth').value };
+        const row = { 
+            name, class: document.getElementById('fClass').value, contact: con, 
+            fees_expected: exp, fees_paid: paid, age: document.getElementById('fAge').value, 
+            dob: document.getElementById('fDob').value, location: document.getElementById('fLoc').value, 
+            health_status: document.getElementById('fHealth').value 
+        };
         
         if(!id) row.lin_number = `PM${name.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
         const { error } = id ? await sb.from('students').update(row).eq('id', id) : await sb.from('students').insert([row]);
 
         if(!error) {
-            const msg = `*PROGRESSIVE MOTHERS SCHOOL*\n*FEE UPDATE*\nStudent: ${name}\nLIN: ${id ? document.getElementById('fLin').value : row.lin_number}\nPaid: ${paid}\nBal: ${exp-paid}\n\n_Eudes Media_`;
+            const msg = `*PROGRESSIVE MOTHERS*\n*FEE UPDATE*\nStudent: ${name}\nLIN: ${id ? document.getElementById('fLin').value : row.lin_number}\nPaid: ${paid}\nBal: ${exp-paid}\n\n_Eudes Media Solutions_`;
             pendingNotifs.push({ msg, con });
-            alert("Record Updated. Check Notifications for approval.");
+            alert("System Synced. Notification waiting in Admin Vault.");
             fetchData(); clearForm();
         }
     }
@@ -208,11 +216,11 @@
     function renderNotifs() {
         let h = "";
         pendingNotifs.forEach((m, i) => {
-            h += `<div class="notif-item"><pre style="font-size:11px; white-space:pre-wrap; font-family:inherit;">${m.msg}</pre>
-                  <button onclick="sendWA(${i})" style="padding:10px; background:var(--green); color:white; border:none; border-radius:10px; margin-right:10px; font-weight:900;">SEND WHATSAPP</button>
-                  <button onclick="pendingNotifs.splice(${i},1);renderNotifs();" style="padding:10px; background:var(--red); color:white; border:none; border-radius:10px; font-weight:900;">DELETE</button></div>`;
+            h += `<div class="notif-card"><pre style="font-size:12px; white-space:pre-wrap; font-family:inherit;">${m.msg}</pre>
+                  <button onclick="sendWA(${i})" style="padding:10px; background:var(--green); color:white; border:none; border-radius:10px; margin-right:10px; font-weight:900;">APPROVE & SEND</button>
+                  <button onclick="pendingNotifs.splice(${i},1);renderNotifs();" style="padding:10px; background:var(--red); color:white; border:none; border-radius:10px; font-weight:900;">DISCARD</button></div>`;
         });
-        document.getElementById('notifList').innerHTML = h || "<p style='color:#999;font-size:12px;text-align:center;'>No pending messages.</p>";
+        document.getElementById('notifList').innerHTML = h || "<p style='color:#999;font-size:12px;text-align:center;'>No messages waiting for approval.</p>";
     }
 
     function sendWA(i) {
@@ -225,11 +233,11 @@
         document.getElementById('fName').value = s.name; document.getElementById('fClass').value = s.class;
         document.getElementById('fCon').value = s.contact; document.getElementById('fExp').value = s.fees_expected;
         document.getElementById('fPaid').value = s.fees_paid; document.getElementById('fLin').value = s.lin_number;
-        document.getElementById('fAge').value = s.age || ""; document.getElementById('fLoc').value = s.location || ""; 
-        document.getElementById('fHealth').value = s.health_status || "";
+        document.getElementById('fAge').value = s.age; document.getElementById('fDob').value = s.dob;
+        document.getElementById('fLoc').value = s.location; document.getElementById('fHealth').value = s.health_status;
         document.getElementById('editId').value = s.id; showTab('reg');
     }
-    function clearForm() { ['fName','fCon','fExp','fPaid','fLin','fAge','fLoc','fHealth'].forEach(f => document.getElementById(f).value=""); document.getElementById('editId').value=""; }
+    function clearForm() { ['fName','fCon','fExp','fPaid','fLin','fAge','fDob','fLoc','fHealth'].forEach(f => document.getElementById(f).value=""); document.getElementById('editId').value=""; }
 </script>
 <input type="hidden" id="editId">
 </body>
