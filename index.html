@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE MOTHERS PMS - V157</title>
+    <title>PROGRESSIVE MOTHERS PMS - V158</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -83,7 +83,7 @@
     </div>
 
     <div id="secNotif" class="card hidden">
-        <h4 style="margin:0 0 15px; color:var(--blue); font-size:12px;"><i class="fa-solid fa-bell"></i> PENDING APPROVALS</h4>
+        <h4 style="margin:0 0 15px; color:var(--blue); font-size:12px;"><i class="fa-solid fa-bell"></i> APPROVAL VAULT</h4>
         <div id="notifList"></div>
     </div>
 
@@ -104,6 +104,10 @@
     <div id="secReg" class="card hidden">
         <label>LIN</label><input id="fLin" disabled style="background:#f4f4f4;">
         <label>Full Name</label><input id="fName">
+        <label>Age</label><input type="number" id="fAge">
+        <label>Date of Birth</label><input type="date" id="fDob">
+        <label>Physical Location</label><input id="fLoc">
+        <label>Health Status</label><input id="fHealth">
         <label>Class</label><select id="fClass"><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         <label>Parent Contact</label><input id="fCon">
         <label>Total Fees</label><input type="number" id="fExp">
@@ -129,17 +133,13 @@
         else if (k === "FINANCE2026") ROLE = "FINANCE";
         else if (k === "TEACHER256") ROLE = "TEACHER";
         else return alert("Invalid Key");
-        
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-        
-        const tabs = ['tReg','tRoll','tRec','tFin','tNotif'];
-        tabs.forEach(t => { 
-            let visible = false;
-            if(ROLE === "ADMIN") visible = true;
-            else if(ROLE === "FINANCE" && (t==="tReg"||t==="tFin")) visible = true;
-            else if(ROLE === "TEACHER" && (t==="tReg"||t==="tRoll")) visible = true;
-            if(visible) document.getElementById(t).style.display="block";
+        ['tReg','tRoll','tRec','tFin','tNotif'].forEach(t => { 
+            let show = ROLE === "ADMIN";
+            if(ROLE === "FINANCE" && (t === "tReg" || t === "tFin")) show = true;
+            if(ROLE === "TEACHER" && (t === "tReg" || t === "tRoll")) show = true;
+            if(show) document.getElementById(t).style.display = "block";
         });
         showTab(ROLE === "ADMIN" ? 'notif' : (ROLE === "TEACHER" ? 'roll' : 'fin'));
         fetchData(); setInterval(tick, 1000);
@@ -157,23 +157,25 @@
         
         const day = n.getDate(); const mon = n.getMonth() + 1;
         const t = n.getHours() * 100 + n.getMinutes();
-        let routine = "🏫 CLASS IN SESSION";
-        
-        // Holidays
-        if(day===1 && mon===5) routine = "👷 LABOUR DAY";
+        let routine = "🏫 CLASS TIME";
+
+        // Holidays 2026
+        if(day===5 && mon===4) routine = "🐣 HAPPY EASTER 2026";
+        else if(day===6 && mon===4) routine = "🐣 EASTER MONDAY";
+        else if(day===1 && mon===5) routine = "👷 LABOUR DAY";
         else if(day===3 && mon===6) routine = "⛪ MARTYRS DAY";
+        else if(day===9 && mon===6) routine = "🎖️ HEROES DAY";
+        else if(day===9 && mon===10) routine = "🇺🇬 INDEPENDENCE DAY";
         else {
-            // Daily Routine
-            if(t >= 400 && t < 630) routine = "📖 EARLY PREP";
-            else if(t >= 630 && t < 800) routine = "🌅 ARRIVAL & CLEANING";
-            else if(t >= 800 && t < 1030) routine = "📚 MORNING LESSONS";
+            // Official School Routine
+            if(t >= 500 && t < 1030) routine = "📚 MORNING LESSONS";
             else if(t >= 1030 && t < 1100) routine = "☕ BREAK TIME";
-            else if(t >= 1100 && t < 1230) routine = "📖 MID-MORNING LESSONS";
-            else if(t >= 1230 && t < 1330) routine = "🍲 LUNCH TIME";
-            else if(t >= 1330 && t < 1430) routine = "💤 SLEEPING TIME";
-            else if(t >= 1430 && t < 1600) routine = "⚽ PLAY & GAMES";
+            else if(t >= 1100 && t < 1300) routine = "📖 MID-DAY LESSONS";
+            else if(t >= 1300 && t < 1400) routine = "🍲 LUNCH TIME";
+            else if(t >= 1400 && t < 1600) routine = "✍️ AFTERNOON CLASSES";
+            else if(t >= 1600 && t < 1900) routine = "🚿 SHOWER & HOME PREP";
             else if(t >= 1900 && t < 2100) routine = "📖 EVENING PREP";
-            else if(t >= 2100 || t < 400) routine = "🌙 SCHOOL CLOSED";
+            else if(t >= 2100 || t < 500) routine = "💤 SLEEPING TIME";
         }
         document.getElementById('activityStatus').innerText = routine;
     }
@@ -182,18 +184,11 @@
         activeTab = t;
         ['tReg','tRoll','tRec','tFin','tNotif'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).classList.remove('active'); });
         document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
-        
-        document.getElementById('secReg').classList.add('hidden');
-        document.getElementById('secList').classList.add('hidden');
-        document.getElementById('searchWrapper').classList.add('hidden');
-        document.getElementById('rollPicker').classList.add('hidden');
-        document.getElementById('secNotif').classList.add('hidden');
+        ['secReg','secList','searchWrapper','rollPicker','secNotif'].forEach(id => document.getElementById(id).classList.add('hidden'));
 
         if(t === 'reg') document.getElementById('secReg').classList.remove('hidden');
-        else if(t === 'notif') {
-            document.getElementById('secNotif').classList.remove('hidden');
-            renderNotifs();
-        } else {
+        else if(t === 'notif') { document.getElementById('secNotif').classList.remove('hidden'); renderNotifs(); }
+        else {
             if(t === 'roll') document.getElementById('rollPicker').classList.remove('hidden');
             document.getElementById('secList').classList.remove('hidden');
             document.getElementById('searchWrapper').classList.remove('hidden');
@@ -213,10 +208,10 @@
                 const isAbs = att[s.id] === 'absent';
                 h += `<div class="list-item"><b>${s.name}</b><small>${s.class}</small>${isAlarm ? '<i class="fa-solid fa-bell-on alarm-icon"></i>':''}<button onclick="toggleAtt('${s.id}')" style="position:absolute;right:15px;top:15px;padding:12px;border:none;border-radius:10px;background:${isAbs?'var(--red)':'var(--green)'};color:white;font-weight:900;">${isAbs?'ABS':'PRES'}</button></div>`;
             } else {
-                h += `<div class="list-item" onclick="setEdit('${s.id}')"><b>${s.name}</b><small>${s.class} | LIN: ${s.lin_number||'N/A'}</small></div>`;
+                h += `<div class="list-item" onclick="setEdit('${s.id}')"><b>${s.name}</b><small>${s.class} | LIN: ${s.lin_number||'GEN...'}</small></div>`;
             }
         });
-        document.getElementById('secList').innerHTML = h || "<p style='text-align:center;padding:20px;color:#999;'>No results.</p>";
+        document.getElementById('secList').innerHTML = h || "<p style='text-align:center;padding:20px;color:#999;'>No students found.</p>";
     }
 
     async function saveData() {
@@ -226,15 +221,16 @@
         const paid = parseInt(document.getElementById('fPaid').value) || 0;
         const con = document.getElementById('fCon').value;
         const cls = document.getElementById('fClass').value;
-        const row = { name, class: cls, contact: con, fees_expected: exp, fees_paid: paid };
+        
+        const row = { name, class: cls, contact: con, fees_expected: exp, fees_paid: paid, age: document.getElementById('fAge').value, dob: document.getElementById('fDob').value, location: document.getElementById('fLoc').value, health_status: document.getElementById('fHealth').value };
         
         if(!id) row.lin_number = `PM${name.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
         const { error } = id ? await sb.from('students').update(row).eq('id', id) : await sb.from('students').insert([row]);
 
         if(!error && (ROLE === "FINANCE" || ROLE === "ADMIN")) {
-            const msg = `*PROGRESSIVE MOTHERS SCHOOL*\n*FEE UPDATE*\n\nStudent: ${name}\nClass: ${cls}\nLIN: ${id ? document.getElementById('fLin').value : row.lin_number}\n\nTotal Fees: ${exp}\nAmount Paid: ${paid}\nBalance: ${exp-paid}\nTime: ${new Date().toLocaleString()}\n\n_Thank you._`;
+            const msg = `*PROGRESSIVE MOTHERS SCHOOL*\n*FEE UPDATE*\n\nStudent: ${name}\nClass: ${cls}\nLIN: ${id ? document.getElementById('fLin').value : row.lin_number}\n\nTotal: ${exp}\nPaid: ${paid}\nBalance: ${exp-paid}\nTime: ${new Date().toLocaleString()}\n\n_Eudes Media Solutions_`;
             pendingNotifs.push({ msg, con });
-            alert(ROLE === "ADMIN" ? "Added to Notifications." : "Update sent to Admin.");
+            alert(ROLE === "ADMIN" ? "Message added to Notifications." : "Sent to Admin for approval.");
         }
         fetchData(); clearForm();
     }
@@ -243,10 +239,10 @@
         let h = "";
         pendingNotifs.forEach((m, i) => {
             h += `<div class="notif-item"><pre style="font-size:11px; white-space:pre-wrap; font-family:inherit;">${m.msg}</pre>
-                  <button onclick="sendWA(${i})" style="padding:10px; background:var(--green); color:white; border:none; border-radius:10px; margin-right:10px; font-weight:900;"><i class="fa-brands fa-whatsapp"></i> SEND</button>
-                  <button onclick="pendingNotifs.splice(${i},1);renderNotifs();" style="padding:10px; background:var(--red); color:white; border:none; border-radius:10px; font-weight:900;">DELETE</button></div>`;
+                  <button onclick="sendWA(${i})" style="padding:10px; background:var(--green); color:white; border:none; border-radius:10px; margin-right:10px; font-weight:900;">SEND VIA WHATSAPP</button>
+                  <button onclick="pendingNotifs.splice(${i},1);renderNotifs();" style="padding:10px; background:var(--red); color:white; border:none; border-radius:10px; font-weight:900;">DISCARD</button></div>`;
         });
-        document.getElementById('notifList').innerHTML = h || "<p style='color:#999;font-size:12px;text-align:center;'>No pending notifications.</p>";
+        document.getElementById('notifList').innerHTML = h || "<p style='color:#999;font-size:12px;text-align:center;'>Approval vault is empty.</p>";
     }
 
     function sendWA(i) {
@@ -260,9 +256,11 @@
         document.getElementById('fName').value = s.name; document.getElementById('fClass').value = s.class;
         document.getElementById('fCon').value = s.contact; document.getElementById('fExp').value = s.fees_expected;
         document.getElementById('fPaid').value = s.fees_paid; document.getElementById('fLin').value = s.lin_number;
+        document.getElementById('fAge').value = s.age || ""; document.getElementById('fDob').value = s.dob || "";
+        document.getElementById('fLoc').value = s.location || ""; document.getElementById('fHealth').value = s.health_status || "";
         document.getElementById('editId').value = s.id; showTab('reg');
     }
-    function clearForm() { ['fName','fCon','fExp','fPaid','fLin'].forEach(f => document.getElementById(f).value=""); document.getElementById('editId').value=""; }
+    function clearForm() { ['fName','fCon','fExp','fPaid','fLin','fAge','fDob','fLoc','fHealth'].forEach(f => document.getElementById(f).value=""); document.getElementById('editId').value=""; }
 </script>
 <input type="hidden" id="editId">
 </body>
