@@ -2,43 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE MOTHERS PMS - V155</title>
+    <title>PROGRESSIVE MOTHERS PMS - V156</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --blue: #002b5b; --gold: #ffce00; --red: #ff3b3b; --green: #2ecc71; --gray: #f4f7fa; }
-        body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 120px; color: #333; }
+        body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 100px; color: #333; }
         
-        /* Navigation & Header */
         .top-nav { background: #001326; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; position: sticky; top: 0; z-index: 2000; }
         .logout-btn { background: var(--red); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 900; cursor: pointer; font-size: 10px; }
+
         .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 20px 15px 90px; text-align: center; border-bottom: 6px solid var(--gold); position: relative; border-radius: 0 0 40px 40px; }
         .clock-box { font-size: 42px; font-weight: 900; margin: 5px 0; }
         .activity-banner { font-size: 10px; font-weight: 900; padding: 8px 15px; border-radius: 50px; display: inline-block; border: 2px solid white; background: rgba(255,255,255,0.1); color: var(--gold); text-transform: uppercase; }
 
-        /* Dashboard */
         .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -45px; z-index: 100; position: relative; }
         .dash-card { background: white; padding: 15px 5px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid #eee; }
         .dash-card span { display: block; font-size: 18px; font-weight: 900; color: var(--blue); }
 
-        /* Tabs */
         .tab-bar { display: flex; background: white; padding: 8px; margin: 20px 15px; border-radius: 15px; overflow-x: auto; }
         .tab { flex: 1; padding: 12px 5px; font-size: 10px; font-weight: 900; color: #bbb; text-align: center; display: none; cursor: pointer; white-space: nowrap; }
         .tab.active { background: var(--blue); color: white; border-radius: 10px; }
 
-        /* List Items */
+        .search-container { padding: 0 15px 10px; }
+        .search-bar { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #ddd; font-weight: 600; box-sizing: border-box; font-size: 14px; }
+
         .list-item { border-left: 6px solid var(--blue); padding: 15px; margin: 10px 15px; background: white; border-radius: 15px; position: relative; border: 1px solid #eee; }
         .list-item b { font-size: 14px; display: block; text-transform: uppercase; padding-right: 80px; color: var(--blue); }
-        .alarm { color: var(--red); animation: pulse 1s infinite; font-size: 18px; position: absolute; right: 80px; top: 15px; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .alarm-icon { color: var(--red); position: absolute; right: 75px; top: 15px; animation: blink 1s infinite; font-size: 18px; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
 
-        /* Messaging & Forms */
         .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eee; }
         label { font-size: 10px; font-weight: 800; color: var(--blue); margin-top: 10px; display: block; text-transform: uppercase; }
         input, select { width: 100%; padding: 14px; margin-top: 5px; border: 1.5px solid #eee; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-weight: 600; }
         
-        .msg-box { background: #f0f4f8; padding: 15px; border-radius: 15px; margin-bottom: 10px; border-left: 4px solid var(--gold); position: relative; }
+        .pass-container { position: relative; display: flex; align-items: center; width: 100%; }
+        .pass-container i { position: absolute; right: 15px; color: var(--blue); cursor: pointer; }
+
+        /* Admin Msg Vault */
+        .vault-item { background: #f0f4f8; padding: 15px; border-radius: 15px; margin-bottom: 10px; border-left: 5px solid var(--gold); }
+
         .btn-main { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; cursor: pointer; }
         .hidden { display: none !important; }
         .footer-brand { text-align: center; font-size: 10px; color: #bbb; padding: 20px; font-weight: 800; }
@@ -50,7 +54,10 @@
     <h2 style="color:var(--blue); font-weight:900;">PROGRESSIVE MOTHERS</h2>
     <div class="card">
         <label>SYSTEM ACCESS KEY</label>
-        <input id="sysKey" type="password" placeholder="••••••••" style="text-align:center;">
+        <div class="pass-container">
+            <input id="sysKey" type="password" placeholder="••••••••" style="text-align:center;">
+            <i class="fa-solid fa-eye" onclick="togglePass()"></i>
+        </div>
         <button onclick="login()" class="btn-main">LOG IN</button>
     </div>
 </div>
@@ -79,27 +86,27 @@
         <div id="tFin" class="tab" onclick="showTab('fin')">FINANCE</div>
     </div>
 
-    <div id="adminVault" class="hidden">
-        <h3 style="margin: 20px; font-size:14px; color:var(--blue);">📩 PENDING FEE NOTIFICATIONS</h3>
-        <div id="vaultContent"></div>
+    <div id="adminVaultSec" class="card hidden">
+        <h4 style="margin:0 0 15px; color:var(--blue); font-size:13px;"><i class="fa-solid fa-envelope-open-text"></i> PENDING FEE UPDATES</h4>
+        <div id="vaultList"></div>
     </div>
 
-    <div id="rollPicker" class="card hidden">
-        <label>SELECT CLASS</label>
-        <select id="selClassRoll" onchange="runGlobalSearch()"><option value="">ALL CLASSES</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+    <div id="rollPicker" class="card hidden" style="background:var(--blue); margin-bottom:0;">
+        <label style="color:white;">FILTER BY CLASS</label>
+        <select id="selClassRoll" onchange="runGlobalSearch()"><option value="">-- ALL CLASSES --</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
     </div>
 
     <div id="searchWrapper" class="search-container hidden">
-        <input type="text" id="globalSearch" class="search-bar" oninput="runGlobalSearch()" placeholder="Search Student Name...">
+        <input type="text" id="globalSearch" class="search-bar" oninput="runGlobalSearch()" placeholder="Search Name or LIN...">
     </div>
 
     <div id="secReg" class="card hidden">
-        <label>LIN</label><input id="fLin" disabled style="background:#eee;">
-        <label>Name</label><input id="fName">
+        <label>LIN</label><input id="fLin" disabled style="background:#f4f4f4;">
+        <label>Full Name</label><input id="fName">
         <label>Class</label><select id="fClass"><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-        <label>Contact</label><input id="fCon">
-        <label>Fees Expected</label><input type="number" id="fExp">
-        <label>Fees Paid</label><input type="number" id="fPaid">
+        <label>Parent Contact</label><input id="fCon">
+        <label>Total Fees</label><input type="number" id="fExp">
+        <label>Amount Paid</label><input type="number" id="fPaid">
         <button onclick="saveData()" class="btn-main">SYNC RECORD</button>
         <button onclick="clearForm()" class="btn-main" style="background:#666">CANCEL</button>
     </div>
@@ -113,21 +120,26 @@
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
     let ROLE = "", students = [], att = {}, pendingMsgs = [];
 
+    function togglePass() { const p = document.getElementById('sysKey'); p.type = p.type === "password" ? "text" : "password"; }
+
     function login() {
         const k = document.getElementById('sysKey').value.trim().toUpperCase();
         if (k === "JESUS CARES") ROLE = "ADMIN";
         else if (k === "FINANCE2026") ROLE = "FINANCE";
         else if (k === "TEACHER256") ROLE = "TEACHER";
-        else return alert("Access Denied");
+        else return alert("Invalid Key");
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-        ['tReg','tRoll','tRec','tFin'].forEach(t => { if(ROLE==="ADMIN" || (ROLE==="FINANCE" && (t==="tReg"||t==="tFin")) || (ROLE==="TEACHER" && (t==="tReg"||t==="tRoll"))) document.getElementById(t).style.display="block"; });
+        ['tReg','tRoll','tRec','tFin'].forEach(t => { 
+            if(ROLE==="ADMIN" || (ROLE==="FINANCE" && (t==="tReg"||t==="tFin")) || (ROLE==="TEACHER" && (t==="tReg"||t==="tRoll"))) 
+            document.getElementById(t).style.display="block"; 
+        });
         showTab('reg'); fetchData(); setInterval(tick, 1000);
     }
 
     async function fetchData() {
         const { data } = await sb.from('students').select('*').order('name');
-        if(data) { students = data; document.getElementById('statTotal').innerText = data.length; runGlobalSearch(); }
+        if(data) { students = data; document.getElementById('statTotal').innerText = students.length; runGlobalSearch(); }
     }
 
     function tick() {
@@ -135,13 +147,13 @@
         document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
         document.getElementById('sysDateDisplay').innerText = n.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
         const t = n.getHours() * 100 + n.getMinutes();
-        let routine = "🏫 CLASS TIME";
-        if(t >= 400 && t < 630) routine = "📖 EARLY MORNING PREP";
+        let routine = "🏫 CLASS IN SESSION";
+        if(t >= 400 && t < 630) routine = "📖 EARLY PREP";
         else if(t >= 630 && t < 800) routine = "🌅 ARRIVAL & CLEANING";
+        else if(t >= 800 && t < 1030) routine = "📚 MORNING LESSONS";
         else if(t >= 1030 && t < 1100) routine = "☕ BREAK TIME";
         else if(t >= 1230 && t < 1330) routine = "🍲 LUNCH TIME";
-        else if(t >= 1330 && t < 1430) routine = "💤 SLEEPING / REST";
-        else if(t >= 1600 && t < 1730) routine = "⚽ GAMES & PLAY";
+        else if(t >= 1330 && t < 1430) routine = "💤 SLEEPING TIME";
         else if(t >= 1900 && t < 2100) routine = "📖 EVENING PREP";
         else if(t >= 2100 || t < 400) routine = "🌙 SCHOOL CLOSED";
         document.getElementById('activityStatus').innerText = routine;
@@ -155,11 +167,11 @@
         document.getElementById('secList').classList.add('hidden');
         document.getElementById('searchWrapper').classList.add('hidden');
         document.getElementById('rollPicker').classList.add('hidden');
-        document.getElementById('adminVault').classList.add('hidden');
+        document.getElementById('adminVaultSec').classList.add('hidden');
 
         if(t === 'reg') document.getElementById('secReg').classList.remove('hidden');
         else if(t === 'rec' && ROLE === "ADMIN") {
-            document.getElementById('adminVault').classList.remove('hidden');
+            document.getElementById('adminVaultSec').classList.remove('hidden');
             renderVault();
         } else {
             if(t === 'roll') document.getElementById('rollPicker').classList.remove('hidden');
@@ -171,19 +183,17 @@
 
     function runGlobalSearch() {
         const q = document.getElementById('globalSearch').value.toUpperCase();
-        const rollClass = document.getElementById('selClassRoll').value;
-        const filtered = students.filter(s => (s.name.toUpperCase().includes(q) || s.class.toUpperCase().includes(q)) && (activeTab === 'roll' && rollClass ? s.class === rollClass : true));
+        const rollCls = document.getElementById('selClassRoll').value;
+        const filtered = students.filter(s => (s.name.toUpperCase().includes(q) || (s.lin_number||"").includes(q)) && (activeTab === 'roll' && rollCls ? s.class === rollCls : true));
         
         let h = "";
         filtered.forEach(s => {
-            const isAbsLong = s.absent_days >= 2; // Logic for 2-day alarm
-            const tray = s.contact ? `<div style="display:flex;gap:10px;margin-top:10px;"><a href="tel:${s.contact}"><i class="fa-solid fa-phone"></i></a> <a href="https://wa.me/${s.contact}"><i class="fa-brands fa-whatsapp"></i></a></div>` : "";
-            
+            const isAlarm = s.absent_days >= 2;
             if(activeTab === 'roll') {
                 const isAbs = att[s.id] === 'absent';
-                h += `<div class="list-item"><b>${s.name}</b><small>${s.class}</small>${isAbsLong?'<i class="fa-solid fa-bell-on alarm"></i>':''}<button onclick="toggleAtt('${s.id}')" style="position:absolute;right:15px;top:15px;padding:10px;border:none;border-radius:10px;background:${isAbs?'var(--red)':'var(--green)'};color:white;">${isAbs?'ABS':'PRES'}</button></div>`;
+                h += `<div class="list-item"><b>${s.name}</b><small>${s.class}</small>${isAlarm ? '<i class="fa-solid fa-bell-on alarm-icon"></i>':''}<button onclick="toggleAtt('${s.id}')" style="position:absolute;right:15px;top:15px;padding:12px;border:none;border-radius:10px;background:${isAbs?'var(--red)':'var(--green)'};color:white;">${isAbs?'ABS':'PRES'}</button></div>`;
             } else {
-                h += `<div class="list-item" onclick="setEdit('${s.id}')"><b>${s.name}</b><small>${s.class} | Bal: ${((s.fees_expected||0)-(s.fees_paid||0)).toLocaleString()}</small>${tray}</div>`;
+                h += `<div class="list-item" onclick="setEdit('${s.id}')"><b>${s.name}</b><small>${s.class} | LIN: ${s.lin_number||'N/A'}</small></div>`;
             }
         });
         document.getElementById('secList').innerHTML = h;
@@ -194,16 +204,20 @@
         const name = document.getElementById('fName').value;
         const exp = parseInt(document.getElementById('fExp').value) || 0;
         const paid = parseInt(document.getElementById('fPaid').value) || 0;
-        const row = { name, class: document.getElementById('fClass').value, contact: document.getElementById('fCon').value, fees_expected: exp, fees_paid: paid };
-        
+        const con = document.getElementById('fCon').value;
+        const cls = document.getElementById('fClass').value;
+        const lin = document.getElementById('fLin').value || "GEN...";
+
+        const row = { name, class: cls, contact: con, fees_expected: exp, fees_paid: paid };
         if(!id) row.lin_number = `PM${name.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
-        
+
         const { error } = id ? await sb.from('students').update(row).eq('id', id) : await sb.from('students').insert([row]);
 
-        if(!error && ROLE === "FINANCE") {
-            const msg = `*PROGRESSIVE MOTHERS*\nFee Update for: ${name}\nClass: ${row.class}\nTotal: ${exp}\nPaid: ${paid}\nBal: ${exp-paid}\nTime: ${new Date().toLocaleString()}`;
-            pendingMsgs.push({ name, msg, phone: row.contact });
-            alert("Sent to Admin for approval.");
+        if(!error && (ROLE === "FINANCE" || (ROLE === "ADMIN" && id))) {
+            const msg = `*PROGRESSIVE MOTHERS SCHOOL*\n*FEE UPDATE*\nName: ${name}\nClass: ${cls}\nLIN: ${row.lin_number||lin}\nTotal: ${exp}\nPaid: ${paid}\nBal: ${exp-paid}\nTime: ${new Date().toLocaleString()}`;
+            pendingMsgs.push({ msg, con });
+            if(ROLE === "ADMIN") alert("Message added to Vault for approval.");
+            else alert("Update sent to Admin.");
         }
         fetchData(); clearForm();
     }
@@ -211,36 +225,26 @@
     function renderVault() {
         let h = "";
         pendingMsgs.forEach((m, i) => {
-            h += `<div class="msg-box"><pre style="white-space:pre-wrap;font-family:inherit;font-size:11px;">${m.msg}</pre>
-                  <button onclick="sendApprove(${i},'wa')" style="padding:5px 10px;background:var(--green);color:white;border:none;border-radius:5px;">Send WhatsApp</button>
-                  <button onclick="pendingMsgs.splice(${i},1);renderVault();" style="padding:5px 10px;background:var(--red);color:white;border:none;border-radius:5px;">Dismiss</button></div>`;
+            h += `<div class="vault-item"><pre style="font-size:11px; white-space:pre-wrap;">${m.msg}</pre>
+                  <button onclick="sendWA(${i})" style="padding:8px;background:var(--green);color:white;border:none;border-radius:5px;margin-right:5px;">Send WhatsApp</button>
+                  <button onclick="pendingMsgs.splice(${i},1);renderVault();" style="padding:8px;background:var(--red);color:white;border:none;border-radius:5px;">Dismiss</button></div>`;
         });
-        document.getElementById('vaultContent').innerHTML = h || "<p style='padding:20px;color:#999;'>No pending messages.</p>";
+        document.getElementById('vaultList').innerHTML = h || "<p style='color:#999;font-size:12px;'>No messages waiting.</p>";
     }
 
-    function sendApprove(i, type) {
-        const m = pendingMsgs[i];
-        window.open(`https://wa.me/${m.phone.replace(/\D/g,'')}?text=${encodeURIComponent(m.msg)}`);
-        pendingMsgs.splice(i, 1); renderVault();
+    function sendWA(i) {
+        window.open(`https://wa.me/${pendingMsgs[i].con.replace(/\D/g,'')}?text=${encodeURIComponent(pendingMsgs[i].msg)}`);
+        pendingMsgs.splice(i,1); renderVault();
     }
 
-    function toggleAtt(id) {
-        att[id] = att[id] === 'absent' ? 'present' : 'absent';
-        runGlobalSearch();
-    }
-
+    function toggleAtt(id) { att[id] = att[id] === 'absent' ? 'present' : 'absent'; runGlobalSearch(); }
     function setEdit(id) {
         const s = students.find(x => x.id == id);
-        document.getElementById('fName').value = s.name;
-        document.getElementById('fLin').value = s.lin_number || "";
-        document.getElementById('fClass').value = s.class;
-        document.getElementById('fCon').value = s.contact || "";
-        document.getElementById('fExp').value = s.fees_expected || 0;
-        document.getElementById('fPaid').value = s.fees_paid || 0;
-        document.getElementById('editId').value = s.id;
-        showTab('reg');
+        document.getElementById('fName').value = s.name; document.getElementById('fClass').value = s.class;
+        document.getElementById('fCon').value = s.contact; document.getElementById('fExp').value = s.fees_expected;
+        document.getElementById('fPaid').value = s.fees_paid; document.getElementById('fLin').value = s.lin_number;
+        document.getElementById('editId').value = s.id; showTab('reg');
     }
-
     function clearForm() { ['fName','fCon','fExp','fPaid','fLin'].forEach(f => document.getElementById(f).value=""); document.getElementById('editId').value=""; }
 </script>
 <input type="hidden" id="editId">
