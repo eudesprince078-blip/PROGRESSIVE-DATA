@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE MOTHERS PMS - V153</title>
+    <title>PROGRESSIVE MOTHERS PMS - V154</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -43,6 +43,10 @@
         .pass-container { position: relative; display: flex; align-items: center; width: 100%; }
         .pass-container i { position: absolute; right: 15px; color: var(--blue); cursor: pointer; }
 
+        /* Notification Modal */
+        #msgModal { position: fixed; bottom: 0; left: 0; right: 0; background: white; z-index: 3000; padding: 20px; border-radius: 30px 30px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); transform: translateY(100%); transition: 0.4s; }
+        #msgModal.open { transform: translateY(0); }
+
         .btn-main { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; cursor: pointer; font-size: 14px; }
         .hidden { display: none !important; }
         .footer-brand { text-align: center; font-size: 10px; color: #bbb; padding: 20px; font-weight: 800; }
@@ -56,7 +60,7 @@
         <label>SYSTEM ACCESS KEY</label>
         <div class="pass-container">
             <input id="sysKey" type="password" placeholder="••••••••" style="text-align:center;">
-            <i class="fa-solid fa-eye" id="toggleEye" onclick="togglePass()"></i>
+            <i class="fa-solid fa-eye" onclick="togglePass()"></i>
         </div>
         <button onclick="login()" class="btn-main">LOG IN</button>
     </div>
@@ -69,9 +73,9 @@
     </div>
 
     <div class="header">
-        <span style="font-weight:900; font-size: 12px; letter-spacing: 1px; display:block; margin-bottom:5px;">GAYAZA-KIJABIJJO</span>
+        <span style="font-weight:900; font-size: 12px; display:block; margin-bottom:5px;">PROGRESSIVE MOTHERS SCHOOL</span>
         <div id="clock" class="clock-box">00:00:00</div>
-        <div id="activityStatus" class="activity-banner">INITIALIZING...</div>
+        <div id="activityStatus" class="activity-banner">...</div>
     </div>
 
     <div class="dash-container">
@@ -108,32 +112,39 @@
         <label>Full Name</label><input id="fName">
         <label>Class</label>
         <select id="fClass"><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-        <label>Parent Contact</label><input id="fCon" placeholder="e.g 0770000000">
+        <label>Parent Contact</label><input id="fCon">
         
         <div id="financeBox">
             <label>Total Fees (UGX)</label><input type="number" id="fExp">
-            <label>Paid (UGX)</label><input type="number" id="fPaid">
+            <label>Amount Paid (UGX)</label><input type="number" id="fPaid">
         </div>
         
         <button onclick="saveData()" class="btn-main">SYNC RECORD</button>
         <button id="delBtn" onclick="deleteStudent()" class="btn-main hidden" style="background:var(--red)">DELETE STUDENT</button>
-        <button onclick="clearForm()" class="btn-main" style="background:#666">CANCEL / NEW</button>
+        <button onclick="clearForm()" class="btn-main" style="background:#666">CANCEL</button>
     </div>
 
     <div id="secList" class="hidden"></div>
+
+    <div id="msgModal">
+        <h4 style="margin:0; color:var(--blue);">SEND FEE UPDATE?</h4>
+        <div id="msgPreview" style="font-size:11px; background:#f4f4f4; padding:15px; margin:10px 0; border-radius:10px; border:1px dashed #ccc;"></div>
+        <div style="display:flex; gap:10px;">
+            <button onclick="sendWA()" class="btn-main" style="background:var(--green); margin-top:0;"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+            <button onclick="closeModal()" class="btn-main" style="background:#666; margin-top:0;">Dismiss</button>
+        </div>
+    </div>
 
     <div class="footer-brand">EUDES MEDIA SOLUTIONS | +256762992440</div>
 </div>
 
 <script>
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
-    let ROLE = "", students = [], att = {}, activeTab = "";
+    let ROLE = "", students = [], att = {}, activeTab = "", currentMsg = "";
 
     function togglePass() {
         const p = document.getElementById('sysKey');
-        const e = document.getElementById('toggleEye');
-        if(p.type === "password") { p.type = "text"; e.className = "fa-solid fa-eye-slash"; }
-        else { p.type = "password"; e.className = "fa-solid fa-eye"; }
+        p.type = p.type === "password" ? "text" : "password";
     }
 
     function login() {
@@ -161,46 +172,41 @@
 
     function tick() {
         const n = new Date();
-        const dStr = n.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
         document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
-        document.getElementById('sysDateDisplay').innerText = dStr;
+        document.getElementById('sysDateDisplay').innerText = n.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
 
         const day = n.getDate(); const mon = n.getMonth() + 1;
-        const hr = n.getHours(); const min = n.getMinutes();
-        const t = hr * 100 + min;
+        const t = n.getHours() * 100 + n.getMinutes();
         
-        let updateText = "🏫 CLASS TIME";
+        let routine = "🏫 CLASS IN SESSION";
         
-        // 1. Check Holiday First
-        if (day === 5 && mon === 4) updateText = "🐣 HAPPY EASTER 2026";
-        else if (day === 6 && mon === 4) updateText = "🐣 EASTER MONDAY";
-        else if (day === 1 && mon === 5) updateText = "👷 LABOUR DAY";
+        // Holidays First
+        if (day === 5 && mon === 4) routine = "🐣 HAPPY EASTER 2026";
+        else if (day === 6 && mon === 4) routine = "🐣 EASTER MONDAY";
         else {
-            // 2. Check Daily Routine
-            if (t >= 630 && t < 800) updateText = "🌅 ARRIVAL & CLEANING";
-            else if (t >= 800 && t < 1030) updateText = "📚 MORNING LESSONS";
-            else if (t >= 1030 && t < 1100) updateText = "☕ BREAK TIME";
-            else if (t >= 1100 && t < 1230) updateText = "📖 LESSONS CONTINUING";
-            else if (t >= 1230 && t < 1330) updateText = "🍲 LUNCH TIME";
-            else if (t >= 1330 && t < 1430) updateText = "💤 SLEEPING / REST";
-            else if (t >= 1600) updateText = "🌙 SCHOOL CLOSED";
+            // Daily Routine Restored
+            if (t >= 630 && t < 800) routine = "🌅 ARRIVAL & CLEANING";
+            else if (t >= 800 && t < 1030) routine = "📚 MORNING LESSONS";
+            else if (t >= 1030 && t < 1100) routine = "☕ BREAK TIME";
+            else if (t >= 1100 && t < 1230) routine = "📖 MID-DAY LESSONS";
+            else if (t >= 1230 && t < 1330) routine = "🍲 LUNCH TIME";
+            else if (t >= 1330 && t < 1430) routine = "💤 SLEEPING TIME";
+            else if (t >= 1430 && t < 1600) routine = "⚽ PLAY & GAMES";
+            else if (t >= 1600) routine = "🌙 SCHOOL CLOSED";
         }
-        document.getElementById('activityStatus').innerText = updateText;
+        document.getElementById('activityStatus').innerText = routine;
     }
 
     function showTab(t) {
         activeTab = t;
         ['tReg','tRoll','tRec','tFin'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).classList.remove('active'); });
         if(document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1))) document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
-        
         document.getElementById('secReg').classList.add('hidden');
         document.getElementById('secList').classList.add('hidden');
         document.getElementById('searchWrapper').classList.add('hidden');
         document.getElementById('rollPicker').classList.add('hidden');
-
-        if(t === 'reg') { 
-            document.getElementById('secReg').classList.remove('hidden'); 
-        } else {
+        if(t === 'reg') document.getElementById('secReg').classList.remove('hidden');
+        else {
             if(t === 'roll') document.getElementById('rollPicker').classList.remove('hidden');
             document.getElementById('secList').classList.remove('hidden');
             document.getElementById('searchWrapper').classList.remove('hidden');
@@ -211,11 +217,10 @@
     function runGlobalSearch() {
         const q = document.getElementById('globalSearch').value.toUpperCase();
         const rollClass = document.getElementById('selClassRoll').value;
-        
         const filtered = students.filter(s => {
-            const matchesSearch = s.name.toUpperCase().includes(q) || (s.lin_number || s.lin || "").toUpperCase().includes(q) || s.class.toUpperCase().includes(q);
-            const matchesClass = activeTab === 'roll' && rollClass ? s.class === rollClass : true;
-            return matchesSearch && matchesClass;
+            const mS = s.name.toUpperCase().includes(q) || (s.lin_number || s.lin || "").toUpperCase().includes(q) || s.class.toUpperCase().includes(q);
+            const mC = activeTab === 'roll' && rollClass ? s.class === rollClass : true;
+            return mS && mC;
         });
 
         let h = "";
@@ -223,32 +228,29 @@
             const lin = s.lin_number || s.lin || "MISSING";
             const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
             const rawPhone = s.contact ? s.contact.toString().replace(/\D/g, '') : "";
+            const phoneStr = rawPhone.length === 9 ? '256'+rawPhone : rawPhone;
             
-            let actions = "";
-            if(rawPhone) {
-                actions = `<div class="action-tray">
-                    <a href="tel:${rawPhone}" class="action-btn call-btn"><i class="fa-solid fa-phone"></i></a>
-                    <a href="https://wa.me/${rawPhone.length === 9 ? '256'+rawPhone : rawPhone}" class="action-btn wa-btn"><i class="fa-brands fa-whatsapp"></i></a>
-                </div>`;
-            }
+            let tray = rawPhone ? `<div class="action-tray">
+                <a href="tel:${rawPhone}" class="action-btn call-btn"><i class="fa-solid fa-phone"></i></a>
+                <a href="https://wa.me/${phoneStr}" class="action-btn wa-btn"><i class="fa-brands fa-whatsapp"></i></a>
+            </div>` : "";
 
             if(activeTab === 'roll') {
                 const isAbs = att[s.id] === 'absent';
-                h += `<div class="list-item"><b>${s.name}</b><small>${lin} | ${s.class}</small>${actions}<button onclick="toggleAtt('${s.id}')" style="position:absolute; right:15px; top:15px; padding:12px; border-radius:10px; border:none; background:${isAbs ? 'var(--red)' : 'var(--green)'}; color:white; font-weight:900;">${isAbs ? 'ABS' : 'PRES'}</button></div>`;
+                h += `<div class="list-item"><b>${s.name}</b><small>${lin} | ${s.class}</small>${tray}<button onclick="toggleAtt('${s.id}')" style="position:absolute; right:15px; top:15px; padding:12px; border-radius:10px; border:none; background:${isAbs?'var(--red)':'var(--green)'}; color:white; font-weight:900;">${isAbs?'ABS':'PRES'}</button></div>`;
             } else if(activeTab === 'fin') {
-                h += `<div class="list-item" onclick="setEdit('${s.id}')"><span style="position:absolute; right:15px; top:15px; font-size:9px; padding:4px 8px; border-radius:5px; background:${bal<=0?'var(--green)':'var(--red)'}; color:white; font-weight:900;">${bal<=0?'CLEARED':'DEBT'}</span><b>${s.name}</b><small>Bal: UGX ${bal.toLocaleString()}</small>${actions}</div>`;
+                h += `<div class="list-item" onclick="setEdit('${s.id}')"><span style="position:absolute; right:15px; top:15px; font-size:9px; padding:4px 8px; border-radius:5px; background:${bal<=0?'var(--green)':'var(--red)'}; color:white; font-weight:900;">${bal<=0?'CLEARED':'DEBT'}</span><b>${s.name}</b><small>Bal: UGX ${bal.toLocaleString()}</small>${tray}</div>`;
             } else {
-                h += `<div class="list-item" onclick="setEdit('${s.id}')"><b>${s.name}</b><small>${lin} | ${s.class}</small>${actions}</div>`;
+                h += `<div class="list-item" onclick="setEdit('${s.id}')"><b>${s.name}</b><small>${lin} | ${s.class}</small>${tray}</div>`;
             }
         });
-        document.getElementById('secList').innerHTML = h || "<p style='text-align:center; padding:20px; color:#999;'>No students found.</p>";
+        document.getElementById('secList').innerHTML = h || "<p style='text-align:center; padding:20px;'>No students found.</p>";
     }
 
     function toggleAtt(id) {
-        att[id] = (att[id] === 'absent') ? 'present' : 'absent';
-        let a = 0; Object.values(att).forEach(v => { if(v === 'absent') a++; });
-        document.getElementById('statAbs').innerText = a; 
-        document.getElementById('statPres').innerText = students.length - a;
+        att[id] = att[id] === 'absent' ? 'present' : 'absent';
+        document.getElementById('statAbs').innerText = Object.values(att).filter(v => v === 'absent').length;
+        document.getElementById('statPres').innerText = students.length - parseInt(document.getElementById('statAbs').innerText);
         runGlobalSearch();
     }
 
@@ -262,9 +264,7 @@
         document.getElementById('fCon').value = s.contact || "";
         document.getElementById('fExp').value = s.fees_expected || 0;
         document.getElementById('fPaid').value = s.fees_paid || 0;
-
-        const isFin = ROLE === "FINANCE";
-        ['fName','fClass','fCon'].forEach(f => document.getElementById(f).disabled = isFin);
+        ['fName','fClass','fCon'].forEach(f => document.getElementById(f).disabled = (ROLE === "FINANCE"));
         if(ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
         showTab('reg');
     }
@@ -272,19 +272,40 @@
     async function saveData() {
         const id = document.getElementById('editId').value;
         const name = document.getElementById('fName').value;
-        const row = {
-            name: name, class: document.getElementById('fClass').value, contact: document.getElementById('fCon').value,
-            fees_expected: parseInt(document.getElementById('fExp').value) || 0,
-            fees_paid: parseInt(document.getElementById('fPaid').value) || 0
-        };
+        const exp = parseInt(document.getElementById('fExp').value) || 0;
+        const paid = parseInt(document.getElementById('fPaid').value) || 0;
+        const bal = exp - paid;
+        const cls = document.getElementById('fClass').value;
+        const con = document.getElementById('fCon').value;
+        const lin = document.getElementById('fLin').value;
 
+        const row = { name, class: cls, contact: con, fees_expected: exp, fees_paid: paid };
         if(!id) row.lin_number = `PM${name.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
 
-        if(id) await sb.from('students').update(row).eq('id', id);
-        else await sb.from('students').insert([row]);
+        const { error } = id ? await sb.from('students').update(row).eq('id', id) : await sb.from('students').insert([row]);
         
-        alert("Synced!"); clearForm(); fetchData();
+        if(!error && id) {
+            const dt = new Date().toLocaleString('en-GB');
+            currentMsg = `*PROGRESSIVE MOTHERS SCHOOL*\n*FEE UPDATE NOTICE*\n\nStudent: ${name}\nClass: ${cls}\nLIN: ${lin}\n\nTotal Fees: UGX ${exp.toLocaleString()}\nAmount Paid: UGX ${paid.toLocaleString()}\nBalance: UGX ${bal.toLocaleString()}\n\nDate: ${dt}\n\n_Thank you for choosing Progressive Mothers._`;
+            currentPhone = con.replace(/\D/g, '');
+            if(ROLE === "ADMIN") prepareMsg();
+            else alert("Update Saved. Admin notified.");
+        }
+        clearForm(); fetchData();
     }
+
+    function prepareMsg() {
+        document.getElementById('msgPreview').innerText = currentMsg;
+        document.getElementById('msgModal').classList.add('open');
+    }
+
+    function sendWA() {
+        const p = currentPhone.length === 9 ? '256'+currentPhone : currentPhone;
+        window.open(`https://wa.me/${p}?text=${encodeURIComponent(currentMsg)}`);
+        closeModal();
+    }
+
+    function closeModal() { document.getElementById('msgModal').classList.remove('open'); }
 
     function clearForm() {
         ['fName','fCon','fExp','fPaid','editId','fLin'].forEach(f => { document.getElementById(f).value = ""; document.getElementById(f).disabled = false; });
@@ -292,7 +313,7 @@
     }
 
     async function deleteStudent() {
-        if(confirm("Delete student?")) { await sb.from('students').delete().eq('id', document.getElementById('editId').value); fetchData(); clearForm(); }
+        if(confirm("Confirm Delete?")) { await sb.from('students').delete().eq('id', document.getElementById('editId').value); fetchData(); clearForm(); }
     }
 </script>
 </body>
