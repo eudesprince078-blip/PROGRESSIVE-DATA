@@ -3,183 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMS - Eudes Media Solutions</title>
+    <title>PMS System - Eudes Media</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --pms-red: #e63946; --pms-dark: #001a33; --pms-bg: #f8f9fc; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--pms-bg); }
+        :root { --pms-red: #e63946; --pms-dark: #001a33; --pms-bg: #f2f5f8; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--pms-bg); overflow-x: hidden; }
 
-        /* TOP RED BAR */
-        .top-nav { background: var(--pms-red); color: white; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; }
-        .school-logo { height: 35px; background: white; border-radius: 50%; padding: 3px; }
-        .top-icons { font-size: 22px; display: flex; gap: 15px; }
+        /* HEADER IMAGE 1 & 2 */
+        .top-red-bar { background: var(--pms-red); color: white; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; height: 50px; }
+        .school-data-tag { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 14px; letter-spacing: 1px; }
+        .plus-icon { background: white; color: var(--pms-red); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
 
-        /* DASHBOARD SECTION (Image 2) */
-        .dashboard-header { background: var(--pms-dark); color: white; padding: 40px 20px; text-align: center; position: relative; }
-        .logout-btn { position: absolute; top: 15px; left: 15px; border: 1px solid gold; color: gold; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; }
-        .current-date { position: absolute; top: 15px; right: 15px; font-size: 12px; text-transform: uppercase; }
-        .school-name { font-size: 16px; font-weight: bold; color: white; margin-bottom: 2px; }
-        .school-loc { font-size: 11px; color: #ffc107; text-transform: uppercase; letter-spacing: 1px; }
-        .digital-clock { font-size: 52px; font-weight: bold; margin: 15px 0; letter-spacing: 2px; }
-        
-        /* STAT CARDS (Image 2) */
-        .stats-container { display: flex; justify-content: center; gap: 10px; margin-top: -30px; padding: 0 10px; }
-        .stat-card { background: white; border-radius: 20px; padding: 15px 5px; width: 30%; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-bottom: 4px solid #ffc107; }
-        .stat-val { font-size: 24px; font-weight: bold; color: var(--pms-dark); display: block; }
-        .stat-label { font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; margin-top: 5px; }
+        /* DASHBOARD SECTION IMAGE 2 */
+        .dashboard-blue { background: var(--pms-dark); color: white; padding: 35px 20px 60px 20px; text-align: center; position: relative; }
+        .logout-btn { position: absolute; top: 15px; left: 15px; border: 1.5px solid #ffc107; color: #ffc107; padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .date-text { position: absolute; top: 18px; right: 15px; font-size: 11px; font-weight: bold; }
+        .school-title { font-size: 15px; font-weight: bold; margin-bottom: 2px; }
+        .location-sub { font-size: 10px; color: #ffc107; letter-spacing: 1.5px; margin-bottom: 15px; }
+        .big-clock { font-size: 55px; font-weight: bold; margin: 10px 0; }
 
-        /* NAV BUTTONS (Image 2) */
-        .main-nav { display: flex; overflow-x: auto; padding: 25px 15px; gap: 10px; justify-content: center; }
-        .nav-pill { padding: 10px 18px; border-radius: 25px; border: 1px solid #eee; background: white; font-size: 12px; font-weight: bold; color: #999; cursor: pointer; white-space: nowrap; transition: 0.3s; }
-        .nav-pill.active { background: var(--pms-dark); color: white; border-color: var(--pms-dark); }
+        /* STAT CARDS IMAGE 2 */
+        .stats-row { display: flex; justify-content: center; gap: 10px; margin-top: -35px; padding: 0 15px; }
+        .s-card { background: white; border-radius: 20px; padding: 15px 5px; width: 32%; text-align: center; box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-bottom: 4px solid #ffc107; }
+        .s-val { font-size: 26px; font-weight: bold; color: var(--pms-dark); display: block; }
+        .s-label { font-size: 9px; color: #999; text-transform: uppercase; font-weight: bold; margin-top: 4px; }
 
-        /* STUDENT CARDS (Image 3) */
-        .student-list { padding: 0 15px 100px 15px; }
-        .student-card { background: white; border-radius: 15px; margin-bottom: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--pms-dark); }
-        .student-info b { font-size: 15px; text-transform: uppercase; color: #333; }
-        .student-sub { font-size: 13px; color: #666; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
-        
-        /* ADMISSION FORM (Image 1) */
-        .form-card { background: white; border-radius: 15px; padding: 20px; margin: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .form-group { margin-bottom: 15px; }
-        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; box-sizing: border-box; }
-        .btn-gen { background: #28a745; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer; }
+        /* NAVIGATION PILLS IMAGE 2 */
+        .nav-scroll { display: flex; overflow-x: auto; padding: 25px 10px; gap: 10px; justify-content: center; scrollbar-width: none; }
+        .pill { padding: 10px 20px; border-radius: 25px; border: 1px solid #ddd; background: white; font-size: 11px; font-weight: bold; color: #888; white-space: nowrap; cursor: pointer; }
+        .pill.active { background: var(--pms-dark); color: white; border-color: var(--pms-dark); }
+
+        /* ADMISSION FORM IMAGE 1 */
+        .form-container { background: white; border-radius: 20px; margin: 15px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .input-group { margin-bottom: 12px; }
+        input, select { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ddd; background: #fafafa; box-sizing: border-box; font-size: 14px; }
+        .btn-green { background: #28a745; color: white; padding: 16px; border: none; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; }
+
+        /* TABLE VIEW IMAGE 1 */
+        .table-header { background: #003366; color: white; display: grid; grid-template-columns: 1.2fr 1.5fr 1.2fr 0.8fr; padding: 15px 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-top: 20px; }
+        .no-records { padding: 30px; text-align: center; color: #003366; background: white; font-weight: bold; font-size: 14px; }
+        .record-row { display: grid; grid-template-columns: 1.2fr 1.5fr 1.2fr 0.8fr; padding: 15px 10px; background: white; border-bottom: 1px solid #eee; font-size: 12px; align-items: center; }
 
         /* FOOTER */
-        .footer { text-align: center; padding: 20px; font-size: 12px; color: #999; text-transform: uppercase; font-weight: bold; }
+        .footer-text { text-align: center; padding: 30px; font-size: 11px; color: #aaa; font-weight: bold; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
 
-<div id="login-gate" style="display:flex; justify-content:center; align-items:center; height:100vh; background:var(--pms-dark);">
-    <div style="background:white; padding:30px; border-radius:20px; text-align:center; width:280px;">
-        <h3>SYSTEM LOGIN</h3>
-        <input type="password" id="sysPass" placeholder="Enter Password">
-        <button onclick="checkLogin()" class="btn-gen" style="background:var(--pms-dark)">LOGIN</button>
+<div class="top-red-bar">
+    <div class="school-data-tag">
+        <img src="https://via.placeholder.com/35" style="border-radius:50%; background:white;">
+        SCHOOL DATA <div class="plus-icon">+</div>
     </div>
+    <div style="font-size:24px;">🔔</div>
 </div>
 
-<div id="app" style="display:none;">
-    <div class="top-nav">
-        <div style="display:flex; align-items:center; gap:10px;">
-            <img src="https://via.placeholder.com/40" class="school-logo">
-            <span style="font-weight:bold; letter-spacing:1px; font-size:14px;">SCHOOL DATA <span style="font-size:20px; color:white;">⊕</span></span>
-        </div>
-        <div class="top-icons"><span>🔗</span><span>🔔</span></div>
-    </div>
-
-    <div class="dashboard-header">
+<div id="dash-section">
+    <div class="dashboard-blue">
         <div class="logout-btn">LOGOUT</div>
-        <div class="current-date" id="headerDate">05 APRIL 2026</div>
-        <div class="school-name">PROGRESSIVE MOTHERS SCHOOL</div>
-        <div class="school-loc">GAYAZA-KIJABIJJO</div>
-        <div class="digital-clock" id="clock">22:19:05</div>
-        <div style="color:white; font-size:18px;">...</div>
+        <div class="date-text" id="headerDate">06 APRIL 2026</div>
+        <div class="school-title">PROGRESSIVE MOTHERS SCHOOL</div>
+        <div class="location-sub">GAYAZA-KIJABIJJO</div>
+        <div class="big-clock" id="clockDisplay">01:32:10</div>
+        <div style="font-size:20px;">...</div>
     </div>
 
-    <div class="stats-container">
-        <div class="stat-card"><span class="stat-val" id="count-total">0</span><span class="stat-label">Students</span></div>
-        <div class="stat-card"><span class="stat-val" style="color:#28a745;">0</span><span class="stat-label">Present</span></div>
-        <div class="stat-card"><span class="stat-val" style="color:#e63946;">0</span><span class="stat-label">Absent</span></div>
+    <div class="stats-row">
+        <div class="s-card"><span class="s-val" id="totalStudents">0</span><span class="s-label">Students</span></div>
+        <div class="s-card"><span class="s-val" style="color:#28a745;">0</span><span class="s-label">Present</span></div>
+        <div class="s-card"><span class="s-val" style="color:#e63946;">0</span><span class="s-label">Absent</span></div>
     </div>
 
-    <div class="main-nav">
-        <div class="nav-pill" onclick="showPortal('admission')">ADMISSION</div>
-        <div class="nav-pill active" onclick="showPortal('rollcall')">ROLL CALL</div>
-        <div class="nav-pill" onclick="showPortal('records')">RECORDS</div>
-        <div class="nav-pill">ABSENTEES</div>
-        <div class="nav-pill">FINANCE</div>
-    </div>
-
-    <div id="portal-rollcall" class="portal">
-        <div class="student-list" id="studentCards">
-            </div>
-    </div>
-
-    <div id="portal-admission" class="portal" style="display:none;">
-        <div class="form-card">
-            <h3 style="margin-top:0;">Registration</h3>
-            <div class="form-group"><input id="regName" placeholder="Full Name"></div>
-            <div class="form-group"><input id="regAge" placeholder="Age"></div>
-            <div class="form-group"><input id="regLoc" placeholder="Physical Location (Stay)"></div>
-            <div class="form-group">
-                <select id="regHealth">
-                    <option>Health: Normal</option>
-                    <option>Health: Special Care</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <select id="regClass">
-                    <option>Class: P.1</option><option>Class: P.7</option>
-                </select>
-            </div>
-            <button class="btn-gen" onclick="saveStudent()">Register & Generate LIN</button>
-        </div>
-    </div>
-
-    <div class="footer">
-        EUDES MEDIA SOLUTIONS | +256762992440
+    <div class="nav-scroll">
+        <div class="pill" onclick="toggleView('admission')">ADMISSION</div>
+        <div class="pill active" onclick="toggleView('records')">ROLL CALL</div>
+        <div class="pill" onclick="toggleView('records')">RECORDS</div>
+        <div class="pill">ABSENTEES</div>
+        <div class="pill">FINANCE</div>
     </div>
 </div>
+
+<div id="view-admission" style="display:none;">
+    <div class="form-container">
+        <div class="input-group"><input id="fName" placeholder="Full Name"></div>
+        <div class="input-group"><input id="fAge" placeholder="Age / Date of Birth"></div>
+        <div class="input-group"><input id="fLoc" placeholder="Physical Location (Stay)"></div>
+        <div class="input-group">
+            <select id="fHealth">
+                <option>Health: Normal</option>
+                <option>Health: Special Care</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <select id="fClass">
+                <option value="P.1">Class: P.1</option>
+                <option value="P.7">Class: P.7</option>
+            </select>
+        </div>
+        <button class="btn-green" onclick="submitRegistration()">Register & Generate LIN</button>
+    </div>
+</div>
+
+<div id="view-records">
+    <div class="table-header">
+        <div>Age/DOB</div>
+        <div>Location/Health</div>
+        <div>Attendance</div>
+        <div>Action</div>
+    </div>
+    <div id="dataTable">
+        <div class="no-records">No records found.</div>
+    </div>
+</div>
+
+<div class="footer-text">EUDES MEDIA SOLUTIONS | +256762992440</div>
 
 <script>
+    // SUPABASE SETUP
     const _supabase = supabase.createClient('https://kjftrwuucjdnhfwesrup.supabase.co', 'sbp_publishable_1PetUo8klWCLfupRq52CVg_Y_Y');
-    
-    function checkLogin() {
-        if(document.getElementById('sysPass').value === "JESUS CARES") {
-            document.getElementById('login-gate').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            loadData();
-        } else { alert("Try Again"); }
-    }
 
-    function showPortal(p) {
-        document.querySelectorAll('.portal').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
-        document.getElementById('portal-' + p).style.display = 'block';
+    function toggleView(view) {
+        document.getElementById('view-admission').style.display = (view === 'admission') ? 'block' : 'none';
+        document.getElementById('view-records').style.display = (view === 'records') ? 'block' : 'none';
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
         event.currentTarget.classList.add('active');
     }
 
-    async function saveStudent() {
+    async function submitRegistration() {
         const lin = "PMA-" + Math.floor(1000 + Math.random() * 9000);
         const { error } = await _supabase.from('students').insert([{
-            name: document.getElementById('regName').value,
+            name: document.getElementById('fName').value,
             lin: lin,
-            age: document.getElementById('regAge').value,
-            location: document.getElementById('regLoc').value,
-            health: document.getElementById('regHealth').value,
-            class: document.getElementById('regClass').value,
-            contact: "+2567..." // Default or prompted
+            age: document.getElementById('fAge').value,
+            location: document.getElementById('fLoc').value,
+            health: document.getElementById('fHealth').value,
+            class: document.getElementById('fClass').value
         }]);
         if(!error) { alert("Success! LIN: " + lin); loadData(); }
     }
 
     async function loadData() {
         const { data } = await _supabase.from('students').select('*');
-        const container = document.getElementById('studentCards');
-        document.getElementById('count-total').innerText = data.length;
-        container.innerHTML = "";
+        const list = document.getElementById('dataTable');
+        document.getElementById('totalStudents').innerText = data.length || 0;
 
+        if (data.length === 0) {
+            list.innerHTML = '<div class="no-records">No records found.</div>';
+            return;
+        }
+
+        let html = "";
         data.forEach(s => {
-            container.innerHTML += `
-                <div class="student-card">
-                    <div class="student-info">
-                        <b>${s.name}</b>
-                        <div class="student-sub">
-                            ${s.lin} | ${s.class} | 📞 ${s.contact || '+256...'}
-                        </div>
-                    </div>
+            html += `
+                <div class="record-row">
+                    <div><b>${s.name}</b><br><small>${s.age}</small></div>
+                    <div>${s.location}<br><small>${s.health}</small></div>
+                    <div><button style="font-size:10px; padding:4px;">Mark</button></div>
+                    <div><button style="background:red; color:white; border:none; border-radius:4px; padding:4px 8px;">DEL</button></div>
                 </div>
             `;
         });
+        list.innerHTML = html;
     }
 
-    // CLOCK LOGIC
+    // CLOCK LOGIC IMAGE 2
     setInterval(() => {
         const n = new Date();
-        document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
-        document.getElementById('headerDate').innerText = n.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+        document.getElementById('clockDisplay').innerText = n.toLocaleTimeString('en-GB');
+        document.getElementById('headerDate').innerText = n.toLocaleDateString('en-GB', { day: '2-digit', month: 'LONG', year: 'numeric' });
     }, 1000);
+
+    loadData();
 </script>
 </body>
 </html>
