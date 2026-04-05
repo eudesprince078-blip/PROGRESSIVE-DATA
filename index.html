@@ -21,12 +21,12 @@
         .pill.active { background: var(--dark); color: white; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         label { font-size: 10px; font-weight: bold; color: var(--blue); display: block; margin-top: 5px; }
-        input, select { width: 100%; padding: 10px; border: 1.2px solid #ccc; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
+        input, select { width: 100%; padding: 10px; border: 1.2px solid #ccc; border-radius: 6px; font-size: 13px; box-sizing: border-box; outline: none; }
         .btn { background: var(--blue); color: white; padding: 12px; border: none; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 11px; }
-        th { background: #003366; color: white; padding: 10px; text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 11px; }
+        th { background: #003366; color: white; padding: 10px; text-align: left; position: sticky; top: 0; }
+        td { padding: 10px; border-bottom: 1px solid #eee; background: white; }
         .badge { padding: 3px 6px; border-radius: 4px; font-size: 10px; color: white; font-weight: bold; }
         .hidden { display: none !important; }
         .footer { text-align: center; font-size: 10px; color: #aaa; padding: 20px; font-weight: bold; }
@@ -54,8 +54,8 @@
     </div>
 
     <div class="stats-row">
-        <div class="s-card"><span class="s-val" id="tCnt">0</span><span class="s-label">Total</span></div>
-        <div class="s-card"><span class="s-val" id="pCnt" style="color:var(--green)">0</span><span class="s-label">Paid</span></div>
+        <div class="s-card"><span class="s-val" id="tCnt">0</span><span class="s-label">Total Students</span></div>
+        <div class="s-card"><span class="s-val" id="pCnt" style="color:var(--green)">0</span><span class="s-label">Paid Full</span></div>
         <div class="s-card"><span class="s-val" id="aCnt" style="color:var(--red)">0</span><span class="s-label">Absentees</span></div>
     </div>
 
@@ -68,25 +68,25 @@
     <div id="v-adm" class="box hidden">
         <h4 style="margin:0 0 10px 0; color:var(--blue);">Student Registration</h4>
         <div class="grid">
-            <div style="grid-column: span 2;"><label>Name</label><input id="name"></div>
-            <div><label>Official LIN (Manual)</label><input id="o_lin" placeholder="e.g. PMS-001"></div>
+            <div style="grid-column: span 2;"><label>Full Name</label><input id="name"></div>
+            <div><label>Official LIN</label><input id="o_lin" placeholder="e.g. 2026/PMS/001"></div>
             <div><label>Gender</label><select id="gen"><option>Male</option><option>Female</option></select></div>
-            <div><label>DOB</label><input id="dob" type="date"></div>
+            <div><label>Date of Birth</label><input id="dob" type="date"></div>
             <div><label>Class</label><select id="cls"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
-            <div><label>Location</label><input id="loc"></div>
+            <div><label>Physical Location</label><input id="loc"></div>
             <div><label>Health Status</label><input id="health" value="Normal"></div>
-            <div><label>Contact</label><input id="ph" value="+256"></div>
-            <div><label>Fees Expected</label><input id="f_exp" type="number"></div>
-            <div><label>Fees Paid</label><input id="f_paid" type="number" value="0"></div>
+            <div><label>Contact Number</label><input id="ph" value="+256"></div>
+            <div><label>Fees Expected (UGX)</label><input id="f_exp" type="number"></div>
+            <div><label>Fees Paid (UGX)</label><input id="f_paid" type="number" value="0"></div>
         </div>
-        <button class="btn" onclick="save()">SAVE STUDENT</button>
+        <button class="btn" onclick="save()">SAVE TO DATABASE</button>
     </div>
 
     <div id="v-rec" class="box table-wrap">
         <table>
             <thead>
                 <tr>
-                    <th>Official LIN</th><th>Auto LIN</th><th>Name</th><th>Class</th><th>Status</th><th>Health</th><th>Action</th>
+                    <th>Official LIN</th><th>Auto LIN</th><th>Name</th><th>Class</th><th>Gender</th><th>Status</th><th>Health</th><th>Action</th>
                 </tr>
             </thead>
             <tbody id="resList"></tbody>
@@ -96,7 +96,7 @@
     <div id="v-fin" class="box table-wrap hidden">
         <table>
             <thead>
-                <tr><th>Name</th><th>Code</th><th>Paid</th><th>Expected</th><th>Balance</th><th>Status</th></tr>
+                <tr><th>Name</th><th>Payment Code</th><th>Paid</th><th>Expected</th><th>Balance</th><th>Status</th></tr>
             </thead>
             <tbody id="finList"></tbody>
         </table>
@@ -106,16 +106,19 @@
 </div>
 
 <script>
+    // FINAL VERIFIED CONNECTION - RESTORED APRIL 6, 2026
     const URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-    const KEY = 'sbp_publishable_1PetUo8klWCLfupRq52CVg_Y_Y';
+    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _supabase = supabase.createClient(URL, KEY);
 
     function login() {
-        if(document.getElementById('u').value === "Admin" && document.getElementById('p').value === "JESUS CARES") {
+        const u = document.getElementById('u').value;
+        const p = document.getElementById('p').value;
+        if(u === "Admin" && p === "JESUS CARES") {
             document.getElementById('loginGate').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             load();
-        } else { alert("Wrong Login"); }
+        } else { alert("Invalid Credentials"); }
     }
 
     function tab(t) {
@@ -126,13 +129,11 @@
     }
 
     async function save() {
-        // Automatic LIN generation
-        const auto_lin = "PMA-" + Math.floor(Math.random()*9000+1000); 
-        
+        const auto_lin = "PMA-" + Math.floor(Math.random()*9000+1000);
         const { error } = await _supabase.from('students').insert([{
             name: document.getElementById('name').value,
-            official_lin: document.getElementById('o_lin').value, // Manual field
-            lin: auto_lin, // Automatic field
+            official_lin: document.getElementById('o_lin').value,
+            lin: auto_lin,
             gender: document.getElementById('gen').value,
             dob: document.getElementById('dob').value,
             class: document.getElementById('cls').value,
@@ -145,13 +146,15 @@
             status: "Active",
             is_absent: false
         }]);
-        
-        if(error) alert(error.message); else { alert("Saved!"); load(); tab('rec'); }
+        if(error) alert("Database Error: " + error.message); else { alert("Success! Saved."); load(); tab('rec'); }
     }
 
     async function load() {
         const { data, error } = await _supabase.from('students').select('*').order('name');
-        if (error) return;
+        if (error) { 
+            document.getElementById('resList').innerHTML = `<tr><td colspan="8" style="color:red; text-align:center;">Error: ${error.message}</td></tr>`;
+            return; 
+        }
 
         document.getElementById('tCnt').innerText = data.length;
         document.getElementById('pCnt').innerText = data.filter(s => parseFloat(s.fees_paid) >= parseFloat(s.fees_expected)).length;
@@ -162,14 +165,13 @@
         list.innerHTML = ""; fList.innerHTML = "";
 
         data.forEach(s => {
-            // Displays both LINs in the table
             list.innerHTML += `<tr>
                 <td><b>${s.official_lin || '---'}</b></td>
                 <td><small>${s.lin}</small></td>
-                <td>${s.name}</td><td>${s.class}</td>
+                <td>${s.name}</td><td>${s.class}</td><td>${s.gender}</td>
                 <td><span class="badge" style="background:${s.status=='Active'?'green':'gray'}">${s.status}</span></td>
                 <td>${s.health_status}</td>
-                <td><button onclick="del('${s.id}')" style="color:red; border:none; background:none;">DEL</button></td>
+                <td><button onclick="del('${s.id}')" style="color:red; border:none; background:none; cursor:pointer;">DEL</button></td>
             </tr>`;
 
             const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
@@ -182,7 +184,10 @@
     }
 
     async function del(id) {
-        if(confirm("Delete?")) { await _supabase.from('students').delete().eq('id', id); load(); }
+        if(confirm("Permanently delete this record?")) {
+            await _supabase.from('students').delete().eq('id', id);
+            load();
+        }
     }
 
     setInterval(() => {
