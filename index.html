@@ -18,14 +18,10 @@
         label { font-size: 11px; font-weight: bold; color: var(--blue); display: block; margin-bottom: 3px; }
         input, select { width: 100%; padding: 10px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none; }
         .btn { background: var(--blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .btn:disabled { background: #888; cursor: not-allowed; }
         .table-wrap { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 12px; }
         th { background: #f8f9fa; color: var(--blue); padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
         td { padding: 12px; border-bottom: 1px solid #eee; background: white; }
-        .badge { padding: 4px 8px; border-radius: 5px; font-weight: bold; }
-        .paid { background: #d4edda; color: var(--green); }
-        .unpaid { background: #f8d7da; color: var(--red); }
         .footer { text-align: center; margin-top: 20px; font-size: 12px; font-weight: bold; color: #444; }
         .hidden { display: none !important; }
     </style>
@@ -36,29 +32,108 @@
     <h2 style="color:var(--blue)">PMS LOGIN</h2>
     <input id="u" placeholder="USERNAME" autocomplete="off">
     <input id="p" type="password" placeholder="PASSWORD" style="margin-top:10px;">
-    <button onclick="login()" id="loginBtn" class="btn" style="margin-top:20px;">ENTER SYSTEM</button>
+    <button onclick="login()" class="btn" style="margin-top:20px;">ENTER SYSTEM</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
         <h2 style="margin:0;">PROGRESSIVE SCHOOL DATA</h2>
-        <p style="margin:0; font-size:11px;">Official Management System</p>
+        <p style="margin:0; font-size:11px;">Official Management System | Eudes Media</p>
     </div>
 
     <div class="dash">
         <div class="stat"><span>Students</span><b id="tCnt">0</b></div>
-        <div class="stat"><span>Fully Paid</span><b id="pCnt" style="color:var(--green)">0</b></div>
-        <div class="stat"><span>Balances</span><b id="bCnt" style="color:var(--red)">0</b></div>
+        <div class="stat"><span>Present</span><b id="pCnt" style="color:var(--green)">0</b></div>
+        <div class="stat"><span>Absent</span><b id="bCnt" style="color:var(--red)">0</b></div>
     </div>
 
     <div class="box">
-        <h3 id="fTitle" style="color:var(--blue); margin-top:0;">Student Registration</h3>
-        <input type="hidden" id="editId">
+        <h3 style="color:var(--blue); margin-top:0;">Student Registration</h3>
         <div class="grid">
             <div><label>Full Name</label><input id="name"></div>
-            <div><label>Official LIN</label><input id="olin"></div>
+            <div><label>Official LIN</label><input id="olin" placeholder="Auto-gen"></div>
             <div><label>Date of Birth</label><input id="dob" type="date" onchange="calcAge()"></div>
             <div><label>Age (Auto)</label><input id="age" readonly style="background:#f0f0f0;"></div>
-            <div><label>Contact Number</label><input id="ph"></div>
-            <div><label>Physical Location</label><input id="loc"></div>
+            <div><label>Contact Number</label><input id="ph" value="+256"></div>
+            <div><label>Location</label><input id="loc"></div>
             <div><label>Class</label>
+                <select id="cls">
+                    <option>P.1</option><option>P.2</option><option>P.7</option>
+                </select>
+            </div>
+            <div><label>Health Status</label><input id="health" value="Normal"></div>
+        </div>
+        <button class="btn" onclick="saveData()">SAVE RECORD</button>
+    </div>
+
+    <div class="box table-wrap">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>LIN</th><th>Name</th><th>Age</th><th>Location</th><th>Health</th><th>Class</th><th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="resList"></tbody>
+        </table>
+    </div>
+
+    <div class="footer">EUDES MEDIA SOLUTIONS | +256762992440</div>
+</div>
+
+<script>
+    // THE KEYS YOU WERE MISSING
+    const URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+    const KEY = 'sbp_publishable_1PetUo8klWCLfupRq52CVg_Y_Y';
+    const _supabase = supabase.createClient(URL, KEY);
+
+    function login() {
+        const user = document.getElementById('u').value;
+        const pass = document.getElementById('p').value;
+        if(user === "Admin" && pass === "JESUS CARES") {
+            document.getElementById('loginGate').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            loadData();
+        } else { alert("Access Denied"); }
+    }
+
+    function calcAge() {
+        const dob = new Date(document.getElementById('dob').value);
+        const diff = Date.now() - dob.getTime();
+        const age = new Date(diff).getUTCFullYear() - 1970;
+        document.getElementById('age').value = age > 0 ? age : 0;
+    }
+
+    async function saveData() {
+        const lin = document.getElementById('olin').value || "PMA-" + Math.floor(Math.random()*9000+1000);
+        const { error } = await _supabase.from('students').insert([{
+            name: document.getElementById('name').value,
+            lin: lin,
+            age: document.getElementById('age').value,
+            location: document.getElementById('loc').value,
+            health: document.getElementById('health').value,
+            class: document.getElementById('cls').value,
+            contact: document.getElementById('ph').value
+        }]);
+        if(error) alert(error.message); else { alert("Saved!"); loadData(); }
+    }
+
+    async function loadData() {
+        const { data, error } = await _supabase.from('students').select('*').order('name');
+        const list = document.getElementById('resList');
+        document.getElementById('tCnt').innerText = data ? data.length : 0;
+        list.innerHTML = "";
+        data.forEach(s => {
+            list.innerHTML += `<tr>
+                <td>${s.lin}</td><td>${s.name}</td><td>${s.age}</td>
+                <td>${s.location}</td><td>${s.health}</td><td>${s.class}</td>
+                <td><button onclick="del('${s.id}')" style="color:red; border:none; background:none; cursor:pointer;">DEL</button></td>
+            </tr>`;
+        });
+    }
+
+    async function del(id) {
+        if(confirm("Delete?")) { await _supabase.from('students').delete().eq('id', id); loadData(); }
+    }
+</script>
+</body>
+</html>
