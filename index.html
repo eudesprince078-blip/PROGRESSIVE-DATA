@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE MOTHERS PMS - V146 FINANCIAL ENGINE</title>
+    <title>PROGRESSIVE MOTHERS PMS - V147 LIN FIX</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -35,18 +35,18 @@
         .btn-main { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; font-size: 14px; cursor: pointer; }
         .hidden { display: none !important; }
 
-        .lin-tag { background: #eee; color: #555; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 900; }
+        /* FIXED LIN TAG STYLE */
+        .lin-tag { background: var(--blue); color: white; padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 900; display: inline-block; margin-bottom: 5px; letter-spacing: 0.5px; }
         
         .fin-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px; }
-        .fin-box { background: white; padding: 15px 5px; text-align: center; border-radius: 18px; border: 1px solid #ddd; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .fin-box span { display: block; font-size: 8px; color: #888; font-weight: 800; margin-bottom: 4px; }
+        .fin-box { background: white; padding: 15px 5px; text-align: center; border-radius: 18px; border: 1px solid #ddd; }
+        .fin-box span { display: block; font-size: 8px; color: #888; font-weight: 800; }
         .fin-box b { font-size: 11px; color: var(--blue); font-weight: 900; }
 
-        .list-item { border-left: 6px solid var(--blue); margin-bottom: 12px; padding: 15px; cursor: pointer; }
-        .list-item b { font-size: 14px; display: block; }
-        .list-item small { font-size: 11px; color: #666; font-weight: 600; line-height: 1.6; }
-        .bal-red { color: var(--red); font-weight: 900; }
-        .bal-green { color: var(--green); font-weight: 900; }
+        .list-item { border-left: 6px solid var(--blue); margin-bottom: 12px; padding: 15px; cursor: pointer; position: relative; overflow: hidden; }
+        .list-item b { font-size: 15px; display: block; text-transform: uppercase; color: var(--blue); }
+        .list-item small { font-size: 11px; color: #555; font-weight: 700; }
+        .bal-status { font-size: 10px; font-weight: 900; margin-top: 5px; display: block; }
 
         .footer-brand { text-align: center; font-size: 10px; color: #bbb; font-weight: 800; margin-top: 30px; padding-bottom: 30px; }
     </style>
@@ -91,47 +91,25 @@
     <div id="secReg" class="card hidden">
         <h3 id="regTitle" style="margin:0; color:var(--blue); font-size: 15px;">STUDENT ADMISSION</h3>
         <input type="hidden" id="editId">
-        
         <label>LIN Number (Generated Automatically)</label>
-        <input id="fLin" readonly placeholder="Auto-generated" style="background:#f9f9f9; color:#999;">
-
+        <input id="fLin" readonly placeholder="Auto-gen on Save" style="background:#f0f4f8; font-weight: 900; color:var(--blue);">
         <label>Full Name</label><input id="fName" placeholder="Enter Full Name">
-        <label>Class</label>
-        <select id="fClass">
-            <option>Baby</option><option>Middle</option><option>Top</option>
-            <option>P.1</option><option>P.2</option><option>P.3</option>
-            <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
-        </select>
-        <label>Parent/Guardian Contact</label><input id="fCon" placeholder="e.g. 07xx xxx xxx">
-        
-        <div id="financePanel" class="hidden">
-            <label>Total Fees Required (UGX)</label><input type="number" id="fExp">
-            <label>Current Amount Paid (UGX)</label><input type="number" id="fPaid">
-        </div>
-        
-        <button onclick="saveData()" class="btn-main">SYNC STUDENT RECORD</button>
+        <label>Class</label><select id="fClass"><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+        <label>Parent/Guardian Contact</label><input id="fCon" placeholder="Contact Number">
+        <div id="financePanel" class="hidden"><label>Total Fees Req.</label><input type="number" id="fExp"><label>Current Paid</label><input type="number" id="fPaid"></div>
+        <button onclick="saveData()" class="btn-main">SAVE STUDENT RECORD</button>
         <button id="delBtn" onclick="deleteStudent()" class="btn-main hidden" style="background:var(--red)">DELETE STUDENT</button>
         <button onclick="clearForm()" class="btn-main" style="background:#666">NEW ADMISSION</button>
     </div>
 
-    <div id="secRoll" class="hidden">
-        <div class="card" style="background:var(--blue);"><select id="rollClass" onchange="loadFilteredRoll()"><option value="">-- Choose Class --</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
-        <div id="rollArea"></div>
-    </div>
-
-    <div id="secRec" class="hidden">
-        <div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="Search Name, Class or LIN..."></div>
-        <div id="recArea"></div>
-    </div>
-
+    <div id="secRoll" class="hidden"><div class="card" style="background:var(--blue);"><select id="rollClass" onchange="loadFilteredRoll()"><option value="">-- Choose Class --</option><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div><div id="rollArea"></div></div>
+    
+    <div id="secRec" class="hidden"><div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="Search Name, Class or LIN..."></div><div id="recArea"></div></div>
+    
     <div id="secAbs" class="hidden"><div id="absentArea"></div></div>
 
     <div id="secFin" class="hidden">
-        <div class="fin-grid">
-            <div class="fin-box"><span>Expected Total</span><b id="dashExp">0</b></div>
-            <div class="fin-box"><span>Total Collected</span><b id="dashPaid" style="color:var(--green)">0</b></div>
-            <div class="fin-box"><span>Total Balance</span><b id="dashBal" style="color:var(--red)">0</b></div>
-        </div>
+        <div class="fin-grid"><div class="fin-box"><span>Goal</span><b id="dashExp">0</b></div><div class="fin-box"><span>Collected</span><b id="dashPaid" style="color:var(--green)">0</b></div><div class="fin-box"><span>Balance</span><b id="dashBal" style="color:var(--red)">0</b></div></div>
         <div id="finArea"></div>
     </div>
 
@@ -148,14 +126,11 @@
         else if (k === "FINANCE2026") ROLE = "FINANCE";
         else if (k === "TEACHER256") ROLE = "TEACHER";
         else return alert("Invalid Key");
-
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-
         if (ROLE === "ADMIN") { ['tReg','tRoll','tRec','tAbs','tFin'].forEach(id => document.getElementById(id).style.display = "block"); document.getElementById('financePanel').classList.remove('hidden'); showTab('reg'); }
         else if (ROLE === "FINANCE") { ['tReg','tFin'].forEach(id => document.getElementById(id).style.display = "block"); document.getElementById('financePanel').classList.remove('hidden'); showTab('fin'); }
         else { document.getElementById('tRoll').style.display = "block"; showTab('roll'); }
-
         fetchData(); setInterval(tick, 1000); tick();
     }
 
@@ -164,11 +139,12 @@
         if(data) { students = data; document.getElementById('statTotal').innerText = students.length; renderRec(); renderFinance(); }
     }
 
+    // SMART LIN FINDER: Checks both possible column names
+    function getLIN(s) { return s.lin_number || s.lin || "NO LIN"; }
+
     function generateLIN(name) {
-        if(!name) return "";
-        const letter = name.trim().charAt(0).toUpperCase();
-        const rand = Math.floor(1000 + Math.random() * 9000);
-        return `PM${letter}${rand}`;
+        const letter = (name || "X").trim().charAt(0).toUpperCase();
+        return `PM${letter}${Math.floor(1000 + Math.random() * 9000)}`;
     }
 
     function tick() {
@@ -177,8 +153,7 @@
         document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
         document.getElementById('currDate').innerText = n.toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
         const sch = [ {s:630, e:800, t:"🌅 ARRIVAL"}, {s:800, e:1030, t:"📚 LESSONS"}, {s:1030, e:1100, t:"☕ BREAK"}, {s:1100, e:1230, t:"📖 LESSONS"}, {s:1230, e:1330, t:"🍲 LUNCH"}, {s:1330, e:1500, t:"💤 SLEEPING"}, {s:1500, e:1600, t:"⚽ PLAY"} ];
-        let cur = "🌙 CLOSED";
-        sch.forEach(s => { if(t >= s.s && t < s.e) cur = s.t; });
+        let cur = "🌙 CLOSED"; sch.forEach(s => { if(t >= s.s && t < s.e) cur = s.t; });
         document.getElementById('activityStatus').innerText = "STATUS: " + cur;
     }
 
@@ -192,63 +167,57 @@
     async function saveData() {
         const id = document.getElementById('editId').value;
         const name = document.getElementById('fName').value;
-        // Generate LIN only if it's a new student
         const lin = id ? document.getElementById('fLin').value : generateLIN(name);
-        
         const row = { 
-            lin_number: lin,
+            lin_number: lin, // New code saves to lin_number
             name: name, 
             class: document.getElementById('fClass').value, 
             contact: document.getElementById('fCon').value, 
             fees_expected: parseInt(document.getElementById('fExp').value) || 0, 
             fees_paid: parseInt(document.getElementById('fPaid').value) || 0 
         };
-
-        if(id) await sb.from('students').update(row).eq('id', id); 
-        else await sb.from('students').insert([row]);
-        
-        alert("SYNCED: Record Saved Successfully."); clearForm(); fetchData();
+        if(id) await sb.from('students').update(row).eq('id', id); else await sb.from('students').insert([row]);
+        alert("SYNCED!"); clearForm(); fetchData();
     }
 
     function setEdit(id) {
         const s = students.find(x => x.id == id);
         if(!s) return;
         document.getElementById('editId').value = s.id;
-        document.getElementById('fLin').value = s.lin_number || "";
+        document.getElementById('fLin').value = getLIN(s);
         document.getElementById('fName').value = s.name;
         document.getElementById('fClass').value = s.class;
         document.getElementById('fCon').value = s.contact;
         document.getElementById('fExp').value = s.fees_expected || 0;
         document.getElementById('fPaid').value = s.fees_paid || 0;
-        document.getElementById('regTitle').innerText = "UPDATE STUDENT: " + s.name;
+        document.getElementById('regTitle').innerText = "UPDATE: " + s.name;
         if(ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
-        showTab('reg');
+        showTab('reg'); window.scrollTo(0,0);
     }
 
     function renderRec() {
         const q = document.getElementById('search').value.toUpperCase();
         let h = "";
-        students.filter(s => s.name.toUpperCase().includes(q) || s.class.toUpperCase().includes(q) || (s.lin_number||"").toUpperCase().includes(q)).forEach(s => {
+        students.filter(s => s.name.toUpperCase().includes(q) || s.class.toUpperCase().includes(q) || getLIN(s).toUpperCase().includes(q)).forEach(s => {
             h += `<div class="card list-item" onclick="setEdit('${s.id}')">
-                    <span class="lin-tag">${s.lin_number || 'NO LIN'}</span>
+                    <span class="lin-tag">${getLIN(s)}</span>
                     <b>${s.name}</b>
-                    <small>Class: ${s.class} | Contact: ${s.contact}</small>
+                    <small>Class: ${s.class} | 📞 ${s.contact}</small>
                   </div>`;
         });
-        document.getElementById('recArea').innerHTML = h || "<p style='text-align:center;'>No matching records.</p>";
+        document.getElementById('recArea').innerHTML = h || "<p style='text-align:center;'>No records found.</p>";
     }
 
     function renderFinance() {
         let tE = 0, tP = 0, h = "";
         students.forEach(s => {
-            const exp = s.fees_expected || 0;
-            const paid = s.fees_paid || 0;
-            const bal = exp - paid;
+            const exp = s.fees_expected || 0; const paid = s.fees_paid || 0; const bal = exp - paid;
             tE += exp; tP += paid;
             h += `<div class="card list-item" onclick="setEdit('${s.id}')" style="border-left-color: ${bal <= 0 ? 'var(--green)' : 'var(--red)'}">
+                    <span class="lin-tag" style="background:#eee; color:#333;">${getLIN(s)}</span>
                     <b>${s.name}</b>
-                    <small>Fees: ${exp.toLocaleString()} | Paid: ${paid.toLocaleString()}</small><br>
-                    <small class="${bal <= 0 ? 'bal-green' : 'bal-red'}">Balance: UGX ${bal.toLocaleString()}</small>
+                    <small>Total: ${exp.toLocaleString()} | Paid: ${paid.toLocaleString()}</small>
+                    <span class="bal-status" style="color:${bal <= 0 ? 'var(--green)' : 'var(--red)'}">BALANCE: UGX ${bal.toLocaleString()}</span>
                   </div>`;
         });
         document.getElementById('dashExp').innerText = tE.toLocaleString();
@@ -264,11 +233,11 @@
         filtered.forEach(s => {
             const isAbs = att[s.id] === 'absent';
             h += `<div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:15px; margin-bottom:10px;">
-                    <div><b>${s.name}</b><br><span class="lin-tag">${s.lin_number}</span></div>
+                    <div><b>${s.name}</b><br><span class="lin-tag" style="font-size:8px;">${getLIN(s)}</span></div>
                     <button onclick="toggleAtt('${s.id}')" style="padding:12px; border-radius:10px; border:none; background:${isAbs ? 'var(--red)' : 'var(--green)'}; color:white; font-weight:900;">${isAbs ? 'ABS' : 'PRES'}</button>
                   </div>`;
         });
-        document.getElementById('rollArea').innerHTML = h || "<p style='text-align:center; padding:20px;'>No students in this class.</p>";
+        document.getElementById('rollArea').innerHTML = h || "<p style='text-align:center; padding:20px;'>Select a class.</p>";
     }
 
     function toggleAtt(id) {
@@ -285,9 +254,8 @@
     }
 
     async function deleteStudent() {
-        if(confirm("Permanently delete this student?")) {
-            await sb.from('students').delete().eq('id', document.getElementById('editId').value);
-            fetchData(); clearForm();
+        if(confirm("Delete this student permanently?")) {
+            await sb.from('students').delete().eq('id', document.getElementById('editId').value); fetchData(); clearForm();
         }
     }
 </script>
