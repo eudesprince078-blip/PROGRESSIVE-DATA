@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE MOTHERS PMS - V142 SMART SELECT</title>
+    <title>PROGRESSIVE MOTHERS PMS - V143 FULL DASHBOARD</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -19,19 +19,17 @@
         .school-loc { font-size: 10px; font-weight: 800; color: var(--gold); letter-spacing: 1.5px; display: block; margin-bottom: 15px; }
         .clock-box { font-size: 48px; font-weight: 900; margin: 5px 0; letter-spacing: -1px; }
         
-        .activity-banner { font-size: 12px; font-weight: 900; padding: 8px 20px; border-radius: 50px; display: inline-block; border: 2px solid white; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .act-lessons { background: var(--blue); }
-        .act-break { background: var(--orange); }
-        .act-arrival { background: var(--green); }
-        .act-closed { background: var(--red); }
+        .activity-banner { font-size: 12px; font-weight: 900; padding: 8px 20px; border-radius: 50px; display: inline-block; border: 2px solid white; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background: var(--blue); }
 
         .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -60px; position: relative; z-index: 5; }
         .dash-card { background: white; padding: 15px 5px; border-radius: 22px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #eee; }
         .dash-card span { display: block; font-size: 22px; font-weight: 900; color: var(--blue); }
         .dash-card small { font-size: 8px; font-weight: 800; color: #999; text-transform: uppercase; }
 
-        .tab-bar { display: flex; justify-content: space-around; background: white; padding: 8px; margin: 25px 15px 15px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .tab { padding: 12px 5px; font-size: 10px; font-weight: 900; color: #bbb; cursor: pointer; text-align: center; flex: 1; display: none; }
+        /* SCROLLABLE TAB BAR FOR MORE OPTIONS */
+        .tab-bar { display: flex; overflow-x: auto; background: white; padding: 8px; margin: 25px 15px 15px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); white-space: nowrap; scrollbar-width: none; }
+        .tab-bar::-webkit-scrollbar { display: none; }
+        .tab { flex: 0 0 auto; padding: 12px 15px; font-size: 10px; font-weight: 900; color: #bbb; cursor: pointer; text-align: center; display: none; }
         .tab.active { background: var(--blue); color: white; border-radius: 15px; }
 
         .card { background: white; padding: 22px; border-radius: 28px; margin: 15px; border: 1px solid #eee; }
@@ -40,6 +38,19 @@
         
         .btn-main { background: var(--blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 18px; font-weight: 900; margin-top: 15px; font-size: 15px; cursor: pointer; }
         .hidden { display: none !important; }
+
+        /* FINANCE DASHBOARD UI */
+        .fin-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px; }
+        .fin-box { background: white; padding: 15px 5px; text-align: center; border-radius: 15px; border: 1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .fin-box span { display: block; font-size: 9px; font-weight: 800; color: #777; text-transform: uppercase; margin-bottom: 5px; }
+        .fin-box b { font-size: 12px; font-weight: 900; }
+
+        /* SCHEDULE TIMELINE UI */
+        .time-slot { display: flex; align-items: center; padding: 15px; border-left: 4px solid #ddd; margin: 0 15px 10px; background: white; border-radius: 0 15px 15px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .time-slot.active { border-left-color: var(--blue); background: #eef5ff; }
+        .time-slot b { width: 75px; font-size: 11px; color: var(--blue); font-weight: 900; }
+        .time-slot span { font-size: 13px; font-weight: 700; color: #333; }
+
         .footer-brand { text-align: center; font-size: 10px; color: #bbb; font-weight: 800; margin-top: 30px; padding-bottom: 20px; }
     </style>
 </head>
@@ -58,7 +69,7 @@
 <div id="mainApp" class="hidden">
     <div class="top-nav">
         <a href="#" class="logout-link" onclick="location.reload()">LOGOUT</a>
-        <div id="currDate">05 APRIL 2026</div>
+        <div id="currDate">SYNCING DATE...</div>
     </div>
 
     <div class="header">
@@ -75,11 +86,17 @@
     </div>
 
     <div class="tab-bar">
+        <div id="tSched" class="tab" onclick="showTab('sched')">SCHEDULE</div>
         <div id="tReg" class="tab" onclick="showTab('reg')">ADMISSION</div>
         <div id="tRoll" class="tab" onclick="showTab('roll')">ROLL CALL</div>
         <div id="tRec" class="tab" onclick="showTab('rec')">RECORDS</div>
         <div id="tAbs" class="tab" onclick="showTab('abs')">ABSENTEES</div>
         <div id="tFin" class="tab" onclick="showTab('fin')">FINANCE</div>
+    </div>
+
+    <div id="secSched" class="hidden">
+        <h3 style="margin:20px 15px 10px; color:var(--blue); font-size:14px; font-weight:900; text-transform:uppercase;">Daily Updates & Routine</h3>
+        <div id="scheduleArea"></div>
     </div>
 
     <div id="secRoll" class="hidden">
@@ -92,9 +109,7 @@
                 <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
         </div>
-        <div id="rollArea">
-            <p style="text-align:center; color:#999; margin-top:20px; font-weight:800;">Please select a class above.</p>
-        </div>
+        <div id="rollArea"><p style="text-align:center; color:#999; margin-top:20px; font-weight:800;">Please select a class above.</p></div>
     </div>
 
     <div id="secReg" class="card hidden">
@@ -113,7 +128,15 @@
 
     <div id="secRec" class="hidden"><div class="card"><input type="text" id="search" oninput="renderRec()" placeholder="Search Name..."></div><div id="recArea"></div></div>
     <div id="secAbs" class="hidden"><div id="absentArea" style="padding:15px;"></div></div>
-    <div id="secFin" class="hidden"><div id="finArea"></div></div>
+    
+    <div id="secFin" class="hidden">
+        <div class="fin-grid">
+            <div class="fin-box"><span>Expected</span><b id="dashExp">0</b></div>
+            <div class="fin-box"><span>Collected</span><b id="dashPaid" style="color:var(--green)">0</b></div>
+            <div class="fin-box"><span>Balance</span><b id="dashBal" style="color:var(--red)">0</b></div>
+        </div>
+        <div id="finArea"></div>
+    </div>
 
     <div class="footer-brand">EUDES MEDIA SOLUTIONS | +256762992440</div>
 </div>
@@ -123,6 +146,16 @@
     let ROLE = "", students = [], att = {};
 
     const holidays = { "1-1": "NEW YEAR", "1-26": "NRM DAY", "2-16": "JANAN LUWUM", "3-8": "WOMEN'S DAY", "4-3": "GOOD FRIDAY", "4-5": "EASTER SUNDAY ✨", "4-6": "EASTER MONDAY", "10-9": "INDEPENDENCE 🇺🇬", "12-25": "CHRISTMAS" };
+
+    const schedule = [
+        { start: 630, end: 800, text: "🌅 Arrival & Breakfast" },
+        { start: 800, end: 1030, text: "📚 Morning Lessons" },
+        { start: 1030, end: 1100, text: "☕ Break Time" },
+        { start: 1100, end: 1230, text: "📖 Mid-Morning Lessons" },
+        { start: 1230, end: 1330, text: "🍲 Lunch Time" },
+        { start: 1330, end: 1500, text: "💤 Sleeping Time (Nursery) / Lessons (Primary)" },
+        { start: 1500, end: 1600, text: "⚽ Play & Departure" }
+    ];
 
     function login() {
         const k = document.getElementById('sysKey').value.toUpperCase();
@@ -134,98 +167,4 @@
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
 
-        if (ROLE === "ADMIN") { ['tReg','tRoll','tRec','tAbs','tFin'].forEach(id => document.getElementById(id).style.display = "block"); document.getElementById('financePanel').classList.remove('hidden'); showTab('reg'); }
-        else if (ROLE === "FINANCE") { ['tReg','tFin'].forEach(id => document.getElementById(id).style.display = "block"); document.getElementById('financePanel').classList.remove('hidden'); showTab('fin'); }
-        else { document.getElementById('tRoll').style.display = "block"; showTab('roll'); }
-
-        fetchData(); setInterval(tick, 1000);
-    }
-
-    async function fetchData() {
-        const { data } = await sb.from('students').select('*').order('name');
-        if(data) { students = data; document.getElementById('statTotal').innerText = students.length; renderRec(); renderFinance(); }
-    }
-
-    function tick() {
-        const n = new Date();
-        const mD = (n.getMonth()+1) + "-" + n.getDate();
-        const time = n.getHours() * 100 + n.getMinutes();
-        document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
-        document.getElementById('currDate').innerText = n.toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
-        const hb = document.getElementById('holidayBanner');
-        if(holidays[mD]) { hb.style.display = "block"; hb.innerText = "✨ HAPPY " + holidays[mD] + " ✨"; } else hb.style.display = "none";
-    }
-
-    function showTab(t) {
-        ['secReg','secRoll','secRec','secFin','secAbs'].forEach(s => document.getElementById(s).classList.add('hidden'));
-        ['tReg','tRoll','tRec','tFin','tAbs'].forEach(s => document.getElementById(s).classList.remove('active'));
-        document.getElementById('sec' + t.charAt(0).toUpperCase() + t.slice(1)).classList.remove('hidden');
-        document.getElementById('t' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('active');
-    }
-
-    function loadFilteredRoll() {
-        const selCls = document.getElementById('rollClass').value;
-        if (!selCls) { document.getElementById('rollArea').innerHTML = "<p style='text-align:center; color:#999; margin-top:20px;'>Please select a class above.</p>"; return; }
-        
-        const filtered = students.filter(s => s.class === selCls);
-        let h = "";
-        filtered.forEach(s => {
-            const isAbs = att[s.id] === 'absent';
-            h += `<div style="background:white; margin:10px 15px; border-radius:15px; display:flex; justify-content:space-between; align-items:center; padding:15px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-                <b>${s.name}</b>
-                <button onclick="toggleAtt('${s.id}')" style="padding:10px 18px; border-radius:12px; border:none; background:${isAbs ? 'var(--red)' : 'var(--green)'}; color:white; font-weight:900;">${isAbs ? 'ABS' : 'PRES'}</button>
-            </div>`;
-        });
-        document.getElementById('rollArea').innerHTML = h || `<p style='text-align:center; color:var(--red); padding:20px;'>No students found in ${selCls}</p>`;
-    }
-
-    function toggleAtt(id) {
-        att[id] = (att[id] === 'absent') ? 'present' : 'absent';
-        let a = 0; Object.values(att).forEach(v => { if(v === 'absent') a++; });
-        document.getElementById('statAbs').innerText = a; document.getElementById('statPres').innerText = students.length - a;
-        loadFilteredRoll(); renderAbs();
-    }
-
-    async function saveData() {
-        const id = document.getElementById('editId').value;
-        const row = { name: document.getElementById('fName').value, class: document.getElementById('fClass').value, contact: document.getElementById('fCon').value, fees_expected: parseInt(document.getElementById('fExp').value) || 0, fees_paid: parseInt(document.getElementById('fPaid').value) || 0 };
-        if(id) await sb.from('students').update(row).eq('id', id); else await sb.from('students').insert([row]);
-        alert("Sync OK."); clearForm(); fetchData();
-    }
-
-    function setEdit(id) {
-        const s = students.find(x => x.id == id);
-        document.getElementById('editId').value = s.id;
-        document.getElementById('fName').value = s.name;
-        document.getElementById('fClass').value = s.class;
-        document.getElementById('fCon').value = s.contact;
-        document.getElementById('fExp').value = s.fees_expected || 0;
-        document.getElementById('fPaid').value = s.fees_paid || 0;
-        if(ROLE === "FINANCE") ['fName','fClass','fCon'].forEach(i => document.getElementById(i).disabled = true);
-        showTab('reg'); if(ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
-    }
-
-    function renderAbs() {
-        let h = ""; students.forEach(s => { if(att[s.id] === 'absent') h += `<div class="card" style="border-left:8px solid var(--red)"><b>${s.name}</b> (${s.class})<br><a href="tel:${s.contact}" style="color:var(--green); font-weight:800;">📞 CALL PARENT</a></div>`; });
-        document.getElementById('absentArea').innerHTML = h || "<p style='text-align:center;'>Everyone Present</p>";
-    }
-
-    function renderFinance() {
-        let h = ""; students.forEach(s => {
-            const b = (s.fees_expected || 0) - (s.fees_paid || 0);
-            h += `<div class="card" onclick="setEdit('${s.id}')" style="border-left:8px solid ${b <= 0 ? 'var(--green)' : 'var(--red)'}"><b>${s.name}</b><br><small>${b <= 0 ? 'PAID' : 'BAL: UGX ' + b.toLocaleString()}</small></div>`;
-        });
-        document.getElementById('finArea').innerHTML = h;
-    }
-
-    function renderRec() {
-        const q = document.getElementById('search').value.toUpperCase();
-        let h = ""; students.filter(s => s.name.toUpperCase().includes(q)).forEach(s => { h += `<div class="card" onclick="setEdit('${s.id}')"><b>${s.name}</b> <small style="float:right;">${s.class}</small></div>`; });
-        document.getElementById('recArea').innerHTML = h;
-    }
-
-    function clearForm() { ['fName','fCon','fExp','fPaid','editId'].forEach(i => { document.getElementById(i).value = ""; document.getElementById(i).disabled = false; }); document.getElementById('delBtn').classList.add('hidden'); }
-    async function deleteStudent() { if(confirm("Delete?")) { await sb.from('students').delete().eq('id', document.getElementById('editId').value); fetchData(); clearForm(); } }
-</script>
-</body>
-</html>
+        if (ROLE === "ADMIN") { ['tSched','tReg','tRoll','tRec','tAbs','tFin'].forEach(id => document.getElementById(
