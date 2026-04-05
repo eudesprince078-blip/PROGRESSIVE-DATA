@@ -2,71 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE MOTHERS PMS - V161</title>
+    <title>PROGRESSIVE MOTHERS PMS - V162</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --blue: #002b5b; --gold: #ffce00; --red: #ff3b3b; --green: #2ecc71; --gray: #f4f7fa; }
-        body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 100px; color: #333; }
+        body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 100px; color: #333; -webkit-tap-highlight-color: transparent; }
         
         .top-nav { background: #001326; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; position: sticky; top: 0; z-index: 2000; }
-        .logout-btn { background: var(--red); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 900; cursor: pointer; font-size: 10px; }
-
-        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 20px 15px 90px; text-align: center; border-bottom: 6px solid var(--gold); position: relative; border-radius: 0 0 40px 40px; }
+        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 20px 15px 90px; text-align: center; border-bottom: 6px solid var(--gold); border-radius: 0 0 40px 40px; }
         .clock-box { font-size: 42px; font-weight: 900; margin: 5px 0; }
-        .activity-banner { font-size: 11px; font-weight: 900; padding: 10px 25px; border-radius: 50px; display: inline-block; border: 2px solid var(--gold); background: rgba(0,0,0,0.4); color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        .activity-banner { font-size: 11px; font-weight: 900; padding: 10px 25px; border-radius: 50px; display: inline-block; border: 2px solid var(--gold); background: rgba(0,0,0,0.4); color: var(--gold); text-transform: uppercase; }
 
         .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -45px; z-index: 100; position: relative; }
-        .dash-card { background: white; padding: 15px 5px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid #eee; }
-        .dash-card span { display: block; font-size: 18px; font-weight: 900; color: var(--blue); }
+        .dash-card { background: white; padding: 15px 5px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
-        .tab-bar { display: flex; background: white; padding: 8px; margin: 20px 15px; border-radius: 15px; overflow-x: auto; gap: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .tab { flex: 1; padding: 12px 5px; font-size: 9px; font-weight: 900; color: #bbb; text-align: center; display: none; cursor: pointer; white-space: nowrap; border-radius: 10px; transition: 0.3s; }
+        .tab-bar { display: flex; background: white; padding: 8px; margin: 20px 15px; border-radius: 15px; gap: 5px; overflow-x: auto; }
+        .tab { flex: 1; padding: 12px 5px; font-size: 9px; font-weight: 900; color: #bbb; text-align: center; display: none; cursor: pointer; border-radius: 10px; }
         .tab.active { background: var(--blue); color: white; }
 
-        .list-item { border-left: 6px solid var(--blue); padding: 15px; margin: 10px 15px; background: white; border-radius: 15px; position: relative; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .list-item b { font-size: 15px; display: block; text-transform: uppercase; color: var(--blue); }
-        .lin-tag { font-size: 11px; font-weight: 800; color: white; background: var(--blue); padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 5px; }
+        .list-item { border-left: 6px solid var(--blue); padding: 15px; margin: 10px 15px; background: white; border-radius: 15px; position: relative; border: 1px solid #eee; }
+        .list-item b { font-size: 15px; display: block; color: var(--blue); text-transform: uppercase; }
+        .lin-tag { font-size: 10px; font-weight: 800; color: #555; background: #eee; padding: 2px 6px; border-radius: 4px; margin: 5px 0; display: inline-block; }
+        .contact-row { display: flex; gap: 10px; margin-top: 10px; }
+        .action-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; color: white; font-weight: 900; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 5px; text-decoration: none; }
 
         .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eee; }
         label { font-size: 10px; font-weight: 800; color: var(--blue); margin-top: 12px; display: block; text-transform: uppercase; }
-        input, select { width: 100%; padding: 14px; margin-top: 5px; border: 1.5px solid #eee; border-radius: 12px; font-size: 14px; box-sizing: border-box; font-weight: 600; outline: none; }
-        input:focus { border-color: var(--blue); }
+        input, select { width: 100%; padding: 14px; margin-top: 5px; border: 1.5px solid #eee; border-radius: 12px; font-size: 14px; box-sizing: border-box; font-weight: 600; }
+        
+        .pass-box { position: relative; }
+        .pass-box i { position: absolute; right: 15px; top: 18px; color: var(--blue); cursor: pointer; }
 
-        .notif-card { background: #fdfdfd; border: 1px solid #eef; padding: 15px; border-radius: 15px; margin-bottom: 12px; border-left: 6px solid var(--gold); }
-        .btn-main { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; cursor: pointer; font-size: 14px; }
+        .btn-main { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; }
         .hidden { display: none !important; }
-        .footer-brand { text-align: center; font-size: 10px; color: #bbb; padding: 30px 20px; font-weight: 800; }
+        .footer-brand { text-align: center; font-size: 10px; color: #bbb; padding: 30px; font-weight: 800; }
     </style>
 </head>
 <body>
 
 <div id="loginGate" style="max-width: 340px; margin: 80px auto; text-align: center;">
-    <h1 style="color:var(--blue); font-weight:900; margin-bottom:5px;">PROGRESSIVE</h1>
-    <p style="font-size:12px; font-weight:700; color:#666; margin-top:0;">MOTHERS NURSERY & PRIMARY</p>
+    <h1 style="color:var(--blue); font-weight:900;">PROGRESSIVE MOTHERS</h1>
     <div class="card">
-        <label>SYSTEM KEY</label>
-        <input id="sysKey" type="password" placeholder="ENTER ACCESS CODE" style="text-align:center;">
-        <button onclick="login()" class="btn-main">AUTHORIZE ACCESS</button>
+        <label>SYSTEM ACCESS KEY</label>
+        <div class="pass-box">
+            <input id="sysKey" type="password" placeholder="••••••••" style="text-align:center;">
+            <i class="fa-solid fa-eye" id="toggleEye" onclick="togglePass()"></i>
+        </div>
+        <button onclick="login()" class="btn-main">LOGIN</button>
     </div>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="top-nav">
         <span id="sysDateDisplay">...</span>
-        <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
+        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:5px 10px; border-radius:5px; font-weight:900;">LOGOUT</button>
     </div>
 
     <div class="header">
         <div id="clock" class="clock-box">00:00:00</div>
-        <div id="activityStatus" class="activity-banner">INITIALIZING...</div>
+        <div id="activityStatus" class="activity-banner">...</div>
     </div>
 
     <div class="dash-container">
         <div class="dash-card"><span id="statTotal">0</span><small>TOTAL</small></div>
-        <div class="dash-card"><span id="statPres" style="color:var(--green)">0</span><small>PRESENT</small></div>
-        <div class="dash-card"><span id="statAbs" style="color:var(--red)">0</span><small>ABSENT</small></div>
+        <div class="dash-card"><span id="statPres" style="color:var(--green)">0</span><small>PRES</small></div>
+        <div class="dash-card"><span id="statAbs" style="color:var(--red)">0</span><small>ABS</small></div>
     </div>
 
     <div class="tab-bar">
@@ -74,31 +76,30 @@
         <div id="tRoll" class="tab" onclick="showTab('roll')">ROLL CALL</div>
         <div id="tRec" class="tab" onclick="showTab('rec')">RECORDS</div>
         <div id="tFin" class="tab" onclick="showTab('fin')">FINANCE</div>
-        <div id="tNotif" class="tab" onclick="showTab('notif')">NOTIFICATIONS</div>
+        <div id="tNotif" class="tab" onclick="showTab('notif')">NOTIFS</div>
     </div>
 
     <div id="secNotif" class="card hidden">
-        <h3 style="margin:0 0 15px; color:var(--blue);"><i class="fa-solid fa-shield-check"></i> APPROVAL VAULT</h3>
+        <h3 style="color:var(--blue); margin:0 0 15px;">ADMIN APPROVALS</h3>
         <div id="notifList"></div>
     </div>
 
     <div id="searchWrapper" class="hidden" style="padding:0 15px;">
-        <input type="text" id="globalSearch" oninput="runGlobalSearch()" placeholder="Search Name or LIN Number..." style="width:100%; padding:15px; border-radius:15px; border:2px solid #ddd; font-weight:700;">
+        <input type="text" id="globalSearch" oninput="runGlobalSearch()" placeholder="Search Name or LIN..." style="width:100%; padding:15px; border-radius:15px; border:2px solid #ddd;">
     </div>
 
     <div id="secReg" class="card hidden">
-        <label>STUDENT LIN</label><input id="fLin" disabled style="background:#f0f0f0; border:none; font-weight:900; color:var(--blue);">
+        <label>LIN (Auto-Generated)</label><input id="fLin" disabled style="background:#f4f4f4; color:var(--blue); font-weight:900;">
         <label>Full Name</label><input id="fName">
         <label>Age</label><input type="number" id="fAge">
-        <label>Date of Birth</label><input type="date" id="fDob">
-        <label>Physical Location</label><input id="fLoc">
-        <label>Health Status</label><input id="fHealth" placeholder="Any medical conditions?">
+        <label>DOB</label><input type="date" id="fDob">
+        <label>Location</label><input id="fLoc">
+        <label>Health Status</label><input id="fHealth">
         <label>Class</label><select id="fClass"><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         <label>Parent Contact</label><input id="fCon">
         <label>Total Fees</label><input type="number" id="fExp">
         <label>Amount Paid</label><input type="number" id="fPaid">
-        <button onclick="saveData()" class="btn-main">SYNC TO CLOUD</button>
-        <button onclick="clearForm()" class="btn-main" style="background:#999">RESET FORM</button>
+        <button id="saveBtn" onclick="saveData()" class="btn-main">SAVE RECORD</button>
     </div>
 
     <div id="secList" class="hidden"></div>
@@ -108,23 +109,30 @@
 
 <script>
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
-    let ROLE = "", students = [], pendingNotifs = [];
+    let ROLE = "", students = [], pendingNotifs = [], activeTab = "";
+
+    function togglePass() {
+        const x = document.getElementById("sysKey");
+        const eye = document.getElementById("toggleEye");
+        if (x.type === "password") { x.type = "text"; eye.className = "fa-solid fa-eye-slash"; }
+        else { x.type = "password"; eye.className = "fa-solid fa-eye"; }
+    }
 
     function login() {
         const k = document.getElementById('sysKey').value.trim().toUpperCase();
         if (k === "JESUS CARES") ROLE = "ADMIN";
         else if (k === "FINANCE2026") ROLE = "FINANCE";
         else if (k === "TEACHER256") ROLE = "TEACHER";
-        else return alert("Invalid Key");
+        else return alert("Wrong Access Key");
         
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         
         ['tReg','tRoll','tRec','tFin','tNotif'].forEach(t => { 
-            let visible = ROLE === "ADMIN";
-            if(ROLE === "FINANCE" && (t==="tReg"||t==="tFin")) visible = true;
-            if(ROLE === "TEACHER" && (t==="tReg"||t==="tRoll")) visible = true;
-            if(visible) document.getElementById(t).style.display="block";
+            let show = ROLE === "ADMIN";
+            if(ROLE === "FINANCE" && (t==="tReg"||t==="tFin")) show = true;
+            if(ROLE === "TEACHER" && (t==="tReg"||t==="tRoll")) show = true;
+            if(show) document.getElementById(t).style.display="block";
         });
         showTab(ROLE === "ADMIN" ? 'notif' : 'reg');
         fetchData(); setInterval(tick, 1000);
@@ -139,28 +147,25 @@
         const n = new Date();
         document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
         document.getElementById('sysDateDisplay').innerText = n.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
-        
-        const day = n.getDate(); const mon = n.getMonth() + 1;
+        const d = n.getDate(); const m = n.getMonth() + 1;
         const t = n.getHours() * 100 + n.getMinutes();
-        let routine = "🏫 NORMAL OPERATIONS";
+        let r = "🏫 SCHOOL OPEN";
 
-        // HOLIDAYS 2026
-        if(day===5 && mon===4) routine = "🐣 HAPPY EASTER 2026";
-        else if(day===6 && mon===4) routine = "🐣 EASTER MONDAY";
-        else if(day===1 && mon===5) routine = "👷 LABOUR DAY";
-        else if(day===3 && mon===6) routine = "⛪ MARTYRS DAY";
+        if(d===5 && m===4) r = "🐣 HAPPY EASTER 2026";
+        else if(d===6 && m===4) r = "🐣 EASTER MONDAY";
+        else if(d===1 && m===5) r = "👷 LABOUR DAY";
+        else if(d===3 && m===6) r = "⛪ MARTYRS DAY";
         else {
-            // YOUR BOARDING SCHEDULE
-            if(t >= 500 && t < 1030) routine = "📚 MORNING LESSONS";
-            else if(t >= 1030 && t < 1100) routine = "☕ BREAK TIME";
-            else if(t >= 1100 && t < 1300) routine = "📖 MID-DAY LESSONS";
-            else if(t >= 1300 && t < 1400) routine = "🍲 LUNCH TIME";
-            else if(t >= 1400 && t < 1600) routine = "✍️ AFTERNOON CLASSES";
-            else if(t >= 1600 && t < 1900) routine = "🚿 SHOWER & HOME PREP";
-            else if(t >= 1900 && t < 2100) routine = "📖 EVENING PREP";
-            else if(t >= 2100 || t < 500) routine = "💤 SLEEPING TIME";
+            if(t >= 500 && t < 1030) r = "📚 MORNING LESSONS";
+            else if(t >= 1030 && t < 1100) r = "☕ BREAK TIME";
+            else if(t >= 1100 && t < 1300) r = "📖 MID-DAY LESSONS";
+            else if(t >= 1300 && t < 1400) r = "🍲 LUNCH TIME";
+            else if(t >= 1400 && t < 1600) r = "✍️ AFTERNOON CLASSES";
+            else if(t >= 1600 && t < 1900) r = "🚿 SHOWER & HOME PREP";
+            else if(t >= 1900 && t < 2100) r = "📖 EVENING PREP";
+            else if(t >= 2100 || t < 500) r = "💤 SLEEPING TIME";
         }
-        document.getElementById('activityStatus').innerText = routine;
+        document.getElementById('activityStatus').innerText = r;
     }
 
     function showTab(t) {
@@ -169,13 +174,9 @@
         document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
         ['secReg','secList','searchWrapper','secNotif'].forEach(id => document.getElementById(id).classList.add('hidden'));
 
-        if(t === 'reg') document.getElementById('secReg').classList.remove('hidden');
+        if(t === 'reg') { document.getElementById('secReg').classList.remove('hidden'); clearForm(); }
         else if(t === 'notif') { document.getElementById('secNotif').classList.remove('hidden'); renderNotifs(); }
-        else {
-            document.getElementById('secList').classList.remove('hidden');
-            document.getElementById('searchWrapper').classList.remove('hidden');
-            runGlobalSearch();
-        }
+        else { document.getElementById('secList').classList.remove('hidden'); document.getElementById('searchWrapper').classList.remove('hidden'); runGlobalSearch(); }
     }
 
     function runGlobalSearch() {
@@ -183,32 +184,41 @@
         const filtered = students.filter(s => s.name.toUpperCase().includes(q) || (s.lin_number||"").includes(q));
         let h = "";
         filtered.forEach(s => {
-            h += `<div class="list-item" onclick="setEdit('${s.id}')"><b>${s.name}</b><span class="lin-tag">${s.lin_number||'LIN: PENDING'}</span><br><small>${s.class} | Health: ${s.health_status||'Good'}</small></div>`;
+            const lin = s.lin_number || `PM${s.name.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
+            const con = s.contact || "No Contact";
+            h += `<div class="list-item">
+                <b onclick="${ROLE==='ADMIN' ? "setEdit('"+s.id+"')" : "alert('Access Denied')"}">${s.name}</b>
+                <span class="lin-tag">LIN: ${lin}</span><br>
+                <small>${s.class} | ${s.health_status || 'Good Health'}</small><br>
+                <small style="color:var(--blue); font-weight:700;">Parent: ${con}</small>
+                <div class="contact-row">
+                    <a href="tel:${con}" class="action-btn" style="background:var(--blue)"><i class="fa-solid fa-phone"></i> CALL</a>
+                    <a href="https://wa.me/${con.replace(/\D/g,'')}" class="action-btn" style="background:var(--green)"><i class="fa-brands fa-whatsapp"></i> WHATSAPP</a>
+                </div>
+            </div>`;
         });
         document.getElementById('secList').innerHTML = h || "<p style='text-align:center;padding:20px;'>No students found.</p>";
     }
 
     async function saveData() {
         const id = document.getElementById('editId').value;
+        if(id && ROLE !== "ADMIN") return alert("Only Admin can edit existing students!");
+        
         const name = document.getElementById('fName').value;
         const exp = parseInt(document.getElementById('fExp').value) || 0;
         const paid = parseInt(document.getElementById('fPaid').value) || 0;
         const con = document.getElementById('fCon').value;
         
-        const row = { 
-            name, class: document.getElementById('fClass').value, contact: con, 
-            fees_expected: exp, fees_paid: paid, age: document.getElementById('fAge').value, 
-            dob: document.getElementById('fDob').value, location: document.getElementById('fLoc').value, 
-            health_status: document.getElementById('fHealth').value 
-        };
+        const row = { name, class: document.getElementById('fClass').value, contact: con, fees_expected: exp, fees_paid: paid, age: document.getElementById('fAge').value, dob: document.getElementById('fDob').value, location: document.getElementById('fLoc').value, health_status: document.getElementById('fHealth').value };
         
         if(!id) row.lin_number = `PM${name.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
+        
         const { error } = id ? await sb.from('students').update(row).eq('id', id) : await sb.from('students').insert([row]);
 
         if(!error) {
             const msg = `*PROGRESSIVE MOTHERS*\n*FEE UPDATE*\nStudent: ${name}\nLIN: ${id ? document.getElementById('fLin').value : row.lin_number}\nPaid: ${paid}\nBal: ${exp-paid}\n\n_Eudes Media Solutions_`;
             pendingNotifs.push({ msg, con });
-            alert("System Synced. Notification waiting in Admin Vault.");
+            alert("Record Saved Successfully!");
             fetchData(); clearForm();
         }
     }
@@ -216,16 +226,11 @@
     function renderNotifs() {
         let h = "";
         pendingNotifs.forEach((m, i) => {
-            h += `<div class="notif-card"><pre style="font-size:12px; white-space:pre-wrap; font-family:inherit;">${m.msg}</pre>
-                  <button onclick="sendWA(${i})" style="padding:10px; background:var(--green); color:white; border:none; border-radius:10px; margin-right:10px; font-weight:900;">APPROVE & SEND</button>
-                  <button onclick="pendingNotifs.splice(${i},1);renderNotifs();" style="padding:10px; background:var(--red); color:white; border:none; border-radius:10px; font-weight:900;">DISCARD</button></div>`;
+            h += `<div class="card" style="border-left:8px solid var(--gold);"><pre style="font-size:12px; white-space:pre-wrap;">${m.msg}</pre>
+                  <button onclick="window.open('https://wa.me/'+pendingNotifs[${i}].con.replace(/\\D/g,'')+'?text='+encodeURIComponent(pendingNotifs[${i}].msg)); pendingNotifs.splice(${i},1); renderNotifs();" style="padding:10px; background:var(--green); color:white; border:none; border-radius:10px; font-weight:900;">SEND TO PARENT</button>
+                  <button onclick="pendingNotifs.splice(${i},1);renderNotifs();" style="padding:10px; background:var(--red); color:white; border:none; border-radius:10px; margin-left:10px; font-weight:900;">DISCARD</button></div>`;
         });
-        document.getElementById('notifList').innerHTML = h || "<p style='color:#999;font-size:12px;text-align:center;'>No messages waiting for approval.</p>";
-    }
-
-    function sendWA(i) {
-        window.open(`https://wa.me/${pendingNotifs[i].con.replace(/\D/g,'')}?text=${encodeURIComponent(pendingNotifs[i].msg)}`);
-        pendingNotifs.splice(i,1); renderNotifs();
+        document.getElementById('notifList').innerHTML = h || "<p style='text-align:center; color:#999;'>No pending approvals.</p>";
     }
 
     function setEdit(id) {
