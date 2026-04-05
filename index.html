@@ -3,133 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progressive Mothers Nursery & Primary School</title>
+    <title>Progressive Mothers - Eudes Media System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #003366; --white: #ffffff; --red: #d9534f; --green: #28a745; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #fff; color: var(--blue); }
+        :root { --blue: #003366; --white: #ffffff; --red: #d9534f; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #fff; color: var(--blue); }
         
-        /* Login Page Style */
-        #loginPage { display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--blue); color: white; }
-        .login-box { background: white; color: var(--blue); padding: 30px; border-radius: 10px; text-align: center; width: 300px; }
+        /* LOGIN INTERFACE */
+        #login-gate { display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--blue); }
+        .login-card { background: white; padding: 40px; border-radius: 15px; width: 350px; text-align: center; }
         
-        /* Main App Style */
-        #mainApp { display: none; }
-        header { background: var(--blue); color: #fff; padding: 25px; text-align: center; border-bottom: 5px solid #0055aa; }
-        .container { padding: 15px; max-width: 1200px; margin: auto; }
-        .card { border: 1px solid var(--blue); padding: 15px; border-radius: 10px; background: #f4f8fb; margin-bottom: 20px; }
-        .holiday-banner { border-left: 6px solid var(--red); background: #fff5f5; }
+        /* MAIN DASHBOARD */
+        #app-interface { display: none; }
+        header { background: var(--blue); color: #fff; padding: 20px; text-align: center; border-bottom: 5px solid #0055aa; }
+        .container { padding: 20px; max-width: 1200px; margin: auto; }
         
-        input, select, button { padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
-        button { background: var(--blue); color: white; cursor: pointer; font-weight: bold; border: none; }
-        .btn-p { background: var(--green); width: auto; }
-        .btn-a { background: var(--red); width: auto; }
-        
-        table { width: 100%; border-collapse: collapse; background: white; margin-top: 15px; }
-        th { background: #004488; color: white; padding: 12px; text-align: left; }
+        .alert-box { border-left: 6px solid var(--red); background: #fff5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .routine-box { border-left: 6px solid var(--blue); background: #f0f7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th { background: var(--blue); color: white; padding: 15px; text-align: left; }
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        input, select, button { padding: 12px; margin: 10px 0; width: 100%; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background: var(--blue); color: white; border: none; cursor: pointer; font-weight: bold; }
+        .btn-sm { width: auto; padding: 5px 10px; margin-right: 5px; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
     </style>
 </head>
 <body>
 
-<div id="loginPage">
-    <div class="login-box">
-        <h2>School Login</h2>
-        <p>Eudes Media Digital Partner</p>
-        <input type="password" id="passInput" placeholder="Enter Password">
-        <button onclick="handleLogin()">Login to System</button>
+<div id="login-gate">
+    <div class="login-card">
+        <h2 style="color: var(--blue)">Progressive Mothers</h2>
+        <p>Enter System Password</p>
+        <input type="password" id="sysPass" placeholder="Password">
+        <button onclick="accessSystem()">LOG IN</button>
     </div>
 </div>
 
-<div id="mainApp">
+<div id="app-interface">
     <header>
         <h1 style="margin:0;">PROGRESSIVE MOTHERS NURSERY & PRIMARY SCHOOL</h1>
-        <p style="margin:5px 0;">+256762992440 | Gayaza - Kijabijo</p>
+        <p>Eudes Media Digital Partner | 📞 +256762992440</p>
     </header>
 
     <div class="container">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-            <div class="card holiday-banner">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="alert-box">
                 <h4 style="margin:0; color: var(--red);">📢 PUBLIC HOLIDAY NOTIFICATIONS</h4>
-                <p style="font-size: 13px;">Next: Easter Monday - All School Operations Suspended.</p>
+                <p style="font-size: 13px;">Next: Easter Monday. School closed for all classes (Baby - P.7).</p>
             </div>
-            <div class="card">
+            <div class="routine-box">
                 <h4 style="margin:0;">🕒 DAILY SCHOOL ROUTINE</h4>
-                <p style="font-size:12px;">07:30 AM Arrival | 08:15 AM Assembly | 04:30 PM Departure</p>
+                <p style="font-size:12px;">07:30 Arrival | 08:15 Assembly | 01:00 Lunch | 04:30 Departure</p>
             </div>
         </div>
 
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>Class Rollcall Management</h3>
-                <div>
-                    <label><b>View Class:</b> </label>
-                    <select id="classFilter" onchange="renderStudents()" style="width: 150px;">
-                        <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
-                        <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
-                        <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
-                    </select>
-                </div>
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 10px; margin: 20px 0; display: flex; gap: 20px;">
+            <div style="flex: 1;">
+                <label><b>USER ROLE:</b></label>
+                <select id="userRole" onchange="loadData()">
+                    <option value="Teacher">Teacher</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Finance">Finance</option>
+                </select>
             </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>LIN (Line No)</th> <th>Name</th>
-                        <th>Location/Health</th>
-                        <th>Attendance</th> <th>Management</th> </tr>
-                </thead>
-                <tbody id="studentList"></tbody>
-            </table>
+            <div style="flex: 1;">
+                <label><b>SELECT CLASS ROLLCALL:</b></label>
+                <select id="classPicker" onchange="loadData()">
+                    <option value="Baby">Baby</option><option value="Middle">Middle</option><option value="Top">Top</option>
+                    <option value="P.1">P.1</option><option value="P.2">P.2</option><option value="P.3">P.3</option>
+                    <option value="P.4">P.4</option><option value="P.5">P.5</option><option value="P.6">P.6</option><option value="P.7">P.7</option>
+                </select>
+            </div>
         </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>LIN (Line No)</th> <th>Name</th>
+                    <th>Location / Health</th>
+                    <th>Attendance</th>
+                    <th>Management</th> </tr>
+            </thead>
+            <tbody id="studentRows"></tbody>
+        </table>
     </div>
 </div>
 
 <script>
-    let currentUserRole = "Teacher"; // This would normally come from your database
+    // INITIALIZE SUPABASE
+    const _supabase = supabase.createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_KEY');
 
-    function handleLogin() {
-        const pass = document.getElementById('passInput').value;
-        if(pass === "1234") { // Replace with your actual password
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            renderStudents();
+    function accessSystem() {
+        const pass = document.getElementById('sysPass').value;
+        // USING YOUR PASSWORD: JESUS CARES
+        if (pass === "JESUS CARES") {
+            document.getElementById('login-gate').style.display = 'none';
+            document.getElementById('app-interface').style.display = 'block';
+            loadData();
         } else {
-            alert("Incorrect Password");
+            alert("Access Denied");
         }
     }
 
-    const studentDatabase = [
-        { lin: "LIN-1001", name: "Ademola Eudes", loc: "Gayaza", health: "Normal", class: "P.1" },
-        { lin: "LIN-1002", name: "Steven Tumaini", loc: "Kijabijo", health: "Normal", class: "Top" }
-    ];
+    async function loadData() {
+        const role = document.getElementById('userRole').value;
+        const cls = document.getElementById('classPicker').value;
+        const tbody = document.getElementById('studentRows');
+        tbody.innerHTML = "<tr><td colspan='5'>Loading Students...</td></tr>";
 
-    function renderStudents() {
-        const cls = document.getElementById('classFilter').value;
-        const tbody = document.getElementById('studentList');
+        // FETCH FROM YOUR DATABASE
+        const { data: students, error } = await _supabase
+            .from('students')
+            .select('*')
+            .eq('class', cls);
+
         tbody.innerHTML = "";
 
-        // SECURITY: ADMIN CANNOT EDIT, FINANCE CANNOT EDIT FEES
-        const isLocked = (currentUserRole === "Admin" || currentUserRole === "Finance");
+        // SECURITY: ADMIN & FINANCE CANNOT EDIT
+        const isLocked = (role === 'Admin' || role === 'Finance');
 
-        const filtered = studentDatabase.filter(s => s.class === cls);
-
-        if(filtered.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No students found in " + cls + " Class.</td></tr>";
+        if (!students || students.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No students found in " + cls + " class.</td></tr>";
             return;
         }
 
-        filtered.forEach(s => {
+        students.forEach(s => {
             tbody.innerHTML += `
                 <tr>
-                    <td><b>${s.lin}</b></td>
-                    <td>${s.name}</td>
-                    <td>${s.loc} / ${s.health}</td>
+                    <td><b>${s.lin || 'N/A'}</b></td> <td>${s.name}</td>
+                    <td>${s.location} / ${s.health}</td>
                     <td>
-                        <button class="btn-p" onclick="alert('Present')">P</button>
-                        <button class="btn-a" onclick="alert('Absent')">A</button>
+                        <button class="btn-sm" style="background:green" onclick="alert('Present')">P</button>
+                        <button class="btn-sm" style="background:red" onclick="alert('Absent')">A</button>
                     </td>
-                    <td><button ${isLocked ? 'disabled' : ''}>${isLocked ? '🔒' : 'Edit'}</button></td>
+                    <td>
+                        <button class="btn-sm" style="background:#666" ${isLocked ? 'disabled' : ''}>
+                            ${isLocked ? '🔒 Locked' : 'Edit'}
+                        </button>
+                    </td>
                 </tr>`;
         });
     }
