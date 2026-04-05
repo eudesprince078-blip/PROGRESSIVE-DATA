@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PROGRESSIVE MOTHERS PMS - V152</title>
+    <title>PROGRESSIVE MOTHERS PMS - V153</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -10,15 +10,15 @@
         :root { --blue: #002b5b; --gold: #ffce00; --red: #ff3b3b; --green: #2ecc71; --gray: #f4f7fa; }
         body { font-family: 'Inter', sans-serif; background: var(--gray); margin: 0; padding-bottom: 100px; color: #333; }
         
-        .top-nav { background: #001326; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid #333; }
+        .top-nav { background: #001326; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; position: sticky; top: 0; z-index: 2000; }
         .logout-btn { background: var(--red); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 900; cursor: pointer; font-size: 10px; }
 
-        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 25px 15px 100px; text-align: center; border-bottom: 6px solid var(--gold); position: relative; border-radius: 0 0 40px 40px; }
+        .header { background: linear-gradient(135deg, #001a33, var(--blue)); color: white; padding: 20px 15px 90px; text-align: center; border-bottom: 6px solid var(--gold); position: relative; border-radius: 0 0 40px 40px; }
         .clock-box { font-size: 42px; font-weight: 900; margin: 5px 0; }
-        .activity-banner { font-size: 11px; font-weight: 900; padding: 8px 20px; border-radius: 50px; display: inline-block; border: 2px solid white; background: rgba(255,255,255,0.1); color: var(--gold); min-width: 150px; }
+        .activity-banner { font-size: 10px; font-weight: 900; padding: 8px 15px; border-radius: 50px; display: inline-block; border: 2px solid white; background: rgba(255,255,255,0.1); color: var(--gold); text-transform: uppercase; }
 
-        .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -50px; z-index: 100; position: relative; }
-        .dash-card { background: white; padding: 15px 5px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .dash-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; margin-top: -45px; z-index: 100; position: relative; }
+        .dash-card { background: white; padding: 15px 5px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid #eee; }
         .dash-card span { display: block; font-size: 18px; font-weight: 900; color: var(--blue); }
 
         .tab-bar { display: flex; background: white; padding: 8px; margin: 20px 15px; border-radius: 15px; overflow-x: auto; }
@@ -26,23 +26,24 @@
         .tab.active { background: var(--blue); color: white; border-radius: 10px; }
 
         .search-container { padding: 0 15px 10px; }
-        .search-bar { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #eee; font-weight: 600; box-sizing: border-box; }
+        .search-bar { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #ddd; font-weight: 600; box-sizing: border-box; font-size: 14px; }
 
-        .list-item { border-left: 6px solid var(--blue); padding: 15px; margin: 10px 15px; background: white; border-radius: 15px; position: relative; min-height: 80px; box-sizing: border-box; }
-        .list-item b { font-size: 14px; display: block; text-transform: uppercase; padding-right: 100px; }
+        .list-item { border-left: 6px solid var(--blue); padding: 15px; margin: 10px 15px; background: white; border-radius: 15px; position: relative; border: 1px solid #eee; border-left-width: 6px; }
+        .list-item b { font-size: 14px; display: block; text-transform: uppercase; padding-right: 80px; color: var(--blue); }
         
-        .action-tray { margin-top: 10px; display: flex; gap: 20px; }
-        .action-btn { text-decoration: none; font-size: 20px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: #f0f4f8; }
-        .call-btn { color: var(--blue); border: 1px solid var(--blue); }
-        .wa-btn { color: var(--green); border: 1px solid var(--green); }
-
-        .status-pill { position: absolute; right: 15px; top: 15px; font-size: 8px; padding: 4px 8px; border-radius: 4px; font-weight: 900; }
+        .action-tray { margin-top: 10px; display: flex; gap: 15px; }
+        .action-btn { text-decoration: none; font-size: 18px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: #f8f9fa; border: 1px solid #eee; }
+        .call-btn { color: var(--blue); }
+        .wa-btn { color: var(--green); }
 
         .card { background: white; padding: 20px; border-radius: 25px; margin: 15px; border: 1px solid #eee; }
         label { font-size: 10px; font-weight: 800; color: var(--blue); margin-top: 10px; display: block; text-transform: uppercase; }
-        input, select { width: 100%; padding: 14px; margin-top: 5px; border: 1.5px solid #eee; border-radius: 10px; font-size: 14px; box-sizing: border-box; }
+        input, select { width: 100%; padding: 14px; margin-top: 5px; border: 1.5px solid #eee; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-weight: 600; }
         
-        .btn-main { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; cursor: pointer; }
+        .pass-container { position: relative; display: flex; align-items: center; width: 100%; }
+        .pass-container i { position: absolute; right: 15px; color: var(--blue); cursor: pointer; }
+
+        .btn-main { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: 900; margin-top: 15px; cursor: pointer; font-size: 14px; }
         .hidden { display: none !important; }
         .footer-brand { text-align: center; font-size: 10px; color: #bbb; padding: 20px; font-weight: 800; }
     </style>
@@ -52,21 +53,25 @@
 <div id="loginGate" style="max-width: 340px; margin: 100px auto; text-align: center;">
     <h2 style="color:var(--blue); font-weight:900;">PROGRESSIVE MOTHERS</h2>
     <div class="card">
-        <input id="sysKey" type="password" placeholder="ACCESS KEY" style="text-align:center; padding: 15px; border-radius: 10px; border: 1px solid #ddd; width: 80%;">
-        <button onclick="login()" class="btn-main">LOGIN</button>
+        <label>SYSTEM ACCESS KEY</label>
+        <div class="pass-container">
+            <input id="sysKey" type="password" placeholder="••••••••" style="text-align:center;">
+            <i class="fa-solid fa-eye" id="toggleEye" onclick="togglePass()"></i>
+        </div>
+        <button onclick="login()" class="btn-main">LOG IN</button>
     </div>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="top-nav">
-        <span id="sysDateDisplay" style="font-size: 9px; color: var(--gold);">...</span>
+        <span id="sysDateDisplay">...</span>
         <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
     </div>
 
     <div class="header">
-        <span style="font-weight:900; font-size: 12px; letter-spacing: 1px;">GAYAZA-KIJABIJJO</span>
+        <span style="font-weight:900; font-size: 12px; letter-spacing: 1px; display:block; margin-bottom:5px;">GAYAZA-KIJABIJJO</span>
         <div id="clock" class="clock-box">00:00:00</div>
-        <div id="activityStatus" class="activity-banner">...</div>
+        <div id="activityStatus" class="activity-banner">INITIALIZING...</div>
     </div>
 
     <div class="dash-container">
@@ -82,22 +87,32 @@
         <div id="tFin" class="tab" onclick="showTab('fin')">FINANCE</div>
     </div>
 
+    <div id="rollPicker" class="card hidden" style="margin-bottom:0; background: var(--blue);">
+        <label style="color:white;">SELECT CLASS FOR ATTENDANCE</label>
+        <select id="selClassRoll" onchange="runGlobalSearch()">
+            <option value="">-- ALL CLASSES --</option>
+            <option>Baby</option><option>Middle</option><option>Top</option>
+            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+            <option>P.5</option><option>P.6</option><option>P.7</option>
+        </select>
+    </div>
+
     <div id="searchWrapper" class="search-container hidden">
         <input type="text" id="globalSearch" class="search-bar" oninput="runGlobalSearch()" placeholder="Search Name, LIN, or Class...">
     </div>
 
     <div id="secReg" class="card hidden">
-        <h3 id="regTitle" style="color:var(--blue); font-size:15px; margin:0;">ADMISSION PANEL</h3>
+        <h3 id="regTitle" style="color:var(--blue); font-size:15px; margin:0;">STUDENT PROFILE</h3>
         <input type="hidden" id="editId">
-        <label>LIN</label><input id="fLin" disabled style="background:#eee; font-weight:900;">
-        <label>Name</label><input id="fName">
+        <label>LIN</label><input id="fLin" disabled style="background:#f4f4f4;">
+        <label>Full Name</label><input id="fName">
         <label>Class</label>
         <select id="fClass"><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-        <label>Contact Number</label><input id="fCon">
+        <label>Parent Contact</label><input id="fCon" placeholder="e.g 0770000000">
         
         <div id="financeBox">
-            <label>Fees Required</label><input type="number" id="fExp">
-            <label>Amount Paid</label><input type="number" id="fPaid">
+            <label>Total Fees (UGX)</label><input type="number" id="fExp">
+            <label>Paid (UGX)</label><input type="number" id="fPaid">
         </div>
         
         <button onclick="saveData()" class="btn-main">SYNC RECORD</button>
@@ -113,6 +128,13 @@
 <script>
     const sb = supabase.createClient("https://kjftrwuucjdnhfwesrup.supabase.co", "sb_publishable_1PetUo8klWCLfupRq52CVg_Y_YYrzcO");
     let ROLE = "", students = [], att = {}, activeTab = "";
+
+    function togglePass() {
+        const p = document.getElementById('sysKey');
+        const e = document.getElementById('toggleEye');
+        if(p.type === "password") { p.type = "text"; e.className = "fa-solid fa-eye-slash"; }
+        else { p.type = "password"; e.className = "fa-solid fa-eye"; }
+    }
 
     function login() {
         const k = document.getElementById('sysKey').value.trim().toUpperCase();
@@ -144,18 +166,24 @@
         document.getElementById('sysDateDisplay').innerText = dStr;
 
         const day = n.getDate(); const mon = n.getMonth() + 1;
-        const t = n.getHours() * 100 + n.getMinutes();
+        const hr = n.getHours(); const min = n.getMinutes();
+        const t = hr * 100 + min;
         
-        // PUBLIC HOLIDAYS & SPECIAL UPDATES
-        let updateText = "🏫 CLASS IN SESSION";
+        let updateText = "🏫 CLASS TIME";
+        
+        // 1. Check Holiday First
         if (day === 5 && mon === 4) updateText = "🐣 HAPPY EASTER 2026";
         else if (day === 6 && mon === 4) updateText = "🐣 EASTER MONDAY";
         else if (day === 1 && mon === 5) updateText = "👷 LABOUR DAY";
-        else if (day === 3 && mon === 6) updateText = "🙏 MARTYRS DAY";
-        else if (day === 9 && mon === 10) updateText = "🇺🇬 INDEPENDENCE DAY";
         else {
-            const sch = [ {s:630, e:800, t:"🌅 ARRIVAL"}, {s:1030, e:1100, t:"☕ BREAK TIME"}, {s:1230, e:1330, t:"🍲 LUNCH TIME"}, {s:1600, e:2359, t:"🌙 SCHOOL CLOSED"} ];
-            sch.forEach(s => { if(t >= s.s && t < s.e) updateText = s.t; });
+            // 2. Check Daily Routine
+            if (t >= 630 && t < 800) updateText = "🌅 ARRIVAL & CLEANING";
+            else if (t >= 800 && t < 1030) updateText = "📚 MORNING LESSONS";
+            else if (t >= 1030 && t < 1100) updateText = "☕ BREAK TIME";
+            else if (t >= 1100 && t < 1230) updateText = "📖 LESSONS CONTINUING";
+            else if (t >= 1230 && t < 1330) updateText = "🍲 LUNCH TIME";
+            else if (t >= 1330 && t < 1430) updateText = "💤 SLEEPING / REST";
+            else if (t >= 1600) updateText = "🌙 SCHOOL CLOSED";
         }
         document.getElementById('activityStatus').innerText = updateText;
     }
@@ -168,24 +196,36 @@
         document.getElementById('secReg').classList.add('hidden');
         document.getElementById('secList').classList.add('hidden');
         document.getElementById('searchWrapper').classList.add('hidden');
+        document.getElementById('rollPicker').classList.add('hidden');
 
-        if(t === 'reg') { document.getElementById('secReg').classList.remove('hidden'); } 
-        else { document.getElementById('secList').classList.remove('hidden'); document.getElementById('searchWrapper').classList.remove('hidden'); runGlobalSearch(); }
+        if(t === 'reg') { 
+            document.getElementById('secReg').classList.remove('hidden'); 
+        } else {
+            if(t === 'roll') document.getElementById('rollPicker').classList.remove('hidden');
+            document.getElementById('secList').classList.remove('hidden');
+            document.getElementById('searchWrapper').classList.remove('hidden');
+            runGlobalSearch();
+        }
     }
 
     function runGlobalSearch() {
         const q = document.getElementById('globalSearch').value.toUpperCase();
-        const filtered = students.filter(s => s.name.toUpperCase().includes(q) || (s.lin_number || s.lin || "").toUpperCase().includes(q) || s.class.toUpperCase().includes(q));
+        const rollClass = document.getElementById('selClassRoll').value;
+        
+        const filtered = students.filter(s => {
+            const matchesSearch = s.name.toUpperCase().includes(q) || (s.lin_number || s.lin || "").toUpperCase().includes(q) || s.class.toUpperCase().includes(q);
+            const matchesClass = activeTab === 'roll' && rollClass ? s.class === rollClass : true;
+            return matchesSearch && matchesClass;
+        });
 
         let h = "";
         filtered.forEach(s => {
-            const lin = s.lin_number || s.lin || "MISSING LIN";
+            const lin = s.lin_number || s.lin || "MISSING";
             const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
             const rawPhone = s.contact ? s.contact.toString().replace(/\D/g, '') : "";
             
             let actions = "";
             if(rawPhone) {
-                // FORCE THE CALL ACTION TO USE tel: PROTOCOL
                 actions = `<div class="action-tray">
                     <a href="tel:${rawPhone}" class="action-btn call-btn"><i class="fa-solid fa-phone"></i></a>
                     <a href="https://wa.me/${rawPhone.length === 9 ? '256'+rawPhone : rawPhone}" class="action-btn wa-btn"><i class="fa-brands fa-whatsapp"></i></a>
@@ -194,14 +234,14 @@
 
             if(activeTab === 'roll') {
                 const isAbs = att[s.id] === 'absent';
-                h += `<div class="list-item"><b>${s.name}</b><small>${lin}</small>${actions}<button onclick="toggleAtt('${s.id}')" style="position:absolute; right:15px; top:15px; padding:12px; border-radius:10px; border:none; background:${isAbs ? 'var(--red)' : 'var(--green)'}; color:white; font-weight:900;">${isAbs ? 'ABS' : 'PRES'}</button></div>`;
+                h += `<div class="list-item"><b>${s.name}</b><small>${lin} | ${s.class}</small>${actions}<button onclick="toggleAtt('${s.id}')" style="position:absolute; right:15px; top:15px; padding:12px; border-radius:10px; border:none; background:${isAbs ? 'var(--red)' : 'var(--green)'}; color:white; font-weight:900;">${isAbs ? 'ABS' : 'PRES'}</button></div>`;
             } else if(activeTab === 'fin') {
-                h += `<div class="list-item" onclick="setEdit('${s.id}')"><span class="status-pill" style="background:${bal<=0?'var(--green)':'var(--red)'}; color:white;">${bal<=0?'CLEARED':'DEBT'}</span><b>${s.name}</b><small>Bal: UGX ${bal.toLocaleString()}</small>${actions}</div>`;
+                h += `<div class="list-item" onclick="setEdit('${s.id}')"><span style="position:absolute; right:15px; top:15px; font-size:9px; padding:4px 8px; border-radius:5px; background:${bal<=0?'var(--green)':'var(--red)'}; color:white; font-weight:900;">${bal<=0?'CLEARED':'DEBT'}</span><b>${s.name}</b><small>Bal: UGX ${bal.toLocaleString()}</small>${actions}</div>`;
             } else {
                 h += `<div class="list-item" onclick="setEdit('${s.id}')"><b>${s.name}</b><small>${lin} | ${s.class}</small>${actions}</div>`;
             }
         });
-        document.getElementById('secList').innerHTML = h;
+        document.getElementById('secList').innerHTML = h || "<p style='text-align:center; padding:20px; color:#999;'>No students found.</p>";
     }
 
     function toggleAtt(id) {
@@ -216,7 +256,7 @@
         const s = students.find(x => x.id == id);
         if(!s) return;
         document.getElementById('editId').value = s.id;
-        document.getElementById('fLin').value = s.lin_number || s.lin || "MISSING";
+        document.getElementById('fLin').value = s.lin_number || s.lin || "GENERATING...";
         document.getElementById('fName').value = s.name;
         document.getElementById('fClass').value = s.class;
         document.getElementById('fCon').value = s.contact || "";
@@ -226,7 +266,7 @@
         const isFin = ROLE === "FINANCE";
         ['fName','fClass','fCon'].forEach(f => document.getElementById(f).disabled = isFin);
         if(ROLE === "ADMIN") document.getElementById('delBtn').classList.remove('hidden');
-        showTab('reg'); window.scrollTo(0,0);
+        showTab('reg');
     }
 
     async function saveData() {
@@ -238,15 +278,12 @@
             fees_paid: parseInt(document.getElementById('fPaid').value) || 0
         };
 
-        const existing = students.find(x => x.id == id);
-        if(!id || (existing && !existing.lin_number && !existing.lin)) {
-            row.lin_number = `PM${name.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
-        }
+        if(!id) row.lin_number = `PM${name.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
 
         if(id) await sb.from('students').update(row).eq('id', id);
         else await sb.from('students').insert([row]);
         
-        alert("SUCCESSFULLY SYNCED!"); clearForm(); fetchData();
+        alert("Synced!"); clearForm(); fetchData();
     }
 
     function clearForm() {
@@ -255,7 +292,7 @@
     }
 
     async function deleteStudent() {
-        if(confirm("Permanently delete record?")) { await sb.from('students').delete().eq('id', document.getElementById('editId').value); fetchData(); clearForm(); }
+        if(confirm("Delete student?")) { await sb.from('students').delete().eq('id', document.getElementById('editId').value); fetchData(); clearForm(); }
     }
 </script>
 </body>
