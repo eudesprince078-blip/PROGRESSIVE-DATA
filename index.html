@@ -7,9 +7,8 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #28a745; --wa: #25D366; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 0; font-size: 16px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 0; }
         
-        /* FULL SCHOOL NAME HEADER */
         .header { background: var(--red); color: white; padding: 12px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .school-title { font-size: 11px; font-weight: 900; line-height: 1.2; text-transform: uppercase; }
 
@@ -22,22 +21,26 @@
         
         .routine-box { background: var(--gold); color: var(--blue); padding: 12px; margin: -15px 15px 10px 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-weight: 900; font-size: 18px; }
 
+        /* DASHBOARD BOXES */
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 10px 15px; }
+        .stat-card { background: white; padding: 10px; border-radius: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 4px solid var(--gold); }
+        .stat-val { font-size: 22px; font-weight: 900; color: var(--blue); display: block; }
+        .stat-lbl { font-size: 10px; font-weight: bold; color: #666; text-transform: uppercase; }
+
         .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 62px; z-index: 900; }
         .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 11px; color: #666; cursor: pointer; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f8f9fa; }
 
-        .item-card { background: white; border-radius: 12px; padding: 15px; margin: 10px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); }
-        
-        /* LIN NUMBERS - BOLD AND VISIBLE */
-        .lin-display { font-weight: 900; color: #fff; background: var(--blue); padding: 4px 10px; border-radius: 4px; font-size: 13px; display: inline-block; margin-bottom: 8px; }
+        .item-card { background: white; border-radius: 12px; padding: 15px; margin: 10px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); position: relative; }
+        .lin-tag { font-weight: 900; color: var(--blue); background: #eef2f7; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 8px; display: inline-block; }
         
         .action-btn { padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; color: white; display: inline-flex; align-items: center; margin-right: 8px; }
         .call-btn { background: var(--blue); }
         .wa-btn { background: var(--wa); }
         
-        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; min-width: 115px; color: white; cursor: pointer; text-transform: uppercase; }
-        .btn-p { background: var(--green); }
-        .btn-a { background: var(--red); }
+        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; min-width: 115px; color: white; cursor: pointer; }
+        .present { background: var(--green); }
+        .absent { background: var(--red); }
         
         .alert-card { background: #fff0f0; border: 2px solid var(--red); color: var(--red); padding: 15px; margin: 10px 15px; border-radius: 12px; }
 
@@ -63,7 +66,13 @@
     </div>
 
     <div class="hero"><div id="clock">00:00:00</div></div>
-    <div class="routine-box" id="r-task">LOADING ROUTINE...</div>
+    <div class="routine-box" id="r-task">LOADING...</div>
+
+    <div class="dashboard">
+        <div class="stat-card"><span class="stat-val" id="count-total">0</span><span class="stat-lbl">Students</span></div>
+        <div class="stat-card"><span class="stat-val" id="count-clear">0</span><span class="stat-lbl">Cleared</span></div>
+        <div class="stat-card"><span class="stat-val" id="count-absent">0</span><span class="stat-lbl" style="color:var(--red);">Absent</span></div>
+    </div>
 
     <div id="chronicSection" class="hidden">
         <div class="alert-card">
@@ -79,7 +88,7 @@
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Name, Class or LIN..." oninput="load()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Name, Class or LIN..." oninput="loadData()"></div>
         <div id="dataList"></div>
     </div>
 
@@ -102,7 +111,7 @@
     </div>
 
     <div id="v-roll" class="hidden" style="padding:15px;">
-        <select id="rollClass" onchange="load()"><option value="">-- Choose Class --</option>
+        <select id="rollClass" onchange="loadData()"><option value="">-- Select Class --</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
         <div id="rollData" style="margin-top:15px;"></div>
@@ -118,9 +127,8 @@
 
     function togglePass() {
         const p = document.getElementById('key');
-        const s = document.querySelector('.toggle-btn');
         p.type = p.type === 'password' ? 'text' : 'password';
-        s.innerText = p.type === 'password' ? 'SHOW' : 'HIDE';
+        document.querySelector('.toggle-btn').innerText = p.type === 'password' ? 'SHOW' : 'HIDE';
     }
 
     function secureLogin() {
@@ -128,7 +136,7 @@
         if (k === "JESUS CARES") role = "Admin";
         else if (k === "FINANCE 256") role = "Finance";
         else if (k === "TEACH2026") role = "Teacher";
-        else { alert("Access Denied"); return; }
+        else { alert("Wrong Key!"); return; }
 
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
@@ -144,7 +152,7 @@
             document.getElementById('chronicSection').classList.remove('hidden');
             tab('rec');
         }
-        load();
+        loadData();
     }
 
     function tab(t) {
@@ -154,40 +162,41 @@
         document.getElementById('tab-'+t).classList.add('active');
     }
 
-    async function load() {
-        const q = document.getElementById('searchBar').value.toLowerCase();
-        let { data } = await _client.from('students').select('*').order('name');
-        if(!data) return;
+    async function loadData() {
+        let { data, error } = await _client.from('students').select('*').order('name');
+        if(error) { console.error(error); return; }
 
-        // Chronic list (Admin Only)
+        // Update Dashboard Stats
+        document.getElementById('count-total').innerText = data.length;
+        document.getElementById('count-clear').innerText = data.filter(s => s.fees_paid >= s.fees_expected && s.fees_expected > 0).length;
+        document.getElementById('count-absent').innerText = data.filter(s => s.is_absent).length;
+
+        // Chronic Alarm
         if(role === "Admin") {
-            const chronicData = data.filter(s => s.absent_days >= 2);
-            document.getElementById('chronicList').innerHTML = chronicData.map(s => `
-                <div style="border-bottom:1px solid #ffcccc; padding:8px 0;">
-                    <b>${s.name}</b> (${s.class}) - <span style="font-weight:bold;">${s.absent_days} Days Absent</span>
+            const chronic = data.filter(s => s.absent_days >= 2);
+            document.getElementById('chronicList').innerHTML = chronic.map(s => `
+                <div style="border-bottom:1px solid #ffcccc; padding:8px 0; font-weight:bold;">
+                    ${s.name} (${s.class}) - ${s.absent_days} Days Absent
                 </div>
             `).join('');
         }
 
-        // Search Name, Class, or LIN
-        if(q) data = data.filter(s => 
-            s.name.toLowerCase().includes(q) || 
-            s.class.toLowerCase().includes(q) || 
-            (s.official_lin && s.official_lin.toLowerCase().includes(q))
-        );
+        // Search Filter
+        const q = document.getElementById('searchBar').value.toLowerCase();
+        let filtered = q ? data.filter(s => s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q) || (s.official_lin && s.official_lin.toLowerCase().includes(q))) : data;
 
-        // RECORDS VIEW
+        // Render Records
         const list = document.getElementById('dataList');
         list.innerHTML = "";
-        data.forEach(s => {
-            const num = s.parent_contact ? s.parent_contact.replace(/\s+/g, '') : '';
-            const wa = num.startsWith('0') ? '256' + num.substring(1) : num;
+        filtered.forEach(s => {
+            const ph = s.parent_contact || "";
+            const wa = ph.startsWith('0') ? '256' + ph.substring(1) : ph;
             list.innerHTML += `<div class="item-card">
-                <div><span class="lin-display">LIN: ${s.official_lin || 'PENDING'}</span></div>
+                <span class="lin-tag">LIN: ${s.official_lin || 'NO LIN'}</span><br>
                 <b style="font-size:18px;">${s.name}</b><br><small>${s.class}</small>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+                <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
                     <div>
-                        <a href="tel:${num}" class="action-btn call-btn">CALL</a>
+                        <a href="tel:${ph}" class="action-btn call-btn">CALL</a>
                         <a href="https://wa.me/${wa}" class="action-btn wa-btn">WHATSAPP</a>
                     </div>
                     ${role !== "Teacher" ? `<button onclick="editMode('${s.id}')" style="background:#eee; border:none; padding:8px 12px; border-radius:5px; font-weight:bold;">EDIT</button>` : ''}
@@ -195,18 +204,15 @@
             </div>`;
         });
 
-        // ROLL CALL VIEW
+        // Render Roll Call
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData');
         rollList.innerHTML = "";
         data.filter(s => s.class === rCls).forEach(s => {
             rollList.innerHTML += `<div class="item-card" style="border-left-color:${s.is_absent?'red':'green'}">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <span style="font-weight:900; font-size:12px;">${s.official_lin || ''}</span><br>
-                        <b>${s.name}</b>
-                    </div>
-                    <button class="btn-roll ${s.is_absent?'btn-a':'btn-p'}" onclick="markAttendance('${s.id}', ${!s.is_absent}, this)">
+                    <div><b>${s.name}</b><br><small class="lin-tag">LIN: ${s.official_lin || ''}</small></div>
+                    <button class="btn-roll ${s.is_absent?'absent':'present'}" onclick="markAtt('${s.id}', ${!s.is_absent}, this)">
                         ${s.is_absent ? 'ABSENT' : 'PRESENT'}
                     </button>
                 </div>
@@ -214,25 +220,14 @@
         });
     }
 
-    async function markAttendance(id, status, btn) {
-        const originalText = btn.innerText;
+    async function markAtt(id, status, btn) {
         btn.innerText = "...";
-        btn.disabled = true;
-        
-        // Fetch current days to calculate count
         const { data: cur } = await _client.from('students').select('absent_days').eq('id', id).single();
-        let currentDays = parseInt(cur.absent_days || 0);
-        let newCount = status ? (currentDays + 1) : Math.max(0, currentDays - 1);
+        let newCount = status ? ((cur.absent_days || 0) + 1) : Math.max(0, (cur.absent_days || 0) - 1);
         
         const { error } = await _client.from('students').update({ is_absent: status, absent_days: newCount }).eq('id', id);
-        
-        if(error) {
-            alert("Network Error: Save Failed. Tap again.");
-            btn.innerText = originalText;
-            btn.disabled = false;
-        } else {
-            load();
-        }
+        if(error) { alert("Network Error! Try again."); btn.innerText = status ? "PRESENT" : "ABSENT"; }
+        else { loadData(); }
     }
 
     async function submitData() {
@@ -247,7 +242,7 @@
         };
         if(id) await _client.from('students').update(payload).eq('id', id);
         else await _client.from('students').insert([payload]);
-        alert("Saved Successfully!"); load();
+        alert("Saved!"); loadData();
     }
 
     async function editMode(id) {
@@ -266,14 +261,9 @@
         const now = new Date();
         const time = now.getHours() * 100 + now.getMinutes();
         let t = "School Resting";
-        if (time >= 700 && time < 800) t = "Arrival & Cleaning";
-        else if (time >= 800 && time < 830) t = "Morning Assembly";
-        else if (time >= 830 && time < 1030) t = "Morning Lessons";
+        if (time >= 830 && time < 1030) t = "Morning Lessons";
         else if (time >= 1030 && time < 1100) t = "Porridge Break";
-        else if (time >= 1100 && time < 1300) t = "Mid-Day Lessons";
         else if (time >= 1300 && time < 1400) t = "Lunch Break";
-        else if (time >= 1400 && time < 1600) t = "Afternoon Lessons";
-        else if (time >= 1600 && time < 1700) t = "Games & Departure";
         document.getElementById('r-task').innerText = t;
         document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
     }
