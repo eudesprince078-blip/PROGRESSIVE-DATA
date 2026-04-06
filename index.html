@@ -32,10 +32,10 @@
 
         .item-card { background: white; border-radius: 12px; padding: 15px; margin: 10px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); }
         
-        /* BOLD LIN AND CONTACT STYLING */
-        .lin-tag { font-weight: 900 !important; color: white; background: var(--blue); padding: 4px 10px; border-radius: 4px; font-size: 13px; display: inline-block; margin-bottom: 8px; }
-        .contact-row { display: flex; gap: 8px; margin-top: 12px; }
-        .contact-btn { flex: 1; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-weight: 900; font-size: 12px; text-transform: uppercase; }
+        /* LIN AND CONTACTS: STYLED TO BE UNMISSABLE */
+        .lin-tag { font-weight: 900 !important; color: white; background: var(--blue); padding: 4px 12px; border-radius: 4px; font-size: 14px; display: inline-block; margin-bottom: 10px; border: 1px solid var(--gold); }
+        .contact-row { display: flex; gap: 10px; margin-top: 15px; }
+        .contact-btn { flex: 1; padding: 14px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-weight: 900; font-size: 12px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .c-call { background: var(--blue); }
         .c-wa { background: var(--wa); }
 
@@ -97,12 +97,12 @@
         <div style="background:white; padding:20px; border-radius:15px; border:1px solid #ddd;">
             <input type="hidden" id="editId">
             <input id="name" placeholder="Full Name">
-            <input id="o_lin" placeholder="LIN NUMBER (BOLD)">
+            <input id="o_lin" placeholder="LIN NUMBER">
             <select id="cls">
                 <option>P.1</option><option>P.2</option><option>P.3</option>
                 <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <input id="parent_ph" type="tel" placeholder="Parent Contact Number">
+            <input id="parent_ph" type="tel" placeholder="Parent Contact">
             <div id="finSection">
                 <input id="f_exp" type="number" placeholder="Total Fees Expected">
                 <input id="f_paid" type="number" placeholder="Total Fees Paid">
@@ -142,7 +142,6 @@
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         
-        // LIMITATIONS
         if(role === "Teacher") { 
             document.getElementById('tab-rec').classList.add('hidden'); 
             document.getElementById('finSection').classList.add('hidden');
@@ -170,45 +169,43 @@
         let { data, error } = await _client.from('students').select('*').order('name');
         if(error) return;
 
-        // Dashboard
         document.getElementById('c-tot').innerText = data.length;
         document.getElementById('c-clr').innerText = data.filter(s => s.fees_paid >= s.fees_expected && s.fees_expected > 0).length;
         document.getElementById('c-abs').innerText = data.filter(s => s.is_absent).length;
 
-        // Alarm Section
         if(role === "Admin") {
             const chr = data.filter(s => s.absent_days >= 2);
-            document.getElementById('chronicList').innerHTML = chr.map(s => `<div style="padding:5px 0; border-bottom:1px solid #ffcccc;"><b>${s.name}</b> (${s.class}) - ${s.absent_days} Days</div>`).join('');
+            document.getElementById('chronicList').innerHTML = chr.map(s => `<div style="padding:8px 0; border-bottom:1px solid #ffcccc; font-weight:bold;">${s.name} (${s.class}) - ${s.absent_days} Days Absent</div>`).join('');
         }
 
         const q = document.getElementById('searchBar').value.toLowerCase();
         let filtered = q ? data.filter(s => s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q) || (s.official_lin && s.official_lin.toLowerCase().includes(q))) : data;
 
-        // RECORDS LIST (LIN & CONTACTS)
+        // FIXED: Rendering with forced LIN and Contacts
         const list = document.getElementById('dataList');
         list.innerHTML = "";
         filtered.forEach(s => {
             const ph = s.parent_contact || "";
             const wa = ph.startsWith('0') ? '256' + ph.substring(1) : ph;
             list.innerHTML += `<div class="item-card">
-                <span class="lin-tag">LIN: ${s.official_lin || 'REQUIRED'}</span><br>
-                <b style="font-size:18px;">${s.name}</b><br><small>${s.class}</small>
+                <span class="lin-tag">LIN: ${s.official_lin || '---'}</span><br>
+                <b style="font-size:19px; color:var(--blue);">${s.name}</b><br>
+                <small style="font-weight:bold; color:#666;">Class: ${s.class}</small>
                 <div class="contact-row">
                     <a href="tel:${ph}" class="contact-btn c-call">📞 CALL</a>
                     <a href="https://wa.me/${wa}" class="contact-btn c-wa">💬 WHATSAPP</a>
                 </div>
-                ${role === "Admin" ? `<button onclick="editMode('${s.id}')" style="margin-top:10px; width:100%; background:#eee; border:none; padding:8px; border-radius:5px; font-weight:bold;">EDIT DATA</button>` : ''}
+                ${role === "Admin" ? `<button onclick="editMode('${s.id}')" style="margin-top:12px; width:100%; background:#f0f0f0; border:1px solid #ccc; padding:10px; border-radius:6px; font-weight:bold;">EDIT STUDENT</button>` : ''}
             </div>`;
         });
 
-        // ROLL CALL LIST
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData');
         rollList.innerHTML = "";
         data.filter(s => s.class === rCls).forEach(s => {
             rollList.innerHTML += `<div class="item-card" style="border-left-color:${s.is_absent?'red':'green'}">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div><b>${s.name}</b><br><span style="font-weight:900; font-size:11px;">LIN: ${s.official_lin || ''}</span></div>
+                    <div><b>${s.name}</b><br><span style="font-weight:900; font-size:11px; color:var(--blue);">LIN: ${s.official_lin || ''}</span></div>
                     <button class="btn-roll ${s.is_absent?'absent':'present'}" onclick="markAtt('${s.id}', ${!s.is_absent}, this)">
                         ${s.is_absent ? 'ABSENT' : 'PRESENT'}
                     </button>
@@ -221,9 +218,8 @@
         btn.innerText = "SAVING...";
         const { data: cur } = await _client.from('students').select('absent_days').eq('id', id).single();
         let newCount = status ? ((cur.absent_days || 0) + 1) : Math.max(0, (cur.absent_days || 0) - 1);
-        
         const { error } = await _client.from('students').update({ is_absent: status, absent_days: newCount }).eq('id', id);
-        if(error) { alert("Failed. Check Internet."); btn.innerText = status ? "PRESENT" : "ABSENT"; }
+        if(error) { alert("Error!"); btn.innerText = status ? "PRESENT" : "ABSENT"; }
         else { loadData(); }
     }
 
@@ -238,7 +234,7 @@
             fees_expected: parseFloat(document.getElementById('f_exp').value) || 0
         };
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(error) alert("Error Saving!"); else { alert("Success!"); loadData(); }
+        if(error) alert("Error!"); else { alert("Saved!"); loadData(); }
     }
 
     async function editMode(id) {
@@ -257,14 +253,9 @@
         const now = new Date();
         const time = now.getHours() * 100 + now.getMinutes();
         let t = "School Resting";
-        if (time >= 700 && time < 800) t = "Arrival & Cleaning";
-        else if (time >= 800 && time < 830) t = "Morning Assembly";
-        else if (time >= 830 && time < 1030) t = "Morning Lessons";
+        if (time >= 830 && time < 1030) t = "Morning Lessons";
         else if (time >= 1030 && time < 1100) t = "Porridge Break";
-        else if (time >= 1100 && time < 1300) t = "Mid-Day Lessons";
         else if (time >= 1300 && time < 1400) t = "Lunch Break";
-        else if (time >= 1400 && time < 1600) t = "Afternoon Lessons";
-        else if (time >= 1600 && time < 1700) t = "Games & Departure";
         document.getElementById('r-task').innerText = t;
         document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
     }
