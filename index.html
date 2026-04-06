@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive PMS V19.3</title>
+    <title>Progressive PMS V19.4</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -19,23 +19,20 @@
         #fullDate { font-size: 16px; font-weight: bold; color: var(--gold); margin-bottom: 5px; text-transform: uppercase; }
         #clock { font-size: 38px; font-weight: 900; margin: 5px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
         
-        .holiday-banner { background: #fff3cd; color: #856404; padding: 12px; font-weight: bold; text-align: center; font-size: 14px; border-bottom: 2px solid var(--gold); }
-
         .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 15px; margin-top: -35px; }
         .s-card { background: white; border-radius: 12px; padding: 15px 5px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-bottom: 5px solid var(--gold); }
         .s-val { font-size: 22px; font-weight: bold; color: var(--blue); }
         .s-lbl { font-size: 10px; font-weight: 900; color: #888; text-transform: uppercase; }
 
         .nav-tabs { display: flex; justify-content: space-around; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 75px; z-index: 900; }
-        .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 12px; color: #666; transition: 0.2s; }
+        .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 12px; color: #666; transition: 0.2s; cursor: pointer; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f8f9fa; }
 
         .item-card { background: white; border-radius: 10px; padding: 15px; margin: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 6px solid var(--blue); }
         
-        /* LIN & CONTACT STYLING */
-        .lin-badge { background: var(--blue); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 900; border: 1px solid var(--gold); }
+        .lin-badge { background: var(--blue); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 900; border: 1px solid var(--gold); display: inline-block; }
         .contact-box { display: flex; gap: 5px; margin-top: 12px; }
-        .c-btn { flex: 1; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-weight: 900; font-size: 11px; text-transform: uppercase; }
+        .c-btn { flex: 1; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-weight: 900; font-size: 11px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
         .btn-roll { padding: 12px; border-radius: 8px; border: none; font-weight: 900; font-size: 14px; min-width: 110px; }
         .btn-save { background: var(--blue); color: white; padding: 18px; width: 100%; border: none; border-radius: 10px; font-weight: 900; font-size: 18px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
@@ -45,7 +42,7 @@
         
         .balance-tag { background: #f8f9fa; padding: 15px; border-radius: 8px; font-weight: 900; color: var(--red); margin-top: 15px; text-align: center; border: 2px dashed var(--red); font-size: 18px; }
         .hidden { display: none !important; }
-        .chronic-item { background: #fff5f5; border: 1px solid #feb2b2; padding: 10px; border-radius: 8px; margin-bottom: 8px; }
+        .holiday-banner { background: #fff3cd; color: #856404; padding: 12px; font-weight: bold; text-align: center; font-size: 14px; border-bottom: 2px solid var(--gold); }
     </style>
 </head>
 <body>
@@ -71,16 +68,6 @@
         <div id="routineLabel" style="font-weight:900; background:var(--gold); color:var(--blue); padding:6px 18px; border-radius:25px; font-size:11px; display:inline-block; text-transform: uppercase;">ROUTINE</div>
     </div>
 
-    <div id="adminAlerts" class="hidden" style="padding: 10px;">
-        <div id="rollCallWarning" class="holiday-banner" style="background:#fff5f5; color:#c53030; margin-bottom:12px; border-radius:10px; border:1px solid #feb2b2;">
-            ⚠️ MISSING ROLL CALL: <span id="pendingClasses"></span>
-        </div>
-        <div class="item-card" style="border-left-color: var(--red);">
-            <b style="color:var(--red); font-size: 14px;">ABSENCE FOLLOW-UP (2+ DAYS)</b>
-            <div id="chronicList" style="font-size:13px; margin-top:10px;"></div>
-        </div>
-    </div>
-
     <div class="stats">
         <div class="s-card"><span class="s-val" id="tCnt">0</span><br><span class="s-lbl">Students</span></div>
         <div class="s-card"><span class="s-val" id="pCnt" style="color:var(--green)">0</span><br><span class="s-lbl">Cleared</span></div>
@@ -94,54 +81,46 @@
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Name, Class or LIN..." oninput="load()" style="border-radius: 25px;"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Name, LIN, or Contact..." oninput="load()" style="border-radius: 25px;"></div>
         <div id="dataList"></div>
     </div>
 
     <div id="v-adm" class="hidden" style="padding:15px;">
-        <div style="background:white; padding:20px; border-radius:15px; border:1px solid #ddd; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="background:white; padding:20px; border-radius:15px; border:1px solid #ddd;">
             <h3 id="formH" style="margin-top:0; color:var(--blue); border-bottom: 2px solid var(--gold); padding-bottom: 5px;">Student File</h3>
             <input type="hidden" id="editId">
             
-            <label>Full Student Name</label><input id="name" placeholder="Enter Full Name">
-            <label>Official School LIN</label><input id="o_lin" placeholder="LIN Number">
-            <label>Assigned Class</label>
+            <label>Full Name</label><input id="name" placeholder="Name">
+            <label>LIN Number</label><input id="lin" placeholder="LIN">
+            <label>Class</label>
             <select id="cls">
                 <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <label>Physical Home Location</label><input id="loc" placeholder="Village/Zone">
-            <label>Parent/Guardian Phone</label><input id="parent_ph" type="tel" placeholder="07...">
+            <label>Location</label><input id="loc" placeholder="Location">
+            <label>Contact Number</label><input id="contact" type="tel" placeholder="07...">
             
             <div id="finSection">
-                <div style="background: #f0f7ff; padding: 15px; border-radius: 10px; margin-top: 15px;">
-                    <label>Fees Expected (UGX)</label><input id="f_exp" type="number" oninput="calcBalance()" placeholder="Amount required">
-                    <label>Fees Paid (UGX)</label><input id="f_paid" type="number" oninput="calcBalance()" placeholder="Amount received">
-                    <div class="balance-tag">BALANCE: <span id="balDisplay">0</span> UGX</div>
-                </div>
+                <label>Fees Expected</label><input id="f_exp" type="number" oninput="calcBalance()">
+                <label>Fees Paid</label><input id="f_paid" type="number" oninput="calcBalance()">
+                <div class="balance-tag">BALANCE: <span id="balDisplay">0</span> UGX</div>
             </div>
-            <button class="btn-save" onclick="submitData()">SAVE TO CLOUD</button>
+            <button class="btn-save" onclick="submitData()">SAVE RECORD</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden" style="padding:15px;">
-        <div style="background:var(--blue); color:white; padding:15px; border-radius:10px; margin-bottom:15px;">
-            <label style="color:white; margin:0;">SELECT CLASS FOR ROLL CALL</label>
-            <select id="rollClass" onchange="load()" style="border:none; margin-top:10px;">
-                <option value="">-- Choose Class --</option>
-                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                <option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-        </div>
-        <div id="rollData"></div>
+        <select id="rollClass" onchange="load()"><option value="">-- Choose Class --</option>
+            <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+            <option>P.5</option><option>P.6</option><option>P.7</option>
+        </select>
+        <div id="rollData" style="margin-top:15px;"></div>
     </div>
 
-    <div style="text-align:center; padding:40px; font-size:12px; color:#aaa; line-height:1.6;">
-        <b>PROGRESSIVE PMS V19.3</b><br>
-        SECURED BY EUDES MEDIA<br>
-        +256 762 992 440
+    <div style="text-align:center; padding:40px; font-size:12px; color:#aaa;">
+        <b>PROGRESSIVE PMS V19.4</b><br>SECURED BY EUDES MEDIA
     </div>
 </div>
 
@@ -158,25 +137,10 @@
         else if (k === "FINANCE 256") activeRole = "Finance";
         else if (k === "TEACH2026") activeRole = "Teacher";
         else { alert("INVALID ACCESS KEY"); return; }
-
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-        setupUI();
+        if(activeRole === "Teacher") { tab('adm'); } else { tab('rec'); }
         load();
-    }
-
-    function setupUI() {
-        if(activeRole === "Teacher") {
-            document.getElementById('tab-rec').classList.add('hidden');
-            document.getElementById('finSection').classList.add('hidden');
-            tab('adm');
-        } else if(activeRole === "Finance") {
-            document.getElementById('tab-roll').classList.add('hidden');
-            tab('rec');
-        } else {
-            document.getElementById('adminAlerts').classList.remove('hidden');
-            tab('rec');
-        }
     }
 
     function tab(t) {
@@ -184,7 +148,6 @@
         document.getElementById('v-'+t).classList.remove('hidden');
         document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
         document.getElementById('tab-'+t).classList.add('active');
-        window.scrollTo(0,0);
     }
 
     function calcBalance() {
@@ -193,85 +156,17 @@
         document.getElementById('balDisplay').innerText = (exp - paid).toLocaleString();
     }
 
-    async function submitData() {
-        const id = document.getElementById('editId').value;
-        const n = document.getElementById('name').value.trim();
-        if(!n) { alert("Please provide the Student Name"); return; }
-
-        const payload = {
-            name: n, 
-            official_lin: document.getElementById('o_lin').value,
-            class: document.getElementById('cls').value, 
-            location: document.getElementById('loc').value,
-            parent_contact: document.getElementById('parent_ph').value
-        };
-        
-        if(!id) {
-            const firstChar = n.charAt(0).toUpperCase();
-            const random = Math.floor(1000 + Math.random() * 9000);
-            payload.lin = `PM${firstChar}${random}`;
-        }
-        
-        if(activeRole !== "Teacher") {
-            payload.fees_paid = parseFloat(document.getElementById('f_paid').value) || 0;
-            payload.fees_expected = parseFloat(document.getElementById('f_exp').value) || 0;
-        }
-
-        let result;
-        if(id) { 
-            if(activeRole === "Finance") {
-                result = await _client.from('students').update({
-                    fees_paid: payload.fees_paid, 
-                    fees_expected: payload.fees_expected
-                }).eq('id', id);
-            } else {
-                result = await _client.from('students').update(payload).eq('id', id);
-            }
-        } else { 
-            result = await _client.from('students').insert([payload]); 
-        }
-        
-        if(result.error) alert("Error: " + result.error.message);
-        else {
-            alert("Record Updated Successfully!");
-            resetForm(); 
-            load();
-            (activeRole === "Teacher") ? tab('adm') : tab('rec');
-        }
-    }
-
     async function load() {
         const query = document.getElementById('searchBar').value.toLowerCase();
         let { data, error } = await _client.from('students').select('*').order('name');
         if(error) return;
         
-        if(activeRole === "Admin") {
-            const today = new Date().toDateString();
-            const marked = [...new Set(data.filter(s => s.last_roll_call === today).map(s => s.class))];
-            const allCls = ['Baby Class','Middle Class','Top Class','P.1','P.2','P.3','P.4','P.5','P.6','P.7'];
-            const missing = allCls.filter(c => !marked.includes(c));
-            
-            if(new Date().getHours() >= 9) {
-                const warn = document.getElementById('rollCallWarning');
-                if(missing.length > 0) {
-                    warn.classList.remove('hidden');
-                    document.getElementById('pendingClasses').innerText = missing.join(", ");
-                } else {
-                    warn.classList.add('hidden');
-                }
-            }
-
-            const chronic = data.filter(s => s.absent_days >= 2);
-            document.getElementById('chronicList').innerHTML = chronic.map(s => 
-                `<div class="chronic-item">
-                    <b>${s.name}</b> <span style="font-size:10px; background:white; padding:2px 5px; border-radius:4px;">${s.class}</span><br>
-                    <a href="tel:${s.parent_contact}" style="color:var(--red); font-weight:bold; text-decoration:none;">📞 Call Parent: ${s.parent_contact || 'None'}</a>
-                </div>`
-            ).join("");
-        }
-
         if(query) {
-            data = data.filter(s => s.name.toLowerCase().includes(query) || s.class.toLowerCase().includes(query) || (s.official_lin && s.official_lin.toLowerCase().includes(query)));
+            data = data.filter(s => 
+                s.name.toLowerCase().includes(query) || 
+                (s.lin && s.lin.toLowerCase().includes(query)) || 
+                (s.contact && s.contact.includes(query))
+            );
         }
 
         document.getElementById('tCnt').innerText = data.length;
@@ -283,21 +178,19 @@
         list.innerHTML = ""; rollList.innerHTML = "";
 
         data.forEach(s => {
-            const ph = s.parent_contact || "";
+            const ph = s.contact || "";
             const wa = ph.startsWith('0') ? '256' + ph.substring(1) : ph;
             list.innerHTML += `<div class="item-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <span class="lin-badge">LIN: ${s.official_lin || 'REQUIRED'}</span>
+                    <span class="lin-badge">LIN: ${s.lin || 'N/A'}</span>
                     <span style="font-size:11px; font-weight:bold; color:#888;">${s.class}</span>
                 </div>
                 <div style="font-size:19px; font-weight:900; color:var(--blue);">${s.name}</div>
-                <div style="font-size:12px; color:#666; margin-top:4px;">📍 ${s.location || 'Unknown'}</div>
-                
+                <div style="font-size:12px; color:#666;">📍 ${s.location || 'Unknown'}</div>
                 <div class="contact-box">
-                    <a href="tel:${ph}" class="c-btn" style="background:var(--blue)">📞 CALL</a>
+                    <a href="tel:${ph}" class="c-btn" style="background:var(--blue)">📞 CALL: ${ph}</a>
                     <a href="https://wa.me/${wa}" class="c-btn" style="background:var(--wa)">💬 WHATSAPP</a>
                 </div>
-                
                 <div style="text-align:right; margin-top:15px;"><button onclick="editMode('${s.id}')" style="background:white; color:var(--blue); border:2px solid var(--blue); padding:10px 15px; border-radius:8px; font-weight:900; font-size:11px;">EDIT PROFILE</button></div>
             </div>`;
         });
@@ -307,9 +200,9 @@
             data.filter(s => s.class === rCls).forEach(s => {
                 rollList.innerHTML += `<div class="item-card" style="border-left-color:${s.is_absent?'var(--red)':'var(--green)'};">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="display:flex; flex-direction:column;">
-                            <span style="font-weight:900; font-size:17px; color:var(--blue);">${s.name}</span>
-                            <small style="font-weight:bold; font-size:10px; color:#888;">LIN: ${s.official_lin || '---'}</small>
+                        <div>
+                            <span style="font-weight:900; font-size:17px; color:var(--blue);">${s.name}</span><br>
+                            <small style="font-weight:bold; color:#888;">LIN: ${s.lin || '---'}</small>
                         </div>
                         <button id="btn-${s.id}" class="btn-roll" onclick="markAbs('${s.id}', ${!s.is_absent})" style="background:${s.is_absent?'var(--red)':'var(--green)'}; color:white;">
                             ${s.is_absent ? 'ABSENT' : 'PRESENT'}
@@ -324,76 +217,47 @@
         const btn = document.getElementById('btn-'+id);
         const oldText = btn.innerText;
         btn.innerText = "WAIT...";
-        
         const { data: s } = await _client.from('students').select('absent_days').eq('id', id).single();
         let newCount = status ? (parseInt(s.absent_days || 0) + 1) : 0;
-        const { error } = await _client.from('students').update({ 
-            is_absent: status, 
-            absent_days: newCount, 
-            last_roll_call: new Date().toDateString() 
-        }).eq('id', id);
-        
-        if(!error) load();
-        else { 
-            alert("Roll call failed: Check Internet.");
-            btn.innerText = oldText;
-        }
+        const { error } = await _client.from('students').update({ is_absent: status, absent_days: newCount, last_roll_call: new Date().toDateString() }).eq('id', id);
+        if(!error) load(); else { alert("Sync error!"); btn.innerText = oldText; }
+    }
+
+    async function submitData() {
+        const id = document.getElementById('editId').value;
+        const payload = {
+            name: document.getElementById('name').value.trim(),
+            lin: document.getElementById('lin').value,
+            class: document.getElementById('cls').value,
+            location: document.getElementById('loc').value,
+            contact: document.getElementById('contact').value,
+            fees_paid: parseFloat(document.getElementById('f_paid').value) || 0,
+            fees_expected: parseFloat(document.getElementById('f_exp').value) || 0
+        };
+        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
+        if(error) alert("Error!"); else { alert("Saved!"); resetForm(); load(); }
     }
 
     async function editMode(id) {
         const { data } = await _client.from('students').select('*').eq('id', id).single();
         document.getElementById('editId').value = data.id;
         document.getElementById('name').value = data.name;
-        document.getElementById('o_lin').value = data.official_lin || "";
+        document.getElementById('lin').value = data.lin || "";
         document.getElementById('cls').value = data.class;
         document.getElementById('loc').value = data.location || "";
-        document.getElementById('parent_ph').value = data.parent_contact || "";
+        document.getElementById('contact').value = data.contact || "";
         document.getElementById('f_paid').value = data.fees_paid || 0;
         document.getElementById('f_exp').value = data.fees_expected || 0;
         calcBalance();
-
-        const lock = (activeRole === "Finance");
-        ['name','o_lin','cls','loc','parent_ph'].forEach(f => document.getElementById(f).disabled = lock);
         tab('adm');
     }
 
-    function resetForm() { 
-        document.getElementById('editId').value = ""; 
-        document.querySelectorAll('input').forEach(i => { i.value = ""; i.disabled = false; }); 
-        document.getElementById('balDisplay').innerText = "0";
-        document.getElementById('formH').innerText = "New Student Registration";
-    }
-
-    const holidays = {
-        "1/1": "New Year's Day", "26/1": "NRM Liberation Day", "16/2": "Janani Luwum Day",
-        "8/3": "Women's Day", "3/4": "Good Friday", "6/4": "Easter Monday",
-        "1/5": "Labour Day", "3/6": "Martyrs' Day", "9/6": "Heroes' Day", "9/10": "Independence Day"
-    };
+    function resetForm() { document.getElementById('editId').value = ""; document.querySelectorAll('input').forEach(i => i.value = ""); }
 
     setInterval(() => {
         const d = new Date();
         document.getElementById('clock').innerText = d.toLocaleTimeString('en-GB');
         document.getElementById('fullDate').innerText = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        
-        const hKey = `${d.getDate()}/${d.getMonth() + 1}`;
-        if(holidays[hKey]) {
-            const hDiv = document.getElementById('holidayDisplay');
-            hDiv.innerText = "⭐ TODAY IS " + holidays[hKey].toUpperCase() + " (HOLIDAY)";
-            hDiv.classList.remove('hidden');
-        }
-
-        const hr = d.getHours();
-        const min = d.getMinutes();
-        const time = hr * 60 + min;
-        let m = "RESTING";
-        if (time >= 300 && time < 630) m = "MORNING LESSONS";
-        else if (time >= 630 && time < 660) m = "BREAK & BREAKFAST";
-        else if (time >= 660 && time < 780) m = "MID-DAY LESSONS";
-        else if (time >= 780 && time < 840) m = "LUNCH TIME";
-        else if (time >= 840 && time < 960) m = "NOON LESSONS";
-        else if (time >= 960 && time < 1140) m = "HOME / PREP";
-        else if (time >= 1140 && time < 1260) m = "EVENING PREPS";
-        document.getElementById('routineLabel').innerText = "ROUTINE: " + m;
     }, 1000);
 </script>
 </body>
