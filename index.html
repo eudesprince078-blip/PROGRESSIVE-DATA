@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v29</title>
+    <title>Progressive Mothers PMS v30</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -41,7 +41,7 @@
 <div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
     <h1 style="color:white; font-weight:900; margin-bottom: 20px;">PMS LOGIN</h1>
     <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; max-width:280px; border:3px solid var(--gold);">
-    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900;">SECURE LOGIN</button>
+    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900;">LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
@@ -58,48 +58,47 @@
 
     <div class="dashboard">
         <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Total Students</span></div>
-        <div class="stat-card" style="border-bottom-color: var(--green);"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present</span></div>
-        <div class="stat-card" style="border-bottom-color: var(--red);"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent</span></div>
+        <div class="stat-card" style="border-bottom-color: var(--green);"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present Today</span></div>
+        <div class="stat-card" style="border-bottom-color: var(--red);"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent Today</span></div>
     </div>
 
     <div class="nav-tabs">
         <div class="tab" id="tab-rec" onclick="tab('rec')">Records</div>
-        <div class="tab" id="tab-adm" onclick="tab('adm')">Admission</div>
+        <div class="tab" id="tab-adm" onclick="tab('adm'); clearForm();">Admission</div>
         <div class="tab" id="tab-roll" onclick="tab('roll')">Attendance</div>
     </div>
 
     <div id="v-rec" class="hidden">
         <div style="padding:15px; display:flex; gap:10px;">
             <input id="searchBar" placeholder="🔍 Search name or LIN..." oninput="loadData()" style="margin:0;">
-            <button onclick="clearForm(); tab('adm');" style="background:var(--blue); color:white; border:none; border-radius:12px; padding:0 20px; font-weight:900; font-size:11px;">+ NEW</button>
+            <button onclick="tab('adm'); clearForm();" style="background:var(--blue); color:white; border:none; border-radius:12px; padding:0 15px; font-weight:900; font-size:11px;">+ NEW</button>
         </div>
         <div id="dataList"></div>
     </div>
 
     <div id="v-adm" class="hidden" style="padding:15px;">
         <div style="background:white; padding:20px; border-radius:20px; border:1px solid #ddd;">
-            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:14px;">REGISTER NEW STUDENT</h3>
+            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:14px;">NEW STUDENT REGISTRATION</h3>
             <input type="hidden" id="editId">
             <label>Full Name</label><input id="name">
-            <label>LIN</label><input id="lin" placeholder="Auto-generated if empty">
-            <label>Class</label><select id="cls"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option></select>
+            <label>LIN (Auto-generated)</label><input id="lin" placeholder="System will generate this">
+            <label>Class</label><select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label>Age</label><input id="age" type="number"></div>
                 <div><label>DOB</label><input id="dob" type="date"></div>
             </div>
             <label>Location</label><input id="location">
-            <label>Parent Contact</label><input id="contact">
+            <label>Contact Number</label><input id="contact">
             <label>Health Status</label><input id="health">
             <label>Expected Fees</label><input id="f_exp" type="number">
             <label>Fees Paid</label><input id="f_paid" type="number">
-            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:15px; font-weight:900; font-size:15px;">SAVE STUDENT DATA</button>
-            <button onclick="clearForm()" style="width:100%; background:#f0f0f0; color:#666; padding:12px; border:none; border-radius:15px; font-weight:800; margin-top:10px; font-size:12px;">CLEAR / CANCEL</button>
+            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:15px; font-weight:900; font-size:15px;">SAVE & REGISTER</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
         <div style="padding:15px;">
-            <select id="rollClass" onchange="loadData()" style="border:2px solid var(--blue); font-weight:900;"><option value="">-- Choose Class --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <select id="rollClass" onchange="loadData()" style="border:2px solid var(--blue); font-weight:900;"><option value="">-- Choose Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         </div>
         <div id="absentSpace" class="hidden" style="background:#fff5f5; border:2px dashed var(--red); border-radius:15px; margin:15px; padding:15px;">
             <h4 style="margin:0 0 10px 0; color:var(--red); font-size:12px;">🚨 ABSENT FOLLOW-UP</h4>
@@ -120,7 +119,7 @@
         if (k === "JESUS CARES") role = "Admin";
         else if (k === "FINANCE 256") role = "Finance";
         else if (k === "TEACH2026") role = "Teacher";
-        else { alert("INVALID KEY"); return; }
+        else { alert("WRONG KEY!"); return; }
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         tab(role === "Teacher" ? 'roll' : 'rec');
@@ -136,7 +135,7 @@
 
     function clearForm() {
         document.getElementById('editId').value = "";
-        document.getElementById('admTitle').innerText = "REGISTER NEW STUDENT";
+        document.getElementById('admTitle').innerText = "NEW STUDENT REGISTRATION";
         ['name','lin','age','dob','location','contact','health','f_paid','f_exp'].forEach(f => {
             document.getElementById(f).value = "";
             document.getElementById(f).disabled = false;
@@ -176,7 +175,19 @@
 
     async function markAtt(id, status) { await _client.from('students').update({ is_absent: status }).eq('id', id); loadData(); }
 
-    async function deleteStudent(id) { if(confirm("Permanently delete this student?")) { await _client.from('students').delete().eq('id', id); loadData(); } }
+    async function deleteStudent(id) { if(confirm("Permanently delete?")) { await _client.from('students').delete().eq('id', id); loadData(); } }
+
+    async function generateUniqueLIN(name) {
+        const char = name.trim().charAt(0).toUpperCase() || 'X';
+        let unique = false; let finalLIN = "";
+        while(!unique) {
+            const num = Math.floor(1000 + Math.random() * 9000);
+            finalLIN = `PM${char}${num}`;
+            const { data } = await _client.from('students').select('lin').eq('lin', finalLIN);
+            if(!data || data.length === 0) unique = true;
+        }
+        return finalLIN;
+    }
 
     async function submitData() {
         const id = document.getElementById('editId').value;
@@ -184,25 +195,42 @@
         const sClass = document.getElementById('cls').value;
         let lin = document.getElementById('lin').value;
 
-        if(!id) {
+        if(!sName) { alert("Please enter a name!"); return; }
+
+        if(!id) { // New Student Guard
             const { data: ex } = await _client.from('students').select('id').eq('name', sName).eq('class', sClass);
-            if(ex.length > 0) { alert("DUPLICATE: ALREADY REGISTERED!"); return; }
-            if(!lin) { 
-                const char = sName.charAt(0).toUpperCase();
-                lin = `PM${char}${Math.floor(1000 + Math.random() * 9000)}`;
-            }
+            if(ex && ex.length > 0) { alert("ALREADY REGISTERED IN THIS CLASS!"); return; }
+            if(!lin) lin = await generateUniqueLIN(sName);
         }
 
-        const payload = { name: sName, class: sClass, lin: lin, age: document.getElementById('age').value, dob: document.getElementById('dob').value, location: document.getElementById('location').value, contact: document.getElementById('contact').value, health: document.getElementById('health').value, fees_paid: parseFloat(document.getElementById('f_paid').value)||0, fees_expected: parseFloat(document.getElementById('f_exp').value)||0 };
+        const payload = { 
+            name: sName, class: sClass, lin: lin, 
+            age: document.getElementById('age').value, 
+            dob: document.getElementById('dob').value, 
+            location: document.getElementById('location').value, 
+            contact: document.getElementById('contact').value, 
+            health: document.getElementById('health').value, 
+            fees_paid: parseFloat(document.getElementById('f_paid').value)||0, 
+            fees_expected: parseFloat(document.getElementById('f_exp').value)||0,
+            is_absent: false // Default to present when registering
+        };
 
-        id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        alert("SUCCESS!"); clearForm(); loadData(); tab('rec');
+        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
+        
+        if(error) {
+            alert("SAVE FAILED: " + error.message);
+        } else {
+            alert("SUCCESSFULLY SAVED!");
+            clearForm();
+            loadData();
+            tab('rec');
+        }
     }
 
     function editMode(id) {
         _client.from('students').select('*').eq('id', id).single().then(({data}) => {
             document.getElementById('editId').value = data.id;
-            document.getElementById('admTitle').innerText = "EDIT: " + data.name;
+            document.getElementById('admTitle').innerText = "EDITING: " + data.name;
             document.getElementById('name').value = data.name;
             document.getElementById('lin').value = data.lin;
             document.getElementById('cls').value = data.class;
@@ -218,6 +246,7 @@
         });
     }
 
+    // Routine Engine
     setInterval(() => {
         const now = new Date(); const day = now.getDay(); const hr = now.getHours(); const min = now.getMinutes(); const time = hr + (min/60);
         let status = "RESTING / SLEEPING";
