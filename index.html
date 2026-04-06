@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v42</title>
+    <title>Progressive Mothers PMS v34</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -12,13 +12,12 @@
         .header { background: var(--red); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); }
         .hero { background: var(--blue); color: white; padding: 20px 15px; text-align: center; border-bottom: 5px solid var(--gold); }
         #clock { font-size: 38px; font-weight: 900; letter-spacing: -1px; margin: 5px 0; }
+        .routine-box { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; font-size: 11px; margin-top: 10px; border: 1px solid var(--gold); }
 
         .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 15px; margin-top: -30px; }
         .stat-card { background: white; padding: 12px 5px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--blue); }
         .stat-val { font-size: 22px; font-weight: 900; color: var(--blue); display: block; }
         .stat-lbl { font-size: 8px; font-weight: 800; color: #888; text-transform: uppercase; }
-        
-        .alert-box { background: #fff3cd; color: #856404; padding: 12px; border-radius: 12px; margin: 0 15px 10px 15px; border-left: 6px solid #ffeeba; font-size: 11px; font-weight: 800; }
 
         .nav-tabs { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 68px; z-index: 999; }
         .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 10px; color: #bbb; cursor: pointer; text-transform: uppercase; }
@@ -26,45 +25,47 @@
 
         .item-card { background: white; border-radius: 15px; padding: 15px; margin: 10px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 8px solid var(--blue); position: relative; }
         .lin-badge { position: absolute; top: 10px; right: 10px; background: var(--blue); color: white; padding: 3px 8px; border-radius: 5px; font-size: 9px; font-weight: 900; }
-        .follow-up-input { width: 100%; margin-top: 10px; padding: 8px; border: 1px dashed #ccc; border-radius: 8px; font-size: 12px; box-sizing: border-box; }
-
+        
         .action-btn { padding: 10px; border-radius: 8px; border: none; font-weight: 800; font-size: 11px; cursor: pointer; width: 100%; }
-        .btn-call { background: var(--green); color: white; text-decoration: none; display: block; text-align: center; line-height: 1.4; }
+        .btn-edit { background: #eee; color: #333; }
+        .btn-call { background: var(--green); color: white; text-decoration: none; display: block; text-align: center; }
 
         input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 15px; margin: 5px 0 12px 0; box-sizing: border-box; font-weight: 600; }
         label { font-size: 9px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
         .hidden { display: none !important; }
-        .toggle-pass { position: absolute; right: 15px; top: 20px; font-size: 12px; font-weight: 800; color: var(--gold); cursor: pointer; }
+        input:disabled, select:disabled { background: #f9f9f9; color: #999; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
 <div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
     <h2 style="color:white; font-weight:900; margin-bottom:20px;">SCHOOL ACCESS</h2>
-    <div style="position:relative; width:100%; max-width:280px;">
-        <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; border:3px solid var(--gold);">
-        <span class="toggle-pass" onclick="togglePass()">SHOW</span>
-    </div>
+    <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; max-width:280px; border:3px solid var(--gold);">
     <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900;">LOGIN SYSTEM</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div style="line-height:1.1;"><b style="font-size:12px;">PROGRESSIVE MOTHERS</b><br><span style="font-size:9px;">Nursery & Primary School</span></div>
-        <button onclick="location.reload()" style="background:white; color:var(--red); border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:11px;">LOGOUT</button>
+        <div style="line-height:1.1;">
+            <b style="font-size:12px;">PROGRESSIVE MOTHERS</b><br>
+            <span style="font-size:9px; opacity:0.9;">Nursery & Primary School</span>
+        </div>
+        <button onclick="location.reload()" style="background:white; color:var(--red); border:none; padding:6px 10px; border-radius:5px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
 
     <div class="hero">
         <div id="full-date" style="color:var(--gold); font-size:11px; font-weight:800;">DATE</div>
         <div id="clock">00:00:00</div>
+        <div class="routine-box">
+            <div id="r-status" style="font-weight:900; color:var(--gold);">LOADING ROUTINE...</div>
+            <div id="r-holiday" style="font-size:9px; margin-top:3px; color:white;"></div>
+        </div>
     </div>
 
-    <div id="alerts"></div>
-
     <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Total</span></div>
-        <div class="stat-card" style="border-bottom-color: var(--green);"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present</span></div>
-        <div class="stat-card" style="border-bottom-color: var(--red);"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Total Pupils</span></div>
+        <div class="stat-card" style="border-bottom-color: var(--green);"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present Today</span></div>
+        <div class="stat-card" style="border-bottom-color: var(--red);"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent Today</span></div>
     </div>
 
     <div class="nav-tabs">
@@ -74,10 +75,7 @@
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px; display:flex; gap:10px;">
-            <input id="searchBar" placeholder="🔍 Search Name, LIN, or Class..." oninput="renderUI()" style="margin:0;">
-            <button onclick="loadData()" style="background:var(--blue); color:white; border:none; border-radius:10px; padding:0 15px; font-weight:900;">↻</button>
-        </div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search name or LIN..." oninput="loadData()"></div>
         <div id="dataList"></div>
     </div>
 
@@ -85,33 +83,40 @@
         <div style="background:white; padding:20px; border-radius:20px; border:1px solid #ddd;">
             <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:13px;">STUDENT REGISTRATION</h3>
             <input type="hidden" id="editId">
+            
             <label>Full Name</label><input id="name">
             <label>LIN</label><input id="lin" readonly placeholder="Auto-generated">
+            
             <label>Class</label>
             <select id="cls">
                 <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
+            
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label>Age</label><input id="age" type="number" value="0"></div>
+                <div><label>Age</label><input id="age" type="number"></div>
                 <div><label>DOB</label><input id="dob" type="date"></div>
             </div>
+            
             <label>Physical Location</label><input id="location">
             <label>Parent Contact</label><input id="contact">
             <label>Health Status</label><input id="health_status">
-            <div id="financeSection">
-                <label style="color:var(--red)">Expected Fees</label><input id="f_exp" type="number" value="0">
-                <label style="color:var(--green)">Paid Fees</label><input id="f_paid" type="number" value="0">
+            
+            <div id="financeSection" style="margin-top:15px; padding-top:15px; border-top:2px dashed #eee;">
+                <label style="color:var(--red)">Expected Fees (UGX)</label><input id="f_exp" type="number">
+                <label style="color:var(--green)">Fees Paid (UGX)</label><input id="f_paid" type="number">
             </div>
-            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:15px; font-weight:900;">SAVE RECORD</button>
+            
+            <button id="saveBtn" onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:15px; font-weight:900; margin-top:10px;">SAVE CHANGES</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
         <div style="padding:15px;">
-            <select id="rollClass" onchange="renderUI()" style="border:2px solid var(--blue);">
-                <option value="">-- Select Class for Roll Call --</option>
+            <label>Select Class for Attendance</label>
+            <select id="rollClass" onchange="loadData()" style="border:2px solid var(--blue);">
+                <option value="">-- Choose --</option>
                 <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
@@ -125,24 +130,25 @@
     const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
-    let role = ""; let cachedData = [];
-
-    function togglePass() {
-        const p = document.getElementById('key');
-        p.type = p.type === "password" ? "text" : "password";
-        document.querySelector('.toggle-pass').innerText = p.type === "password" ? "HIDE" : "SHOW";
-    }
+    let role = "";
 
     function secureLogin() {
         const k = document.getElementById('key').value.trim().toUpperCase();
         if (k === "JESUS CARES") role = "Admin";
         else if (k === "FINANCE 256") role = "Finance";
         else if (k === "TEACH2026") role = "Teacher";
-        else return alert("INVALID ACCESS KEY");
+        else { alert("WRONG KEY!"); return; }
         
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-        tab(role === "Teacher" ? 'roll' : 'rec');
+        
+        // Tab Restrictions
+        if (role === "Teacher") { 
+            document.getElementById('tab-rec').classList.add('hidden');
+            tab('roll'); 
+        } else {
+            tab('rec');
+        }
         loadData();
     }
 
@@ -153,99 +159,55 @@
         document.getElementById('tab-'+t).classList.add('active');
     }
 
-    async function loadData() {
-        const { data, error } = await _client.from('students').select('*').order('name');
-        if(data) { 
-            // Ensure is_absent is treated as a strict boolean
-            cachedData = data.map(s => ({...s, is_absent: s.is_absent === true})); 
-            renderUI(); 
-        }
+    function clearForm() {
+        document.getElementById('editId').value = "";
+        document.getElementById('admTitle').innerText = "NEW STUDENT REGISTRATION";
+        const fields = ['name','lin','age','dob','location','contact','health_status','f_paid','f_exp'];
+        fields.forEach(f => {
+            const el = document.getElementById(f);
+            el.value = "";
+            el.disabled = false;
+        });
+        
+        // Role based visual locks
+        if(role === "Teacher") document.getElementById('financeSection').classList.add('hidden');
+        else document.getElementById('financeSection').classList.remove('hidden');
     }
 
-    function renderUI() {
-        const alerts = document.getElementById('alerts'); alerts.innerHTML = "";
-        
-        // 1. Dashboard Logic
-        const total = cachedData.length;
-        const absent = cachedData.filter(s => s.is_absent).length;
+    async function loadData() {
+        const { data, error } = await _client.from('students').select('*').order('name');
+        if(error) return;
+
+        // Dashboard Logic: Green = Total - Absent
+        const total = data.length;
+        const absent = data.filter(s => s.is_absent === true).length;
         document.getElementById('c-tot').innerText = total;
         document.getElementById('c-abs').innerText = absent;
         document.getElementById('c-pres').innerText = total - absent;
 
-        // 2. Absence Alerts
-        cachedData.filter(s => s.absence_streak >= 2).forEach(s => {
-            alerts.innerHTML += `<div class="alert-box">⚠️ <b>${s.name}</b>: Absent for ${s.absence_streak} days. <a href="tel:${s.contact}" style="color:var(--blue)">Call Parent</a></div>`;
-        });
-
-        // 3. Records View (Search Name, LIN, or Class)
+        // Records List
         const q = document.getElementById('searchBar').value.toLowerCase();
+        let filtered = q ? data.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))) : data;
         const list = document.getElementById('dataList'); list.innerHTML = "";
-        cachedData.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q)) || s.class.toLowerCase().includes(q)).forEach(s => {
-            list.innerHTML += `<div class="item-card">
-                <div class="lin-badge">${s.lin || 'NEW'}</div>
-                <b>${s.name}</b><br><small>${s.class} | ${s.location}</small>
-                <div style="font-size:10px; margin-top:5px; color:${s.is_absent ? 'var(--red)' : 'var(--green)'}">
-                    ${s.is_absent ? 'LATEST: Absent (' + (s.follow_up || 'No reason saved') + ')' : 'LATEST: Present'}
-                </div>
-                <div style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                    <button class="action-btn" style="background:#eee" onclick="editMode('${s.id}')">DETAILS</button>
-                    <a href="tel:${s.contact}" class="action-btn btn-call">CALL</a>
-                </div>
-            </div>`;
+        filtered.forEach(s => {
+            list.innerHTML += `<div class="item-card"><div class="lin-badge">${s.lin || 'N/A'}</div><b>${s.name}</b><br><small>${s.class}</small><div style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:8px;"><button class="action-btn btn-edit" onclick="editMode('${s.id}')">EDIT / VIEW</button><a href="tel:${s.contact}" class="action-btn btn-call">CALL</a></div></div>`;
         });
 
-        // 4. Attendance View
+        // Attendance List
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData'); rollList.innerHTML = "";
-        cachedData.filter(s => s.class === rCls).forEach(s => {
+        data.filter(s => s.class === rCls).forEach(s => {
             const isA = s.is_absent === true;
-            rollList.innerHTML += `
-                <div class="item-card" style="border-left-color:${isA?'var(--red)':'var(--green)'}">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <b>${s.name}</b>
-                        <button style="padding:10px; border-radius:10px; border:none; color:white; font-weight:900; min-width:90px; background:${isA?'var(--red)':'var(--green)'}" onclick="markAttendance('${s.id}', ${!isA})">
-                            ${isA ? 'ABSENT' : 'PRESENT'}
-                        </button>
-                    </div>
-                    ${isA ? `<input class="follow-up-input" placeholder="What happened to this child?" value="${s.follow_up || ''}" onchange="saveReason('${s.id}', this.value)">` : ''}
-                </div>`;
+            rollList.innerHTML += `<div class="item-card" style="border-left-color:${isA?'var(--red)':'var(--green)'}"><div style="display:flex; justify-content:space-between; align-items:center;"><div><b>${s.name}</b><br><small>${s.lin}</small></div><button style="padding:10px; border-radius:10px; border:none; color:white; font-weight:900; min-width:90px; background:${isA?'var(--red)':'var(--green)'}" onclick="markAtt('${s.id}', ${!isA})">${isA?'ABSENT':'PRESENT'}</button></div></div>`;
         });
     }
 
-    async function markAttendance(id, status) {
-        const student = cachedData.find(s => s.id === id);
-        if(!student) return;
-
-        // UI Update First
-        student.is_absent = status;
-        if(status) {
-            student.absence_streak = (student.absence_streak || 0) + 1;
-        } else {
-            student.absence_streak = 0;
-            student.follow_up = "";
-        }
-        renderUI();
-
-        // Database Sync
-        const { error } = await _client.from('students').update({ 
-            is_absent: status, 
-            absence_streak: student.absence_streak,
-            follow_up: student.follow_up
-        }).eq('id', id);
-        
-        if(error) console.error("Update failed", error);
-    }
-
-    async function saveReason(id, val) {
-        const student = cachedData.find(s => s.id === id);
-        if(student) student.follow_up = val;
-        await _client.from('students').update({ follow_up: val }).eq('id', id);
-    }
+    async function markAtt(id, status) { await _client.from('students').update({ is_absent: status }).eq('id', id); loadData(); }
 
     async function submitData() {
         const id = document.getElementById('editId').value;
         const sName = document.getElementById('name').value.trim();
-        if(!sName) return alert("Name is required");
+        if(!sName) return alert("Name required");
 
         let lin = document.getElementById('lin').value;
         if(!id) lin = `PM${sName.charAt(0).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`;
@@ -262,38 +224,71 @@
         };
 
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("Record Saved!"); clearForm(); loadData(); tab('rec'); }
+        if(error) alert(error.message);
+        else { alert("Saved!"); clearForm(); loadData(); tab(role === "Teacher" ? 'roll' : 'rec'); }
     }
 
     function editMode(id) {
-        const s = cachedData.find(st => st.id === id);
-        document.getElementById('editId').value = s.id;
-        document.getElementById('name').value = s.name;
-        document.getElementById('lin').value = s.lin;
-        document.getElementById('cls').value = s.class;
-        document.getElementById('age').value = s.age;
-        document.getElementById('dob').value = s.dob;
-        document.getElementById('location').value = s.location;
-        document.getElementById('contact').value = s.contact;
-        document.getElementById('health_status').value = s.health_status;
-        document.getElementById('f_paid').value = s.fees_paid;
-        document.getElementById('f_exp').value = s.fees_expected;
-        if(role === "Teacher") document.getElementById('financeSection').classList.add('hidden');
-        tab('adm');
-    }
+        _client.from('students').select('*').eq('id', id).single().then(({data}) => {
+            document.getElementById('editId').value = data.id;
+            document.getElementById('name').value = data.name;
+            document.getElementById('lin').value = data.lin;
+            document.getElementById('cls').value = data.class;
+            document.getElementById('age').value = data.age;
+            document.getElementById('dob').value = data.dob;
+            document.getElementById('location').value = data.location;
+            document.getElementById('contact').value = data.contact;
+            document.getElementById('health_status').value = data.health_status;
+            document.getElementById('f_paid').value = data.fees_paid;
+            document.getElementById('f_exp').value = data.fees_expected;
 
-    function clearForm() {
-        document.getElementById('editId').value = "";
-        ['name','lin','age','dob','location','contact','health_status','f_paid','f_exp'].forEach(f => {
-            document.getElementById(f).value = (f==='age' || f==='f_paid' || f==='f_exp') ? "0" : "";
+            // PERMISSION LOCKS
+            const infoFields = ['name','lin','age','dob','location','contact','health_status','cls'];
+            const feeFields = ['f_paid','f_exp'];
+
+            if(role === "Finance") {
+                infoFields.forEach(f => document.getElementById(f).disabled = true);
+                feeFields.forEach(f => document.getElementById(f).disabled = false);
+            } else if(role === "Teacher") {
+                infoFields.forEach(f => document.getElementById(f).disabled = false);
+                document.getElementById('financeSection').classList.add('hidden');
+            } else { // Admin
+                infoFields.concat(feeFields).forEach(f => document.getElementById(f).disabled = false);
+            }
+            tab('adm');
         });
     }
 
-    setInterval(() => {
-        const now = new Date();
+    // Routine & Holiday Engine
+    function updateRoutine() {
+        const now = new Date(); const day = now.getDay(); const hr = now.getHours(); const min = now.getMinutes(); const t = hr + (min/60);
+        let status = "SCHOOL CLOSED / RESTING";
+        
+        // Public Holidays 2026 (Uganda)
+        const holidays = { "1-1":"New Year", "26-1":"NRM Day", "16-2":"Archbishop Luwum", "8-3":"Women's Day", "3-4":"Good Friday", "6-4":"Easter Monday", "1-5":"Labour Day", "3-6":"Martyrs Day", "9-6":"Heroes Day", "9-10":"Independence Day" };
+        const dStr = now.getDate() + "-" + (now.getMonth()+1);
+        
+        if(holidays[dStr]) {
+            status = "PUBLIC HOLIDAY: " + holidays[dStr];
+            document.getElementById('r-holiday').innerText = "🚩 Enjoy the " + holidays[dStr] + " break!";
+        } else if(day === 0) status = "SUNDAY - WEEKEND REST";
+        else if(day === 6) status = (t >= 9 && t < 12) ? "SATURDAY REMEDIALS" : "WEEKEND BREAK";
+        else {
+            if(t >= 7.5 && t < 8) status = "ASSEMBLY / ARRIVAL";
+            else if(t >= 8 && t < 10.5) status = "MORNING LESSONS";
+            else if(t >= 10.5 && t < 11) status = "BREAK TIME";
+            else if(t >= 11 && t < 13) status = "MID-MORNING LESSONS";
+            else if(t >= 13 && t < 14) status = "LUNCH BREAK";
+            else if(t >= 14 && t < 16.5) status = "AFTERNOON LESSONS";
+            else if(t >= 16.5 && t < 17) status = "GAMES / CLEANING";
+            else status = "EVENING / HOME TIME";
+        }
+        
+        document.getElementById('r-status').innerText = status;
         document.getElementById('full-date').innerText = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
         document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-    }, 1000);
+    }
+    setInterval(updateRoutine, 1000);
 </script>
 </body>
 </html>
