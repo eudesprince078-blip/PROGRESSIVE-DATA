@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers - Gayaza Kijabijjo</title>
+    <title>Progressive Mothers Management System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -10,31 +10,31 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 0; font-size: 16px; }
         
         .header { background: var(--red); color: white; padding: 12px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .school-title { font-size: 11px; font-weight: 900; line-height: 1.2; }
-        
-        .hero { background: var(--blue); color: white; padding: 20px 10px; text-align: center; }
-        #clock { font-size: 40px; font-weight: 900; margin: 5px 0; }
-        
-        /* ROUTINE SECTION */
-        .routine-box { background: var(--gold); color: var(--blue); padding: 12px; margin: -15px 15px 15px 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); position: relative; z-index: 5; }
-        .routine-time { font-size: 10px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
-        .routine-task { font-size: 18px; font-weight: 900; }
+        .school-title { font-size: 10px; font-weight: 900; line-height: 1.2; }
 
-        .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 15px 15px 15px; }
-        .s-card { background: white; border-radius: 10px; padding: 12px 5px; text-align: center; border-bottom: 4px solid var(--gold); }
-        .s-val { font-size: 20px; font-weight: bold; color: var(--blue); }
+        .login-screen { position: fixed; inset: 0; background: var(--blue); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: white; text-align: center; }
+        .pass-box { position: relative; width: 100%; max-width: 280px; margin-top: 15px; }
+        .toggle-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--blue); font-weight: bold; font-size: 11px; cursor: pointer; padding: 5px; }
 
-        .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 65px; z-index: 900; }
-        .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 11px; color: #666; }
+        .hero { background: var(--blue); color: white; padding: 15px 10px; text-align: center; }
+        #clock { font-size: 38px; font-weight: 900; }
+        
+        .routine-box { background: var(--gold); color: var(--blue); padding: 12px; margin: -15px 15px 10px 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+
+        .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 62px; z-index: 900; }
+        .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 11px; color: #666; cursor: pointer; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f8f9fa; }
 
         .item-card { background: white; border-radius: 12px; padding: 15px; margin: 10px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); }
+        .lin-bold { font-weight: 900; color: var(--blue); font-size: 14px; background: #eef2f7; padding: 2px 6px; border-radius: 4px; }
         
-        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; font-size: 13px; min-width: 110px; cursor: pointer; color: white; transition: 0.3s; }
-        .btn-present { background: var(--green); }
-        .btn-absent { background: var(--red); }
+        .action-btn { padding: 10px 15px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: bold; color: white; display: inline-flex; align-items: center; margin-right: 5px; }
+        .call-btn { background: var(--blue); }
+        .wa-btn { background: var(--wa); }
         
-        .login-screen { position: fixed; inset: 0; background: var(--blue); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: white; text-align: center; }
+        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; min-width: 100px; color: white; cursor: pointer; }
+        .alert-card { background: #fff0f0; border: 2px solid var(--red); color: var(--red); padding: 15px; margin: 10px 15px; border-radius: 12px; }
+
         input, select { width: 100%; padding: 14px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px; margin-top: 8px; box-sizing: border-box; }
         .hidden { display: none !important; }
     </style>
@@ -42,31 +42,30 @@
 <body>
 
 <div id="loginGate" class="login-screen">
-    <div style="font-size:16px; font-weight:900; color:var(--gold);">PROGRESSIVE MOTHERS<br>NURSERY AND PRIMARY SCHOOL</div>
-    <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; margin-top:20px; max-width:280px;">
-    <button onclick="secureLogin()" style="width:100%; max-width:250px; background:var(--gold); color:var(--blue); padding:16px; border:none; border-radius:10px; font-weight:900; margin-top:15px;">LOGIN</button>
+    <div style="font-weight:900; color:var(--gold);">PROGRESSIVE MOTHERS GAYAZA</div>
+    <div class="pass-box">
+        <input id="key" type="password" placeholder="ACCESS KEY" style="text-align:center;">
+        <span class="toggle-btn" onclick="togglePass()">SHOW</span>
+    </div>
+    <button onclick="secureLogin()" style="width:100%; max-width:250px; background:var(--gold); color:var(--blue); padding:18px; border:none; border-radius:10px; font-weight:900; margin-top:15px;">LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
         <div class="school-title">PROGRESSIVE MOTHERS<br>GAYAZA-KIJABIJJO</div>
-        <button onclick="location.reload()" style="background:transparent; border:1px solid white; color:white; padding:5px; border-radius:4px; font-size:10px;">LOGOUT</button>
+        <button onclick="location.reload()" style="background:white; color:var(--red); border:none; padding:5px 10px; border-radius:5px; font-weight:bold; font-size:10px;">LOGOUT</button>
     </div>
 
-    <div class="hero">
-        <div id="fullDate" style="font-size:11px; color:var(--gold); font-weight:bold;">DATE</div>
-        <div id="clock">00:00:00</div>
-    </div>
-
+    <div class="hero"><div id="clock">00:00:00</div></div>
     <div class="routine-box">
-        <div class="routine-time" id="r-time">CURRENT ACTIVITY</div>
-        <div class="routine-task" id="r-task">LOADING...</div>
+        <div id="r-task" style="font-weight:900; font-size:16px;">LOADING ROUTINE...</div>
     </div>
 
-    <div class="stats">
-        <div class="s-card"><span class="s-val" id="tCnt">0</span><br><small>TOTAL</small></div>
-        <div class="s-card"><span class="s-val" id="pCnt" style="color:var(--green)">0</span><br><small>CLEARED</small></div>
-        <div class="s-card"><span class="s-val" id="aCnt" style="color:var(--red)">0</span><br><small>ABSENT</small></div>
+    <div id="chronicSection" class="hidden">
+        <div class="alert-card">
+            <h4 style="margin:0 0 10px 0;">⚠️ ATTENTION: ABSENT 2+ DAYS</h4>
+            <div id="chronicList"></div>
+        </div>
     </div>
 
     <div class="nav-tabs">
@@ -76,31 +75,32 @@
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Students..." oninput="load()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Name, Class or LIN..." oninput="load()"></div>
         <div id="dataList"></div>
     </div>
 
     <div id="v-adm" class="hidden" style="padding:15px;">
-        <div style="background:white; padding:20px; border-radius:15px;">
+        <div style="background:white; padding:20px; border-radius:15px; border:1px solid #ddd;">
             <input type="hidden" id="editId">
             <input id="name" placeholder="Full Name">
+            <input id="o_lin" placeholder="Official LIN">
             <select id="cls">
-                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                <option>P.5</option><option>P.6</option><option>P.7</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option>
+                <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <input id="parent_ph" type="tel" placeholder="Contact Number">
-            <input id="f_exp" type="number" placeholder="Fees Expected">
-            <input id="f_paid" type="number" placeholder="Fees Paid">
-            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:10px; font-weight:900; margin-top:15px;">SAVE STUDENT</button>
+            <input id="loc" placeholder="Home Location">
+            <input id="parent_ph" type="tel" placeholder="Parent Contact">
+            <div id="finSection">
+                <input id="f_exp" type="number" placeholder="Expected Fees">
+                <input id="f_paid" type="number" placeholder="Paid Fees">
+            </div>
+            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:10px; font-weight:900; margin-top:20px;">SAVE STUDENT</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden" style="padding:15px;">
-        <select id="rollClass" onchange="load()">
-            <option value="">-- Select Class --</option>
-            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-            <option>P.5</option><option>P.6</option><option>P.7</option>
+        <select id="rollClass" onchange="load()"><option value="">-- Choose Class --</option>
+            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
         <div id="rollData" style="margin-top:15px;"></div>
     </div>
@@ -113,14 +113,35 @@
 
     let role = "";
 
+    function togglePass() {
+        const p = document.getElementById('key');
+        const s = document.querySelector('.toggle-btn');
+        p.type = p.type === 'password' ? 'text' : 'password';
+        s.innerText = p.type === 'password' ? 'SHOW' : 'HIDE';
+    }
+
     function secureLogin() {
         const k = document.getElementById('key').value.trim().toUpperCase();
         if (k === "JESUS CARES") role = "Admin";
+        else if (k === "FINANCE 256") role = "Finance";
         else if (k === "TEACH2026") role = "Teacher";
-        else { alert("Wrong Key"); return; }
+        else { alert("Access Denied"); return; }
+
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-        tab('roll'); load();
+        
+        if(role === "Teacher") { 
+            document.getElementById('tab-rec').classList.add('hidden'); 
+            document.getElementById('finSection').classList.add('hidden'); 
+            tab('roll'); 
+        } else if(role === "Finance") { 
+            document.getElementById('tab-roll').classList.add('hidden'); 
+            tab('rec'); 
+        } else {
+            document.getElementById('chronicSection').classList.remove('hidden');
+            tab('rec');
+        }
+        load();
     }
 
     function tab(t) {
@@ -131,75 +152,114 @@
     }
 
     async function load() {
+        const q = document.getElementById('searchBar').value.toLowerCase();
         let { data } = await _client.from('students').select('*').order('name');
         if(!data) return;
 
-        document.getElementById('tCnt').innerText = data.length;
-        document.getElementById('pCnt').innerText = data.filter(s => s.fees_paid >= s.fees_expected).length;
-        document.getElementById('aCnt').innerText = data.filter(s => s.is_absent).length;
+        // CHRONIC ABSENT LOGIC (2+ DAYS)
+        const chronicList = document.getElementById('chronicList');
+        const chronicData = data.filter(s => s.absent_days >= 2);
+        chronicList.innerHTML = chronicData.map(s => `
+            <div style="border-bottom:1px solid #ffcccc; padding:8px 0;">
+                <b>${s.name}</b> (${s.class}) - <span style="font-weight:bold;">${s.absent_days} Days Absent</span><br>
+                <a href="tel:${s.parent_contact}" class="action-btn call-btn" style="padding:5px 10px; font-size:10px;">CALL</a>
+            </div>
+        `).join('');
 
-        const rollList = document.getElementById('rollData');
-        const rCls = document.getElementById('rollClass').value;
-        rollList.innerHTML = "";
+        // SEARCH LOGIC
+        if(q) data = data.filter(s => 
+            s.name.toLowerCase().includes(q) || 
+            s.class.toLowerCase().includes(q) || 
+            (s.official_lin && s.official_lin.toLowerCase().includes(q))
+        );
 
-        if(rCls) {
-            data.filter(s => s.class === rCls).forEach(s => {
-                rollList.innerHTML += `<div class="item-card" style="border-left-color:${s.is_absent?'red':'green'}">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <b>${s.name}</b>
-                        <button class="btn-roll ${s.is_absent?'btn-absent':'btn-present'}" onclick="markAttendance('${s.id}', ${!s.is_absent}, this)">
-                            ${s.is_absent ? 'ABSENT' : 'PRESENT'}
-                        </button>
+        const list = document.getElementById('dataList');
+        list.innerHTML = "";
+        data.forEach(s => {
+            const num = s.parent_contact ? s.parent_contact.replace(/\s+/g, '') : '';
+            const wa = num.startsWith('0') ? '256' + num.substring(1) : num;
+            list.innerHTML += `<div class="item-card">
+                <div style="margin-bottom:8px;"><span class="lin-bold">${s.official_lin || 'NO LIN'}</span></div>
+                <b style="font-size:18px;">${s.name}</b><br><small>${s.class}</small>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <div>
+                        <a href="tel:${num}" class="action-btn call-btn">📞</a>
+                        <a href="https://wa.me/${wa}" class="action-btn wa-btn">💬</a>
                     </div>
-                </div>`;
-            });
-        }
+                    ${role !== "Teacher" ? `<button onclick="editMode('${s.id}')" style="background:#eee; border:none; padding:8px 12px; border-radius:5px; font-size:11px; font-weight:bold;">EDIT</button>` : ''}
+                </div>
+            </div>`;
+        });
+
+        const rCls = document.getElementById('rollClass').value;
+        const rollList = document.getElementById('rollData');
+        rollList.innerHTML = "";
+        data.filter(s => s.class === rCls).forEach(s => {
+            rollList.innerHTML += `<div class="item-card" style="border-left-color:${s.is_absent?'red':'green'}">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <b>${s.name}</b>
+                    <button class="btn-roll" style="background:${s.is_absent?'var(--red)':'var(--green)'}" onclick="markAttendance('${s.id}', ${!s.is_absent}, this)">
+                        ${s.is_absent ? 'ABSENT' : 'PRESENT'}
+                    </button>
+                </div>
+            </div>`;
+        });
     }
 
     async function markAttendance(id, status, btn) {
-        const originalText = btn.innerText;
-        btn.innerText = "WAIT...";
-        btn.disabled = true;
-
-        const { error } = await _client.from('students').update({ is_absent: status }).eq('id', id);
-
-        if(error) {
-            alert("Connection Weak. Try again.");
-            btn.innerText = originalText;
-            btn.disabled = false;
-        } else {
-            load();
-        }
+        btn.innerText = "...";
+        const { data: cur } = await _client.from('students').select('absent_days').eq('id', id).single();
+        let newCount = status ? (parseInt(cur.absent_days || 0) + 1) : 0;
+        
+        await _client.from('students').update({ is_absent: status, absent_days: newCount }).eq('id', id);
+        load();
     }
 
-    // SCHOOL ROUTINE LOGIC
+    async function submitData() {
+        const id = document.getElementById('editId').value;
+        const payload = {
+            name: document.getElementById('name').value,
+            official_lin: document.getElementById('o_lin').value,
+            class: document.getElementById('cls').value,
+            location: document.getElementById('loc').value,
+            parent_contact: document.getElementById('parent_ph').value,
+            fees_paid: parseFloat(document.getElementById('f_paid').value) || 0,
+            fees_expected: parseFloat(document.getElementById('f_exp').value) || 0
+        };
+        if(id) await _client.from('students').update(payload).eq('id', id);
+        else await _client.from('students').insert([payload]);
+        alert("Success!"); load();
+    }
+
+    async function editMode(id) {
+        const { data } = await _client.from('students').select('*').eq('id', id).single();
+        document.getElementById('editId').value = data.id;
+        document.getElementById('name').value = data.name;
+        document.getElementById('o_lin').value = data.official_lin || "";
+        document.getElementById('cls').value = data.class;
+        document.getElementById('loc').value = data.location || "";
+        document.getElementById('parent_ph').value = data.parent_contact || "";
+        document.getElementById('f_paid').value = data.fees_paid;
+        document.getElementById('f_exp').value = data.fees_expected;
+        tab('adm');
+    }
+
     function updateRoutine() {
         const now = new Date();
-        const hr = now.getHours();
-        const min = now.getMinutes();
-        const time = hr * 100 + min;
-        let task = "Rest Time";
-        let label = "School Closed";
-
-        if (time >= 700 && time < 800) { task = "Arrival & Cleaning"; label = "07:00 AM - 08:00 AM"; }
-        else if (time >= 800 && time < 830) { task = "Morning Assembly"; label = "08:00 AM - 08:30 AM"; }
-        else if (time >= 830 && time < 1030) { task = "Lesson Period 1"; label = "08:30 AM - 10:30 AM"; }
-        else if (time >= 1030 && time < 1100) { task = "Porridge Break"; label = "10:30 AM - 11:00 AM"; }
-        else if (time >= 1100 && time < 1240) { task = "Lesson Period 2"; label = "11:00 AM - 12:40 PM"; }
-        else if (time >= 1240 && time < 1400) { task = "Lunch Break"; label = "12:40 PM - 02:00 PM"; }
-        else if (time >= 1400 && time < 1600) { task = "Afternoon Lessons"; label = "02:00 PM - 04:00 PM"; }
-        else if (time >= 1600 && time < 1700) { task = "Games & Departure"; label = "04:00 PM - 05:00 PM"; }
-
-        document.getElementById('r-task').innerText = task;
-        document.getElementById('r-time').innerText = label;
+        const time = now.getHours() * 100 + now.getMinutes();
+        let t = "School Resting";
+        if (time >= 700 && time < 800) t = "Arrival & Cleaning";
+        else if (time >= 800 && time < 830) t = "Morning Assembly";
+        else if (time >= 830 && time < 1030) t = "Morning Lessons";
+        else if (time >= 1030 && time < 1100) t = "Porridge Break";
+        else if (time >= 1100 && time < 1300) t = "Mid-Day Lessons";
+        else if (time >= 1300 && time < 1400) t = "Lunch Break";
+        else if (time >= 1400 && time < 1600) t = "Afternoon Lessons";
+        else if (time >= 1600 && time < 1700) t = "Games & Departure";
+        document.getElementById('r-task').innerText = t;
+        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
     }
-
-    setInterval(() => {
-        const d = new Date();
-        document.getElementById('clock').innerText = d.toLocaleTimeString('en-GB');
-        document.getElementById('fullDate').innerText = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        updateRoutine();
-    }, 1000);
+    setInterval(updateRoutine, 1000);
 </script>
 </body>
 </html>
