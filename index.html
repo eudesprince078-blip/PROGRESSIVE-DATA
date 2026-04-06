@@ -2,196 +2,286 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive PMS Master</title>
+    <title>Progressive PMS V14 - Live Database</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --pms-blue: #001a33; --pms-red: #e63946; --gold: #ffc107; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding-bottom: 30px; }
+        :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #28a745; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding-bottom: 50px; }
         
-        /* Dashboard Branding */
-        .header { background: var(--pms-red); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        .hero { background: var(--pms-blue); color: white; padding: 30px 15px 50px 15px; text-align: center; }
-        .clock { font-size: 48px; font-weight: bold; margin: 10px 0; }
-        
-        /* Stats Display */
-        .stats { display: flex; justify-content: center; gap: 8px; margin-top: -35px; padding: 0 10px; }
-        .card { background: white; border-radius: 12px; padding: 15px 5px; width: 32%; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom: 4px solid var(--gold); }
-        .val { font-size: 22px; font-weight: bold; color: var(--pms-blue); display: block; }
-        .lbl { font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; }
+        /* Branding & Header */
+        .header-red { background: var(--red); color: white; padding: 12px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; width: 100%; z-index: 100; box-sizing: border-box; }
+        .hero { background: var(--blue); color: white; padding: 70px 15px 45px 15px; text-align: center; border-bottom: 5px solid var(--gold); }
+        .clock { font-size: 42px; font-weight: bold; margin: 5px 0; letter-spacing: 2px; }
+        .routine-bar { background: rgba(255,255,255,0.15); padding: 6px 12px; font-size: 11px; border-radius: 20px; margin-top: 8px; display: inline-block; font-weight: bold; }
 
+        /* Dashboard Stats */
+        .stats { display: flex; justify-content: center; gap: 8px; margin-top: -30px; padding: 0 10px; }
+        .s-card { background: white; border-radius: 12px; padding: 12px 5px; width: 32%; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom: 4px solid var(--gold); }
+        .s-val { font-size: 22px; font-weight: bold; color: var(--blue); display: block; }
+        .s-lbl { font-size: 9px; color: #888; text-transform: uppercase; font-weight: 800; }
+        
         /* Navigation */
-        .nav { display: flex; overflow-x: auto; padding: 20px 10px; gap: 10px; justify-content: center; }
-        .pill { padding: 10px 20px; border-radius: 25px; background: white; border: 1px solid #ddd; font-size: 11px; font-weight: bold; color: #888; cursor: pointer; }
-        .pill.active { background: var(--pms-blue); color: white; border-color: var(--pms-blue); }
+        .nav { display: flex; overflow-x: auto; padding: 15px 10px; gap: 8px; justify-content: center; }
+        .pill { padding: 10px 18px; border-radius: 25px; border: 1px solid #ddd; background: white; font-size: 11px; font-weight: bold; color: #555; cursor: pointer; transition: 0.3s; }
+        .pill.active { background: var(--blue); color: white; border-color: var(--blue); box-shadow: 0 4px 8px rgba(0,26,51,0.3); }
 
-        /* Content Areas */
-        .container { background: white; margin: 10px; border-radius: 12px; padding: 20px; border: 1.5px solid var(--pms-blue); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
-        label { font-size: 11px; font-weight: bold; color: var(--pms-blue); display: block; margin-bottom: 4px; }
-        .btn { background: var(--pms-blue); color: white; padding: 15px; border: none; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        /* UI Components */
+        .box { background: var(--white); padding: 15px; border-radius: 12px; margin: 10px; border: 1.5px solid var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        label { font-size: 10px; font-weight: bold; color: var(--blue); display: block; margin-top: 5px; }
+        input, select { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 8px; font-size: 14px; box-sizing: border-box; background: #fafafa; }
+        input:focus { border-color: var(--gold); outline: none; background: #fff; }
         
-        /* Data Table */
-        .table-wrap { overflow-x: auto; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 12px; }
-        th { background: #003366; color: white; padding: 12px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .btn { background: var(--blue); color: white; padding: 14px; border: none; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 13px; }
+        .btn:active { transform: scale(0.98); }
+        
+        /* Table Styles */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 850px; font-size: 12px; }
+        th { background: var(--blue); color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #f0f0f0; }
+        .badge { padding: 4px 8px; border-radius: 5px; font-size: 10px; color: white; font-weight: bold; }
+        
         .hidden { display: none !important; }
+        .footer { text-align: center; font-size: 11px; color: var(--blue); padding: 25px; font-weight: bold; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
-<div id="login" class="container" style="max-width:320px; margin: 100px auto; text-align:center;">
-    <h2 style="color:var(--pms-blue)">SYSTEM LOGIN</h2>
-    <input id="user" placeholder="Username" style="margin-bottom:10px;">
-    <input id="pass" type="password" placeholder="Password">
-    <button onclick="doLogin()" class="btn">LOGIN</button>
+<div id="loginGate" class="box" style="max-width:320px; margin: 130px auto; text-align:center;">
+    <h2 style="color:var(--blue); margin-bottom:5px;">PROGRESSIVE PMS</h2>
+    <p style="font-size:10px; color:#888; margin-bottom:20px;">MANAGEMENT SYSTEM v14</p>
+    <input id="u" placeholder="USERNAME" style="margin-bottom:10px;">
+    <input id="p" type="password" placeholder="PASSWORD">
+    <button onclick="login()" class="btn">SECURE LOGIN</button>
 </div>
 
-<div id="app" class="hidden">
-    <div class="header">
-        <div>SCHOOL DATA <span style="background:white; color:var(--pms-red); border-radius:50%; padding:2px 6px; margin-left:5px;">+</span></div>
-        <div>🔔</div>
+<div id="mainApp" class="hidden">
+    <div class="header-red">
+        <div style="font-weight:900; letter-spacing:1px;">PROGRESSIVE MOTHERS</div>
+        <div id="holidayDisplay" style="font-size:10px; font-weight:bold; color:yellow;"></div>
+        <div style="font-size:18px;">📊</div>
     </div>
 
     <div class="hero">
-        <div style="font-size:14px; font-weight:bold;">PROGRESSIVE MOTHERS SCHOOL</div>
-        <div style="font-size:10px; color:var(--gold);">GAYAZA-KIJABIJJO</div>
         <div class="clock" id="clock">00:00:00</div>
-        <div id="date" style="font-size:11px; font-weight:bold;">-- APRIL 2026</div>
+        <div id="dateStr" style="font-size:11px; font-weight:bold; opacity:0.8; margin-bottom:10px;">MONDAY, 06 APRIL 2026</div>
+        <div class="routine-bar" id="routineDisplay">ROUTINE: CHECKING...</div>
     </div>
 
     <div class="stats">
-        <div class="card"><span class="val" id="tCnt">0</span><span class="lbl">Students</span></div>
-        <div class="card"><span class="val" id="pCnt" style="color:#28a745">0</span><span class="lbl">Paid Full</span></div>
-        <div class="card"><span class="val" id="aCnt" style="color:var(--pms-red)">0</span><span class="lbl">Absentees</span></div>
+        <div class="s-card"><span class="s-val" id="tCnt">0</span><span class="s-lbl">Students</span></div>
+        <div class="s-card"><span class="s-val" id="pCnt" style="color:var(--green)">0</span><span class="s-lbl">Paid Full</span></div>
+        <div class="s-card"><span class="s-val" id="aCnt" style="color:var(--red)">0</span><span class="s-lbl">Absent</span></div>
     </div>
 
     <div class="nav">
-        <div class="pill active" id="n-rec" onclick="setView('rec')">RECORDS</div>
-        <div class="pill" id="n-adm" onclick="setView('adm')">ADMISSION</div>
-        <div class="pill" id="n-fin" onclick="setView('fin')">FINANCE</div>
+        <div class="pill active" id="t-rec" onclick="tab('rec')">RECORDS</div>
+        <div class="pill" id="t-adm" onclick="tab('adm')">ADMISSION</div>
+        <div class="pill" id="t-roll" onclick="tab('roll')">ROLL CALL</div>
     </div>
 
-    <div id="v-adm" class="container hidden">
-        <h3 style="margin-top:0; color:var(--pms-blue)">New Admission</h3>
+    <div id="v-adm" class="box hidden">
+        <h3 id="formTitle" style="margin-top:0; color:var(--blue);">Student Registration</h3>
+        <input type="hidden" id="editId">
         <div class="grid">
-            <div style="grid-column: span 2;"><label>Full Name</label><input id="f_name"></div>
-            <div><label>Official LIN</label><input id="f_olin" placeholder="PMS/2026/000"></div>
-            <div><label>Gender</label><select id="f_gen"><option>Male</option><option>Female</option></select></div>
-            <div><label>DOB</label><input id="f_dob" type="date"></div>
-            <div><label>Class</label><select id="f_cls"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
-            <div><label>Location</label><input id="f_loc"></div>
-            <div><label>Fees Expected</label><input id="f_exp" type="number"></div>
-            <div><label>Fees Paid</label><input id="f_paid" type="number" value="0"></div>
+            <div style="grid-column: span 2;"><label>Full Name</label><input id="name" placeholder="Enter Full Name"></div>
+            <div><label>Official LIN</label><input id="o_lin" placeholder="School LIN"></div>
+            <div><label>Class</label>
+                <select id="cls">
+                    <option>P.1</option><option>P.2</option><option>P.3</option>
+                    <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+                </select>
+            </div>
+            <div><label>Fees Paid (UGX)</label><input id="f_paid" type="number" placeholder="0"></div>
+            <div><label>Fees Expected (UGX)</label><input id="f_exp" type="number" placeholder="0"></div>
+            <div><label>Health Status</label><input id="health" value="Normal"></div>
         </div>
-        <button class="btn" onclick="saveData()">SAVE STUDENT RECORD</button>
+        <button class="btn" id="saveBtn" onclick="dbSave()">UPDATE DATABASE</button>
+        <button class="btn hidden" id="cancelBtn" onclick="resetForm()" style="background:#666;">CANCEL EDIT</button>
     </div>
 
-    <div id="v-rec" class="container table-wrap">
+    <div id="v-rec" class="box table-wrap">
         <table>
             <thead>
-                <tr><th>Official LIN</th><th>Auto LIN</th><th>Name</th><th>Class</th><th>Gender</th><th>Status</th><th>Action</th></tr>
+                <tr><th>Official LIN</th><th>Full Name</th><th>Class</th><th>Payment Status</th><th>Action</th></tr>
             </thead>
             <tbody id="resList"></tbody>
         </table>
     </div>
 
-    <div id="v-fin" class="container table-wrap hidden">
-        <table>
-            <thead>
-                <tr><th>Name</th><th>Payment Code</th><th>Paid</th><th>Balance</th><th>Status</th></tr>
-            </thead>
-            <tbody id="finList"></tbody>
-        </table>
+    <div id="v-roll" class="box hidden">
+        <label>Select Class for Attendance</label>
+        <select id="rollFilter" onchange="load()" style="margin-bottom:15px; border:2px solid var(--blue);">
+            <option value="All">All Classes</option>
+            <option>P.1</option><option>P.2</option><option>P.3</option>
+            <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+        </select>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Student Name</th><th>Class</th><th>Attendance Status</th></tr></thead>
+                <tbody id="rollList"></tbody>
+            </table>
+        </div>
     </div>
 
-    <div style="text-align:center; padding:20px; font-size:10px; font-weight:bold; color:#aaa;">
-        EUDES MEDIA SOLUTIONS | +256762992440
-    </div>
+    <div class="footer">EUDES MEDIA SOLUTIONS | +256762992440</div>
 </div>
 
 <script>
-    // FULL VERIFIED CONNECTION
-    const URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-    const _supabase = supabase.createClient(URL, KEY);
+    // SUPABASE CONFIGURATION
+    const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
+    const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-    function doLogin() {
-        if(document.getElementById('user').value === "Admin" && document.getElementById('pass').value === "JESUS CARES") {
-            document.getElementById('login').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            refresh();
-        } else { alert("Login Failed"); }
+    function login() {
+        if(document.getElementById('p').value === "JESUS CARES") {
+            document.getElementById('loginGate').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            load();
+        } else { alert("Invalid Credentials"); }
     }
 
-    function setView(v) {
-        ['v-adm','v-rec','v-fin'].forEach(id => document.getElementById(id).classList.add('hidden'));
-        document.getElementById('v-'+v).classList.remove('hidden');
+    function tab(t) {
+        ['v-adm','v-rec','v-roll'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById('v-'+t).classList.remove('hidden');
         document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-        document.getElementById('n-'+v).classList.add('active');
+        document.getElementById('t-'+t).classList.add('active');
     }
 
-    async function saveData() {
-        const auto_lin = "PMA-" + Math.floor(Math.random()*9000+1000);
-        const { error } = await _supabase.from('students').insert([{
-            name: document.getElementById('f_name').value,
-            official_lin: document.getElementById('f_olin').value,
-            lin: auto_lin,
-            gender: document.getElementById('f_gen').value,
-            dob: document.getElementById('f_dob').value,
-            class: document.getElementById('f_cls').value,
-            location: document.getElementById('f_loc').value,
-            fees_expected: document.getElementById('f_exp').value || 0,
+    async function dbSave() {
+        const id = document.getElementById('editId').value;
+        const payload = {
+            name: document.getElementById('name').value,
+            official_lin: document.getElementById('o_lin').value,
+            class: document.getElementById('cls').value,
             fees_paid: document.getElementById('f_paid').value || 0,
-            payment_code: "TX-" + Math.floor(Math.random()*9000),
-            status: "Active",
-            is_absent: false
-        }]);
-        if(error) alert(error.message); else { alert("Saved!"); refresh(); setView('rec'); }
+            fees_expected: document.getElementById('f_exp').value || 0,
+            health_status: document.getElementById('health').value,
+            contact: "+256762992440"
+        };
+
+        if(!payload.name) { alert("Name is required"); return; }
+
+        let response;
+        if(id) {
+            // Update Existing
+            response = await _client.from('students').update(payload).eq('id', id);
+        } else {
+            // Create New
+            payload.lin = "PMA-" + Math.floor(Math.random()*10000);
+            response = await _client.from('students').insert([payload]);
+        }
+
+        if(response.error) {
+            alert("Error: " + response.error.message);
+        } else {
+            alert("Supabase Database Updated!");
+            resetForm();
+            load();
+            tab('rec');
+        }
     }
 
-    async function refresh() {
-        const { data, error } = await _supabase.from('students').select('*').order('name');
+    async function load() {
+        let { data, error } = await _client.from('students').select('*').order('name', { ascending: true });
         if (error) { console.error(error); return; }
 
+        // Filter by class for Roll Call
+        const filter = document.getElementById('rollFilter').value;
+        const filteredData = filter === "All" ? data : data.filter(s => s.class === filter);
+
+        // Dashboard Stats
         document.getElementById('tCnt').innerText = data.length;
         document.getElementById('pCnt').innerText = data.filter(s => parseFloat(s.fees_paid) >= parseFloat(s.fees_expected)).length;
         document.getElementById('aCnt').innerText = data.filter(s => s.is_absent).length;
 
         const list = document.getElementById('resList');
-        const flist = document.getElementById('finList');
-        list.innerHTML = ""; flist.innerHTML = "";
+        const roll = document.getElementById('rollList');
+        list.innerHTML = ""; roll.innerHTML = "";
 
         data.forEach(s => {
+            const isFullPaid = (s.fees_expected - s.fees_paid) <= 0;
             list.innerHTML += `<tr>
-                <td><b>${s.official_lin || '---'}</b></td>
-                <td><small>${s.lin}</small></td>
-                <td>${s.name}</td><td>${s.class}</td><td>${s.gender}</td>
-                <td><span style="background:green;color:white;padding:3px 6px;border-radius:4px;font-size:10px;">${s.status}</span></td>
-                <td><button onclick="del('${s.id}')" style="color:red;border:none;background:none;cursor:pointer;">DEL</button></td>
+                <td><b>${s.official_lin || 'PENDING'}</b></td>
+                <td>${s.name}</td><td>${s.class}</td>
+                <td><span class="badge" style="background:${isFullPaid?'var(--green)':'var(--red)'}">${isFullPaid?'PAID':'DEBT'}</span></td>
+                <td><button onclick="editMode('${s.id}')" style="background:none; border:1px solid var(--blue); color:var(--blue); padding:4px 8px; border-radius:4px; cursor:pointer;">EDIT</button></td>
             </tr>`;
+        });
 
-            const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
-            flist.innerHTML += `<tr>
-                <td>${s.name}</td><td>${s.payment_code}</td><td>${s.fees_paid}</td>
-                <td>${bal}</td><td>${bal<=0?'PAID':'DEBT'}</td>
+        filteredData.forEach(s => {
+            roll.innerHTML += `<tr>
+                <td>${s.name}</td><td>${s.class}</td>
+                <td>
+                    <button onclick="updateAttendance('${s.id}', ${!s.is_absent})" 
+                        style="background:${s.is_absent?'#eee':'var(--green)'}; color:${s.is_absent?'#999':'white'}; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">
+                        ${s.is_absent ? 'MARK PRESENT' : 'PRESENT'}
+                    </button>
+                    <button onclick="updateAttendance('${s.id}', true)" 
+                        style="background:${s.is_absent?'var(--red)':'#eee'}; color:${s.is_absent?'white':'#999'}; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left:5px;">
+                        ${s.is_absent ? 'ABSENT' : 'MARK ABSENT'}
+                    </button>
+                </td>
             </tr>`;
         });
     }
 
-    async function del(id) {
-        if(confirm("Delete Record?")) {
-            await _supabase.from('students').delete().eq('id', id);
-            refresh();
-        }
+    async function updateAttendance(id, status) {
+        await _client.from('students').update({ is_absent: status }).eq('id', id);
+        load();
     }
 
+    async function editMode(id) {
+        const { data } = await _client.from('students').select('*').eq('id', id).single();
+        document.getElementById('editId').value = data.id;
+        document.getElementById('name').value = data.name;
+        document.getElementById('o_lin').value = data.official_lin;
+        document.getElementById('cls').value = data.class;
+        document.getElementById('f_paid').value = data.fees_paid;
+        document.getElementById('f_exp').value = data.fees_expected;
+        document.getElementById('health').value = data.health_status;
+        
+        document.getElementById('formTitle').innerText = "Update " + data.name;
+        document.getElementById('saveBtn').innerText = "CONFIRM CHANGES";
+        document.getElementById('cancelBtn').classList.remove('hidden');
+        tab('adm');
+    }
+
+    function resetForm() {
+        document.getElementById('editId').value = "";
+        document.querySelectorAll('input').forEach(i => i.value = "");
+        document.getElementById('formTitle').innerText = "Student Registration";
+        document.getElementById('saveBtn').innerText = "UPDATE DATABASE";
+        document.getElementById('cancelBtn').classList.add('hidden');
+    }
+
+    // Daily Routines & Ugandan Calendar
     setInterval(() => {
-        const d = new Date();
-        document.getElementById('clock').innerText = d.toLocaleTimeString('en-GB');
-        document.getElementById('date').innerText = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'LONG', year: 'numeric' }).toUpperCase();
+        const now = new Date();
+        const hr = now.getHours();
+        const min = now.getMinutes();
+        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
+        
+        // Date formatting
+        const options = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+        document.getElementById('dateStr').innerText = now.toLocaleDateString('en-GB', options).toUpperCase();
+
+        // Routines
+        let routine = "REST TIME";
+        if(hr < 8) routine = "ARRIVAL & PREPARATION";
+        else if(hr == 8 && min < 30) routine = "MORNING ASSEMBLY";
+        else if(hr < 13) routine = "CLASS SESSIONS";
+        else if(hr == 13) routine = "LUNCH BREAK";
+        else if(hr < 16) routine = "AFTERNOON CLASSES";
+        else routine = "DISMISSAL / EXTRA-CURRICULAR";
+        document.getElementById('routineDisplay').innerText = "ROUTINE: " + routine;
+
+        // Easter Monday 2026 Check
+        if(now.getMonth() == 3 && now.getDate() == 6) {
+            document.getElementById('holidayDisplay').innerText = "EASTER MONDAY (HOLIDAY)";
+        }
     }, 1000);
 </script>
 </body>
