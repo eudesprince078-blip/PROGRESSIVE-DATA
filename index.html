@@ -9,17 +9,18 @@
         :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #28a745; --wa: #25D366; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 0; font-size: 16px; }
         
+        /* HEADER RESTORED */
         .header { background: var(--red); color: white; padding: 12px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .school-title { font-size: 10px; font-weight: 900; line-height: 1.2; }
+        .school-title { font-size: 11px; font-weight: 900; line-height: 1.2; }
 
         .login-screen { position: fixed; inset: 0; background: var(--blue); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: white; text-align: center; }
         .pass-box { position: relative; width: 100%; max-width: 280px; margin-top: 15px; }
         .toggle-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--blue); font-weight: bold; font-size: 11px; cursor: pointer; padding: 5px; }
 
         .hero { background: var(--blue); color: white; padding: 15px 10px; text-align: center; }
-        #clock { font-size: 38px; font-weight: 900; }
+        #clock { font-size: 38px; font-weight: 900; margin-bottom: 5px; }
         
-        .routine-box { background: var(--gold); color: var(--blue); padding: 12px; margin: -15px 15px 10px 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .routine-box { background: var(--gold); color: var(--blue); padding: 12px; margin: -15px 15px 10px 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-weight: 900; }
 
         .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 62px; z-index: 900; }
         .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 11px; color: #666; cursor: pointer; }
@@ -28,11 +29,12 @@
         .item-card { background: white; border-radius: 12px; padding: 15px; margin: 10px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); }
         .lin-bold { font-weight: 900; color: var(--blue); font-size: 14px; background: #eef2f7; padding: 2px 6px; border-radius: 4px; }
         
-        .action-btn { padding: 10px 15px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: bold; color: white; display: inline-flex; align-items: center; margin-right: 5px; }
-        .call-btn { background: var(--blue); }
-        .wa-btn { background: var(--wa); }
+        /* CONTACT BUTTONS RESTORED */
+        .action-btn { padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 16px; display: inline-flex; align-items: center; margin-right: 8px; }
+        .call-btn { background: var(--blue); color: white; }
+        .wa-btn { background: var(--wa); color: white; }
         
-        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; min-width: 100px; color: white; cursor: pointer; }
+        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; min-width: 110px; color: white; cursor: pointer; }
         .alert-card { background: #fff0f0; border: 2px solid var(--red); color: var(--red); padding: 15px; margin: 10px 15px; border-radius: 12px; }
 
         input, select { width: 100%; padding: 14px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px; margin-top: 8px; box-sizing: border-box; }
@@ -42,7 +44,7 @@
 <body>
 
 <div id="loginGate" class="login-screen">
-    <div style="font-weight:900; color:var(--gold);">PROGRESSIVE MOTHERS GAYAZA</div>
+    <div style="font-size: 18px; font-weight:900; color:var(--gold);">PROGRESSIVE MOTHERS<br>NURSERY AND PRIMARY SCHOOL</div>
     <div class="pass-box">
         <input id="key" type="password" placeholder="ACCESS KEY" style="text-align:center;">
         <span class="toggle-btn" onclick="togglePass()">SHOW</span>
@@ -52,14 +54,12 @@
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div class="school-title">PROGRESSIVE MOTHERS<br>GAYAZA-KIJABIJJO</div>
+        <div class="school-title">PROGRESSIVE MOTHERS<br>NURSERY AND PRIMARY SCHOOL</div>
         <button onclick="location.reload()" style="background:white; color:var(--red); border:none; padding:5px 10px; border-radius:5px; font-weight:bold; font-size:10px;">LOGOUT</button>
     </div>
 
     <div class="hero"><div id="clock">00:00:00</div></div>
-    <div class="routine-box">
-        <div id="r-task" style="font-weight:900; font-size:16px;">LOADING ROUTINE...</div>
-    </div>
+    <div class="routine-box" id="r-task">LOADING ROUTINE...</div>
 
     <div id="chronicSection" class="hidden">
         <div class="alert-card">
@@ -156,17 +156,16 @@
         let { data } = await _client.from('students').select('*').order('name');
         if(!data) return;
 
-        // CHRONIC ABSENT LOGIC (2+ DAYS)
-        const chronicList = document.getElementById('chronicList');
-        const chronicData = data.filter(s => s.absent_days >= 2);
-        chronicList.innerHTML = chronicData.map(s => `
-            <div style="border-bottom:1px solid #ffcccc; padding:8px 0;">
-                <b>${s.name}</b> (${s.class}) - <span style="font-weight:bold;">${s.absent_days} Days Absent</span><br>
-                <a href="tel:${s.parent_contact}" class="action-btn call-btn" style="padding:5px 10px; font-size:10px;">CALL</a>
-            </div>
-        `).join('');
+        // Chronic list for Admin
+        if(role === "Admin") {
+            const chronicData = data.filter(s => s.absent_days >= 2);
+            document.getElementById('chronicList').innerHTML = chronicData.map(s => `
+                <div style="border-bottom:1px solid #ffcccc; padding:8px 0;">
+                    <b>${s.name}</b> (${s.class}) - <span style="font-weight:bold;">${s.absent_days} Days</span>
+                </div>
+            `).join('');
+        }
 
-        // SEARCH LOGIC
         if(q) data = data.filter(s => 
             s.name.toLowerCase().includes(q) || 
             s.class.toLowerCase().includes(q) || 
@@ -181,12 +180,12 @@
             list.innerHTML += `<div class="item-card">
                 <div style="margin-bottom:8px;"><span class="lin-bold">${s.official_lin || 'NO LIN'}</span></div>
                 <b style="font-size:18px;">${s.name}</b><br><small>${s.class}</small>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
                     <div>
-                        <a href="tel:${num}" class="action-btn call-btn">📞</a>
-                        <a href="https://wa.me/${wa}" class="action-btn wa-btn">💬</a>
+                        <a href="tel:${num}" class="action-btn call-btn">📞 CALL</a>
+                        <a href="https://wa.me/${wa}" class="action-btn wa-btn">💬 WA</a>
                     </div>
-                    ${role !== "Teacher" ? `<button onclick="editMode('${s.id}')" style="background:#eee; border:none; padding:8px 12px; border-radius:5px; font-size:11px; font-weight:bold;">EDIT</button>` : ''}
+                    ${role !== "Teacher" ? `<button onclick="editMode('${s.id}')" style="background:#eee; border:none; padding:8px 12px; border-radius:5px; font-weight:bold;">EDIT</button>` : ''}
                 </div>
             </div>`;
         });
@@ -208,11 +207,21 @@
 
     async function markAttendance(id, status, btn) {
         btn.innerText = "...";
+        btn.disabled = true;
+        
         const { data: cur } = await _client.from('students').select('absent_days').eq('id', id).single();
         let newCount = status ? (parseInt(cur.absent_days || 0) + 1) : 0;
         
-        await _client.from('students').update({ is_absent: status, absent_days: newCount }).eq('id', id);
-        load();
+        // FIXED: Allows toggling back and forth
+        const { error } = await _client.from('students').update({ is_absent: status, absent_days: newCount }).eq('id', id);
+        
+        if(error) {
+            alert("Network Error: Save Failed");
+            btn.disabled = false;
+            btn.innerText = status ? "PRESENT" : "ABSENT";
+        } else {
+            load();
+        }
     }
 
     async function submitData() {
