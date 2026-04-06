@@ -2,22 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive PMS V20</title>
+    <title>Progressive PMS V21</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #28a745; --wa: #25D366; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 0; font-size: 16px; user-select: none; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 0; font-size: 16px; }
         
         .header { background: var(--red); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .school-title { font-size: 16px; font-weight: 900; letter-spacing: 0.5px; }
+        .school-title { font-size: 16px; font-weight: 900; }
         .motto { font-size: 10px; font-style: italic; color: #ffeeba; display: block; }
 
         .login-screen { position: fixed; inset: 0; background: var(--blue); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: white; text-align: center; }
+        
         .hero { background: var(--blue); color: white; padding: 25px 10px; text-align: center; }
         #fullDate { font-size: 15px; font-weight: bold; color: var(--gold); text-transform: uppercase; }
         #clock { font-size: 42px; font-weight: 900; margin: 5px 0; }
         
+        .holiday-banner { background: #fff3cd; color: #856404; padding: 12px; font-weight: bold; text-align: center; font-size: 13px; border-bottom: 2px solid var(--gold); }
+
         .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 15px; margin-top: -35px; }
         .s-card { background: white; border-radius: 12px; padding: 15px 5px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-bottom: 5px solid var(--gold); }
         .s-val { font-size: 22px; font-weight: bold; color: var(--blue); }
@@ -27,12 +30,13 @@
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f8f9fa; }
 
         .item-card { background: white; border-radius: 10px; padding: 15px; margin: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 6px solid var(--blue); }
-        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; font-size: 14px; min-width: 120px; cursor: pointer; color: white; -webkit-tap-highlight-color: transparent; }
         
-        .action-btn { padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 11px; font-weight: bold; color: white; display: inline-flex; align-items: center; margin-right: 5px; }
+        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; font-size: 14px; min-width: 120px; cursor: pointer; color: white; }
+        .action-btn { padding: 10px 14px; border-radius: 6px; text-decoration: none; font-size: 11px; font-weight: bold; color: white; display: inline-flex; align-items: center; margin-top: 10px; margin-right: 5px; }
         .call-btn { background: var(--blue); }
         .wa-btn { background: var(--wa); }
-        .logout-btn { background: rgba(255,255,255,0.2); color: white; border: 1px solid white; padding: 5px 10px; border-radius: 5px; font-size: 10px; font-weight: bold; }
+        
+        .logout-btn { background: rgba(255,255,255,0.2); color: white; border: 1px solid white; padding: 6px 12px; border-radius: 5px; font-size: 11px; font-weight: bold; }
 
         input, select { width: 100%; padding: 15px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px; margin-top: 8px; box-sizing: border-box; }
         .balance-tag { background: #f8f9fa; padding: 15px; border-radius: 8px; font-weight: 900; color: var(--red); margin-top: 15px; text-align: center; border: 2px dashed var(--red); font-size: 18px; }
@@ -56,6 +60,8 @@
         </div>
         <button class="logout-btn" onclick="location.reload()">LOGOUT</button>
     </div>
+
+    <div id="holidayBanner" class="holiday-banner hidden"></div>
 
     <div class="hero">
         <div id="fullDate">DATE</div>
@@ -185,16 +191,16 @@
         const q = document.getElementById('searchBar').value.toLowerCase();
         let { data } = await _client.from('students').select('*').order('name');
         
+        // Chronic Section (Admin)
         if(role === "Admin") {
             const chronic = data.filter(s => s.absent_days >= 2);
             document.getElementById('chronicList').innerHTML = chronic.map(s => {
                 const phone = s.parent_contact ? s.parent_contact.replace(/\s+/g, '') : '';
+                const waNum = phone.startsWith('0') ? '256' + phone.substring(1) : phone;
                 return `<div style="padding:10px; border-bottom:1px solid #eee;">
                     <b>${s.name}</b> (${s.class})<br>
-                    <div style="margin-top:5px;">
-                        <a href="tel:${phone}" class="action-btn call-btn">📞 CALL</a>
-                        <a href="https://wa.me/${phone.startsWith('0') ? '256'+phone.substring(1) : phone}" class="action-btn wa-btn">💬 WHATSAPP</a>
-                    </div>
+                    <a href="tel:${phone}" class="action-btn call-btn">📞 CALL</a>
+                    <a href="https://wa.me/${waNum}" class="action-btn wa-btn">💬 WHATSAPP</a>
                 </div>`;
             }).join("");
         }
@@ -210,10 +216,19 @@
         list.innerHTML = ""; rollList.innerHTML = "";
 
         data.forEach(s => {
+            const phone = s.parent_contact ? s.parent_contact.replace(/\s+/g, '') : '';
+            const waNum = phone.startsWith('0') ? '256' + phone.substring(1) : phone;
+            
             list.innerHTML += `<div class="item-card">
                 <div style="display:flex; justify-content:space-between; font-size:10px; color:#888;"><span>${s.lin}</span><span>${s.class}</span></div>
                 <b>${s.name}</b><br><small>📍 ${s.location || 'N/A'}</small>
-                <div style="text-align:right;"><button onclick="editMode('${s.id}')" style="background:var(--blue); color:white; border:none; padding:8px 15px; border-radius:5px; font-size:11px;">EDIT</button></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                    <div>
+                        <a href="tel:${phone}" class="action-btn call-btn" style="padding:6px 10px;">📞</a>
+                        <a href="https://wa.me/${waNum}" class="action-btn wa-btn" style="padding:6px 10px;">💬</a>
+                    </div>
+                    <button onclick="editMode('${s.id}')" style="background:var(--blue); color:white; border:none; padding:8px 15px; border-radius:5px; font-size:11px;">EDIT</button>
+                </div>
             </div>`;
         });
 
@@ -231,17 +246,10 @@
     }
 
     async function markAttendance(id, status) {
-        // Direct update to Supabase
-        const { data: current } = await _client.from('students').select('absent_days').eq('id', id).single();
-        let newCount = status ? (parseInt(current.absent_days || 0) + 1) : 0;
-        
-        await _client.from('students').update({ 
-            is_absent: status, 
-            absent_days: newCount, 
-            last_roll_call: new Date().toDateString() 
-        }).eq('id', id);
-        
-        load(); // Refresh the UI
+        const { data: cur } = await _client.from('students').select('absent_days').eq('id', id).single();
+        let count = status ? (parseInt(cur.absent_days || 0) + 1) : 0;
+        await _client.from('students').update({ is_absent: status, absent_days: count, last_roll_call: new Date().toDateString() }).eq('id', id);
+        load();
     }
 
     async function editMode(id) {
@@ -262,10 +270,27 @@
 
     function resetForm() { document.getElementById('editId').value = ""; document.querySelectorAll('input').forEach(i => { i.value = ""; i.disabled = false; }); document.getElementById('balDisplay').innerText = "0"; }
 
+    // Uganda Public Holidays 2026
+    const holidays = {
+        "1/1": "New Year's Day", "26/1": "NRM Liberation Day", "16/2": "Janani Luwum Day",
+        "8/3": "Women's Day", "3/4": "Good Friday", "6/4": "Easter Monday",
+        "1/5": "Labour Day", "3/6": "Martyrs' Day", "9/6": "Heroes' Day", "9/10": "Independence Day"
+    };
+
     setInterval(() => {
         const d = new Date();
         document.getElementById('clock').innerText = d.toLocaleTimeString('en-GB');
         document.getElementById('fullDate').innerText = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        
+        const hKey = `${d.getDate()}/${d.getMonth() + 1}`;
+        const banner = document.getElementById('holidayBanner');
+        if(holidays[hKey]) {
+            banner.innerText = "⭐ TODAY IS " + holidays[hKey].toUpperCase() + " (HOLIDAY)";
+            banner.classList.remove('hidden');
+        } else {
+            banner.classList.add('hidden');
+        }
+
         const hr = d.getHours(); const min = d.getMinutes(); const t = hr * 60 + min;
         let r = "RESTING";
         if (t >= 300 && t < 630) r = "MORNING LESSONS";
