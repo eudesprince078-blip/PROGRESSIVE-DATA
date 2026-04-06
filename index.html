@@ -9,32 +9,36 @@
         :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #28a745; --wa: #25D366; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 0; font-size: 16px; }
         
-        /* HEADER RESTORED */
+        /* FULL SCHOOL NAME HEADER */
         .header { background: var(--red); color: white; padding: 12px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .school-title { font-size: 11px; font-weight: 900; line-height: 1.2; }
+        .school-title { font-size: 11px; font-weight: 900; line-height: 1.2; text-transform: uppercase; }
 
         .login-screen { position: fixed; inset: 0; background: var(--blue); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: white; text-align: center; }
         .pass-box { position: relative; width: 100%; max-width: 280px; margin-top: 15px; }
         .toggle-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--blue); font-weight: bold; font-size: 11px; cursor: pointer; padding: 5px; }
 
         .hero { background: var(--blue); color: white; padding: 15px 10px; text-align: center; }
-        #clock { font-size: 38px; font-weight: 900; margin-bottom: 5px; }
+        #clock { font-size: 38px; font-weight: 900; }
         
-        .routine-box { background: var(--gold); color: var(--blue); padding: 12px; margin: -15px 15px 10px 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-weight: 900; }
+        .routine-box { background: var(--gold); color: var(--blue); padding: 12px; margin: -15px 15px 10px 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-weight: 900; font-size: 18px; }
 
         .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 62px; z-index: 900; }
         .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 11px; color: #666; cursor: pointer; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f8f9fa; }
 
         .item-card { background: white; border-radius: 12px; padding: 15px; margin: 10px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); }
-        .lin-bold { font-weight: 900; color: var(--blue); font-size: 14px; background: #eef2f7; padding: 2px 6px; border-radius: 4px; }
         
-        /* CONTACT BUTTONS RESTORED */
-        .action-btn { padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 16px; display: inline-flex; align-items: center; margin-right: 8px; }
-        .call-btn { background: var(--blue); color: white; }
-        .wa-btn { background: var(--wa); color: white; }
+        /* LIN NUMBERS - BOLD AND VISIBLE */
+        .lin-display { font-weight: 900; color: #fff; background: var(--blue); padding: 4px 10px; border-radius: 4px; font-size: 13px; display: inline-block; margin-bottom: 8px; }
         
-        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; min-width: 110px; color: white; cursor: pointer; }
+        .action-btn { padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; color: white; display: inline-flex; align-items: center; margin-right: 8px; }
+        .call-btn { background: var(--blue); }
+        .wa-btn { background: var(--wa); }
+        
+        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; min-width: 115px; color: white; cursor: pointer; text-transform: uppercase; }
+        .btn-p { background: var(--green); }
+        .btn-a { background: var(--red); }
+        
         .alert-card { background: #fff0f0; border: 2px solid var(--red); color: var(--red); padding: 15px; margin: 10px 15px; border-radius: 12px; }
 
         input, select { width: 100%; padding: 14px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px; margin-top: 8px; box-sizing: border-box; }
@@ -83,16 +87,15 @@
         <div style="background:white; padding:20px; border-radius:15px; border:1px solid #ddd;">
             <input type="hidden" id="editId">
             <input id="name" placeholder="Full Name">
-            <input id="o_lin" placeholder="Official LIN">
+            <input id="o_lin" placeholder="LIN NUMBER">
             <select id="cls">
                 <option>P.1</option><option>P.2</option><option>P.3</option>
                 <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <input id="loc" placeholder="Home Location">
-            <input id="parent_ph" type="tel" placeholder="Parent Contact">
+            <input id="parent_ph" type="tel" placeholder="Parent Contact Number">
             <div id="finSection">
-                <input id="f_exp" type="number" placeholder="Expected Fees">
-                <input id="f_paid" type="number" placeholder="Paid Fees">
+                <input id="f_exp" type="number" placeholder="Fees Expected">
+                <input id="f_paid" type="number" placeholder="Fees Paid">
             </div>
             <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:10px; font-weight:900; margin-top:20px;">SAVE STUDENT</button>
         </div>
@@ -156,48 +159,54 @@
         let { data } = await _client.from('students').select('*').order('name');
         if(!data) return;
 
-        // Chronic list for Admin
+        // Chronic list (Admin Only)
         if(role === "Admin") {
             const chronicData = data.filter(s => s.absent_days >= 2);
             document.getElementById('chronicList').innerHTML = chronicData.map(s => `
                 <div style="border-bottom:1px solid #ffcccc; padding:8px 0;">
-                    <b>${s.name}</b> (${s.class}) - <span style="font-weight:bold;">${s.absent_days} Days</span>
+                    <b>${s.name}</b> (${s.class}) - <span style="font-weight:bold;">${s.absent_days} Days Absent</span>
                 </div>
             `).join('');
         }
 
+        // Search Name, Class, or LIN
         if(q) data = data.filter(s => 
             s.name.toLowerCase().includes(q) || 
             s.class.toLowerCase().includes(q) || 
             (s.official_lin && s.official_lin.toLowerCase().includes(q))
         );
 
+        // RECORDS VIEW
         const list = document.getElementById('dataList');
         list.innerHTML = "";
         data.forEach(s => {
             const num = s.parent_contact ? s.parent_contact.replace(/\s+/g, '') : '';
             const wa = num.startsWith('0') ? '256' + num.substring(1) : num;
             list.innerHTML += `<div class="item-card">
-                <div style="margin-bottom:8px;"><span class="lin-bold">${s.official_lin || 'NO LIN'}</span></div>
+                <div><span class="lin-display">LIN: ${s.official_lin || 'PENDING'}</span></div>
                 <b style="font-size:18px;">${s.name}</b><br><small>${s.class}</small>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
                     <div>
-                        <a href="tel:${num}" class="action-btn call-btn">📞 CALL</a>
-                        <a href="https://wa.me/${wa}" class="action-btn wa-btn">💬 WA</a>
+                        <a href="tel:${num}" class="action-btn call-btn">CALL</a>
+                        <a href="https://wa.me/${wa}" class="action-btn wa-btn">WHATSAPP</a>
                     </div>
                     ${role !== "Teacher" ? `<button onclick="editMode('${s.id}')" style="background:#eee; border:none; padding:8px 12px; border-radius:5px; font-weight:bold;">EDIT</button>` : ''}
                 </div>
             </div>`;
         });
 
+        // ROLL CALL VIEW
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData');
         rollList.innerHTML = "";
         data.filter(s => s.class === rCls).forEach(s => {
             rollList.innerHTML += `<div class="item-card" style="border-left-color:${s.is_absent?'red':'green'}">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <b>${s.name}</b>
-                    <button class="btn-roll" style="background:${s.is_absent?'var(--red)':'var(--green)'}" onclick="markAttendance('${s.id}', ${!s.is_absent}, this)">
+                    <div>
+                        <span style="font-weight:900; font-size:12px;">${s.official_lin || ''}</span><br>
+                        <b>${s.name}</b>
+                    </div>
+                    <button class="btn-roll ${s.is_absent?'btn-a':'btn-p'}" onclick="markAttendance('${s.id}', ${!s.is_absent}, this)">
                         ${s.is_absent ? 'ABSENT' : 'PRESENT'}
                     </button>
                 </div>
@@ -206,19 +215,21 @@
     }
 
     async function markAttendance(id, status, btn) {
+        const originalText = btn.innerText;
         btn.innerText = "...";
         btn.disabled = true;
         
+        // Fetch current days to calculate count
         const { data: cur } = await _client.from('students').select('absent_days').eq('id', id).single();
-        let newCount = status ? (parseInt(cur.absent_days || 0) + 1) : 0;
+        let currentDays = parseInt(cur.absent_days || 0);
+        let newCount = status ? (currentDays + 1) : Math.max(0, currentDays - 1);
         
-        // FIXED: Allows toggling back and forth
         const { error } = await _client.from('students').update({ is_absent: status, absent_days: newCount }).eq('id', id);
         
         if(error) {
-            alert("Network Error: Save Failed");
+            alert("Network Error: Save Failed. Tap again.");
+            btn.innerText = originalText;
             btn.disabled = false;
-            btn.innerText = status ? "PRESENT" : "ABSENT";
         } else {
             load();
         }
@@ -230,14 +241,13 @@
             name: document.getElementById('name').value,
             official_lin: document.getElementById('o_lin').value,
             class: document.getElementById('cls').value,
-            location: document.getElementById('loc').value,
             parent_contact: document.getElementById('parent_ph').value,
             fees_paid: parseFloat(document.getElementById('f_paid').value) || 0,
             fees_expected: parseFloat(document.getElementById('f_exp').value) || 0
         };
         if(id) await _client.from('students').update(payload).eq('id', id);
         else await _client.from('students').insert([payload]);
-        alert("Success!"); load();
+        alert("Saved Successfully!"); load();
     }
 
     async function editMode(id) {
@@ -246,7 +256,6 @@
         document.getElementById('name').value = data.name;
         document.getElementById('o_lin').value = data.official_lin || "";
         document.getElementById('cls').value = data.class;
-        document.getElementById('loc').value = data.location || "";
         document.getElementById('parent_ph').value = data.parent_contact || "";
         document.getElementById('f_paid').value = data.fees_paid;
         document.getElementById('f_exp').value = data.fees_expected;
