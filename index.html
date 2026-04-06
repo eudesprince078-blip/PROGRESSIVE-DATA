@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v30</title>
+    <title>Progressive Mothers PMS v31</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -40,7 +40,7 @@
 
 <div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
     <h1 style="color:white; font-weight:900; margin-bottom: 20px;">PMS LOGIN</h1>
-    <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; max-width:280px; border:3px solid var(--gold);">
+    <input id="key" type="password" placeholder="KEY" style="text-align:center; max-width:280px;">
     <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900;">LOGIN</button>
 </div>
 
@@ -58,8 +58,8 @@
 
     <div class="dashboard">
         <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Total Students</span></div>
-        <div class="stat-card" style="border-bottom-color: var(--green);"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present Today</span></div>
-        <div class="stat-card" style="border-bottom-color: var(--red);"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent Today</span></div>
+        <div class="stat-card" style="border-bottom-color: var(--green);"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present</span></div>
+        <div class="stat-card" style="border-bottom-color: var(--red);"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent</span></div>
     </div>
 
     <div class="nav-tabs">
@@ -78,21 +78,21 @@
 
     <div id="v-adm" class="hidden" style="padding:15px;">
         <div style="background:white; padding:20px; border-radius:20px; border:1px solid #ddd;">
-            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:14px;">NEW STUDENT REGISTRATION</h3>
+            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:14px;">STUDENT REGISTRATION</h3>
             <input type="hidden" id="editId">
             <label>Full Name</label><input id="name">
-            <label>LIN (Auto-generated)</label><input id="lin" placeholder="System will generate this">
+            <label>LIN (Generated on Save)</label><input id="lin" readonly placeholder="Auto-filled after save">
             <label>Class</label><select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label>Age</label><input id="age" type="number"></div>
                 <div><label>DOB</label><input id="dob" type="date"></div>
             </div>
             <label>Location</label><input id="location">
-            <label>Contact Number</label><input id="contact">
+            <label>Parent Contact</label><input id="contact">
             <label>Health Status</label><input id="health">
             <label>Expected Fees</label><input id="f_exp" type="number">
             <label>Fees Paid</label><input id="f_paid" type="number">
-            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:15px; font-weight:900; font-size:15px;">SAVE & REGISTER</button>
+            <button id="saveBtn" onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:15px; font-weight:900; font-size:15px;">CONFIRM & SAVE</button>
         </div>
     </div>
 
@@ -119,7 +119,7 @@
         if (k === "JESUS CARES") role = "Admin";
         else if (k === "FINANCE 256") role = "Finance";
         else if (k === "TEACH2026") role = "Teacher";
-        else { alert("WRONG KEY!"); return; }
+        else { alert("INVALID KEY"); return; }
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         tab(role === "Teacher" ? 'roll' : 'rec');
@@ -140,9 +140,11 @@
             document.getElementById(f).value = "";
             document.getElementById(f).disabled = false;
         });
+        document.getElementById('saveBtn').innerText = "CONFIRM & SAVE";
     }
 
     async function loadData() {
+        // Force refresh data from server
         const { data, error } = await _client.from('students').select('*').order('name');
         if(error) return;
 
@@ -150,13 +152,21 @@
         document.getElementById('c-pres').innerText = data.filter(s => s.is_absent === false).length;
         document.getElementById('c-abs').innerText = data.filter(s => s.is_absent === true).length;
 
+        // Reset Records List
         const q = document.getElementById('searchBar').value.toLowerCase();
         let filtered = q ? data.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))) : data;
-        const list = document.getElementById('dataList'); list.innerHTML = "";
+        const list = document.getElementById('dataList'); 
+        list.innerHTML = ""; // CRITICAL: Clear list before rebuilding
+
+        if (filtered.length === 0 && q !== "") {
+            list.innerHTML = "<p style='text-align:center; padding:20px; color:#888;'>No student found.</p>";
+        }
+
         filtered.forEach(s => {
-            list.innerHTML += `<div class="item-card"><div class="lin-badge">${s.lin || 'N/A'}</div><b>${s.name}</b><br><small>${s.class}</small><div style="margin-top:12px; display:flex; gap:8px;"><button class="action-btn btn-edit" onclick="editMode('${s.id}')">EDIT</button><a href="tel:${s.contact}" class="action-btn btn-call">CALL</a>${role==='Admin'?`<button class="action-btn btn-del" onclick="deleteStudent('${s.id}')">DELETE</button>`:''}</div></div>`;
+            list.innerHTML += `<div class="item-card"><div class="lin-badge">${s.lin || 'NEW'}</div><b>${s.name}</b><br><small>${s.class}</small><div style="margin-top:12px; display:flex; gap:8px;"><button class="action-btn btn-edit" onclick="editMode('${s.id}')">EDIT</button><a href="tel:${s.contact}" class="action-btn btn-call">CALL</a>${role==='Admin'?`<button class="action-btn btn-del" onclick="deleteStudent('${s.id}')">DELETE</button>`:''}</div></div>`;
         });
 
+        // Attendance List
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData'); rollList.innerHTML = "";
         const absList = document.getElementById('absentData'); absList.innerHTML = "";
@@ -190,17 +200,24 @@
     }
 
     async function submitData() {
+        const btn = document.getElementById('saveBtn');
         const id = document.getElementById('editId').value;
         const sName = document.getElementById('name').value.trim();
         const sClass = document.getElementById('cls').value;
         let lin = document.getElementById('lin').value;
 
         if(!sName) { alert("Please enter a name!"); return; }
+        btn.disabled = true; btn.innerText = "SAVING...";
 
-        if(!id) { // New Student Guard
+        // If it's a NEW registration, double check duplicate and generate LIN
+        if(!id) { 
             const { data: ex } = await _client.from('students').select('id').eq('name', sName).eq('class', sClass);
-            if(ex && ex.length > 0) { alert("ALREADY REGISTERED IN THIS CLASS!"); return; }
-            if(!lin) lin = await generateUniqueLIN(sName);
+            if(ex && ex.length > 0) { 
+                alert("This student is already registered in " + sClass); 
+                btn.disabled = false; btn.innerText = "CONFIRM & SAVE";
+                return; 
+            }
+            lin = await generateUniqueLIN(sName);
         }
 
         const payload = { 
@@ -212,18 +229,19 @@
             health: document.getElementById('health').value, 
             fees_paid: parseFloat(document.getElementById('f_paid').value)||0, 
             fees_expected: parseFloat(document.getElementById('f_exp').value)||0,
-            is_absent: false // Default to present when registering
+            is_absent: false 
         };
 
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
         
         if(error) {
             alert("SAVE FAILED: " + error.message);
+            btn.disabled = false; btn.innerText = "TRY AGAIN";
         } else {
             alert("SUCCESSFULLY SAVED!");
             clearForm();
-            loadData();
-            tab('rec');
+            await loadData(); // Force reload the records
+            tab('rec'); // Switch to records to show the result
         }
     }
 
@@ -241,35 +259,15 @@
             document.getElementById('health').value = data.health;
             document.getElementById('f_paid').value = data.fees_paid;
             document.getElementById('f_exp').value = data.fees_expected;
-            if(role === "Finance") ['name','lin','age','dob','cls','location','contact','health'].forEach(f => document.getElementById(f).disabled = true);
+            document.getElementById('saveBtn').innerText = "UPDATE RECORD";
+            if(role === "Finance") ['name','age','dob','cls','location','contact','health'].forEach(f => document.getElementById(f).disabled = true);
             tab('adm');
         });
     }
 
-    // Routine Engine
+    // Routine Clock
     setInterval(() => {
-        const now = new Date(); const day = now.getDay(); const hr = now.getHours(); const min = now.getMinutes(); const time = hr + (min/60);
-        let status = "RESTING / SLEEPING";
-        const holidays = [{m:4,d:6},{m:5,d:1},{m:6,d:3}];
-        const isH = holidays.some(h => h.m === (now.getMonth()+1) && h.d === now.getDate());
-
-        if(isH) status = "OFFICIAL PUBLIC HOLIDAY";
-        else if(day === 6) status = (time>=19 && time<21) ? "PREP LESSONS (SAT)" : "SABBATH - NO LESSONS";
-        else if(day === 0) {
-            if(time>=5 && time<16) status = "UPPER CLASSES ONLY";
-            else if(time>=19 && time<21) status = "PREP LESSONS (UPPER)";
-            else status = "PREPARATIONS / HOME";
-        } else {
-            if(time>=5 && time<8.5) status = "EARLY MORNING LESSONS";
-            else if(time>=8.5 && time<10.5) status = "MORNING LESSONS";
-            else if(time>=10.5 && time<11) status = "BREAK & BREAKFAST";
-            else if(time>=11 && time<13) status = "LESSONS";
-            else if(time>=13 && time<14) status = "LUNCH TIME";
-            else if(time>=14 && time<16) status = "NOON LESSONS";
-            else if(day===5 && time>=19) status = "RESTING (NO FRI PREP)";
-            else if(time>=19 && time<21) status = "PREP LESSONS (UPPER)";
-        }
-        document.getElementById('r-task').innerText = "STATUS: " + status;
+        const now = new Date();
         document.getElementById('full-date').innerText = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
         document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
     }, 1000);
