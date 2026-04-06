@@ -2,79 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers Management System</title>
+    <title>Progressive Mothers - Gayaza Kijabijjo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #28a745; --wa: #25D366; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 0; font-size: 16px; }
         
-        /* Header & Labels */
-        .header { background: var(--red); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .school-title { font-size: 12px; font-weight: 900; line-height: 1.2; }
-        .motto { font-size: 9px; font-style: italic; color: #ffeeba; display: block; }
+        .header { background: var(--red); color: white; padding: 12px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .school-title { font-size: 11px; font-weight: 900; line-height: 1.2; }
         
-        .login-screen { position: fixed; inset: 0; background: var(--blue); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: white; text-align: center; }
-        .pass-container { position: relative; width: 100%; max-width: 280px; margin-top: 10px; }
-        .toggle-pass { position: absolute; right: 10px; top: 50%; transform: translateY(-10px); color: var(--blue); font-size: 11px; font-weight: bold; cursor: pointer; }
+        .hero { background: var(--blue); color: white; padding: 20px 10px; text-align: center; }
+        #clock { font-size: 40px; font-weight: 900; margin: 5px 0; }
+        
+        /* ROUTINE SECTION */
+        .routine-box { background: var(--gold); color: var(--blue); padding: 12px; margin: -15px 15px 15px 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); position: relative; z-index: 5; }
+        .routine-time { font-size: 10px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
+        .routine-task { font-size: 18px; font-weight: 900; }
 
-        .hero { background: var(--blue); color: white; padding: 25px 10px; text-align: center; }
-        #clock { font-size: 42px; font-weight: 900; margin: 5px 0; }
-        .holiday-banner { background: #fff3cd; color: #856404; padding: 10px; font-weight: bold; text-align: center; font-size: 12px; border-bottom: 2px solid var(--gold); }
-
-        .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 15px; margin-top: -35px; }
-        .s-card { background: white; border-radius: 12px; padding: 15px 5px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-bottom: 5px solid var(--gold); }
+        .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 15px 15px 15px; }
+        .s-card { background: white; border-radius: 10px; padding: 12px 5px; text-align: center; border-bottom: 4px solid var(--gold); }
         .s-val { font-size: 20px; font-weight: bold; color: var(--blue); }
 
-        .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 72px; z-index: 900; }
-        .tab { flex: 1; text-align: center; padding: 18px 5px; font-weight: 900; font-size: 11px; color: #666; }
+        .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 65px; z-index: 900; }
+        .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 11px; color: #666; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f8f9fa; }
 
-        .item-card { background: white; border-radius: 12px; padding: 15px; margin: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-left: 6px solid var(--blue); }
+        .item-card { background: white; border-radius: 12px; padding: 15px; margin: 10px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); }
         
-        /* Attendance Button Logic */
-        .btn-roll { padding: 16px; border-radius: 8px; border: none; font-weight: 900; font-size: 14px; min-width: 120px; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; font-size: 13px; min-width: 110px; cursor: pointer; color: white; transition: 0.3s; }
         .btn-present { background: var(--green); }
         .btn-absent { background: var(--red); }
-        .btn-saving { opacity: 0.6; pointer-events: none; }
         
-        .action-btn { padding: 10px 14px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: bold; color: white; display: inline-flex; align-items: center; margin-top: 10px; margin-right: 5px; }
-        .call-btn { background: var(--blue); }
-        .wa-btn { background: var(--wa); }
-        
-        input, select { width: 100%; padding: 15px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px; margin-top: 8px; box-sizing: border-box; }
+        .login-screen { position: fixed; inset: 0; background: var(--blue); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: white; text-align: center; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px; margin-top: 8px; box-sizing: border-box; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div id="loginGate" class="login-screen">
-    <div style="font-size:18px; font-weight:900; color:var(--gold);">PROGRESSIVE MOTHERS<br>NURSERY AND PRIMARY SCHOOL<br>GAYAZA-KIJABIJJO</div>
-    <div style="font-style:italic; margin: 15px 0 30px 0;">"With God everything is possible"</div>
-    
-    <div class="pass-container">
-        <input id="key" type="password" placeholder="ACCESS KEY" style="text-align:center; border: 4px solid var(--gold);">
-        <span class="toggle-pass" onclick="togglePass()">SHOW</span>
-    </div>
-    
-    <button onclick="secureLogin()" style="width:100%; max-width:250px; background:var(--gold); color:var(--blue); padding:18px; border:none; border-radius:10px; font-weight:900; margin-top:20px;">LOGIN</button>
+    <div style="font-size:16px; font-weight:900; color:var(--gold);">PROGRESSIVE MOTHERS<br>NURSERY AND PRIMARY SCHOOL</div>
+    <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; margin-top:20px; max-width:280px;">
+    <button onclick="secureLogin()" style="width:100%; max-width:250px; background:var(--gold); color:var(--blue); padding:16px; border:none; border-radius:10px; font-weight:900; margin-top:15px;">LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div>
-            <span class="school-title">PROGRESSIVE MOTHERS - GAYAZA</span>
-            <span class="motto">"With God everything is possible"</span>
-        </div>
-        <button onclick="location.reload()" style="background:transparent; border:1px solid white; color:white; padding:5px 10px; border-radius:5px; font-size:10px;">LOGOUT</button>
+        <div class="school-title">PROGRESSIVE MOTHERS<br>GAYAZA-KIJABIJJO</div>
+        <button onclick="location.reload()" style="background:transparent; border:1px solid white; color:white; padding:5px; border-radius:4px; font-size:10px;">LOGOUT</button>
     </div>
 
-    <div id="holidayBanner" class="holiday-banner hidden"></div>
-
     <div class="hero">
-        <div id="fullDate" style="font-size:12px; color:var(--gold);">DATE</div>
+        <div id="fullDate" style="font-size:11px; color:var(--gold); font-weight:bold;">DATE</div>
         <div id="clock">00:00:00</div>
-        <div id="routineLabel" style="font-weight:900; background:var(--gold); color:var(--blue); padding:5px 12px; border-radius:20px; font-size:10px; display:inline-block;">ROUTINE</div>
+    </div>
+
+    <div class="routine-box">
+        <div class="routine-time" id="r-time">CURRENT ACTIVITY</div>
+        <div class="routine-task" id="r-task">LOADING...</div>
     </div>
 
     <div class="stats">
@@ -95,35 +81,28 @@
     </div>
 
     <div id="v-adm" class="hidden" style="padding:15px;">
-        <div style="background:white; padding:20px; border-radius:15px; border:1px solid #ddd;">
-            <h3 style="margin-top:0; font-size:18px;">Registration</h3>
+        <div style="background:white; padding:20px; border-radius:15px;">
             <input type="hidden" id="editId">
             <input id="name" placeholder="Full Name">
-            <input id="o_lin" placeholder="Official LIN">
             <select id="cls">
                 <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <input id="loc" placeholder="Physical Location">
             <input id="parent_ph" type="tel" placeholder="Contact Number">
-            
-            <div id="finSection" style="background:#f9f9f9; padding:15px; border-radius:10px; margin-top:10px;">
-                <label style="font-weight:bold; font-size:11px;">FEES EXPECTED</label><input id="f_exp" type="number">
-                <label style="font-weight:bold; font-size:11px;">FEES PAID</label><input id="f_paid" type="number">
-            </div>
-            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:10px; font-weight:900; margin-top:20px;">SAVE DATA</button>
+            <input id="f_exp" type="number" placeholder="Fees Expected">
+            <input id="f_paid" type="number" placeholder="Fees Paid">
+            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:10px; font-weight:900; margin-top:15px;">SAVE STUDENT</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden" style="padding:15px;">
-        <select id="rollClass" onchange="load()" style="border:3px solid var(--blue); font-weight:bold; margin-bottom:15px;">
-            <option value="">-- Choose Class --</option>
-            <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+        <select id="rollClass" onchange="load()">
+            <option value="">-- Select Class --</option>
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
             <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
-        <div id="rollData"></div>
+        <div id="rollData" style="margin-top:15px;"></div>
     </div>
 </div>
 
@@ -134,25 +113,14 @@
 
     let role = "";
 
-    function togglePass() {
-        const p = document.getElementById('key');
-        const s = document.querySelector('.toggle-pass');
-        p.type = (p.type === "password") ? "text" : "password";
-        s.innerText = (p.type === "password") ? "SHOW" : "HIDE";
-    }
-
     function secureLogin() {
         const k = document.getElementById('key').value.trim().toUpperCase();
         if (k === "JESUS CARES") role = "Admin";
-        else if (k === "FINANCE 256") role = "Finance";
         else if (k === "TEACH2026") role = "Teacher";
-        else { alert("Access Denied"); return; }
+        else { alert("Wrong Key"); return; }
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-        if(role === "Teacher") { document.getElementById('tab-rec').classList.add('hidden'); document.getElementById('finSection').classList.add('hidden'); tab('adm'); }
-        else if(role === "Finance") { document.getElementById('tab-roll').classList.add('hidden'); tab('rec'); }
-        else tab('rec');
-        load();
+        tab('roll'); load();
     }
 
     function tab(t) {
@@ -163,45 +131,24 @@
     }
 
     async function load() {
-        const q = document.getElementById('searchBar').value.toLowerCase();
         let { data } = await _client.from('students').select('*').order('name');
         if(!data) return;
 
-        if(q) data = data.filter(s => s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q));
-
         document.getElementById('tCnt').innerText = data.length;
-        document.getElementById('pCnt').innerText = data.filter(s => s.fees_paid >= s.fees_expected && s.fees_expected > 0).length;
+        document.getElementById('pCnt').innerText = data.filter(s => s.fees_paid >= s.fees_expected).length;
         document.getElementById('aCnt').innerText = data.filter(s => s.is_absent).length;
 
-        const list = document.getElementById('dataList');
         const rollList = document.getElementById('rollData');
-        list.innerHTML = ""; rollList.innerHTML = "";
-
-        data.forEach(s => {
-            const num = s.parent_contact ? s.parent_contact.replace(/\s+/g, '') : '';
-            const wa = num.startsWith('0') ? '256' + num.substring(1) : num;
-            list.innerHTML += `<div class="item-card">
-                <b>${s.name}</b><br><small>${s.class} | LIN: ${s.official_lin || '---'}</small>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                    <div>
-                        <a href="tel:${num}" class="action-btn call-btn">📞 CALL</a>
-                        <a href="https://wa.me/${wa}" class="action-btn wa-btn">💬 WA</a>
-                    </div>
-                    <button onclick="editMode('${s.id}')" style="background:var(--blue); color:white; border:none; padding:8px 12px; border-radius:5px; font-size:11px;">EDIT</button>
-                </div>
-            </div>`;
-        });
-
         const rCls = document.getElementById('rollClass').value;
+        rollList.innerHTML = "";
+
         if(rCls) {
             data.filter(s => s.class === rCls).forEach(s => {
-                const btnClass = s.is_absent ? 'btn-absent' : 'btn-present';
-                const label = s.is_absent ? 'ABSENT' : 'PRESENT';
-                rollList.innerHTML += `<div class="item-card" style="border-left-color:${s.is_absent?'var(--red)':'var(--green)'};">
+                rollList.innerHTML += `<div class="item-card" style="border-left-color:${s.is_absent?'red':'green'}">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:bold; font-size:16px; max-width:140px;">${s.name}</span>
-                        <button class="btn-roll ${btnClass}" onclick="markAttendance('${s.id}', ${!s.is_absent}, this)">
-                            ${label}
+                        <b>${s.name}</b>
+                        <button class="btn-roll ${s.is_absent?'btn-absent':'btn-present'}" onclick="markAttendance('${s.id}', ${!s.is_absent}, this)">
+                            ${s.is_absent ? 'ABSENT' : 'PRESENT'}
                         </button>
                     </div>
                 </div>`;
@@ -210,63 +157,48 @@
     }
 
     async function markAttendance(id, status, btn) {
-        // UI Instant Feedback
-        btn.classList.add('btn-saving');
-        btn.innerText = "...";
-        
-        const { error } = await _client.from('students').update({ 
-            is_absent: status,
-            last_roll_call: new Date().toDateString() 
-        }).eq('id', id);
+        const originalText = btn.innerText;
+        btn.innerText = "WAIT...";
+        btn.disabled = true;
+
+        const { error } = await _client.from('students').update({ is_absent: status }).eq('id', id);
 
         if(error) {
-            console.error(error);
-            alert("Network Error: Save Failed"); // Replaced scary popup with simple alert
+            alert("Connection Weak. Try again.");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        } else {
+            load();
         }
-        load();
     }
 
-    async function submitData() {
-        const id = document.getElementById('editId').value;
-        const payload = {
-            name: document.getElementById('name').value,
-            official_lin: document.getElementById('o_lin').value,
-            class: document.getElementById('cls').value,
-            location: document.getElementById('loc').value,
-            parent_contact: document.getElementById('parent_ph').value,
-            fees_paid: parseFloat(document.getElementById('f_paid').value) || 0,
-            fees_expected: parseFloat(document.getElementById('f_exp').value) || 0
-        };
-        if(id) await _client.from('students').update(payload).eq('id', id);
-        else await _client.from('students').insert([payload]);
-        alert("Saved!"); resetForm(); load();
+    // SCHOOL ROUTINE LOGIC
+    function updateRoutine() {
+        const now = new Date();
+        const hr = now.getHours();
+        const min = now.getMinutes();
+        const time = hr * 100 + min;
+        let task = "Rest Time";
+        let label = "School Closed";
+
+        if (time >= 700 && time < 800) { task = "Arrival & Cleaning"; label = "07:00 AM - 08:00 AM"; }
+        else if (time >= 800 && time < 830) { task = "Morning Assembly"; label = "08:00 AM - 08:30 AM"; }
+        else if (time >= 830 && time < 1030) { task = "Lesson Period 1"; label = "08:30 AM - 10:30 AM"; }
+        else if (time >= 1030 && time < 1100) { task = "Porridge Break"; label = "10:30 AM - 11:00 AM"; }
+        else if (time >= 1100 && time < 1240) { task = "Lesson Period 2"; label = "11:00 AM - 12:40 PM"; }
+        else if (time >= 1240 && time < 1400) { task = "Lunch Break"; label = "12:40 PM - 02:00 PM"; }
+        else if (time >= 1400 && time < 1600) { task = "Afternoon Lessons"; label = "02:00 PM - 04:00 PM"; }
+        else if (time >= 1600 && time < 1700) { task = "Games & Departure"; label = "04:00 PM - 05:00 PM"; }
+
+        document.getElementById('r-task').innerText = task;
+        document.getElementById('r-time').innerText = label;
     }
-
-    async function editMode(id) {
-        const { data } = await _client.from('students').select('*').eq('id', id).single();
-        document.getElementById('editId').value = data.id;
-        document.getElementById('name').value = data.name;
-        document.getElementById('o_lin').value = data.official_lin || "";
-        document.getElementById('cls').value = data.class;
-        document.getElementById('loc').value = data.location || "";
-        document.getElementById('parent_ph').value = data.parent_contact || "";
-        document.getElementById('f_paid').value = data.fees_paid;
-        document.getElementById('f_exp').value = data.fees_expected;
-        tab('adm');
-    }
-
-    function resetForm() { document.getElementById('editId').value = ""; document.querySelectorAll('input').forEach(i => i.value = ""); }
-
-    const holidays = { "1/1": "New Year", "26/1": "NRM Day", "16/2": "Janani Luwum", "8/3": "Women's Day", "3/4": "Good Friday", "6/4": "Easter Monday", "1/5": "Labour Day", "3/6": "Martyrs", "9/6": "Heroes", "9/10": "Independence" };
 
     setInterval(() => {
         const d = new Date();
         document.getElementById('clock').innerText = d.toLocaleTimeString('en-GB');
         document.getElementById('fullDate').innerText = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        const hKey = `${d.getDate()}/${d.getMonth() + 1}`;
-        const banner = document.getElementById('holidayBanner');
-        if(holidays[hKey]) { banner.innerText = "⭐ TODAY IS " + holidays[hKey].toUpperCase() + " (HOLIDAY)"; banner.classList.remove('hidden'); }
-        else banner.classList.add('hidden');
+        updateRoutine();
     }, 1000);
 </script>
 </body>
