@@ -14,7 +14,7 @@
 
         .login-screen { position: fixed; inset: 0; background: var(--blue); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: white; text-align: center; }
         .pass-box { position: relative; width: 100%; max-width: 280px; margin-top: 15px; }
-        .toggle-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--blue); font-weight: bold; font-size: 11px; cursor: pointer; background: var(--gold); padding: 5px; border-radius: 4px; }
+        .toggle-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--blue); font-weight: bold; font-size: 10px; cursor: pointer; background: var(--gold); padding: 6px; border-radius: 4px; z-index: 10; }
 
         .hero { background: var(--white); color: var(--blue); padding: 15px 10px; text-align: center; border-bottom: 1px solid #ddd; }
         #clock { font-size: 38px; font-weight: 900; color: var(--blue); }
@@ -31,14 +31,17 @@
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f8f9fa; }
 
         .item-card { background: white; border-radius: 12px; padding: 15px; margin: 10px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); }
-        .lin-tag { font-weight: 900; color: white; background: var(--blue); padding: 5px 12px; border-radius: 4px; font-size: 14px; display: inline-block; margin-bottom: 10px; }
         
-        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; min-width: 100px; color: white; cursor: pointer; }
+        .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; min-width: 110px; color: white; cursor: pointer; }
         .present { background: var(--green); }
         .absent { background: var(--red); }
+        .saving { background: #ccc !important; color: #666 !important; pointer-events: none; }
         
+        .balance-box { background: #fff4f4; border: 2px dashed var(--red); padding: 10px; border-radius: 8px; margin-top: 10px; text-align: center; font-weight: 900; color: var(--red); }
+
         input, select { width: 100%; padding: 14px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px; margin-top: 5px; margin-bottom: 10px; box-sizing: border-box; }
         label { font-size: 11px; font-weight: 900; color: var(--blue); }
+        input:disabled { background: #eee; cursor: not-allowed; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -63,7 +66,7 @@
     </div>
 
     <div class="hero">
-        <div id="full-date">DATE</div>
+        <div id="full-date" style="font-weight:bold; color:var(--red);">DATE</div>
         <div id="clock">00:00:00</div>
     </div>
     <div class="routine-box" id="r-task">ROUTINE</div>
@@ -90,22 +93,23 @@
             <input type="hidden" id="editId">
             <label>Name</label><input id="name">
             <label>LIN</label><input id="lin">
-            <label>Age</label><input id="age">
-            <label>D.O.B</label><input id="dob" type="date">
+            <label>Age</label><input id="age" type="number">
+            <label>DOB</label><input id="dob" type="date">
             <label>Class</label>
             <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
             <label>Location</label><input id="location">
             <label>Contact</label><input id="contact">
             <label>Health</label><input id="health">
             <hr>
-            <label>Fees Expected</label><input id="f_exp" type="number">
-            <label>Fees Paid</label><input id="f_paid" type="number">
+            <label>Fees Expected</label><input id="f_exp" type="number" oninput="updateBal()">
+            <label>Fees Paid</label><input id="f_paid" type="number" oninput="updateBal()">
+            <div class="balance-box">BALANCE: <span id="balDisplay">0</span> UGX</div>
             <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:10px; font-weight:900; margin-top:10px;">SAVE DATA</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden" style="padding:15px;">
-        <select id="rollClass" onchange="loadData()"><option value="">-- Select Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+        <select id="rollClass" onchange="loadData()"><option value="">-- Choose Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         <div id="rollData" style="margin-top:15px;"></div>
     </div>
 </div>
@@ -136,7 +140,6 @@
         else if (k === "FINANCE 256") role = "Finance";
         else if (k === "TEACH2026") role = "Teacher";
         else { alert("WRONG KEY"); return; }
-        
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         tab(role === "Teacher" ? 'roll' : 'rec');
@@ -150,35 +153,39 @@
         document.getElementById('tab-'+t).classList.add('active');
     }
 
+    function updateBal() {
+        const exp = parseFloat(document.getElementById('f_exp').value) || 0;
+        const paid = parseFloat(document.getElementById('f_paid').value) || 0;
+        document.getElementById('balDisplay').innerText = (exp - paid).toLocaleString();
+    }
+
     async function loadData() {
         const { data, error } = await _client.from('students').select('*').order('name');
         if(error) return;
 
         document.getElementById('c-tot').innerText = data.length;
         document.getElementById('c-clr').innerText = data.filter(s => (s.fees_paid || 0) >= (s.fees_expected || 0) && s.fees_expected > 0).length;
-        document.getElementById('c-abs').innerText = data.filter(s => s.is_absent).length;
+        document.getElementById('c-abs').innerText = data.filter(s => s.is_absent === true).length;
 
-        // Records List
         const q = document.getElementById('searchBar').value.toLowerCase();
         let filtered = q ? data.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))) : data;
         const list = document.getElementById('dataList'); list.innerHTML = "";
         filtered.forEach(s => {
             list.innerHTML += `<div class="item-card">
-                <span class="lin-tag">LIN: ${s.lin || 'NONE'}</span><br>
-                <b>${s.name}</b><br><small>${s.class}</small><br>
+                <b>${s.name}</b><br><small>LIN: ${s.lin || 'N/A'}</small>
                 <button onclick="editMode('${s.id}')" style="margin-top:10px; width:100%; padding:8px;">EDIT</button>
             </div>`;
         });
 
-        // Roll Call List
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData'); rollList.innerHTML = "";
         data.filter(s => s.class === rCls).forEach(s => {
-            rollList.innerHTML += `<div class="item-card" style="border-left-color:${s.is_absent?'red':'green'}">
+            const abs = s.is_absent === true;
+            rollList.innerHTML += `<div class="item-card" style="border-left-color:${abs?'red':'green'}">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <b>${s.name}</b>
-                    <button class="btn-roll ${s.is_absent?'absent':'present'}" onclick="markAtt('${s.id}', ${!s.is_absent})">
-                        ${s.is_absent ? 'ABSENT' : 'PRESENT'}
+                    <button id="btn-${s.id}" class="btn-roll ${abs?'absent':'present'}" onclick="markAtt('${s.id}', ${!abs})">
+                        ${abs ? 'ABSENT' : 'PRESENT'}
                     </button>
                 </div>
             </div>`;
@@ -186,10 +193,19 @@
     }
 
     async function markAtt(id, status) {
-        const { data: cur } = await _client.from('students').select('absent_days').eq('id', id).single();
-        let count = status ? ((cur.absent_days || 0) + 1) : 0;
-        await _client.from('students').update({ is_absent: status, absent_days: count }).eq('id', id);
-        loadData();
+        const btn = document.getElementById('btn-'+id);
+        btn.innerText = "SAVING...";
+        btn.classList.add('saving');
+
+        const { error } = await _client.from('students').update({ is_absent: status }).eq('id', id);
+
+        if (error) {
+            alert("Network Error!");
+            btn.classList.remove('saving');
+            btn.innerText = status ? "PRESENT" : "ABSENT";
+        } else {
+            loadData();
+        }
     }
 
     async function editMode(id) {
@@ -208,6 +224,7 @@
         
         const isFin = (role === "Finance");
         ['name','lin','age','dob','cls','location','contact','health'].forEach(f => document.getElementById(f).disabled = isFin);
+        updateBal();
         tab('adm');
     }
 
@@ -228,7 +245,7 @@
             payload.health = document.getElementById('health').value;
         }
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(error) alert("Error!"); else { alert("Saved!"); loadData(); tab('rec'); }
+        if(error) alert("Error saving!"); else { alert("Saved!"); loadData(); tab('rec'); }
     }
 
     setInterval(() => {
