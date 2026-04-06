@@ -22,7 +22,7 @@
         .routine-box { background: var(--gold); color: var(--blue); padding: 12px; margin: 10px 15px; border-radius: 12px; text-align: center; font-weight: 900; font-size: 16px; text-transform: uppercase; }
 
         .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 10px 15px; }
-        .stat-card { background: white; padding: 10px; border-radius: 12px; text-align: center; border-bottom: 4px solid var(--blue); }
+        .stat-card { background: white; padding: 10px; border-radius: 12px; text-align: center; border-bottom: 4px solid var(--blue); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); display: block; }
         .stat-lbl { font-size: 8px; font-weight: bold; color: #666; text-transform: uppercase; }
 
@@ -31,17 +31,18 @@
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f8f9fa; }
 
         .item-card { background: white; border-radius: 12px; padding: 15px; margin: 10px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); }
+        .lin-tag { font-weight: 900; color: white; background: var(--blue); padding: 5px 12px; border-radius: 4px; font-size: 13px; display: inline-block; margin-bottom: 8px; }
         
         .btn-roll { padding: 15px; border-radius: 8px; border: none; font-weight: 900; min-width: 110px; color: white; cursor: pointer; }
         .present { background: var(--green); }
         .absent { background: var(--red); }
-        .saving { background: #ccc !important; color: #666 !important; pointer-events: none; }
+        .saving { background: #ccc !important; pointer-events: none; }
         
-        .balance-box { background: #fff4f4; border: 2px dashed var(--red); padding: 10px; border-radius: 8px; margin-top: 10px; text-align: center; font-weight: 900; color: var(--red); }
+        .balance-box { background: #fff4f4; border: 2px dashed var(--red); padding: 10px; border-radius: 8px; margin: 10px 0; text-align: center; font-weight: 900; color: var(--red); }
 
         input, select { width: 100%; padding: 14px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px; margin-top: 5px; margin-bottom: 10px; box-sizing: border-box; }
         label { font-size: 11px; font-weight: 900; color: var(--blue); }
-        input:disabled { background: #eee; cursor: not-allowed; }
+        input:disabled, select:disabled { background: #f0f0f0; cursor: not-allowed; color: #777; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -58,7 +59,7 @@
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div class="school-title">PROGRESSIVE MOTHERS</div>
+        <div class="school-title">PROGRESSIVE MOTHERS<br>MANAGEMENT</div>
         <div>
             <button onclick="loadData()" style="background:var(--gold); border:none; padding:8px 10px; border-radius:5px; font-weight:bold; font-size:10px;">REFRESH</button>
             <button onclick="logout()" style="background:var(--white); color:var(--red); border:none; padding:8px 10px; border-radius:5px; font-weight:bold; font-size:10px; margin-left:5px;">LOGOUT</button>
@@ -66,14 +67,14 @@
     </div>
 
     <div class="hero">
-        <div id="full-date" style="font-weight:bold; color:var(--red);">DATE</div>
+        <div id="full-date" style="font-weight:bold; color:var(--red); font-size:12px;">DATE</div>
         <div id="clock">00:00:00</div>
     </div>
-    <div class="routine-box" id="r-task">ROUTINE</div>
+    <div class="routine-box" id="r-task">ROUTINE: LOADING...</div>
 
     <div class="dashboard">
         <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Students</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-clr" style="color:var(--green)">0</span><span class="stat-lbl">Paid</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-clr" style="color:var(--green)">0</span><span class="stat-lbl">Cleared</span></div>
         <div class="stat-card"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent</span></div>
     </div>
 
@@ -91,25 +92,25 @@
     <div id="v-adm" class="hidden" style="padding:15px;">
         <div style="background:white; padding:20px; border-radius:15px; border:1px solid #ddd;">
             <input type="hidden" id="editId">
-            <label>Name</label><input id="name">
-            <label>LIN</label><input id="lin">
+            <label>Full Name</label><input id="name">
+            <label>LIN Number</label><input id="lin">
             <label>Age</label><input id="age" type="number">
-            <label>DOB</label><input id="dob" type="date">
+            <label>Date of Birth</label><input id="dob" type="date">
             <label>Class</label>
             <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
             <label>Location</label><input id="location">
             <label>Contact</label><input id="contact">
-            <label>Health</label><input id="health">
-            <hr>
-            <label>Fees Expected</label><input id="f_exp" type="number" oninput="updateBal()">
-            <label>Fees Paid</label><input id="f_paid" type="number" oninput="updateBal()">
+            <label>Health Status</label><input id="health">
+            <hr style="margin:15px 0; border:1px dashed var(--gold);">
+            <label>Fees Expected (UGX)</label><input id="f_exp" type="number" oninput="updateBal()">
+            <label>Fees Paid (UGX)</label><input id="f_paid" type="number" oninput="updateBal()">
             <div class="balance-box">BALANCE: <span id="balDisplay">0</span> UGX</div>
-            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:10px; font-weight:900; margin-top:10px;">SAVE DATA</button>
+            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:10px; font-weight:900; margin-top:10px;">SAVE UPDATES</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden" style="padding:15px;">
-        <select id="rollClass" onchange="loadData()"><option value="">-- Choose Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+        <select id="rollClass" onchange="loadData()"><option value="">-- Select Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         <div id="rollData" style="margin-top:15px;"></div>
     </div>
 </div>
@@ -163,29 +164,33 @@
         const { data, error } = await _client.from('students').select('*').order('name');
         if(error) return;
 
+        // Dashboard Restored
         document.getElementById('c-tot').innerText = data.length;
         document.getElementById('c-clr').innerText = data.filter(s => (s.fees_paid || 0) >= (s.fees_expected || 0) && s.fees_expected > 0).length;
         document.getElementById('c-abs').innerText = data.filter(s => s.is_absent === true).length;
 
+        // Records List
         const q = document.getElementById('searchBar').value.toLowerCase();
         let filtered = q ? data.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))) : data;
         const list = document.getElementById('dataList'); list.innerHTML = "";
         filtered.forEach(s => {
             list.innerHTML += `<div class="item-card">
-                <b>${s.name}</b><br><small>LIN: ${s.lin || 'N/A'}</small>
-                <button onclick="editMode('${s.id}')" style="margin-top:10px; width:100%; padding:8px;">EDIT</button>
+                <span class="lin-tag">LIN: ${s.lin || 'N/A'}</span><br>
+                <b style="font-size:18px; color:var(--blue);">${s.name}</b><br><small>${s.class}</small>
+                <button onclick="editMode('${s.id}')" style="margin-top:10px; width:100%; padding:10px; font-weight:bold; border-radius:5px;">VIEW / EDIT</button>
             </div>`;
         });
 
+        // Roll Call List
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData'); rollList.innerHTML = "";
         data.filter(s => s.class === rCls).forEach(s => {
-            const abs = s.is_absent === true;
-            rollList.innerHTML += `<div class="item-card" style="border-left-color:${abs?'red':'green'}">
+            const isAbs = s.is_absent === true;
+            rollList.innerHTML += `<div class="item-card" style="border-left-color:${isAbs?'red':'green'}">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <b>${s.name}</b>
-                    <button id="btn-${s.id}" class="btn-roll ${abs?'absent':'present'}" onclick="markAtt('${s.id}', ${!abs})">
-                        ${abs ? 'ABSENT' : 'PRESENT'}
+                    <button id="btn-${s.id}" class="btn-roll ${isAbs?'absent':'present'}" onclick="markAtt('${s.id}', ${!isAbs})">
+                        ${isAbs ? 'ABSENT' : 'PRESENT'}
                     </button>
                 </div>
             </div>`;
@@ -194,18 +199,9 @@
 
     async function markAtt(id, status) {
         const btn = document.getElementById('btn-'+id);
-        btn.innerText = "SAVING...";
-        btn.classList.add('saving');
-
+        btn.innerText = "SAVING..."; btn.classList.add('saving');
         const { error } = await _client.from('students').update({ is_absent: status }).eq('id', id);
-
-        if (error) {
-            alert("Network Error!");
-            btn.classList.remove('saving');
-            btn.innerText = status ? "PRESENT" : "ABSENT";
-        } else {
-            loadData();
-        }
+        if (error) { alert("Save Failed!"); loadData(); } else { loadData(); }
     }
 
     async function editMode(id) {
@@ -222,6 +218,7 @@
         document.getElementById('f_paid').value = data.fees_paid || 0;
         document.getElementById('f_exp').value = data.fees_expected || 0;
         
+        // Finance restriction: Only money fields allowed
         const isFin = (role === "Finance");
         ['name','lin','age','dob','cls','location','contact','health'].forEach(f => document.getElementById(f).disabled = isFin);
         updateBal();
@@ -245,14 +242,22 @@
             payload.health = document.getElementById('health').value;
         }
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(error) alert("Error saving!"); else { alert("Saved!"); loadData(); tab('rec'); }
+        if(error) alert("Error saving!"); else { alert("Saved Successfully!"); loadData(); tab('rec'); }
     }
 
     setInterval(() => {
         const now = new Date();
-        document.getElementById('full-date').innerText = now.toLocaleDateString();
-        document.getElementById('clock').innerText = now.toLocaleTimeString();
+        document.getElementById('full-date').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
+        const h = now.getHours();
+        let t = "AFTER SCHOOL";
+        if(h >= 8 && h < 10) t = "MORNING LESSONS";
+        else if(h >= 10 && h < 11) t = "BREAK TIME";
+        else if(h >= 11 && h < 13) t = "MID-DAY LESSONS";
+        else if(h >= 13 && h < 14) t = "LUNCH BREAK";
+        else if(h >= 14 && h < 17) t = "AFTERNOON LESSONS";
+        document.getElementById('r-task').innerText = "ROUTINE: " + t;
     }, 1000);
 </script>
 </body>
-</html>
+    </html>
