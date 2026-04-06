@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v27</title>
+    <title>Progressive Mothers PMS v28</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -27,8 +27,13 @@
         .lin-badge { position: absolute; top: 15px; right: 15px; background: var(--blue); color: white; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 900; }
         
         .absent-list { background: #fff5f5; border: 2px dashed var(--red); border-radius: 15px; margin: 15px; padding: 15px; }
-        .absent-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ffdada; }
+        .absent-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #ffdada; }
         
+        .action-btn { padding: 10px; border-radius: 8px; border: none; font-weight: 800; font-size: 11px; cursor: pointer; text-align: center; text-decoration: none; flex: 1; }
+        .btn-edit { background: #eee; color: #333; }
+        .btn-call { background: var(--green); color: white; }
+        .btn-del { background: var(--red); color: white; }
+
         .roll-btn { padding: 15px; border-radius: 10px; border: none; font-weight: 900; min-width: 110px; color: white; cursor: pointer; }
         .present { background: var(--green); }
         .absent { background: var(--red); }
@@ -40,10 +45,10 @@
 </head>
 <body>
 
-<div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center;">
-    <h1 style="color:white; font-weight:900;">PMS ACCESS</h1>
-    <input id="key" type="password" placeholder="KEY" style="text-align:center; max-width:250px; border:3px solid var(--gold);">
-    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:20px; width:100%; max-width:250px; border:none; border-radius:15px; font-weight:900;">LOGIN</button>
+<div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
+    <h1 style="color:white; font-weight:900;">PMS LOGIN</h1>
+    <input id="key" type="password" placeholder="ACCESS KEY" style="text-align:center; max-width:250px;">
+    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:20px; width:100%; max-width:250px; border:none; border-radius:15px; font-weight:900;">SECURE LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
@@ -71,7 +76,7 @@
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="Search Name or LIN..." oninput="loadData()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search name or LIN..." oninput="loadData()"></div>
         <div id="dataList"></div>
     </div>
 
@@ -79,28 +84,28 @@
         <div style="background:white; padding:20px; border-radius:20px; border:1px solid #ddd;">
             <input type="hidden" id="editId">
             <label>Name</label><input id="name">
-            <label>LIN (Leave blank for auto)</label><input id="lin">
-            <label>Class</label><select id="cls"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option></select>
+            <label>LIN</label><input id="lin" placeholder="Auto-generated if empty">
+            <label>Class</label><select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label>Age</label><input id="age" type="number"></div>
                 <div><label>DOB</label><input id="dob" type="date"></div>
             </div>
             <label>Location</label><input id="location">
-            <label>Contact</label><input id="contact">
-            <label>Health</label><input id="health">
+            <label>Contact Number</label><input id="contact">
+            <label>Health Status</label><input id="health">
             <label>Fees Expected</label><input id="f_exp" type="number">
             <label>Fees Paid</label><input id="f_paid" type="number">
-            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:20px; border:none; border-radius:15px; font-weight:900;">SAVE STUDENT</button>
+            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:20px; border:none; border-radius:15px; font-weight:900;">SAVE STUDENT INFO</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
         <div style="padding:15px;">
-            <select id="rollClass" onchange="loadData()" style="border:2px solid var(--blue);"><option value="">-- Select Class --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <select id="rollClass" onchange="loadData()" style="border:2px solid var(--blue); font-weight:900;"><option value="">-- Choose Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         </div>
         
         <div id="absentSpace" class="absent-list hidden">
-            <h4 style="margin:0 0 10px 0; color:var(--red); font-size:12px;">ABSENT FOLLOW-UP LIST</h4>
+            <h4 style="margin:0 0 10px 0; color:var(--red); font-size:12px;">🚨 ABSENT FOLLOW-UP (CALL PARENTS)</h4>
             <div id="absentData"></div>
         </div>
         
@@ -119,7 +124,7 @@
         if (k === "JESUS CARES") role = "Admin";
         else if (k === "FINANCE 256") role = "Finance";
         else if (k === "TEACH2026") role = "Teacher";
-        else { alert("INVALID KEY"); return; }
+        else { alert("INVALID ACCESS KEY"); return; }
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         tab(role === "Teacher" ? 'roll' : 'rec');
@@ -141,15 +146,24 @@
         document.getElementById('c-abs').innerText = data.filter(s => s.is_absent).length;
         document.getElementById('c-clr').innerText = data.filter(s => s.fees_paid >= s.fees_expected && s.fees_expected > 0).length;
 
-        // Records Search
+        // Records Tab
         const q = document.getElementById('searchBar').value.toLowerCase();
         let filtered = q ? data.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))) : data;
         const list = document.getElementById('dataList'); list.innerHTML = "";
         filtered.forEach(s => {
-            list.innerHTML += `<div class="item-card"><div class="lin-badge">${s.lin || 'N/A'}</div><b>${s.name}</b><br><small>${s.class}</small><div style="margin-top:10px;"><button onclick="editMode('${s.id}')" style="padding:8px; width:80px; border:none; border-radius:5px; background:#eee;">EDIT</button></div></div>`;
+            list.innerHTML += `
+            <div class="item-card">
+                <div class="lin-badge">${s.lin || 'N/A'}</div>
+                <b>${s.name}</b><br><small>${s.class} | ${s.contact || 'No Contact'}</small>
+                <div style="margin-top:12px; display:flex; gap:8px;">
+                    <button class="action-btn btn-edit" onclick="editMode('${s.id}')">EDIT</button>
+                    <a href="tel:${s.contact}" class="action-btn btn-call">CALL</a>
+                    ${role === 'Admin' ? `<button class="action-btn btn-del" onclick="deleteStudent('${s.id}', '${s.name}')">DELETE</button>` : ''}
+                </div>
+            </div>`;
         });
 
-        // Roll Call & Absent Space
+        // Attendance & Absent Space
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData'); rollList.innerHTML = "";
         const absList = document.getElementById('absentData'); absList.innerHTML = "";
@@ -160,13 +174,23 @@
         if(absentStudents.length > 0) {
             document.getElementById('absentSpace').classList.remove('hidden');
             absentStudents.forEach(s => {
-                absList.innerHTML += `<div class="absent-row"><span><b>${s.name}</b></span><a href="tel:${s.contact}" style="color:var(--red); font-weight:900; text-decoration:none;">📞 CALL</a></div>`;
+                absList.innerHTML += `
+                <div class="absent-row">
+                    <span><b>${s.name}</b></span>
+                    <a href="tel:${s.contact}" style="background:var(--green); color:white; padding:8px 15px; border-radius:8px; text-decoration:none; font-weight:900; font-size:11px;">CALL PARENT</a>
+                </div>`;
             });
         } else { document.getElementById('absentSpace').classList.add('hidden'); }
 
         classStudents.forEach(s => {
             const isAbs = s.is_absent === true;
-            rollList.innerHTML += `<div class="item-card" style="border-left-color:${isAbs?'var(--red)':'var(--green)'}"><div style="display:flex; justify-content:space-between; align-items:center;"><b>${s.name}</b><button class="roll-btn ${isAbs?'absent':'present'}" onclick="markAtt('${s.id}', ${!isAbs})">${isAbs?'ABSENT':'PRESENT'}</button></div></div>`;
+            rollList.innerHTML += `
+            <div class="item-card" style="border-left-color:${isAbs?'var(--red)':'var(--green)'}">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <b>${s.name}</b>
+                    <button class="roll-btn ${isAbs?'absent':'present'}" onclick="markAtt('${s.id}', ${!isAbs})">${isAbs?'ABSENT':'PRESENT'}</button>
+                </div>
+            </div>`;
         });
     }
 
@@ -187,15 +211,23 @@
         return finalLIN;
     }
 
+    async function deleteStudent(id, name) {
+        if(confirm(`Are you sure you want to PERMANENTLY DELETE ${name}?`)) {
+            const { error } = await _client.from('students').delete().eq('id', id);
+            if(error) alert("Error deleting student");
+            else loadData();
+        }
+    }
+
     async function submitData() {
         const id = document.getElementById('editId').value;
         const sName = document.getElementById('name').value.trim();
         const sClass = document.getElementById('cls').value;
         let lin = document.getElementById('lin').value;
 
-        if(!id) { // Anti-Duplicate
+        if(!id) {
             const { data: exist } = await _client.from('students').select('id').eq('name', sName).eq('class', sClass);
-            if(exist && exist.length > 0) { alert("STUDENT ALREADY REGISTERED!"); return; }
+            if(exist && exist.length > 0) { alert("ERROR: THIS STUDENT IS ALREADY REGISTERED IN THIS CLASS!"); return; }
             if(!lin) lin = await generateUniqueLIN(sName);
         }
 
@@ -207,7 +239,7 @@
         } else {
             id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
         }
-        alert("SAVED!"); loadData(); tab('rec');
+        alert("SUCCESSFULLY SAVED!"); loadData(); tab('rec');
     }
 
     function editMode(id) {
@@ -216,6 +248,11 @@
             document.getElementById('name').value = data.name;
             document.getElementById('lin').value = data.lin;
             document.getElementById('cls').value = data.class;
+            document.getElementById('age').value = data.age;
+            document.getElementById('dob').value = data.dob;
+            document.getElementById('location').value = data.location;
+            document.getElementById('contact').value = data.contact;
+            document.getElementById('health').value = data.health;
             document.getElementById('f_paid').value = data.fees_paid;
             document.getElementById('f_exp').value = data.fees_expected;
             const isFin = (role === "Finance");
@@ -226,8 +263,8 @@
 
     setInterval(() => {
         const now = new Date(); const day = now.getDay(); const hr = now.getHours(); const min = now.getMinutes(); const time = hr + (min/60);
-        let status = "RESTING";
-        const holidays = [{m:4,d:6},{m:5,d:1},{m:6,d:3}]; // Easter Monday is m4,d6
+        let status = "RESTING / SLEEPING";
+        const holidays = [{m:4,d:6},{m:5,d:1},{m:6,d:3}];
         const isH = holidays.some(h => h.m === (now.getMonth()+1) && h.d === now.getDate());
 
         if(isH) status = "OFFICIAL PUBLIC HOLIDAY";
@@ -243,7 +280,7 @@
             else if(time>=11 && time<13) status = "LESSONS";
             else if(time>=13 && time<14) status = "LUNCH TIME";
             else if(time>=14 && time<16) status = "NOON LESSONS";
-            else if(day===5 && time>=19) status = "RESTING (NO FRI PREP)";
+            else if(day===5 && time>=19) status = "RESTING (NO FRIDAY PREP)";
             else if(time>=19 && time<21) status = "PREP LESSONS (UPPER)";
         }
         document.getElementById('r-task').innerText = "STATUS: " + status;
