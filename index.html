@@ -2,74 +2,60 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers Management System</title>
+    <title>Progressive Mothers PMS v27</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #25D366; --light: #f0f4f8; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; overflow-x: hidden; }
+        :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #25D366; --light: #f4f7f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
         
-        /* Professional Header */
-        .header { background: var(--red); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .school-info { font-size: 11px; font-weight: 800; text-transform: uppercase; line-height: 1.2; }
-
-        /* Hero Section */
+        .header { background: var(--red); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); }
         .hero { background: var(--blue); color: white; padding: 25px 15px; text-align: center; border-bottom: 5px solid var(--gold); }
-        #full-date { font-size: 14px; opacity: 0.9; margin-bottom: 5px; font-weight: 600; }
-        #clock { font-size: 42px; font-weight: 900; letter-spacing: -1px; }
-        .routine-badge { background: var(--gold); color: var(--blue); padding: 8px 20px; border-radius: 20px; display: inline-block; font-weight: 900; font-size: 14px; margin-top: 10px; box-shadow: 0 4px 0 #cc9a06; }
+        #clock { font-size: 45px; font-weight: 900; letter-spacing: -2px; }
+        .routine-badge { background: white; color: var(--blue); padding: 10px 20px; border-radius: 30px; display: inline-block; font-weight: 900; font-size: 13px; border: 2px solid var(--gold); margin-top: 10px; }
 
-        /* Dashboard Stats */
-        .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; padding: 15px; margin-top: -20px; }
-        .stat-card { background: white; padding: 15px 5px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--gold); }
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 15px; margin-top: -25px; }
+        .stat-card { background: white; padding: 15px 5px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--blue); }
         .stat-val { font-size: 24px; font-weight: 900; color: var(--blue); display: block; }
-        .stat-lbl { font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase; }
+        .stat-lbl { font-size: 8px; font-weight: 800; color: #888; text-transform: uppercase; }
 
-        /* Navigation */
-        .nav-tabs { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 72px; z-index: 999; }
-        .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 800; font-size: 12px; color: #aaa; cursor: pointer; text-transform: uppercase; }
-        .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #fafafa; }
+        .nav-tabs { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 68px; z-index: 999; }
+        .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 11px; color: #bbb; cursor: pointer; text-transform: uppercase; }
+        .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #fcfcfc; }
 
-        /* Cards & Buttons */
-        .item-card { background: white; border-radius: 15px; padding: 18px; margin: 12px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-left: 8px solid var(--blue); position: relative; }
+        .item-card { background: white; border-radius: 15px; padding: 18px; margin: 12px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 8px solid var(--blue); position: relative; }
         .lin-badge { position: absolute; top: 15px; right: 15px; background: var(--blue); color: white; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 900; }
         
-        .action-btns { display: flex; gap: 10px; margin-top: 12px; }
-        .btn-act { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 800; color: white; cursor: pointer; text-align: center; text-decoration: none; font-size: 12px; }
-        .btn-edit { background: #eee; color: #444; }
-        .btn-call { background: var(--blue); }
-        .btn-wa { background: var(--green); }
+        .absent-list { background: #fff5f5; border: 2px dashed var(--red); border-radius: 15px; margin: 15px; padding: 15px; }
+        .absent-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ffdada; }
         
-        .roll-btn { padding: 15px; border-radius: 10px; border: none; font-weight: 900; min-width: 110px; color: white; }
+        .roll-btn { padding: 15px; border-radius: 10px; border: none; font-weight: 900; min-width: 110px; color: white; cursor: pointer; }
         .present { background: var(--green); }
         .absent { background: var(--red); }
-        .saving { opacity: 0.5; pointer-events: none; background: #999 !important; }
-
-        /* Forms */
-        .form-box { background: white; padding: 20px; border-radius: 20px; margin: 15px; border: 1px solid #ddd; }
-        input, select { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; margin: 8px 0 15px 0; box-sizing: border-box; font-weight: 600; }
-        label { font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; margin-left: 5px; }
+        
+        input, select { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; font-size: 16px; margin: 8px 0 15px 0; box-sizing: border-box; font-weight: 600; }
+        label { font-size: 10px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" class="login-screen" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
-    <h2 style="color:var(--gold); font-weight:900; text-align:center;">PROGRESSIVE MOTHERS SCHOOL</h2>
-    <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; max-width:280px; border:3px solid var(--gold);">
-    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:10px; font-weight:900;">LOGIN SYSTEM</button>
+<div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center;">
+    <h1 style="color:white; font-weight:900;">PMS ACCESS</h1>
+    <input id="key" type="password" placeholder="KEY" style="text-align:center; max-width:250px; border:3px solid var(--gold);">
+    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:20px; width:100%; max-width:250px; border:none; border-radius:15px; font-weight:900;">LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div class="school-info">Progressive Mothers<br>Nursery & Primary School</div>
-        <button onclick="logout()" style="background:white; color:var(--red); border:none; padding:8px 15px; border-radius:6px; font-weight:900; font-size:11px;">LOGOUT</button>
+        <div style="font-size:10px; font-weight:900;">PROGRESSIVE MOTHERS<br>NURSERY & PRIMARY</div>
+        <button onclick="location.reload()" style="background:white; color:var(--red); border:none; padding:8px 12px; border-radius:5px; font-weight:900;">LOGOUT</button>
     </div>
 
     <div class="hero">
-        <div id="full-date">DATE</div>
+        <div id="full-date" style="color:var(--gold); font-size:12px; font-weight:800;">DATE</div>
         <div id="clock">00:00:00</div>
-        <div class="routine-badge" id="r-task">LOADING...</div>
+        <div class="routine-badge" id="r-task">STATUS</div>
     </div>
 
     <div class="dashboard">
@@ -81,37 +67,43 @@
     <div class="nav-tabs">
         <div class="tab" id="tab-rec" onclick="tab('rec')">Records</div>
         <div class="tab" id="tab-adm" onclick="tab('adm')">Admission</div>
-        <div class="tab" id="tab-roll" onclick="tab('roll')">Roll Call</div>
+        <div class="tab" id="tab-roll" onclick="tab('roll')">Attendance</div>
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="Search Name, Class or LIN..." oninput="loadData()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="Search Name or LIN..." oninput="loadData()"></div>
         <div id="dataList"></div>
     </div>
 
-    <div id="v-adm" class="hidden">
-        <div class="form-box">
+    <div id="v-adm" class="hidden" style="padding:15px;">
+        <div style="background:white; padding:20px; border-radius:20px; border:1px solid #ddd;">
             <input type="hidden" id="editId">
-            <label>Student Full Name</label><input id="name">
-            <label>LIN (PMA-XXXX)</label><input id="lin" placeholder="Auto-generates if empty">
-            <label>Class</label>
-            <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <label>Name</label><input id="name">
+            <label>LIN (Leave blank for auto)</label><input id="lin">
+            <label>Class</label><select id="cls"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option></select>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label>Age</label><input id="age" type="number"></div>
                 <div><label>DOB</label><input id="dob" type="date"></div>
             </div>
-            <label>Physical Location</label><input id="location">
-            <label>Health Status</label><input id="health">
-            <label>Parent Contact</label><input id="contact">
-            <hr style="border:1px dashed #ddd; margin:15px 0;">
+            <label>Location</label><input id="location">
+            <label>Contact</label><input id="contact">
+            <label>Health</label><input id="health">
             <label>Fees Expected</label><input id="f_exp" type="number">
             <label>Fees Paid</label><input id="f_paid" type="number">
-            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:12px; font-weight:900; font-size:16px;">SAVE STUDENT DATA</button>
+            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:20px; border:none; border-radius:15px; font-weight:900;">SAVE STUDENT</button>
         </div>
     </div>
 
-    <div id="v-roll" class="hidden" style="padding:15px;">
-        <select id="rollClass" onchange="loadData()" style="border:2px solid var(--blue);"><option value="">-- Select Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+    <div id="v-roll" class="hidden">
+        <div style="padding:15px;">
+            <select id="rollClass" onchange="loadData()" style="border:2px solid var(--blue);"><option value="">-- Select Class --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+        </div>
+        
+        <div id="absentSpace" class="absent-list hidden">
+            <h4 style="margin:0 0 10px 0; color:var(--red); font-size:12px;">ABSENT FOLLOW-UP LIST</h4>
+            <div id="absentData"></div>
+        </div>
+        
         <div id="rollData"></div>
     </div>
 </div>
@@ -122,14 +114,12 @@
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
     let role = "";
 
-    function logout() { location.reload(); }
-
     function secureLogin() {
         const k = document.getElementById('key').value.trim().toUpperCase();
         if (k === "JESUS CARES") role = "Admin";
         else if (k === "FINANCE 256") role = "Finance";
         else if (k === "TEACH2026") role = "Teacher";
-        else { alert("INVALID ACCESS KEY"); return; }
+        else { alert("INVALID KEY"); return; }
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         tab(role === "Teacher" ? 'roll' : 'rec');
@@ -148,118 +138,117 @@
         if(error) return;
 
         document.getElementById('c-tot').innerText = data.length;
-        document.getElementById('c-clr').innerText = data.filter(s => (s.fees_paid || 0) >= (s.fees_expected || 0) && s.fees_expected > 0).length;
-        document.getElementById('c-abs').innerText = data.filter(s => s.is_absent === true).length;
+        document.getElementById('c-abs').innerText = data.filter(s => s.is_absent).length;
+        document.getElementById('c-clr').innerText = data.filter(s => s.fees_paid >= s.fees_expected && s.fees_expected > 0).length;
 
+        // Records Search
         const q = document.getElementById('searchBar').value.toLowerCase();
         let filtered = q ? data.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))) : data;
-        
         const list = document.getElementById('dataList'); list.innerHTML = "";
         filtered.forEach(s => {
-            const isCleared = (s.fees_paid || 0) >= (s.fees_expected || 0) && s.fees_expected > 0;
-            list.innerHTML += `<div class="item-card">
-                <div class="lin-badge">${s.lin || 'NO LIN'}</div>
-                <b style="font-size:16px;">${s.name}</b><br>
-                <small>${s.class} | ${isCleared ? '<span style="color:var(--green); font-weight:900;">CLEARED</span>' : '<span style="color:var(--red); font-weight:900;">BALANCE</span>'}</small>
-                <div class="action-btns">
-                    <button class="btn-act btn-edit" onclick="editMode('${s.id}')">EDIT</button>
-                    <a href="tel:${s.contact}" class="btn-act btn-call">CALL</a>
-                    <a href="https://wa.me/${s.contact}" class="btn-act btn-wa">WHATSAPP</a>
-                </div>
-            </div>`;
+            list.innerHTML += `<div class="item-card"><div class="lin-badge">${s.lin || 'N/A'}</div><b>${s.name}</b><br><small>${s.class}</small><div style="margin-top:10px;"><button onclick="editMode('${s.id}')" style="padding:8px; width:80px; border:none; border-radius:5px; background:#eee;">EDIT</button></div></div>`;
         });
 
+        // Roll Call & Absent Space
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData'); rollList.innerHTML = "";
-        data.filter(s => s.class === rCls).forEach(s => {
+        const absList = document.getElementById('absentData'); absList.innerHTML = "";
+        
+        const classStudents = data.filter(s => s.class === rCls);
+        const absentStudents = classStudents.filter(s => s.is_absent);
+
+        if(absentStudents.length > 0) {
+            document.getElementById('absentSpace').classList.remove('hidden');
+            absentStudents.forEach(s => {
+                absList.innerHTML += `<div class="absent-row"><span><b>${s.name}</b></span><a href="tel:${s.contact}" style="color:var(--red); font-weight:900; text-decoration:none;">📞 CALL</a></div>`;
+            });
+        } else { document.getElementById('absentSpace').classList.add('hidden'); }
+
+        classStudents.forEach(s => {
             const isAbs = s.is_absent === true;
-            rollList.innerHTML += `<div class="item-card" style="border-left-color:${isAbs?'var(--red)':'var(--green)'}">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <b>${s.name}</b>
-                    <button id="btn-${s.id}" class="roll-btn ${isAbs?'absent':'present'}" onclick="markAtt('${s.id}', ${!isAbs})">
-                        ${isAbs ? 'ABSENT' : 'PRESENT'}
-                    </button>
-                </div>
-            </div>`;
+            rollList.innerHTML += `<div class="item-card" style="border-left-color:${isAbs?'var(--red)':'var(--green)'}"><div style="display:flex; justify-content:space-between; align-items:center;"><b>${s.name}</b><button class="roll-btn ${isAbs?'absent':'present'}" onclick="markAtt('${s.id}', ${!isAbs})">${isAbs?'ABSENT':'PRESENT'}</button></div></div>`;
         });
     }
 
     async function markAtt(id, status) {
-        const btn = document.getElementById('btn-'+id);
-        btn.innerText = "SAVING..."; btn.classList.add('saving');
-        const { error } = await _client.from('students').update({ is_absent: status }).eq('id', id);
-        if (error) alert("Error updating attendance");
+        await _client.from('students').update({ is_absent: status }).eq('id', id);
         loadData();
     }
 
-    async function editMode(id) {
-        const { data } = await _client.from('students').select('*').eq('id', id).single();
-        document.getElementById('editId').value = data.id;
-        document.getElementById('name').value = data.name;
-        document.getElementById('lin').value = data.lin || "";
-        document.getElementById('age').value = data.age || "";
-        document.getElementById('dob').value = data.dob || "";
-        document.getElementById('cls').value = data.class;
-        document.getElementById('location').value = data.location || "";
-        document.getElementById('contact').value = data.contact || "";
-        document.getElementById('health').value = data.health || "";
-        document.getElementById('f_paid').value = data.fees_paid || 0;
-        document.getElementById('f_exp').value = data.fees_expected || 0;
-        
-        const isFin = (role === "Finance");
-        ['name','lin','age','dob','cls','location','contact','health'].forEach(f => document.getElementById(f).disabled = isFin);
-        tab('adm');
+    async function generateUniqueLIN(name) {
+        const char = name.trim().charAt(0).toUpperCase();
+        let unique = false; let finalLIN = "";
+        while(!unique) {
+            const num = Math.floor(1000 + Math.random() * 9000);
+            finalLIN = `PM${char}${num}`;
+            const { data } = await _client.from('students').select('lin').eq('lin', finalLIN);
+            if(data.length === 0) unique = true;
+        }
+        return finalLIN;
     }
 
     async function submitData() {
         const id = document.getElementById('editId').value;
+        const sName = document.getElementById('name').value.trim();
+        const sClass = document.getElementById('cls').value;
         let lin = document.getElementById('lin').value;
-        
-        // LIN Generator logic
-        if(!lin) {
-            const rand = Math.floor(1000 + Math.random() * 9000);
-            lin = `PMA-${rand}`;
+
+        if(!id) { // Anti-Duplicate
+            const { data: exist } = await _client.from('students').select('id').eq('name', sName).eq('class', sClass);
+            if(exist && exist.length > 0) { alert("STUDENT ALREADY REGISTERED!"); return; }
+            if(!lin) lin = await generateUniqueLIN(sName);
         }
 
-        const payload = {
-            fees_paid: parseFloat(document.getElementById('f_paid').value) || 0,
-            fees_expected: parseFloat(document.getElementById('f_exp').value) || 0,
-            lin: lin
-        };
+        const payload = { name: sName, class: sClass, lin: lin, age: document.getElementById('age').value, dob: document.getElementById('dob').value, location: document.getElementById('location').value, contact: document.getElementById('contact').value, health: document.getElementById('health').value, fees_paid: parseFloat(document.getElementById('f_paid').value)||0, fees_expected: parseFloat(document.getElementById('f_exp').value)||0 };
 
-        if(role !== "Finance") {
-            payload.name = document.getElementById('name').value;
-            payload.age = document.getElementById('age').value;
-            payload.dob = document.getElementById('dob').value;
-            payload.class = document.getElementById('cls').value;
-            payload.location = document.getElementById('location').value;
-            payload.contact = document.getElementById('contact').value;
-            payload.health = document.getElementById('health').value;
+        if(role === "Finance") {
+            const finOnly = { fees_paid: payload.fees_paid, fees_expected: payload.fees_expected };
+            await _client.from('students').update(finOnly).eq('id', id);
+        } else {
+            id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
         }
+        alert("SAVED!"); loadData(); tab('rec');
+    }
 
-        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(error) alert("Error saving data"); else { alert("Saved!"); loadData(); tab('rec'); }
+    function editMode(id) {
+        _client.from('students').select('*').eq('id', id).single().then(({data}) => {
+            document.getElementById('editId').value = data.id;
+            document.getElementById('name').value = data.name;
+            document.getElementById('lin').value = data.lin;
+            document.getElementById('cls').value = data.class;
+            document.getElementById('f_paid').value = data.fees_paid;
+            document.getElementById('f_exp').value = data.fees_expected;
+            const isFin = (role === "Finance");
+            ['name','lin','age','dob','cls','location','contact','health'].forEach(f => document.getElementById(f).disabled = isFin);
+            tab('adm');
+        });
     }
 
     setInterval(() => {
-        const now = new Date();
-        document.getElementById('full-date').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-        
-        // Holiday & Routine Engine
-        const month = now.getMonth() + 1;
-        const day = now.getDate();
-        const hour = now.getHours();
-        let routine = "RESTING TIME";
+        const now = new Date(); const day = now.getDay(); const hr = now.getHours(); const min = now.getMinutes(); const time = hr + (min/60);
+        let status = "RESTING";
+        const holidays = [{m:4,d:6},{m:5,d:1},{m:6,d:3}]; // Easter Monday is m4,d6
+        const isH = holidays.some(h => h.m === (now.getMonth()+1) && h.d === now.getDate());
 
-        if(month === 4 && day >= 3 && day <= 6) routine = "⛪ HAPPY EASTER 2026";
-        else if(hour >= 8 && hour < 10) routine = "MORNING LESSONS";
-        else if(hour >= 10 && hour < 11) routine = "BREAK TIME";
-        else if(hour >= 11 && hour < 13) routine = "MID-DAY LESSONS";
-        else if(hour >= 13 && hour < 14) routine = "LUNCH BREAK";
-        else if(hour >= 14 && hour < 17) routine = "AFTERNOON LESSONS";
-        
-        document.getElementById('r-task').innerText = routine;
+        if(isH) status = "OFFICIAL PUBLIC HOLIDAY";
+        else if(day === 6) status = (time>=19 && time<21) ? "PREP LESSONS (SAT)" : "SABBATH - NO LESSONS";
+        else if(day === 0) {
+            if(time>=5 && time<16) status = "UPPER CLASSES ONLY";
+            else if(time>=19 && time<21) status = "PREP LESSONS (UPPER)";
+            else status = "PREPARATIONS / HOME";
+        } else {
+            if(time>=5 && time<8.5) status = "EARLY MORNING LESSONS";
+            else if(time>=8.5 && time<10.5) status = "MORNING LESSONS";
+            else if(time>=10.5 && time<11) status = "BREAK & BREAKFAST";
+            else if(time>=11 && time<13) status = "LESSONS";
+            else if(time>=13 && time<14) status = "LUNCH TIME";
+            else if(time>=14 && time<16) status = "NOON LESSONS";
+            else if(day===5 && time>=19) status = "RESTING (NO FRI PREP)";
+            else if(time>=19 && time<21) status = "PREP LESSONS (UPPER)";
+        }
+        document.getElementById('r-task').innerText = "STATUS: " + status;
+        document.getElementById('full-date').innerText = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
     }, 1000);
 </script>
 </body>
