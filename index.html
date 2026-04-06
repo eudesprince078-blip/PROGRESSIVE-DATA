@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v31</title>
+    <title>Progressive Mothers PMS v32</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -12,7 +12,6 @@
         .header { background: var(--red); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); }
         .hero { background: var(--blue); color: white; padding: 20px 15px; text-align: center; border-bottom: 5px solid var(--gold); }
         #clock { font-size: 40px; font-weight: 900; letter-spacing: -1px; }
-        .routine-badge { background: white; color: var(--blue); padding: 8px 18px; border-radius: 30px; display: inline-block; font-weight: 900; font-size: 12px; border: 2px solid var(--gold); margin-top: 10px; }
 
         .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 15px; margin-top: -25px; }
         .stat-card { background: white; padding: 15px 5px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--blue); }
@@ -40,8 +39,8 @@
 
 <div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
     <h1 style="color:white; font-weight:900; margin-bottom: 20px;">PMS LOGIN</h1>
-    <input id="key" type="password" placeholder="KEY" style="text-align:center; max-width:280px;">
-    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900;">LOGIN</button>
+    <input id="key" type="password" placeholder="ACCESS KEY" style="text-align:center; max-width:280px; border:3px solid var(--gold);">
+    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900;">SECURE LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
@@ -53,7 +52,7 @@
     <div class="hero">
         <div id="full-date" style="color:var(--gold); font-size:12px; font-weight:800;">DATE</div>
         <div id="clock">00:00:00</div>
-        <div class="routine-badge" id="r-task">STATUS</div>
+        <div id="r-task" style="background:white; color:var(--blue); padding:5px 15px; border-radius:20px; font-size:10px; font-weight:900; margin-top:10px; display:inline-block; border:1px solid var(--gold);">STATUS</div>
     </div>
 
     <div class="dashboard">
@@ -80,25 +79,39 @@
         <div style="background:white; padding:20px; border-radius:20px; border:1px solid #ddd;">
             <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:14px;">STUDENT REGISTRATION</h3>
             <input type="hidden" id="editId">
+            
             <label>Full Name</label><input id="name">
-            <label>LIN (Generated on Save)</label><input id="lin" readonly placeholder="Auto-filled after save">
-            <label>Class</label><select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <label>LIN (Generated on Save)</label><input id="lin" readonly placeholder="Auto-generated">
+            
+            <label>Class</label><select id="cls">
+                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                <option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
+            
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label>Age</label><input id="age" type="number"></div>
                 <div><label>DOB</label><input id="dob" type="date"></div>
             </div>
-            <label>Location</label><input id="location">
-            <label>Parent Contact</label><input id="contact">
-            <label>Health Status</label><input id="health">
+            
+            <label>Physical Location</label><input id="location">
+            <label>Contact Number</label><input id="contact">
+            <label>Health Status</label><input id="health_status">
+            
             <label>Expected Fees</label><input id="f_exp" type="number">
             <label>Fees Paid</label><input id="f_paid" type="number">
-            <button id="saveBtn" onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:15px; font-weight:900; font-size:15px;">CONFIRM & SAVE</button>
+            
+            <button id="saveBtn" onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:15px; font-weight:900; font-size:15px;">SAVE STUDENT</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
         <div style="padding:15px;">
-            <select id="rollClass" onchange="loadData()" style="border:2px solid var(--blue); font-weight:900;"><option value="">-- Choose Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <select id="rollClass" onchange="loadData()" style="border:2px solid var(--blue); font-weight:900;">
+                <option value="">-- Choose Class --</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                <option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
         </div>
         <div id="absentSpace" class="hidden" style="background:#fff5f5; border:2px dashed var(--red); border-radius:15px; margin:15px; padding:15px;">
             <h4 style="margin:0 0 10px 0; color:var(--red); font-size:12px;">🚨 ABSENT FOLLOW-UP</h4>
@@ -136,15 +149,15 @@
     function clearForm() {
         document.getElementById('editId').value = "";
         document.getElementById('admTitle').innerText = "NEW STUDENT REGISTRATION";
-        ['name','lin','age','dob','location','contact','health','f_paid','f_exp'].forEach(f => {
+        ['name','lin','age','dob','location','contact','health_status','f_paid','f_exp'].forEach(f => {
             document.getElementById(f).value = "";
             document.getElementById(f).disabled = false;
         });
-        document.getElementById('saveBtn').innerText = "CONFIRM & SAVE";
+        document.getElementById('saveBtn').innerText = "SAVE STUDENT";
+        document.getElementById('saveBtn').disabled = false;
     }
 
     async function loadData() {
-        // Force refresh data from server
         const { data, error } = await _client.from('students').select('*').order('name');
         if(error) return;
 
@@ -152,21 +165,14 @@
         document.getElementById('c-pres').innerText = data.filter(s => s.is_absent === false).length;
         document.getElementById('c-abs').innerText = data.filter(s => s.is_absent === true).length;
 
-        // Reset Records List
         const q = document.getElementById('searchBar').value.toLowerCase();
         let filtered = q ? data.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))) : data;
-        const list = document.getElementById('dataList'); 
-        list.innerHTML = ""; // CRITICAL: Clear list before rebuilding
-
-        if (filtered.length === 0 && q !== "") {
-            list.innerHTML = "<p style='text-align:center; padding:20px; color:#888;'>No student found.</p>";
-        }
+        const list = document.getElementById('dataList'); list.innerHTML = "";
 
         filtered.forEach(s => {
             list.innerHTML += `<div class="item-card"><div class="lin-badge">${s.lin || 'NEW'}</div><b>${s.name}</b><br><small>${s.class}</small><div style="margin-top:12px; display:flex; gap:8px;"><button class="action-btn btn-edit" onclick="editMode('${s.id}')">EDIT</button><a href="tel:${s.contact}" class="action-btn btn-call">CALL</a>${role==='Admin'?`<button class="action-btn btn-del" onclick="deleteStudent('${s.id}')">DELETE</button>`:''}</div></div>`;
         });
 
-        // Attendance List
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData'); rollList.innerHTML = "";
         const absList = document.getElementById('absentData'); absList.innerHTML = "";
@@ -206,17 +212,12 @@
         const sClass = document.getElementById('cls').value;
         let lin = document.getElementById('lin').value;
 
-        if(!sName) { alert("Please enter a name!"); return; }
+        if(!sName) { alert("Name is required!"); return; }
         btn.disabled = true; btn.innerText = "SAVING...";
 
-        // If it's a NEW registration, double check duplicate and generate LIN
-        if(!id) { 
+        if(!id) {
             const { data: ex } = await _client.from('students').select('id').eq('name', sName).eq('class', sClass);
-            if(ex && ex.length > 0) { 
-                alert("This student is already registered in " + sClass); 
-                btn.disabled = false; btn.innerText = "CONFIRM & SAVE";
-                return; 
-            }
+            if(ex && ex.length > 0) { alert("Already registered!"); btn.disabled = false; btn.innerText = "SAVE STUDENT"; return; }
             lin = await generateUniqueLIN(sName);
         }
 
@@ -226,7 +227,7 @@
             dob: document.getElementById('dob').value, 
             location: document.getElementById('location').value, 
             contact: document.getElementById('contact').value, 
-            health: document.getElementById('health').value, 
+            health_status: document.getElementById('health_status').value, // SYNCED TO SUPABASE
             fees_paid: parseFloat(document.getElementById('f_paid').value)||0, 
             fees_expected: parseFloat(document.getElementById('f_exp').value)||0,
             is_absent: false 
@@ -240,15 +241,15 @@
         } else {
             alert("SUCCESSFULLY SAVED!");
             clearForm();
-            await loadData(); // Force reload the records
-            tab('rec'); // Switch to records to show the result
+            await loadData();
+            tab('rec');
         }
     }
 
     function editMode(id) {
         _client.from('students').select('*').eq('id', id).single().then(({data}) => {
             document.getElementById('editId').value = data.id;
-            document.getElementById('admTitle').innerText = "EDITING: " + data.name;
+            document.getElementById('admTitle').innerText = "EDIT: " + data.name;
             document.getElementById('name').value = data.name;
             document.getElementById('lin').value = data.lin;
             document.getElementById('cls').value = data.class;
@@ -256,16 +257,15 @@
             document.getElementById('dob').value = data.dob;
             document.getElementById('location').value = data.location;
             document.getElementById('contact').value = data.contact;
-            document.getElementById('health').value = data.health;
+            document.getElementById('health_status').value = data.health_status;
             document.getElementById('f_paid').value = data.fees_paid;
             document.getElementById('f_exp').value = data.fees_expected;
             document.getElementById('saveBtn').innerText = "UPDATE RECORD";
-            if(role === "Finance") ['name','age','dob','cls','location','contact','health'].forEach(f => document.getElementById(f).disabled = true);
+            if(role === "Finance") ['name','age','dob','cls','location','contact','health_status'].forEach(f => document.getElementById(f).disabled = true);
             tab('adm');
         });
     }
 
-    // Routine Clock
     setInterval(() => {
         const now = new Date();
         document.getElementById('full-date').innerText = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
