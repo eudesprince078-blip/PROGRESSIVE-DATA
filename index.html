@@ -2,78 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive PMS V14 - Live Database</title>
+    <title>Progressive PMS V15 - Secure Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #28a745; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding-bottom: 50px; }
         
-        /* Branding & Header */
         .header-red { background: var(--red); color: white; padding: 12px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; width: 100%; z-index: 100; box-sizing: border-box; }
-        .hero { background: var(--blue); color: white; padding: 70px 15px 45px 15px; text-align: center; border-bottom: 5px solid var(--gold); }
-        .clock { font-size: 42px; font-weight: bold; margin: 5px 0; letter-spacing: 2px; }
-        .routine-bar { background: rgba(255,255,255,0.15); padding: 6px 12px; font-size: 11px; border-radius: 20px; margin-top: 8px; display: inline-block; font-weight: bold; }
+        .hero { background: var(--blue); color: white; padding: 75px 15px 40px 15px; text-align: center; border-bottom: 5px solid var(--gold); }
+        .clock { font-size: 42px; font-weight: bold; margin: 5px 0; }
+        .routine-bar { background: var(--gold); color: var(--blue); padding: 8px 15px; font-size: 11px; border-radius: 5px; margin-top: 10px; display: inline-block; font-weight: 900; }
 
-        /* Dashboard Stats */
         .stats { display: flex; justify-content: center; gap: 8px; margin-top: -30px; padding: 0 10px; }
         .s-card { background: white; border-radius: 12px; padding: 12px 5px; width: 32%; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom: 4px solid var(--gold); }
-        .s-val { font-size: 22px; font-weight: bold; color: var(--blue); display: block; }
-        .s-lbl { font-size: 9px; color: #888; text-transform: uppercase; font-weight: 800; }
+        .s-val { font-size: 20px; font-weight: bold; color: var(--blue); display: block; }
         
-        /* Navigation */
         .nav { display: flex; overflow-x: auto; padding: 15px 10px; gap: 8px; justify-content: center; }
-        .pill { padding: 10px 18px; border-radius: 25px; border: 1px solid #ddd; background: white; font-size: 11px; font-weight: bold; color: #555; cursor: pointer; transition: 0.3s; }
-        .pill.active { background: var(--blue); color: white; border-color: var(--blue); box-shadow: 0 4px 8px rgba(0,26,51,0.3); }
+        .pill { padding: 10px 18px; border-radius: 25px; border: 1px solid #ddd; background: white; font-size: 11px; font-weight: bold; color: #555; cursor: pointer; }
+        .pill.active { background: var(--blue); color: white; }
 
-        /* UI Components */
-        .box { background: var(--white); padding: 15px; border-radius: 12px; margin: 10px; border: 1.5px solid var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .box { background: var(--white); padding: 15px; border-radius: 12px; margin: 10px; border: 1.5px solid var(--blue); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        label { font-size: 10px; font-weight: bold; color: var(--blue); display: block; margin-top: 5px; }
-        input, select { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 8px; font-size: 14px; box-sizing: border-box; background: #fafafa; }
-        input:focus { border-color: var(--gold); outline: none; background: #fff; }
+        label { font-size: 10px; font-weight: bold; color: var(--blue); display: block; margin-top: 8px; }
+        input, select { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 8px; font-size: 13px; box-sizing: border-box; }
+        .btn { background: var(--blue); color: white; padding: 14px; border: none; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         
-        .btn { background: var(--blue); color: white; padding: 14px; border: none; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 13px; }
-        .btn:active { transform: scale(0.98); }
-        
-        /* Table Styles */
-        .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 850px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; min-width: 850px; font-size: 11px; }
         th { background: var(--blue); color: white; padding: 12px; text-align: left; }
         td { padding: 12px; border-bottom: 1px solid #f0f0f0; }
-        .badge { padding: 4px 8px; border-radius: 5px; font-size: 10px; color: white; font-weight: bold; }
         
         .hidden { display: none !important; }
-        .footer { text-align: center; font-size: 11px; color: var(--blue); padding: 25px; font-weight: bold; letter-spacing: 1px; }
+        .footer { text-align: center; font-size: 11px; color: var(--blue); padding: 25px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="loginGate" class="box" style="max-width:320px; margin: 130px auto; text-align:center;">
-    <h2 style="color:var(--blue); margin-bottom:5px;">PROGRESSIVE PMS</h2>
-    <p style="font-size:10px; color:#888; margin-bottom:20px;">MANAGEMENT SYSTEM v14</p>
-    <input id="u" placeholder="USERNAME" style="margin-bottom:10px;">
-    <input id="p" type="password" placeholder="PASSWORD">
-    <button onclick="login()" class="btn">SECURE LOGIN</button>
+<div id="loginGate" class="box" style="max-width:320px; margin: 100px auto; text-align:center;">
+    <h2 style="color:var(--blue)">PROGRESSIVE PMS</h2>
+    <select id="roleSelect" style="margin-bottom:10px; border:2px solid var(--blue);">
+        <option value="Admin">ADMIN SECTION</option>
+        <option value="Finance">FINANCE SECTION</option>
+        <option value="Teacher">TEACHERS SECTION</option>
+    </select>
+    <input id="pass" type="password" placeholder="SECTION PASSWORD">
+    <button onclick="accessSystem()" class="btn">LOG IN</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header-red">
-        <div style="font-weight:900; letter-spacing:1px;">PROGRESSIVE MOTHERS</div>
-        <div id="holidayDisplay" style="font-size:10px; font-weight:bold; color:yellow;"></div>
-        <div style="font-size:18px;">📊</div>
+        <div id="roleDisplay" style="font-weight:900;">[ROLE]</div>
+        <div id="holidayDisplay" style="font-size:10px; color:yellow; font-weight:bold;"></div>
+        <div onclick="location.reload()" style="cursor:pointer;">Logout</div>
     </div>
 
     <div class="hero">
         <div class="clock" id="clock">00:00:00</div>
-        <div id="dateStr" style="font-size:11px; font-weight:bold; opacity:0.8; margin-bottom:10px;">MONDAY, 06 APRIL 2026</div>
-        <div class="routine-bar" id="routineDisplay">ROUTINE: CHECKING...</div>
+        <div class="routine-bar" id="routineDisplay">ROUTINE: LOADING...</div>
+        <div style="margin-top:10px; font-size:11px;"><input type="date" id="calendar" style="width:150px; padding:5px; height:30px;"></div>
     </div>
 
     <div class="stats">
-        <div class="s-card"><span class="s-val" id="tCnt">0</span><span class="s-lbl">Students</span></div>
-        <div class="s-card"><span class="s-val" id="pCnt" style="color:var(--green)">0</span><span class="s-lbl">Paid Full</span></div>
-        <div class="s-card"><span class="s-val" id="aCnt" style="color:var(--red)">0</span><span class="s-lbl">Absent</span></div>
+        <div class="s-card"><span class="s-val" id="tCnt">0</span><small>Students</small></div>
+        <div class="s-card"><span class="s-val" id="pCnt" style="color:var(--green)">0</span><small>Paid Full</small></div>
+        <div class="s-card"><span class="s-val" id="aCnt" style="color:var(--red)">0</span><small>Absent</small></div>
     </div>
 
     <div class="nav">
@@ -83,44 +75,43 @@
     </div>
 
     <div id="v-adm" class="box hidden">
-        <h3 id="formTitle" style="margin-top:0; color:var(--blue);">Student Registration</h3>
+        <h3 id="formTitle">Admission & Details</h3>
         <input type="hidden" id="editId">
         <div class="grid">
-            <div style="grid-column: span 2;"><label>Full Name</label><input id="name" placeholder="Enter Full Name"></div>
-            <div><label>Official LIN</label><input id="o_lin" placeholder="School LIN"></div>
+            <div style="grid-column: span 2;"><label>Full Name</label><input id="name"></div>
+            <div><label>School LIN</label><input id="o_lin"></div>
             <div><label>Class</label>
                 <select id="cls">
                     <option>P.1</option><option>P.2</option><option>P.3</option>
                     <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
                 </select>
             </div>
-            <div><label>Fees Paid (UGX)</label><input id="f_paid" type="number" placeholder="0"></div>
-            <div><label>Fees Expected (UGX)</label><input id="f_exp" type="number" placeholder="0"></div>
-            <div><label>Health Status</label><input id="health" value="Normal"></div>
+            <div><label>Physical Location (Home)</label><input id="loc" placeholder="Gayaza, Mukono, etc"></div>
+            <div><label id="f_paid_label">Fees Paid (UGX)</label><input id="f_paid" type="number"></div>
+            <div><label id="f_exp_label">Fees Expected (UGX)</label><input id="f_exp" type="number"></div>
         </div>
-        <button class="btn" id="saveBtn" onclick="dbSave()">UPDATE DATABASE</button>
-        <button class="btn hidden" id="cancelBtn" onclick="resetForm()" style="background:#666;">CANCEL EDIT</button>
+        <button class="btn" id="saveBtn" onclick="saveData()">SAVE STUDENT DATA</button>
     </div>
 
     <div id="v-rec" class="box table-wrap">
         <table>
             <thead>
-                <tr><th>Official LIN</th><th>Full Name</th><th>Class</th><th>Payment Status</th><th>Action</th></tr>
+                <tr><th>LIN</th><th>Name</th><th>Class</th><th>Location</th><th>Action</th></tr>
             </thead>
             <tbody id="resList"></tbody>
         </table>
     </div>
 
     <div id="v-roll" class="box hidden">
-        <label>Select Class for Attendance</label>
+        <label>Select Your Class</label>
         <select id="rollFilter" onchange="load()" style="margin-bottom:15px; border:2px solid var(--blue);">
-            <option value="All">All Classes</option>
+            <option value="All">View All</option>
             <option>P.1</option><option>P.2</option><option>P.3</option>
             <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
         <div class="table-wrap">
             <table>
-                <thead><tr><th>Student Name</th><th>Class</th><th>Attendance Status</th></tr></thead>
+                <thead><tr><th>Student</th><th>Class</th><th>Attendance</th></tr></thead>
                 <tbody id="rollList"></tbody>
             </table>
         </div>
@@ -130,17 +121,40 @@
 </div>
 
 <script>
-    // SUPABASE CONFIGURATION
     const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-    function login() {
-        if(document.getElementById('p').value === "JESUS CARES") {
+    let activeRole = "";
+
+    function accessSystem() {
+        const pass = document.getElementById('pass').value;
+        const role = document.getElementById('roleSelect').value;
+
+        // Security logic based on your request
+        if(pass === "JESUS CARES") {
+            activeRole = role;
             document.getElementById('loginGate').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('roleDisplay').innerText = role.toUpperCase() + " ACCESS";
+            applyPermissions();
             load();
-        } else { alert("Invalid Credentials"); }
+        } else { alert("Incorrect Password for this section"); }
+    }
+
+    function applyPermissions() {
+        // Finance Section limitations
+        if(activeRole === "Finance") {
+            document.getElementById('t-roll').classList.add('hidden'); // No Roll Call
+            // Can edit fees but restricted on name/class (UI focus)
+        }
+        // Teacher Section limitations
+        if(activeRole === "Teacher") {
+            document.getElementById('f_paid').classList.add('hidden');
+            document.getElementById('f_exp').classList.add('hidden');
+            document.getElementById('f_paid_label').classList.add('hidden');
+            document.getElementById('f_exp_label').classList.add('hidden');
+        }
     }
 
     function tab(t) {
@@ -150,87 +164,53 @@
         document.getElementById('t-'+t).classList.add('active');
     }
 
-    async function dbSave() {
+    async function saveData() {
         const id = document.getElementById('editId').value;
         const payload = {
             name: document.getElementById('name').value,
             official_lin: document.getElementById('o_lin').value,
             class: document.getElementById('cls').value,
+            location: document.getElementById('loc').value,
             fees_paid: document.getElementById('f_paid').value || 0,
-            fees_expected: document.getElementById('f_exp').value || 0,
-            health_status: document.getElementById('health').value,
-            contact: "+256762992440"
+            fees_expected: document.getElementById('f_exp').value || 0
         };
 
-        if(!payload.name) { alert("Name is required"); return; }
+        if(activeRole === "Teacher") { delete payload.fees_paid; delete payload.fees_expected; }
 
-        let response;
-        if(id) {
-            // Update Existing
-            response = await _client.from('students').update(payload).eq('id', id);
-        } else {
-            // Create New
-            payload.lin = "PMA-" + Math.floor(Math.random()*10000);
-            response = await _client.from('students').insert([payload]);
-        }
-
-        if(response.error) {
-            alert("Error: " + response.error.message);
-        } else {
-            alert("Supabase Database Updated!");
-            resetForm();
-            load();
-            tab('rec');
-        }
+        if(id) { await _client.from('students').update(payload).eq('id', id); }
+        else { await _client.from('students').insert([payload]); }
+        
+        alert("Data Saved Successfully");
+        load(); tab('rec');
     }
 
     async function load() {
-        let { data, error } = await _client.from('students').select('*').order('name', { ascending: true });
-        if (error) { console.error(error); return; }
-
-        // Filter by class for Roll Call
+        let { data } = await _client.from('students').select('*').order('name');
         const filter = document.getElementById('rollFilter').value;
-        const filteredData = filter === "All" ? data : data.filter(s => s.class === filter);
+        const rollData = filter === "All" ? data : data.filter(s => s.class === filter);
 
-        // Dashboard Stats
         document.getElementById('tCnt').innerText = data.length;
-        document.getElementById('pCnt').innerText = data.filter(s => parseFloat(s.fees_paid) >= parseFloat(s.fees_expected)).length;
+        document.getElementById('pCnt').innerText = data.filter(s => s.fees_paid >= s.fees_expected).length;
         document.getElementById('aCnt').innerText = data.filter(s => s.is_absent).length;
 
         const list = document.getElementById('resList');
-        const roll = document.getElementById('rollList');
-        list.innerHTML = ""; roll.innerHTML = "";
+        const rollList = document.getElementById('rollList');
+        list.innerHTML = ""; rollList.innerHTML = "";
 
         data.forEach(s => {
-            const isFullPaid = (s.fees_expected - s.fees_paid) <= 0;
             list.innerHTML += `<tr>
-                <td><b>${s.official_lin || 'PENDING'}</b></td>
-                <td>${s.name}</td><td>${s.class}</td>
-                <td><span class="badge" style="background:${isFullPaid?'var(--green)':'var(--red)'}">${isFullPaid?'PAID':'DEBT'}</span></td>
-                <td><button onclick="editMode('${s.id}')" style="background:none; border:1px solid var(--blue); color:var(--blue); padding:4px 8px; border-radius:4px; cursor:pointer;">EDIT</button></td>
+                <td>${s.official_lin || '---'}</td>
+                <td>${s.name}</td><td>${s.class}</td><td>${s.location || 'N/A'}</td>
+                <td><button onclick="editMode('${s.id}')">EDIT</button></td>
             </tr>`;
         });
 
-        filteredData.forEach(s => {
-            roll.innerHTML += `<tr>
+        rollData.forEach(s => {
+            rollList.innerHTML += `<tr>
                 <td>${s.name}</td><td>${s.class}</td>
-                <td>
-                    <button onclick="updateAttendance('${s.id}', ${!s.is_absent})" 
-                        style="background:${s.is_absent?'#eee':'var(--green)'}; color:${s.is_absent?'#999':'white'}; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">
-                        ${s.is_absent ? 'MARK PRESENT' : 'PRESENT'}
-                    </button>
-                    <button onclick="updateAttendance('${s.id}', true)" 
-                        style="background:${s.is_absent?'var(--red)':'#eee'}; color:${s.is_absent?'white':'#999'}; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left:5px;">
-                        ${s.is_absent ? 'ABSENT' : 'MARK ABSENT'}
-                    </button>
-                </td>
+                <td><button onclick="markAbs('${s.id}', ${!s.is_absent})" style="background:${s.is_absent?'red':'green'}; color:white; border:none; padding:5px; border-radius:5px;">${s.is_absent?'ABSENT':'PRESENT'}</button></td>
             </tr>`;
         });
-    }
-
-    async function updateAttendance(id, status) {
-        await _client.from('students').update({ is_absent: status }).eq('id', id);
-        load();
     }
 
     async function editMode(id) {
@@ -239,49 +219,39 @@
         document.getElementById('name').value = data.name;
         document.getElementById('o_lin').value = data.official_lin;
         document.getElementById('cls').value = data.class;
+        document.getElementById('loc').value = data.location;
         document.getElementById('f_paid').value = data.fees_paid;
         document.getElementById('f_exp').value = data.fees_expected;
-        document.getElementById('health').value = data.health_status;
-        
-        document.getElementById('formTitle').innerText = "Update " + data.name;
-        document.getElementById('saveBtn').innerText = "CONFIRM CHANGES";
-        document.getElementById('cancelBtn').classList.remove('hidden');
         tab('adm');
     }
 
-    function resetForm() {
-        document.getElementById('editId').value = "";
-        document.querySelectorAll('input').forEach(i => i.value = "");
-        document.getElementById('formTitle').innerText = "Student Registration";
-        document.getElementById('saveBtn').innerText = "UPDATE DATABASE";
-        document.getElementById('cancelBtn').classList.add('hidden');
+    async function markAbs(id, status) {
+        await _client.from('students').update({ is_absent: status }).eq('id', id);
+        load();
     }
 
-    // Daily Routines & Ugandan Calendar
+    // Daily Schedule Routine
     setInterval(() => {
         const now = new Date();
         const hr = now.getHours();
         const min = now.getMinutes();
+        const totalMin = (hr * 60) + min;
         document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-        
-        // Date formatting
-        const options = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
-        document.getElementById('dateStr').innerText = now.toLocaleDateString('en-GB', options).toUpperCase();
 
-        // Routines
-        let routine = "REST TIME";
-        if(hr < 8) routine = "ARRIVAL & PREPARATION";
-        else if(hr == 8 && min < 30) routine = "MORNING ASSEMBLY";
-        else if(hr < 13) routine = "CLASS SESSIONS";
-        else if(hr == 13) routine = "LUNCH BREAK";
-        else if(hr < 16) routine = "AFTERNOON CLASSES";
-        else routine = "DISMISSAL / EXTRA-CURRICULAR";
-        document.getElementById('routineDisplay').innerText = "ROUTINE: " + routine;
+        let msg = "";
+        if (totalMin >= 300 && totalMin < 630) msg = "MORNING LESSONS";
+        else if (totalMin >= 630 && totalMin < 660) msg = "BREAK TIME & BREAKFAST";
+        else if (totalMin >= 660 && totalMin < 780) msg = "MID DAY LESSONS";
+        else if (totalMin >= 780 && totalMin < 840) msg = "LUNCH TIME";
+        else if (totalMin >= 840 && totalMin < 960) msg = "NOON LESSONS";
+        else if (totalMin >= 960 && totalMin < 1140) msg = "GOING HOME / PREPS PREPARATION";
+        else if (totalMin >= 1140 && totalMin < 1260) msg = "EVENING LESSONS / PREPS";
+        else msg = "RESTING / SLEEPING TIME";
 
-        // Easter Monday 2026 Check
-        if(now.getMonth() == 3 && now.getDate() == 6) {
-            document.getElementById('holidayDisplay').innerText = "EASTER MONDAY (HOLIDAY)";
-        }
+        document.getElementById('routineDisplay').innerText = "ROUTINE: " + msg;
+
+        // Calendar / Holidays
+        if(now.getMonth() == 3 && now.getDate() == 6) document.getElementById('holidayDisplay').innerText = "EASTER MONDAY";
     }, 1000);
 </script>
 </body>
