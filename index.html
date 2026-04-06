@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v46</title>
+    <title>Progressive Mothers PMS v46.1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -26,21 +26,21 @@
         .lin-badge { position: absolute; top: 10px; right: 10px; background: var(--blue); color: white; padding: 3px 8px; border-radius: 5px; font-size: 9px; font-weight: 900; }
         
         input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 15px; margin: 5px 0 12px 0; box-sizing: border-box; font-weight: 600; }
-        input:disabled, select:disabled { background: #f0f0f0; color: #666; cursor: not-allowed; border: 2px solid #ddd; }
+        input:disabled, select:disabled { background: #f0f0f0; color: #666; cursor: not-allowed; }
         label { font-size: 9px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
         .hidden { display: none !important; }
 
         .btn-download { background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; font-size: 11px; width: 100%; cursor: pointer; margin-top: 5px; }
         .btn-save { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 900; margin-top: 10px; }
-        .btn-save:disabled { background: #ccc; }
     </style>
 </head>
 <body>
 
 <div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
     <h2 style="color:white; font-weight:900; margin-bottom:20px;">SCHOOL ACCESS</h2>
-    <input id="key" type="password" placeholder="ACCESS KEY" style="text-align:center; max-width:280px; border:3px solid var(--gold);">
-    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900;">LOGIN</button>
+    <input id="key" type="text" placeholder="ENTER ACCESS KEY" style="text-align:center; max-width:280px; border:3px solid var(--gold); text-transform: uppercase;">
+    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900; margin-top:10px;">LOGIN SYSTEM</button>
+    <p style="color:white; font-size:10px; margin-top:20px; opacity:0.6;">v46.1 STABLE</p>
 </div>
 
 <div id="mainApp" class="hidden">
@@ -71,7 +71,7 @@
             <input id="searchBar" placeholder="🔍 Search name or LIN..." oninput="renderUI()" style="margin-bottom:10px;">
             
             <div id="adminPanel" class="hidden" style="background:white; padding:15px; border-radius:15px; border:1px solid #ddd;">
-                <b style="font-size:11px; color:var(--blue);">ADMIN DOWNLOAD PORTAL</b>
+                <b style="font-size:11px; color:var(--blue);">DOWNLOAD ABSENTEE REPORT</b>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
                     <div>
                         <select id="downloadClass" style="margin:0; padding:8px; font-size:12px;">
@@ -82,9 +82,7 @@
                         </select>
                         <button class="btn-download" onclick="exportData('class')">SAVE CLASS</button>
                     </div>
-                    <div>
-                        <button class="btn-download" style="background:var(--red); height:100%;" onclick="exportData('school')">SAVE FULL SCHOOL</button>
-                    </div>
+                    <button class="btn-download" style="background:var(--red); height:100%;" onclick="exportData('school')">SAVE ALL SCHOOL</button>
                 </div>
             </div>
         </div>
@@ -93,30 +91,28 @@
 
     <div id="v-adm" class="hidden" style="padding:15px;">
         <div style="background:white; padding:20px; border-radius:20px; border:1px solid #ddd;">
-            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:13px;">STUDENT REGISTRATION</h3>
+            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:13px;">STUDENT PROFILE</h3>
             <input type="hidden" id="editId">
             
-            <div id="infoSection">
-                <label>Full Name</label><input id="name">
-                <label>LIN Number</label><input id="lin" readonly placeholder="Auto-generated">
-                <label>Class</label>
-                <select id="cls">
-                    <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                    <option>P.5</option><option>P.6</option><option>P.7</option>
-                </select>
-                <label>Parent Contact</label><input id="contact">
-                <label>Physical Location</label><input id="location">
-                <label>Health Status</label><input id="health_status">
-            </div>
+            <label>Name</label><input id="name">
+            <label>LIN</label><input id="lin" readonly>
+            <label>Class</label>
+            <select id="cls">
+                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                <option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
+            <label>Contact</label><input id="contact">
+            <label>Location</label><input id="location">
+            <label>Health Status</label><input id="health_status">
             
             <div id="financeSection" style="margin-top:15px; padding-top:15px; border-top:2px dashed #eee;">
-                <label style="color:var(--red)">Expected Fees (UGX)</label><input id="f_exp" type="number">
-                <label style="color:var(--green)">Fees Paid (UGX)</label><input id="f_paid" type="number">
+                <label style="color:var(--red)">Expected Fees</label><input id="f_exp" type="number">
+                <label style="color:var(--green)">Paid Fees</label><input id="f_paid" type="number">
             </div>
             
-            <button id="saveBtn" onclick="submitData()" class="btn-save">SAVE CHANGES</button>
-            <p id="lockMsg" style="color:var(--red); font-size:10px; font-weight:bold; text-align:center;" class="hidden">⚠️ ACCESS RESTRICTED: YOU CANNOT EDIT THIS SECTION</p>
+            <button id="saveBtn" onclick="submitData()" class="btn-save">SAVE DATA</button>
+            <p id="lockMsg" style="color:var(--red); font-size:10px; font-weight:bold; text-align:center; margin-top:10px;" class="hidden"></p>
         </div>
     </div>
 
@@ -140,11 +136,12 @@
     let role = ""; let cachedData = [];
 
     function secureLogin() {
-        const k = document.getElementById('key').value.trim().toUpperCase();
-        if (k === "JESUS CARES") role = "Admin";
-        else if (k === "FINANCE 256") role = "Finance";
-        else if (k === "TEACH2026") role = "Teacher";
-        else return alert("INVALID ACCESS KEY");
+        const val = document.getElementById('key').value.trim().toUpperCase();
+        
+        if (val === "JESUS CARES") role = "Admin";
+        else if (val === "FINANCE 256") role = "Finance";
+        else if (val === "TEACH2026") role = "Teacher";
+        else { alert("WRONG KEY! ACCESS DENIED."); return; }
         
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
@@ -177,9 +174,9 @@
         const list = document.getElementById('dataList'); list.innerHTML = "";
         cachedData.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))).forEach(s => {
             list.innerHTML += `<div class="item-card">
-                <div class="lin-badge">${s.lin || 'NEW'}</div>
+                <div class="lin-badge">${s.lin || 'N/A'}</div>
                 <b>${s.name}</b><br><small>${s.class} | ${s.contact}</small>
-                <div style="margin-top:10px;"><button class="action-btn" style="background:#eee" onclick="editMode('${s.id}')">VIEW / EDIT</button></div>
+                <div style="margin-top:10px;"><button class="action-btn" style="background:#eee; padding:8px; border:none; border-radius:5px; cursor:pointer;" onclick="editMode('${s.id}')">DETAILS / EDIT</button></div>
             </div>`;
         });
 
@@ -213,25 +210,81 @@
         document.getElementById('f_paid').value = s.fees_paid || 0;
         document.getElementById('f_exp').value = s.fees_expected || 0;
 
-        // --- ROLE BASED PERMISSIONS ---
-        const infoInputs = ['name', 'cls', 'contact', 'location', 'health_status'];
-        const financeInputs = ['f_paid', 'f_exp'];
+        const infoIds = ['name', 'cls', 'contact', 'location', 'health_status'];
+        const financeIds = ['f_paid', 'f_exp'];
         const saveBtn = document.getElementById('saveBtn');
         const lockMsg = document.getElementById('lockMsg');
 
         if(role === "Admin") {
-            infoInputs.concat(financeInputs).forEach(id => document.getElementById(id).disabled = false);
-            saveBtn.disabled = false;
+            infoIds.concat(financeIds).forEach(id => document.getElementById(id).disabled = false);
+            saveBtn.style.display = "block";
             lockMsg.classList.add('hidden');
         } else if(role === "Finance") {
-            infoInputs.forEach(id => document.getElementById(id).disabled = true);
-            financeInputs.forEach(id => document.getElementById(id).disabled = false);
-            saveBtn.disabled = false;
+            infoIds.forEach(id => document.getElementById(id).disabled = true);
+            financeIds.forEach(id => document.getElementById(id).disabled = false);
+            saveBtn.style.display = "block";
             lockMsg.classList.remove('hidden');
-            lockMsg.innerText = "⚠️ FINANCE: YOU CAN ONLY EDIT FEE FIELDS";
-        } else { // Teacher
-            infoInputs.concat(financeInputs).forEach(id => document.getElementById(id).disabled = true);
-            saveBtn.disabled = true;
+            lockMsg.innerText = "FINANCE: ONLY FEES CAN BE EDITED";
+        } else {
+            infoIds.concat(financeIds).forEach(id => document.getElementById(id).disabled = true);
+            saveBtn.style.display = "none";
             lockMsg.classList.remove('hidden');
-            lockMsg.innerText = "⚠️ TEACHER: EDITING IS DISABLED";
+            lockMsg.innerText = "TEACHER: EDITING IS DISABLED";
         }
+        tab('adm');
+    }
+
+    async function submitData() {
+        const id = document.getElementById('editId').value;
+        const sName = document.getElementById('name').value.trim();
+        if(!sName) return alert("Name is required");
+
+        const payload = { 
+            name: sName, class: document.getElementById('cls').value,
+            contact: document.getElementById('contact').value,
+            location: document.getElementById('location').value,
+            health_status: document.getElementById('health_status').value,
+            fees_paid: parseInt(document.getElementById('f_paid').value) || 0,
+            fees_expected: parseInt(document.getElementById('f_exp').value) || 0
+        };
+        
+        if(!id) payload.lin = `PM${sName.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
+
+        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
+        if(!error) { alert("Data Saved!"); loadData(); tab('rec'); } else { alert(error.message); }
+    }
+
+    function clearForm() {
+        if(role === "Teacher" || role === "Finance") {
+            alert("New student registration is only for Admin.");
+            tab('rec'); return;
+        }
+        document.getElementById('editId').value = "";
+        ['name','lin','contact','location','health_status','f_paid','f_exp'].forEach(f => {
+            document.getElementById(f).value = (f==='f_paid'||f==='f_exp') ? "0" : "";
+            document.getElementById(f).disabled = false;
+        });
+        document.getElementById('saveBtn').style.display = "block";
+        document.getElementById('lockMsg').classList.add('hidden');
+    }
+
+    function exportData(mode) {
+        const targetClass = document.getElementById('downloadClass').value;
+        const list = (mode === 'class') ? cachedData.filter(s => s.class === targetClass && s.is_absent === true) : cachedData.filter(s => s.is_absent === true);
+        if(list.length === 0) return alert("No absent students found.");
+        
+        let content = `<html><body style="font-family:sans-serif;"><h2>PROGRESSIVE MOTHERS - ABSENTEE LIST</h2><table border="1" style="width:100%; border-collapse:collapse;"><tr><th>Name</th><th>LIN</th><th>Class</th><th>Contact</th></tr>${list.map(s=>`<tr><td>${s.name}</td><td>${s.lin}</td><td>${s.class}</td><td>${s.contact}</td></tr>`).join('')}</table></body></html>`;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([content], { type: 'text/html' }));
+        a.download = (mode==='class'?targetClass:'Full_School') + "_Absentees.html";
+        a.click();
+    }
+
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('full-date').innerText = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
+    }, 1000);
+</script>
+</body>
+</html>
