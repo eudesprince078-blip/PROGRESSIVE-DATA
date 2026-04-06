@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v44</title>
+    <title>Progressive Mothers PMS v46</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -26,37 +26,24 @@
         .lin-badge { position: absolute; top: 10px; right: 10px; background: var(--blue); color: white; padding: 3px 8px; border-radius: 5px; font-size: 9px; font-weight: 900; }
         
         input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 15px; margin: 5px 0 12px 0; box-sizing: border-box; font-weight: 600; }
+        input:disabled, select:disabled { background: #f0f0f0; color: #666; cursor: not-allowed; border: 2px solid #ddd; }
         label { font-size: 9px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
         .hidden { display: none !important; }
 
-        /* Password Toggle Styling */
-        .pass-box { position: relative; width: 100%; max-width: 280px; }
-        .toggle-btn { position: absolute; right: 15px; top: 18px; font-size: 10px; font-weight: 900; color: var(--gold); cursor: pointer; text-transform: uppercase; }
-
-        /* Print Layout */
-        @media print {
-            body * { visibility: hidden; }
-            #printSection, #printSection * { visibility: visible; }
-            #printSection { position: absolute; left: 0; top: 0; width: 100%; }
-            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-            th, td { border: 1px solid black; padding: 8px; text-align: left; font-size: 12px; }
-        }
+        .btn-download { background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; font-size: 11px; width: 100%; cursor: pointer; margin-top: 5px; }
+        .btn-save { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 900; margin-top: 10px; }
+        .btn-save:disabled { background: #ccc; }
     </style>
 </head>
 <body>
 
 <div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
     <h2 style="color:white; font-weight:900; margin-bottom:20px;">SCHOOL ACCESS</h2>
-    <div class="pass-box">
-        <input id="key" type="password" placeholder="ACCESS KEY" style="text-align:center; border:3px solid var(--gold);">
-        <span class="toggle-btn" onclick="togglePass()">Show</span>
-    </div>
+    <input id="key" type="password" placeholder="ACCESS KEY" style="text-align:center; max-width:280px; border:3px solid var(--gold);">
     <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900;">LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
-    <div id="printSection" class="hidden"></div>
-
     <div class="header">
         <div style="line-height:1.1;"><b style="font-size:12px;">PROGRESSIVE MOTHERS</b><br><span style="font-size:9px;">Nursery & Primary School</span></div>
         <button onclick="location.reload()" style="background:white; color:var(--red); border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:11px;">LOGOUT</button>
@@ -82,16 +69,22 @@
     <div id="v-rec" class="hidden">
         <div style="padding:15px;">
             <input id="searchBar" placeholder="🔍 Search name or LIN..." oninput="renderUI()" style="margin-bottom:10px;">
-            <div id="adminPanel" class="hidden" style="background:white; padding:10px; border-radius:12px; border:1px solid #ddd;">
-                <label>Print Absentee Report By Class</label>
-                <div style="display:flex; gap:8px;">
-                    <select id="printClassSelect" style="margin:0;">
-                        <option value="">-- Select Class --</option>
-                        <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                        <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                        <option>P.5</option><option>P.6</option><option>P.7</option>
-                    </select>
-                    <button onclick="printAbsentees()" style="background:var(--red); color:white; border:none; padding:0 15px; border-radius:10px; font-weight:900;">PRINT</button>
+            
+            <div id="adminPanel" class="hidden" style="background:white; padding:15px; border-radius:15px; border:1px solid #ddd;">
+                <b style="font-size:11px; color:var(--blue);">ADMIN DOWNLOAD PORTAL</b>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                    <div>
+                        <select id="downloadClass" style="margin:0; padding:8px; font-size:12px;">
+                            <option value="">-- Class --</option>
+                            <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                            <option>P.5</option><option>P.6</option><option>P.7</option>
+                        </select>
+                        <button class="btn-download" onclick="exportData('class')">SAVE CLASS</button>
+                    </div>
+                    <div>
+                        <button class="btn-download" style="background:var(--red); height:100%;" onclick="exportData('school')">SAVE FULL SCHOOL</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -100,20 +93,30 @@
 
     <div id="v-adm" class="hidden" style="padding:15px;">
         <div style="background:white; padding:20px; border-radius:20px; border:1px solid #ddd;">
-            <h3 style="margin:0 0 15px 0; color:var(--blue); font-size:13px;">STUDENT REGISTRATION</h3>
+            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:13px;">STUDENT REGISTRATION</h3>
             <input type="hidden" id="editId">
-            <label>Name</label><input id="name">
-            <label>LIN</label><input id="lin" readonly>
-            <label>Class</label>
-            <select id="cls">
-                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                <option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-            <label>Contact</label><input id="contact">
-            <label>Location</label><input id="location">
-            <label>Health Status</label><input id="health_status">
-            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:15px; font-weight:900;">SAVE STUDENT</button>
+            
+            <div id="infoSection">
+                <label>Full Name</label><input id="name">
+                <label>LIN Number</label><input id="lin" readonly placeholder="Auto-generated">
+                <label>Class</label>
+                <select id="cls">
+                    <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                    <option>P.5</option><option>P.6</option><option>P.7</option>
+                </select>
+                <label>Parent Contact</label><input id="contact">
+                <label>Physical Location</label><input id="location">
+                <label>Health Status</label><input id="health_status">
+            </div>
+            
+            <div id="financeSection" style="margin-top:15px; padding-top:15px; border-top:2px dashed #eee;">
+                <label style="color:var(--red)">Expected Fees (UGX)</label><input id="f_exp" type="number">
+                <label style="color:var(--green)">Fees Paid (UGX)</label><input id="f_paid" type="number">
+            </div>
+            
+            <button id="saveBtn" onclick="submitData()" class="btn-save">SAVE CHANGES</button>
+            <p id="lockMsg" style="color:var(--red); font-size:10px; font-weight:bold; text-align:center;" class="hidden">⚠️ ACCESS RESTRICTED: YOU CANNOT EDIT THIS SECTION</p>
         </div>
     </div>
 
@@ -136,20 +139,16 @@
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
     let role = ""; let cachedData = [];
 
-    function togglePass() {
-        const p = document.getElementById('key');
-        p.type = p.type === "password" ? "text" : "password";
-        document.querySelector('.toggle-btn').innerText = p.type === "password" ? "Hide" : "Show";
-    }
-
     function secureLogin() {
         const k = document.getElementById('key').value.trim().toUpperCase();
         if (k === "JESUS CARES") role = "Admin";
+        else if (k === "FINANCE 256") role = "Finance";
         else if (k === "TEACH2026") role = "Teacher";
-        else return alert("ACCESS DENIED");
+        else return alert("INVALID ACCESS KEY");
         
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
+        
         if(role === "Admin") document.getElementById('adminPanel').classList.remove('hidden');
         tab(role === "Teacher" ? 'roll' : 'rec');
         loadData();
@@ -180,9 +179,7 @@
             list.innerHTML += `<div class="item-card">
                 <div class="lin-badge">${s.lin || 'NEW'}</div>
                 <b>${s.name}</b><br><small>${s.class} | ${s.contact}</small>
-                <div style="margin-top:10px; display:grid; grid-template-columns:1fr; gap:8px;">
-                    <button class="action-btn" style="background:#eee" onclick="editMode('${s.id}')">DETAILS / EDIT</button>
-                </div>
+                <div style="margin-top:10px;"><button class="action-btn" style="background:#eee" onclick="editMode('${s.id}')">VIEW / EDIT</button></div>
             </div>`;
         });
 
@@ -204,74 +201,6 @@
         loadData();
     }
 
-    function printAbsentees() {
-        const targetClass = document.getElementById('printClassSelect').value;
-        if(!targetClass) return alert("Please select a class first");
-
-        const classList = cachedData.filter(s => s.class === targetClass);
-        const absentList = classList.filter(s => s.is_absent === true);
-
-        // Safety Check: If no one is marked absent, check if roll call was even done
-        if(absentList.length === 0 && classList.length > 0) {
-            const confirmPrint = confirm("No students are marked absent for " + targetClass + ". Print anyway?");
-            if(!confirmPrint) return;
-        }
-
-        let html = `
-            <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:10px;">
-                <h2 style="margin:0;">PROGRESSIVE MOTHERS NURSERY & PRIMARY SCHOOL</h2>
-                <h3 style="margin:5px 0;">ABSENTEE REPORT - ${targetClass}</h3>
-                <p>Date: ${new Date().toLocaleDateString('en-GB')}</p>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Student Name</th>
-                        <th>LIN Number</th>
-                        <th>Class</th>
-                        <th>Parent Contact</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-
-        absentList.forEach((s, i) => {
-            html += `<tr>
-                <td>${i+1}</td>
-                <td>${s.name}</td>
-                <td>${s.lin || 'N/A'}</td>
-                <td>${s.class}</td>
-                <td>${s.contact || 'N/A'}</td>
-            </tr>`;
-        });
-
-        html += `</tbody></table>
-            <div style="margin-top:30px; display:flex; justify-content:space-between;">
-                <span>Class Teacher: ________________</span>
-                <span>Administrator: ________________</span>
-            </div>`;
-
-        const printBox = document.getElementById('printSection');
-        printBox.innerHTML = html;
-        window.print();
-    }
-
-    async function submitData() {
-        const id = document.getElementById('editId').value;
-        const sName = document.getElementById('name').value.trim();
-        if(!sName) return alert("Name required");
-        let lin = document.getElementById('lin').value || `PM${sName.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
-        
-        const payload = { 
-            name: sName, class: document.getElementById('cls').value, lin: lin,
-            contact: document.getElementById('contact').value,
-            location: document.getElementById('location').value,
-            health_status: document.getElementById('health_status').value
-        };
-        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("Saved!"); clearForm(); loadData(); tab('rec'); }
-    }
-
     function editMode(id) {
         const s = cachedData.find(st => st.id === id);
         document.getElementById('editId').value = s.id;
@@ -281,19 +210,28 @@
         document.getElementById('contact').value = s.contact;
         document.getElementById('location').value = s.location;
         document.getElementById('health_status').value = s.health_status;
-        tab('adm');
-    }
+        document.getElementById('f_paid').value = s.fees_paid || 0;
+        document.getElementById('f_exp').value = s.fees_expected || 0;
 
-    function clearForm() {
-        document.getElementById('editId').value = "";
-        ['name','lin','contact','location','health_status'].forEach(f => document.getElementById(f).value = "");
-    }
+        // --- ROLE BASED PERMISSIONS ---
+        const infoInputs = ['name', 'cls', 'contact', 'location', 'health_status'];
+        const financeInputs = ['f_paid', 'f_exp'];
+        const saveBtn = document.getElementById('saveBtn');
+        const lockMsg = document.getElementById('lockMsg');
 
-    setInterval(() => {
-        const now = new Date();
-        document.getElementById('full-date').innerText = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-    }, 1000);
-</script>
-</body>
-</html>
+        if(role === "Admin") {
+            infoInputs.concat(financeInputs).forEach(id => document.getElementById(id).disabled = false);
+            saveBtn.disabled = false;
+            lockMsg.classList.add('hidden');
+        } else if(role === "Finance") {
+            infoInputs.forEach(id => document.getElementById(id).disabled = true);
+            financeInputs.forEach(id => document.getElementById(id).disabled = false);
+            saveBtn.disabled = false;
+            lockMsg.classList.remove('hidden');
+            lockMsg.innerText = "⚠️ FINANCE: YOU CAN ONLY EDIT FEE FIELDS";
+        } else { // Teacher
+            infoInputs.concat(financeInputs).forEach(id => document.getElementById(id).disabled = true);
+            saveBtn.disabled = true;
+            lockMsg.classList.remove('hidden');
+            lockMsg.innerText = "⚠️ TEACHER: EDITING IS DISABLED";
+        }
