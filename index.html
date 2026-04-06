@@ -2,19 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v40</title>
+    <title>Progressive Mothers PMS v42</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #25D366; --light: #f4f7f9; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
         
-        /* Header */
         .header { background: var(--red); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); }
         .hero { background: var(--blue); color: white; padding: 20px 15px; text-align: center; border-bottom: 5px solid var(--gold); }
         #clock { font-size: 38px; font-weight: 900; letter-spacing: -1px; margin: 5px 0; }
 
-        /* Dashboard & Alerts */
         .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 15px; margin-top: -30px; }
         .stat-card { background: white; padding: 12px 5px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--blue); }
         .stat-val { font-size: 22px; font-weight: 900; color: var(--blue); display: block; }
@@ -22,12 +20,10 @@
         
         .alert-box { background: #fff3cd; color: #856404; padding: 12px; border-radius: 12px; margin: 0 15px 10px 15px; border-left: 6px solid #ffeeba; font-size: 11px; font-weight: 800; }
 
-        /* Tabs */
         .nav-tabs { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 68px; z-index: 999; }
         .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 10px; color: #bbb; cursor: pointer; text-transform: uppercase; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #fcfcfc; }
 
-        /* Student Cards */
         .item-card { background: white; border-radius: 15px; padding: 15px; margin: 10px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 8px solid var(--blue); position: relative; }
         .lin-badge { position: absolute; top: 10px; right: 10px; background: var(--blue); color: white; padding: 3px 8px; border-radius: 5px; font-size: 9px; font-weight: 900; }
         .follow-up-input { width: 100%; margin-top: 10px; padding: 8px; border: 1px dashed #ccc; border-radius: 8px; font-size: 12px; box-sizing: border-box; }
@@ -35,23 +31,21 @@
         .action-btn { padding: 10px; border-radius: 8px; border: none; font-weight: 800; font-size: 11px; cursor: pointer; width: 100%; }
         .btn-call { background: var(--green); color: white; text-decoration: none; display: block; text-align: center; line-height: 1.4; }
 
-        /* Form */
         input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 15px; margin: 5px 0 12px 0; box-sizing: border-box; font-weight: 600; }
         label { font-size: 9px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
         .hidden { display: none !important; }
-        
         .toggle-pass { position: absolute; right: 15px; top: 20px; font-size: 12px; font-weight: 800; color: var(--gold); cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
-    <h2 style="color:white; font-weight:900; margin-bottom:20px;">PROGRESSIVE ACCESS</h2>
+    <h2 style="color:white; font-weight:900; margin-bottom:20px;">SCHOOL ACCESS</h2>
     <div style="position:relative; width:100%; max-width:280px;">
-        <input id="key" type="password" placeholder="ACCESS KEY" style="text-align:center; border:3px solid var(--gold);">
+        <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; border:3px solid var(--gold);">
         <span class="toggle-pass" onclick="togglePass()">SHOW</span>
     </div>
-    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900;">LOGIN</button>
+    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900;">LOGIN SYSTEM</button>
 </div>
 
 <div id="mainApp" class="hidden">
@@ -80,18 +74,19 @@
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;">
-            <input id="searchBar" placeholder="🔍 Search Name, LIN, or Class (e.g. P.1)..." oninput="renderUI()" style="margin:0;">
+        <div style="padding:15px; display:flex; gap:10px;">
+            <input id="searchBar" placeholder="🔍 Search Name, LIN, or Class..." oninput="renderUI()" style="margin:0;">
+            <button onclick="loadData()" style="background:var(--blue); color:white; border:none; border-radius:10px; padding:0 15px; font-weight:900;">↻</button>
         </div>
         <div id="dataList"></div>
     </div>
 
     <div id="v-adm" class="hidden" style="padding:15px;">
         <div style="background:white; padding:20px; border-radius:20px; border:1px solid #ddd;">
-            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:13px;">REGISTRATION</h3>
+            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:13px;">STUDENT REGISTRATION</h3>
             <input type="hidden" id="editId">
-            <label>Name</label><input id="name">
-            <label>LIN</label><input id="lin" readonly>
+            <label>Full Name</label><input id="name">
+            <label>LIN</label><input id="lin" readonly placeholder="Auto-generated">
             <label>Class</label>
             <select id="cls">
                 <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
@@ -102,21 +97,21 @@
                 <div><label>Age</label><input id="age" type="number" value="0"></div>
                 <div><label>DOB</label><input id="dob" type="date"></div>
             </div>
-            <label>Location</label><input id="location">
-            <label>Contact</label><input id="contact">
-            <label>Health</label><input id="health_status">
+            <label>Physical Location</label><input id="location">
+            <label>Parent Contact</label><input id="contact">
+            <label>Health Status</label><input id="health_status">
             <div id="financeSection">
                 <label style="color:var(--red)">Expected Fees</label><input id="f_exp" type="number" value="0">
                 <label style="color:var(--green)">Paid Fees</label><input id="f_paid" type="number" value="0">
             </div>
-            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:15px; font-weight:900;">SAVE STUDENT</button>
+            <button onclick="submitData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:15px; font-weight:900;">SAVE RECORD</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
         <div style="padding:15px;">
             <select id="rollClass" onchange="renderUI()" style="border:2px solid var(--blue);">
-                <option value="">-- Choose Class --</option>
+                <option value="">-- Select Class for Roll Call --</option>
                 <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
@@ -135,7 +130,7 @@
     function togglePass() {
         const p = document.getElementById('key');
         p.type = p.type === "password" ? "text" : "password";
-        document.querySelector('.toggle-pass').innerText = p.type === "password" ? "SHOW" : "HIDE";
+        document.querySelector('.toggle-pass').innerText = p.type === "password" ? "HIDE" : "SHOW";
     }
 
     function secureLogin() {
@@ -143,7 +138,7 @@
         if (k === "JESUS CARES") role = "Admin";
         else if (k === "FINANCE 256") role = "Finance";
         else if (k === "TEACH2026") role = "Teacher";
-        else return alert("ACCESS DENIED");
+        else return alert("INVALID ACCESS KEY");
         
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
@@ -159,37 +154,39 @@
     }
 
     async function loadData() {
-        const { data } = await _client.from('students').select('*').order('name');
-        if(data) { cachedData = data; renderUI(); }
+        const { data, error } = await _client.from('students').select('*').order('name');
+        if(data) { 
+            // Ensure is_absent is treated as a strict boolean
+            cachedData = data.map(s => ({...s, is_absent: s.is_absent === true})); 
+            renderUI(); 
+        }
     }
 
     function renderUI() {
-        const alertArea = document.getElementById('alerts'); alertArea.innerHTML = "";
+        const alerts = document.getElementById('alerts'); alerts.innerHTML = "";
         
-        // Stats
+        // 1. Dashboard Logic
         const total = cachedData.length;
-        const absent = cachedData.filter(s => s.is_absent === true).length;
+        const absent = cachedData.filter(s => s.is_absent).length;
         document.getElementById('c-tot').innerText = total;
         document.getElementById('c-abs').innerText = absent;
         document.getElementById('c-pres').innerText = total - absent;
 
-        // Alerts for Chronic Absence
+        // 2. Absence Alerts
         cachedData.filter(s => s.absence_streak >= 2).forEach(s => {
-            alertArea.innerHTML += `<div class="alert-box">⚠️ <b>${s.name}</b> (Absent ${s.absence_streak} days). <a href="tel:${s.contact}">Call Parent</a></div>`;
+            alerts.innerHTML += `<div class="alert-box">⚠️ <b>${s.name}</b>: Absent for ${s.absence_streak} days. <a href="tel:${s.contact}" style="color:var(--blue)">Call Parent</a></div>`;
         });
 
-        // Records Search (Name, LIN, or Class)
+        // 3. Records View (Search Name, LIN, or Class)
         const q = document.getElementById('searchBar').value.toLowerCase();
         const list = document.getElementById('dataList'); list.innerHTML = "";
-        cachedData.filter(s => 
-            s.name.toLowerCase().includes(q) || 
-            (s.lin && s.lin.toLowerCase().includes(q)) || 
-            s.class.toLowerCase().includes(q)
-        ).forEach(s => {
+        cachedData.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q)) || s.class.toLowerCase().includes(q)).forEach(s => {
             list.innerHTML += `<div class="item-card">
                 <div class="lin-badge">${s.lin || 'NEW'}</div>
-                <b>${s.name}</b><br><small>${s.class} | Loc: ${s.location || 'N/A'}</small>
-                <div style="font-size:10px; color:var(--red); margin-top:5px;">${s.is_absent ? 'Last Status: Absent (' + (s.follow_up || 'No reason') + ')' : 'Status: Present'}</div>
+                <b>${s.name}</b><br><small>${s.class} | ${s.location}</small>
+                <div style="font-size:10px; margin-top:5px; color:${s.is_absent ? 'var(--red)' : 'var(--green)'}">
+                    ${s.is_absent ? 'LATEST: Absent (' + (s.follow_up || 'No reason saved') + ')' : 'LATEST: Present'}
+                </div>
                 <div style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                     <button class="action-btn" style="background:#eee" onclick="editMode('${s.id}')">DETAILS</button>
                     <a href="tel:${s.contact}" class="action-btn btn-call">CALL</a>
@@ -197,7 +194,7 @@
             </div>`;
         });
 
-        // Attendance View
+        // 4. Attendance View
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData'); rollList.innerHTML = "";
         cachedData.filter(s => s.class === rCls).forEach(s => {
@@ -206,42 +203,66 @@
                 <div class="item-card" style="border-left-color:${isA?'var(--red)':'var(--green)'}">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <b>${s.name}</b>
-                        <button style="padding:10px; border-radius:10px; border:none; color:white; font-weight:900; min-width:90px; background:${isA?'var(--red)':'var(--green)'}" onclick="markAtt('${s.id}', ${!isA})">${isA?'ABSENT':'PRESENT'}</button>
+                        <button style="padding:10px; border-radius:10px; border:none; color:white; font-weight:900; min-width:90px; background:${isA?'var(--red)':'var(--green)'}" onclick="markAttendance('${s.id}', ${!isA})">
+                            ${isA ? 'ABSENT' : 'PRESENT'}
+                        </button>
                     </div>
-                    ${isA ? `<input class="follow-up-input" placeholder="Reason for absence..." value="${s.follow_up || ''}" onchange="saveNote('${s.id}', this.value)">` : ''}
+                    ${isA ? `<input class="follow-up-input" placeholder="What happened to this child?" value="${s.follow_up || ''}" onchange="saveReason('${s.id}', this.value)">` : ''}
                 </div>`;
         });
     }
 
-    async function markAtt(id, status) {
+    async function markAttendance(id, status) {
         const student = cachedData.find(s => s.id === id);
+        if(!student) return;
+
+        // UI Update First
         student.is_absent = status;
-        student.absence_streak = status ? (student.absence_streak + 1) : 0;
+        if(status) {
+            student.absence_streak = (student.absence_streak || 0) + 1;
+        } else {
+            student.absence_streak = 0;
+            student.follow_up = "";
+        }
         renderUI();
-        await _client.from('students').update({ is_absent: status, absence_streak: student.absence_streak }).eq('id', id);
+
+        // Database Sync
+        const { error } = await _client.from('students').update({ 
+            is_absent: status, 
+            absence_streak: student.absence_streak,
+            follow_up: student.follow_up
+        }).eq('id', id);
+        
+        if(error) console.error("Update failed", error);
     }
 
-    async function saveNote(id, val) {
+    async function saveReason(id, val) {
         const student = cachedData.find(s => s.id === id);
-        student.follow_up = val;
+        if(student) student.follow_up = val;
         await _client.from('students').update({ follow_up: val }).eq('id', id);
     }
 
     async function submitData() {
         const id = document.getElementById('editId').value;
         const sName = document.getElementById('name').value.trim();
-        if(!sName) return alert("Name required");
-        let lin = document.getElementById('lin').value || `PM${sName.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
-        
+        if(!sName) return alert("Name is required");
+
+        let lin = document.getElementById('lin').value;
+        if(!id) lin = `PM${sName.charAt(0).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`;
+
         const payload = { 
             name: sName, class: document.getElementById('cls').value, lin: lin,
-            age: parseInt(document.getElementById('age').value)||0, dob: document.getElementById('dob').value||null,
-            location: document.getElementById('location').value, contact: document.getElementById('contact').value,
+            age: parseInt(document.getElementById('age').value) || 0,
+            dob: document.getElementById('dob').value || null,
+            location: document.getElementById('location').value,
+            contact: document.getElementById('contact').value,
             health_status: document.getElementById('health_status').value,
-            fees_paid: parseInt(document.getElementById('f_paid').value)||0, fees_expected: parseInt(document.getElementById('f_exp').value)||0
+            fees_paid: parseInt(document.getElementById('f_paid').value) || 0,
+            fees_expected: parseInt(document.getElementById('f_exp').value) || 0
         };
+
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("Success!"); clearForm(); loadData(); tab('rec'); }
+        if(!error) { alert("Record Saved!"); clearForm(); loadData(); tab('rec'); }
     }
 
     function editMode(id) {
