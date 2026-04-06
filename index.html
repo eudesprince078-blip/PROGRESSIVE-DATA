@@ -2,61 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v47.2</title>
+    <title>Progressive Mothers PMS v47.4</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #25D366; --light: #f4f7f9; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
-        .header { background: var(--red); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); }
+        .header { background: var(--red); color: white; padding: 20px 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--gold); }
         .hero { background: var(--blue); color: white; padding: 20px 15px; text-align: center; border-bottom: 5px solid var(--gold); }
-        #clock { font-size: 38px; font-weight: 900; letter-spacing: -1px; margin: 5px 0; }
+        #clock { font-size: 32px; font-weight: 900; margin: 5px 0; letter-spacing: -1px; }
         
+        /* Dashboard Stats */
         .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 15px; margin-top: -30px; }
         .stat-card { background: white; padding: 12px 5px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--blue); }
-        .stat-val { font-size: 22px; font-weight: 900; color: var(--blue); display: block; }
+        .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); display: block; }
         .stat-lbl { font-size: 8px; font-weight: 800; color: #888; text-transform: uppercase; }
 
-        .nav-tabs { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 68px; z-index: 999; overflow-x: auto; }
+        /* Navigation */
+        .nav-tabs { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 82px; z-index: 999; overflow-x: auto; }
         .tab { flex: 1; min-width: 80px; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 9px; color: #bbb; cursor: pointer; text-transform: uppercase; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #fcfcfc; }
 
-        .item-card { background: white; border-radius: 15px; padding: 15px; margin: 10px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 8px solid var(--blue); position: relative; transition: 0.2s; }
-        .item-card:active { transform: scale(0.98); }
-        .follow-up-badge { background: var(--red); color: white; padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: 900; margin-left: 5px; vertical-align: middle; }
-        
-        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
-        .sum-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 4px solid var(--blue); }
-        .sum-card h4 { margin: 0; font-size: 10px; color: #888; text-transform: uppercase; }
-        .sum-card p { margin: 5px 0 0 0; font-size: 18px; font-weight: 900; color: var(--blue); }
+        /* Item Cards */
+        .item-card { background: white; border-radius: 15px; padding: 15px; margin: 10px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 8px solid var(--blue); position: relative; }
+        .follow-up-badge { background: var(--red); color: white; padding: 3px 7px; border-radius: 5px; font-size: 9px; font-weight: 900; position: absolute; top: 10px; right: 10px; }
+        .alert-box { background: #fff3f3; border: 1px solid var(--red); color: var(--red); padding: 12px; margin: 15px; border-radius: 12px; font-size: 11px; font-weight: 800; text-align: center; }
 
-        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 15px; margin: 5px 0 12px 0; box-sizing: border-box; font-weight: 600; }
-        label { font-size: 9px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; font-size: 15px; margin: 5px 0 15px 0; box-sizing: border-box; font-weight: 600; }
         .hidden { display: none !important; }
-        .btn-save { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; }
-        .alert-box { background: #fff3f3; border: 1px solid var(--red); color: var(--red); padding: 10px; margin: 15px; border-radius: 10px; font-size: 11px; }
+        .btn-save { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 16px; }
         
-        .routine-box { background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; font-size: 10px; margin-top: 10px; border: 1px solid var(--gold); line-height: 1.4; }
+        /* Login UI */
+        .login-input-wrap { position: relative; width: 100%; max-width: 320px; }
+        .toggle-btn { position: absolute; right: 15px; top: 18px; font-size: 10px; font-weight: 900; color: var(--blue); cursor: pointer; background: var(--gold); padding: 4px 8px; border-radius: 6px; }
     </style>
 </head>
 <body>
 
 <div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
-    <h2 style="color:white; font-weight:900; margin-bottom:20px;">SCHOOL ACCESS</h2>
-    <input id="key" type="password" placeholder="ACCESS KEY" style="text-align:center; max-width:280px; border:3px solid var(--gold); padding: 15px; border-radius: 12px; font-weight: 900;">
-    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:280px; border:none; border-radius:12px; font-weight:900; margin-top:10px;">LOGIN</button>
+    <h1 style="color:white; font-weight:900; font-size:24px; text-align:center; margin-bottom:5px; letter-spacing:1px;">PROGRESSIVE MOTHER'S</h1>
+    <p style="color:var(--gold); font-weight:800; margin-bottom:40px; font-size:12px;">NURSERY & PRIMARY SCHOOL</p>
+    
+    <div class="login-input-wrap">
+        <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; border:3px solid var(--gold); text-transform: uppercase; background: white; color: var(--blue);">
+        <span class="toggle-btn" onclick="togglePass()">SHOW</span>
+    </div>
+    
+    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:320px; border:none; border-radius:15px; font-weight:900; margin-top:12px; font-size:16px; cursor:pointer;">LOGIN SYSTEM</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div style="line-height:1.1;"><b style="font-size:12px;">PROGRESSIVE MOTHERS</b><br><span style="font-size:9px;">Nursery & Primary School</span></div>
-        <button onclick="location.reload()" style="background:white; color:var(--red); border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size: 11px;">LOGOUT</button>
+        <div style="line-height:1.2;">
+            <b style="font-size:14px; letter-spacing:0.5px;">PROGRESSIVE MOTHER'S</b><br>
+            <span style="font-size:10px; font-weight:800; opacity:0.8;">NURSERY & PRIMARY SCHOOL</span>
+        </div>
+        <button onclick="location.reload()" style="background:white; color:var(--red); border:none; padding:8px 12px; border-radius:10px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
 
     <div class="hero">
-        <div id="full-date" style="color:var(--gold); font-size:11px; font-weight:800;">DATE</div>
+        <div id="full-date" style="color:var(--gold); font-size:11px; font-weight:800; text-transform:uppercase;">DATE</div>
         <div id="clock">00:00:00</div>
-        <div class="routine-box" id="routineDisplay">Loading Daily Routine...</div>
+        <div id="routineDisplay" style="background:rgba(255,255,255,0.08); padding:10px; border-radius:10px; font-size:11px; margin-top:10px; border:1px solid var(--gold); font-weight:600;">Loading School Routine...</div>
     </div>
 
     <div class="dashboard">
@@ -65,7 +72,7 @@
         <div class="stat-card" style="border-bottom-color: var(--red);"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent</span></div>
     </div>
 
-    <div class="nav-tabs">
+    <div class="nav-tabs" id="mainNav">
         <div class="tab" id="tab-sum" onclick="tab('sum')">Director</div>
         <div class="tab" id="tab-rec" onclick="tab('rec')">Records</div>
         <div class="tab" id="tab-adm" onclick="tab('adm')">Admission</div>
@@ -73,42 +80,34 @@
     </div>
 
     <div id="v-sum" class="hidden">
-        <div class="summary-grid">
-            <div class="sum-card"><h4>Expected Revenue</h4><p id="s-exp">0</p></div>
-            <div class="sum-card" style="border-top-color:var(--green)"><h4>Total Paid</h4><p id="s-paid" style="color:var(--green)">0</p></div>
-            <div class="sum-card" style="border-top-color:var(--red)"><h4>Total Arrears</h4><p id="s-bal" style="color:var(--red)">0</p></div>
-            <div class="sum-card"><h4>Collection %</h4><p id="s-perc">0%</p></div>
-        </div>
-        <div id="followUpSection"></div>
-        <div style="padding:15px; font-weight:bold; color:var(--blue)">Class Performance:</div>
-        <div id="classBreakdown" style="padding: 0 15px 20px 15px;"></div>
+        <div id="absenceAlerts"></div>
+        <div style="padding:15px; font-weight:900; color:var(--blue); font-size:13px;">FINANCIAL SUMMARY (TOTALS):</div>
+        <div id="financeBox" style="padding: 0 15px 25px 15px;"></div>
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search name or LIN..." oninput="renderUI()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search pupil by name..." oninput="renderUI()" style="border: 2px solid var(--blue);"></div>
         <div id="dataList"></div>
     </div>
 
     <div id="v-adm" class="hidden" style="padding:15px;">
-        <button onclick="clearForm()" style="width:100%; background:var(--gold); border:none; padding:12px; border-radius:10px; font-weight:900; margin-bottom:15px; color:var(--blue)">+ NEW REGISTRATION (CLEAR)</button>
-        <div style="background:white; padding:20px; border-radius:20px; border:1px solid #ddd;">
-            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:13px;">STUDENT PROFILE</h3>
+        <button onclick="clearForm()" style="width:100%; background:var(--gold); border:none; padding:15px; border-radius:15px; font-weight:900; margin-bottom:15px; color:var(--blue); font-size:14px;">+ NEW PUPIL REGISTRATION</button>
+        <div style="background:white; padding:25px; border-radius:25px; border:1px solid #ddd; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <h3 id="admTitle" style="margin:0 0 20px 0; color:var(--blue); font-size:15px; text-transform:uppercase;">PUPIL PROFILE</h3>
             <input type="hidden" id="editId">
-            <label>Full Name</label><input id="name">
-            <label>LIN (System Generated)</label><input id="lin" readonly>
-            <label>Class</label>
+            <label style="font-size:10px; font-weight:900; color:gray;">FULL NAME</label><input id="name">
+            <label style="font-size:10px; font-weight:900; color:gray;">LIN (AUTO)</label><input id="lin" readonly style="background:#f9f9f9;">
+            <label style="font-size:10px; font-weight:900; color:gray;">CLASS</label>
             <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Parent Contact</label><input id="contact">
-            <label>Physical Location</label><input id="location">
-            <label>Health Status</label><input id="health_status">
-            <label style="color:var(--red)">Expected Fees (UGX)</label><input id="f_exp" type="number">
-            <label style="color:var(--green)">Paid Fees (UGX)</label><input id="f_paid" type="number">
-            <button onclick="submitData()" class="btn-save">SAVE RECORD</button>
+            <label style="font-size:10px; font-weight:900; color:gray;">PARENT CONTACT</label><input id="contact" type="tel">
+            <label style="font-size:10px; font-weight:900; color:var(--red);">FEES EXPECTED (UGX)</label><input id="f_exp" type="number">
+            <label style="font-size:10px; font-weight:900; color:var(--green);">FEES PAID (UGX)</label><input id="f_paid" type="number">
+            <button onclick="submitData()" class="btn-save">SAVE TO CLOUD</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
-        <div style="padding:15px;"><select id="rollClass" onchange="renderUI()" style="border:2px solid var(--blue);"><option value="">-- Choose Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
+        <div style="padding:15px;"><select id="rollClass" onchange="renderUI()" style="border:3px solid var(--blue); background:white;"><option value="">-- Choose Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
         <div id="rollData"></div>
     </div>
 </div>
@@ -119,14 +118,31 @@
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
     let role = ""; let cachedData = [];
 
+    function togglePass() {
+        const p = document.getElementById('key');
+        const b = document.querySelector('.toggle-btn');
+        p.type = p.type === "password" ? "text" : "password";
+        b.innerText = p.type === "password" ? "SHOW" : "HIDE";
+    }
+
     function secureLogin() {
         const val = document.getElementById('key').value.trim().toUpperCase();
-        if (val === "JESUS CARES") role = "Admin";
-        else if (val === "TEACH2026") role = "Teacher";
-        else return alert("INVALID KEY");
+        
+        // Corrected Login Logic
+        if (val === "JESUS CARES") { role = "Admin"; tab('sum'); }
+        else if (val === "FINANCE 256") { role = "Finance"; tab('sum'); } // Finance starts at Summary
+        else if (val === "TEACH2026") { role = "Teacher"; tab('roll'); }
+        else { return alert("LOGIN FAILED: KEY NOT RECOGNIZED"); }
+
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-        tab(role === "Admin" ? 'sum' : 'roll');
+        
+        // Restrict Tabs for Teachers
+        if(role === "Teacher") {
+            document.getElementById('tab-sum').classList.add('hidden');
+            document.getElementById('tab-adm').classList.add('hidden');
+        }
+        
         loadData();
     }
 
@@ -139,45 +155,33 @@
 
     async function loadData() {
         const { data } = await _client.from('students').select('*').order('name');
-        if(data) { cachedData = data; renderUI(); updateDirectorStats(); }
+        if(data) { cachedData = data; renderUI(); updateFinanceDash(); }
     }
 
-    function updateDirectorStats() {
-        let tE = 0, tP = 0;
-        let cBreak = {};
-        const followDiv = document.getElementById('followUpSection');
-        let followHtml = '<div class="alert-box"><b>ABSENCE ALERT (Follow-up Required)</b></div>';
-        let hasAbsents = false;
-
-        cachedData.forEach(s => {
-            tE += (s.fees_expected || 0);
-            tP += (s.fees_paid || 0);
-            if(!cBreak[s.class]) cBreak[s.class] = { p: 0, e: 0 };
-            cBreak[s.class].p += (s.fees_paid || 0);
-            cBreak[s.class].e += (s.fees_expected || 0);
-
-            if(s.is_absent === true) {
-                hasAbsents = true;
-                followHtml += `<div class="item-card" style="border-left-color:var(--red)">
-                    <b>${s.name}</b> <span class="follow-up-badge">ABSENT</span><br>
-                    <small>Class: ${s.class} | Call Parent: ${s.contact || 'N/A'}</small>
-                </div>`;
-            }
-        });
-
-        document.getElementById('s-exp').innerText = tE.toLocaleString();
-        document.getElementById('s-paid').innerText = tP.toLocaleString();
-        document.getElementById('s-bal').innerText = (tE - tP).toLocaleString();
-        document.getElementById('s-perc').innerText = tE > 0 ? Math.round((tP/tE)*100) + "%" : "0%";
-        followDiv.innerHTML = hasAbsents ? followHtml : "";
-
-        const breakDiv = document.getElementById('classBreakdown');
-        breakDiv.innerHTML = "";
-        for(let c in cBreak) {
-            breakDiv.innerHTML += `<div style="background:white; padding:12px; border-radius:10px; margin-bottom:5px; font-size:11px; display:flex; justify-content:space-between; border-left:4px solid var(--blue)">
-                <b>${c}</b><span>Paid: ${cBreak[c].p.toLocaleString()} / Exp: ${cBreak[c].e.toLocaleString()}</span>
+    function updateFinanceDash() {
+        // Absence Follow-up List
+        const alertDiv = document.getElementById('absenceAlerts');
+        const absents = cachedData.filter(s => s.is_absent === true);
+        let h = '<div class="alert-box">⚠️ TODAY\'S ABSENT PUPILS</div>';
+        absents.forEach(s => {
+            h += `<div class="item-card" style="border-left-color:var(--red)">
+                <span class="follow-up-badge">ABSENT</span>
+                <b>${s.name}</b><br><small>Class: ${s.class} | Parent: ${s.contact || 'No Phone'}</small>
             </div>`;
-        }
+        });
+        alertDiv.innerHTML = absents.length > 0 ? h : '<div style="padding:20px; text-align:center; color:gray; font-size:12px;">All pupils are currently present.</div>';
+
+        // Revenue Summary
+        let tE = 0, tP = 0;
+        cachedData.forEach(s => { tE += (s.fees_expected || 0); tP += (s.fees_paid || 0); });
+        document.getElementById('financeBox').innerHTML = `
+            <div style="background:var(--blue); color:white; padding:20px; border-radius:20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                <div style="margin-bottom:10px;">Expected: <span style="float:right; font-weight:900;">UGX ${tE.toLocaleString()}</span></div>
+                <div style="margin-bottom:10px; color:var(--green)">Collected: <span style="float:right; font-weight:900;">UGX ${tP.toLocaleString()}</span></div>
+                <div style="border-top:1px solid rgba(255,255,255,0.2); padding-top:10px; color:var(--gold); font-size:18px;">
+                    DEMAND: <span style="float:right; font-weight:900;">UGX ${(tE-tP).toLocaleString()}</span>
+                </div>
+            </div>`;
     }
 
     function renderUI() {
@@ -187,8 +191,8 @@
 
         const q = document.getElementById('searchBar').value.toLowerCase();
         const list = document.getElementById('dataList'); list.innerHTML = "";
-        cachedData.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))).forEach(s => {
-            list.innerHTML += `<div class="item-card" onclick="editMode('${s.id}')"><div style="position:absolute; top:10px; right:10px; font-size:9px; font-weight:900; color:var(--blue)">${s.lin || ''}</div><b>${s.name}</b><br><small>${s.class}</small></div>`;
+        cachedData.filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
+            list.innerHTML += `<div class="item-card" onclick="editMode('${s.id}')"><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin || 'N/A'}</small></div>`;
         });
 
         const rCls = document.getElementById('rollClass').value;
@@ -197,7 +201,7 @@
             const isA = s.is_absent === true;
             rList.innerHTML += `<div class="item-card" style="border-left-color:${isA?'var(--red)':'var(--green)'}">
                 <b>${s.name}</b>
-                <button onclick="markAtt('${s.id}', ${!isA})" style="float:right; background:${isA?'var(--red)':'var(--green)'}; color:white; border:none; padding:8px 12px; border-radius:10px; font-weight:900;">${isA?'ABSENT':'PRESENT'}</button>
+                <button onclick="markAtt('${s.id}', ${!isA})" style="float:right; padding:10px 15px; border-radius:12px; border:none; background:${isA?'var(--red)':'var(--green)'}; color:white; font-weight:900; font-size:10px;">${isA?'MARK ABSENT':'MARK PRESENT'}</button>
             </div>`;
         });
     }
@@ -208,57 +212,52 @@
     }
 
     function editMode(id) {
+        if(role === "Teacher") return alert("Teachers cannot edit financial records.");
         const s = cachedData.find(st => st.id == id);
         document.getElementById('editId').value = s.id;
         document.getElementById('name').value = s.name;
         document.getElementById('lin').value = s.lin || "";
         document.getElementById('cls').value = s.class;
         document.getElementById('contact').value = s.contact || "";
-        document.getElementById('location').value = s.location || "";
-        document.getElementById('health_status').value = s.health_status || "";
         document.getElementById('f_exp').value = s.fees_expected || 0;
         document.getElementById('f_paid').value = s.fees_paid || 0;
-        document.getElementById('admTitle').innerText = "EDITING: " + s.name;
+        document.getElementById('admTitle').innerText = "UPDATING: " + s.name;
         tab('adm');
     }
 
     function clearForm() {
         document.getElementById('editId').value = "";
         document.getElementById('name').value = "";
-        document.getElementById('lin').value = "PMA-" + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('lin').value = "PMS-" + Math.floor(1000 + Math.random()*9000);
         document.getElementById('contact').value = "";
-        document.getElementById('location').value = "";
-        document.getElementById('health_status').value = "Normal";
         document.getElementById('f_exp').value = 0;
         document.getElementById('f_paid').value = 0;
         document.getElementById('admTitle').innerText = "NEW REGISTRATION";
-        alert("Form ready for new student registration.");
+        alert("Admission form reset.");
     }
 
     async function submitData() {
         const id = document.getElementById('editId').value;
         const payload = { 
-            name: document.getElementById('name').value, class: document.getElementById('cls').value,
-            contact: document.getElementById('contact').value, lin: document.getElementById('lin').value,
-            location: document.getElementById('location').value, health_status: document.getElementById('health_status').value,
+            name: document.getElementById('name').value, 
+            class: document.getElementById('cls').value,
+            contact: document.getElementById('contact').value,
+            lin: document.getElementById('lin').value,
             fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
             fees_paid: parseInt(document.getElementById('f_paid').value) || 0
         };
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("Data Saved Successfully!"); loadData(); tab('rec'); } else { alert("Error: " + error.message); }
+        if(!error) { alert("Data Saved Successfully!"); loadData(); tab('rec'); }
     }
 
     function updateRoutine() {
         const now = new Date();
         const time = now.getHours() * 60 + now.getMinutes();
-        let rText = "Evening Program / Home Time";
-        if (time >= 420 && time < 480) rText = "Arrival & Morning Cleanup";
-        else if (time >= 480 && time < 600) rText = "Morning Lessons Session I";
-        else if (time >= 600 && time < 630) rText = "Break Time ☕";
-        else if (time >= 630 && time < 780) rText = "Academic Session II";
-        else if (time >= 780 && time < 840) rText = "Lunch Break 🍲";
-        else if (time >= 840 && time < 1020) rText = "Afternoon Classes & Activities";
-        document.getElementById('routineDisplay').innerText = rText;
+        let r = "Evening Program";
+        if (time >= 420 && time < 480) r = "Morning Arrival / Assembly";
+        else if (time >= 480 && time < 780) r = "Academic Sessions / Classes";
+        else if (time >= 780 && time < 840) r = "Lunch Break 🍲";
+        document.getElementById('routineDisplay').innerText = r;
     }
 
     setInterval(() => {
