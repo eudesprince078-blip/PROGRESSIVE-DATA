@@ -2,34 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v46.5</title>
+    <title>Progressive Mothers PMS v46.6</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #25D366; --light: #f4f7f9; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
-        
         .header { background: var(--red); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); }
         .hero { background: var(--blue); color: white; padding: 20px 15px; text-align: center; border-bottom: 5px solid var(--gold); }
         #clock { font-size: 38px; font-weight: 900; letter-spacing: -1px; margin: 5px 0; }
-
         .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 15px; margin-top: -30px; }
         .stat-card { background: white; padding: 12px 5px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--blue); }
         .stat-val { font-size: 22px; font-weight: 900; color: var(--blue); display: block; }
         .stat-lbl { font-size: 8px; font-weight: 800; color: #888; text-transform: uppercase; }
-
         .nav-tabs { display: flex; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 68px; z-index: 999; }
         .tab { flex: 1; text-align: center; padding: 15px 5px; font-weight: 900; font-size: 10px; color: #bbb; cursor: pointer; text-transform: uppercase; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #fcfcfc; }
-
         .item-card { background: white; border-radius: 15px; padding: 15px; margin: 10px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 8px solid var(--blue); position: relative; }
         .lin-badge { position: absolute; top: 10px; right: 10px; background: var(--blue); color: white; padding: 3px 8px; border-radius: 5px; font-size: 9px; font-weight: 900; }
-        
         input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 15px; margin: 5px 0 12px 0; box-sizing: border-box; font-weight: 600; }
         input:disabled, select:disabled { background: #f9f9f9; color: #999; border: 2px solid #eee; cursor: not-allowed; }
         label { font-size: 9px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
         .hidden { display: none !important; }
-
         .btn-save { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 900; margin-top: 10px; cursor: pointer; }
         .btn-del { width: 100%; background: var(--red); color: white; padding: 12px; border: none; border-radius: 10px; font-weight: 900; margin-top: 10px; cursor: pointer; font-size: 11px; }
         .toggle-pass { position: absolute; right: 15px; top: 20px; font-size: 12px; font-weight: 800; color: var(--gold); cursor: pointer; }
@@ -51,31 +45,24 @@
         <div style="line-height:1.1;"><b style="font-size:12px;">PROGRESSIVE MOTHERS</b><br><span style="font-size:9px;">Nursery & Primary School</span></div>
         <button onclick="location.reload()" style="background:white; color:var(--red); border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:11px;">LOGOUT</button>
     </div>
-
     <div class="hero">
         <div id="full-date" style="color:var(--gold); font-size:11px; font-weight:800;">DATE</div>
         <div id="clock">00:00:00</div>
     </div>
-
     <div class="dashboard">
         <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Total</span></div>
         <div class="stat-card" style="border-bottom-color: var(--green);"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present</span></div>
         <div class="stat-card" style="border-bottom-color: var(--red);"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent</span></div>
     </div>
-
     <div class="nav-tabs">
         <div class="tab" id="tab-rec" onclick="tab('rec')">Records</div>
         <div class="tab" id="tab-adm" onclick="tab('adm'); clearForm();">Admission</div>
         <div class="tab" id="tab-roll" onclick="tab('roll')">Attendance</div>
     </div>
-
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;">
-            <input id="searchBar" placeholder="🔍 Search name or LIN..." oninput="renderUI()" style="margin-bottom:10px;">
-        </div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search name or LIN..." oninput="renderUI()" style="margin-bottom:10px;"></div>
         <div id="dataList"></div>
     </div>
-
     <div id="v-adm" class="hidden" style="padding:15px;">
         <div style="background:white; padding:20px; border-radius:20px; border:1px solid #ddd;">
             <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue); font-size:13px;">STUDENT PROFILE</h3>
@@ -83,35 +70,20 @@
             <label>Name</label><input id="name">
             <label>LIN</label><input id="lin" readonly placeholder="Auto-generated">
             <label>Class</label>
-            <select id="cls">
-                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                <option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
+            <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
             <label>Contact</label><input id="contact">
             <label>Location</label><input id="location">
             <label>Health Status</label><input id="health_status">
-            
             <div id="financeSection" style="margin-top:15px; padding-top:15px; border-top:2px dashed #eee;">
                 <label style="color:var(--red)">Expected Fees (UGX)</label><input id="f_exp" type="number">
                 <label style="color:var(--green)">Paid Fees (UGX)</label><input id="f_paid" type="number">
             </div>
-            
-            <button id="saveBtn" onclick="submitData()" class="btn-save">SAVE DATA</button>
+            <button id="saveBtn" onclick="submitData()" class="btn-save">SAVE CHANGES</button>
             <button id="delBtn" onclick="deleteStudent()" class="btn-del hidden">DELETE PERMANENTLY</button>
-            <p id="lockMsg" style="color:var(--red); font-size:10px; font-weight:bold; text-align:center; margin-top:10px;" class="hidden"></p>
         </div>
     </div>
-
     <div id="v-roll" class="hidden">
-        <div style="padding:15px;">
-            <select id="rollClass" onchange="renderUI()" style="border:2px solid var(--blue);">
-                <option value="">-- Choose Class --</option>
-                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                <option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-        </div>
+        <div style="padding:15px;"><select id="rollClass" onchange="renderUI()" style="border:2px solid var(--blue);"><option value="">-- Choose Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
         <div id="rollData"></div>
     </div>
 </div>
@@ -122,11 +94,7 @@
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
     let role = ""; let cachedData = [];
 
-    function togglePass() {
-        const p = document.getElementById('key');
-        p.type = p.type === "password" ? "text" : "password";
-        document.querySelector('.toggle-pass').innerText = p.type === "password" ? "SHOW" : "HIDE";
-    }
+    function togglePass() { const p = document.getElementById('key'); p.type = p.type === "password" ? "text" : "password"; document.querySelector('.toggle-pass').innerText = p.type === "password" ? "SHOW" : "HIDE"; }
 
     function secureLogin() {
         const val = document.getElementById('key').value.trim().toUpperCase();
@@ -134,33 +102,18 @@
         else if (val === "FINANCE 256") role = "Finance";
         else if (val === "TEACH2026") role = "Teacher";
         else return alert("INVALID ACCESS KEY");
-        
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
-        
-        if(role === "Teacher") {
-            document.getElementById('tab-rec').classList.add('hidden');
-            document.getElementById('tab-adm').classList.add('hidden');
-            tab('roll');
-        } else {
-            tab('rec');
-        }
+        if(role === "Teacher") { document.getElementById('tab-rec').classList.add('hidden'); document.getElementById('tab-adm').classList.add('hidden'); tab('roll'); }
+        else tab('rec');
         loadData();
     }
 
-    function tab(t) {
-        ['v-adm','v-rec','v-roll'].forEach(v => document.getElementById(v).classList.add('hidden'));
-        document.getElementById('v-'+t).classList.remove('hidden');
-        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-'+t).classList.add('active');
-    }
+    function tab(t) { ['v-adm','v-rec','v-roll'].forEach(v => document.getElementById(v).classList.add('hidden')); document.getElementById('v-'+t).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); }
 
     async function loadData() {
         const { data } = await _client.from('students').select('*').order('name');
-        if(data) { 
-            cachedData = data.map(s => ({...s, is_absent: s.is_absent === true})); 
-            renderUI(); 
-        }
+        if(data) { cachedData = data; renderUI(); }
     }
 
     function renderUI() {
@@ -173,39 +126,30 @@
         const q = document.getElementById('searchBar').value.toLowerCase();
         const list = document.getElementById('dataList'); list.innerHTML = "";
         cachedData.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))).forEach(s => {
-            list.innerHTML += `<div class="item-card">
-                <div class="lin-badge">${s.lin || 'NEW'}</div>
-                <b>${s.name}</b><br><small>${s.class}</small>
-                <div style="margin-top:10px;"><button style="background:#eee; padding:8px; border:none; border-radius:5px; font-weight:800; cursor:pointer;" onclick="editMode('${s.id}')">DETAILS / EDIT</button></div>
-            </div>`;
+            list.innerHTML += `<div class="item-card"><div class="lin-badge">${s.lin || 'NEW'}</div><b>${s.name}</b><br><small>${s.class}</small><div style="margin-top:10px;"><button style="background:#eee; padding:8px; border:none; border-radius:5px; font-weight:800; cursor:pointer;" onclick="editMode('${s.id}')">DETAILS / EDIT</button></div></div>`;
         });
 
         const rCls = document.getElementById('rollClass').value;
         const rollList = document.getElementById('rollData'); rollList.innerHTML = "";
         cachedData.filter(s => s.class === rCls).forEach(s => {
             const isA = s.is_absent === true;
-            rollList.innerHTML += `<div class="item-card" style="border-left-color:${isA?'var(--red)':'var(--green)'}">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <b>${s.name}</b>
-                    <button style="padding:10px; border-radius:10px; border:none; color:white; font-weight:900; min-width:90px; background:${isA?'var(--red)':'var(--green)'}" onclick="markAtt('${s.id}', ${!isA})">${isA?'ABSENT':'PRESENT'}</button>
-                </div>
-            </div>`;
+            rollList.innerHTML += `<div class="item-card" style="border-left-color:${isA?'var(--red)':'var(--green)'}"><div style="display:flex; justify-content:space-between; align-items:center;"><b>${s.name}</b><button style="padding:10px; border-radius:10px; border:none; color:white; font-weight:900; min-width:90px; background:${isA?'var(--red)':'var(--green)'}" onclick="markAtt('${s.id}', ${!isA})">${isA?'ABSENT':'PRESENT'}</button></div></div>`;
         });
     }
 
     async function markAtt(id, status) {
-        // Instant UI update
-        const student = cachedData.find(s => s.id === id);
-        if(student) {
-            student.is_absent = status;
+        const sIdx = cachedData.findIndex(s => s.id == id);
+        if(sIdx > -1) {
+            cachedData[sIdx].is_absent = status;
             renderUI();
+            const { error } = await _client.from('students').update({ is_absent: status }).eq('id', id);
+            if(error) { alert("Sync Error: " + error.message); loadData(); }
         }
-        // Background sync
-        await _client.from('students').update({ is_absent: status }).eq('id', id);
     }
 
     function editMode(id) {
-        const s = cachedData.find(st => st.id === id);
+        const s = cachedData.find(st => st.id == id);
+        if(!s) return;
         document.getElementById('editId').value = s.id;
         document.getElementById('name').value = s.name;
         document.getElementById('lin').value = s.lin || "";
@@ -220,26 +164,10 @@
         const financeFields = ['f_paid', 'f_exp'];
         const saveBtn = document.getElementById('saveBtn');
         const delBtn = document.getElementById('delBtn');
-        const lockMsg = document.getElementById('lockMsg');
 
-        saveBtn.classList.remove('hidden');
-        delBtn.classList.add('hidden');
-        lockMsg.classList.add('hidden');
-
-        if(role === "Admin") {
-            infoFields.concat(financeFields).forEach(f => document.getElementById(f).disabled = false);
-            delBtn.classList.remove('hidden');
-        } else if(role === "Finance") {
-            infoFields.forEach(f => document.getElementById(f).disabled = true);
-            financeFields.forEach(f => document.getElementById(f).disabled = false);
-            lockMsg.innerText = "FINANCE: ONLY FEES ARE EDITABLE";
-            lockMsg.classList.remove('hidden');
-        } else {
-            infoFields.concat(financeFields).forEach(f => document.getElementById(f).disabled = true);
-            saveBtn.classList.add('hidden');
-            lockMsg.innerText = "TEACHER: VIEW ONLY MODE";
-            lockMsg.classList.remove('hidden');
-        }
+        if(role === "Admin") { infoFields.concat(financeFields).forEach(f => document.getElementById(f).disabled = false); delBtn.classList.remove('hidden'); saveBtn.classList.remove('hidden'); }
+        else if(role === "Finance") { infoFields.forEach(f => document.getElementById(f).disabled = true); financeFields.forEach(f => document.getElementById(f).disabled = false); delBtn.classList.add('hidden'); saveBtn.classList.remove('hidden'); }
+        else { infoFields.concat(financeFields).forEach(f => document.getElementById(f).disabled = true); delBtn.classList.add('hidden'); saveBtn.classList.add('hidden'); }
         tab('adm');
     }
 
@@ -249,54 +177,32 @@
         if(!sName) return alert("Name is required");
 
         const payload = { 
-            name: sName, 
-            class: document.getElementById('cls').value,
-            contact: document.getElementById('contact').value,
-            location: document.getElementById('location').value,
-            health_status: document.getElementById('health_status').value,
-            fees_paid: parseInt(document.getElementById('f_paid').value) || 0,
-            fees_expected: parseInt(document.getElementById('f_exp').value) || 0
+            name: sName, class: document.getElementById('cls').value, contact: document.getElementById('contact').value,
+            location: document.getElementById('location').value, health_status: document.getElementById('health_status').value,
+            fees_paid: parseInt(document.getElementById('f_paid').value) || 0, fees_expected: parseInt(document.getElementById('f_exp').value) || 0
         };
         
         if(!id) payload.lin = `PM${sName.charAt(0).toUpperCase()}${Math.floor(1000+Math.random()*9000)}`;
 
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        
-        if(!error) { 
-            alert("Record Saved Successfully!"); 
-            await loadData(); 
-            tab('rec'); 
-        } else { 
-            alert("Error saving: " + error.message); 
-        }
+        if(!error) { alert("Success!"); loadData(); tab('rec'); } else { alert("Save Error: " + error.message); }
     }
 
     async function deleteStudent() {
         const id = document.getElementById('editId').value;
         if(!id || role !== "Admin") return;
-        if(confirm("Permanently delete this student from the system?")) {
-            const { error } = await _client.from('students').delete().eq('id', id);
-            if(!error) { alert("Student Deleted."); loadData(); tab('rec'); }
-        }
+        if(confirm("Confirm Permanent Deletion?")) { const { error } = await _client.from('students').delete().eq('id', id); if(!error) { alert("Deleted."); loadData(); tab('rec'); } }
     }
 
     function clearForm() {
-        if(role !== "Admin") { alert("Access restricted to Admin."); tab('rec'); return; }
+        if(role !== "Admin") { alert("Restricted."); tab('rec'); return; }
         document.getElementById('editId').value = "";
-        ['name','lin','contact','location','health_status','f_paid','f_exp'].forEach(f => {
-            document.getElementById(f).value = (f.includes('f_')) ? "0" : "";
-            document.getElementById(f).disabled = false;
-        });
-        document.getElementById('saveBtn').classList.remove('hidden');
+        ['name','lin','contact','location','health_status','f_paid','f_exp'].forEach(f => { document.getElementById(f).value = f.includes('f_') ? "0" : ""; document.getElementById(f).disabled = false; });
         document.getElementById('delBtn').classList.add('hidden');
-        document.getElementById('lockMsg').classList.add('hidden');
+        document.getElementById('saveBtn').classList.remove('hidden');
     }
 
-    setInterval(() => {
-        const now = new Date();
-        document.getElementById('full-date').innerText = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-    }, 1000);
+    setInterval(() => { const now = new Date(); document.getElementById('full-date').innerText = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB'); }, 1000);
 </script>
 </body>
 </html>
