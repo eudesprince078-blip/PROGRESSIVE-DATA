@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v49.8 | lowercase Sync</title>
+    <title>Progressive Mothers PMS v49.9 | Underscore Sync</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -28,9 +28,6 @@
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         
         .profile-detail { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 13px; }
-        .profile-label { font-weight: 800; color: #777; }
-        .profile-value { font-weight: 700; color: var(--blue); }
-
         .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
         .history-table th { text-align: left; color: #aaa; padding: 5px; }
         .history-table td { padding: 8px 5px; border-top: 1px solid #eee; }
@@ -50,7 +47,7 @@
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PMS v49.8</span></div>
+        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PMS v49.9</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
 
@@ -155,7 +152,14 @@
 
     async function loadData() {
         const { data } = await _client.from('students').select('*').order('name');
-        if(data) { cachedData = data; renderUI(); updateFinance(); }
+        if(data) { 
+            cachedData = data; 
+            document.getElementById('c-tot').innerText = data.length;
+            document.getElementById('c-pres').innerText = data.filter(s => !s.is_absent).length;
+            document.getElementById('c-abs').innerText = data.filter(s => s.is_absent).length;
+            renderUI(); 
+            updateFinance(); 
+        }
     }
 
     function updateFinance() {
@@ -188,7 +192,7 @@
     }
 
     async function submitData() {
-        const btn = document.getElementById('saveBtn'); btn.innerText = "SYNCHRONIZING...";
+        const btn = document.getElementById('saveBtn'); btn.innerText = "SAVING...";
         const id = document.getElementById('editId').value;
         const newAmt = parseInt(document.getElementById('pay_amt').value) || 0;
         const newDate = document.getElementById('pay_date').value;
@@ -196,7 +200,7 @@
 
         if(id) {
             const existing = cachedData.find(s => s.id == id);
-            if(existing['payment-history']) hist = JSON.parse(existing['payment-history']);
+            if(existing.payment_history) hist = JSON.parse(existing.payment_history);
             currentPaid = existing.fees_paid || 0;
         }
         if(newAmt > 0 && newDate) { hist.push({ date: newDate, amount: newAmt }); currentPaid += newAmt; }
@@ -211,3 +215,54 @@
             health_status: document.getElementById('health_field').value,
             lin: document.getElementById('lin').value,
             fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
+            fees_paid: currentPaid,
+            payment_history: JSON.stringify(hist)
+        };
+
+        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
+        if(!error) { alert("Record Synced"); await loadData(); clearForm(); tab('rec'); }
+        else alert("DB Error: " + error.message);
+    }
+
+    function editMode(id) {
+        if(currentUserRole === "Teacher") return alert("TEACHERS CANNOT EDIT.");
+        const s = cachedData.find(st => st.id == id);
+        document.getElementById('editId').value = s.id;
+        document.getElementById('name').value = s.name;
+        document.getElementById('lin').value = s.lin || "";
+        document.getElementById('age').value = s.age || "";
+        document.getElementById('dob').value = s.dob || "";
+        document.getElementById('cls').value = s.class;
+        document.getElementById('location_field').value = s.location || "";
+        document.getElementById('health_field').value = s.health_status || "";
+        document.getElementById('contact').value = s.contact || "";
+        document.getElementById('f_exp').value = s.fees_expected || 0;
+        
+        let hTable = `<table class="history-table"><tr><th>Date</th><th>Amount</th></tr>`;
+        if(s.payment_history) {
+            JSON.parse(s.payment_history).forEach(h => {
+                hTable += `<tr><td>${h.date}</td><td>${h.amount.toLocaleString()}</td></tr>`;
+            });
+        }
+        document.getElementById('payHistoryDisplay').innerHTML = hTable + `</table>`;
+        document.getElementById('paySection').classList.remove('hidden');
+        tab('adm');
+    }
+
+    function clearForm() {
+        document.getElementById('editId').value = "";
+        document.getElementById('name').value = "";
+        document.getElementById('lin').value = "PMA-" + Math.floor(1000 + Math.random()*8999);
+        document.getElementById('age').value = ""; document.getElementById('dob').value = "";
+        document.getElementById('location_field').value = ""; document.getElementById('health_field').value = "";
+        document.getElementById('contact').value = ""; document.getElementById('f_exp').value = 0;
+        document.getElementById('pay_amt').value = ""; document.getElementById('payHistoryDisplay').innerHTML = "";
+        document.getElementById('saveBtn').innerText = "SAVE TO CLOUD";
+    }
+
+    async function markAtt(id, status) { await _client.from('students').update({ is_absent: status }).eq('id', id); loadData(); }
+    function tab(t) { ['v-adm','v-rec','v-roll','v-sum'].forEach(v => document.getElementById(v).classList.add('hidden')); document.getElementById('v-'+t).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); }
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
+</script>
+</body>
+</html>
