@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v49.2 | Professional Edition</title>
+    <title>Progressive Mothers PMS v49.3 | Professional Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #002d5b; --gold: #ffc107; --red: #d90429; --white: #ffffff; --green: #2b9348; --light: #f1f4f9; }
         body { font-family: 'Inter', sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
         
-        /* Login Gate Enhancement */
         #loginGate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; }
         .pass-wrapper { position: relative; width: 100%; max-width: 320px; }
         #togglePass { position: absolute; right: 15px; top: 22px; color: var(--blue); font-weight: 800; cursor: pointer; font-size: 12px; background: var(--gold); padding: 5px; border-radius: 5px; }
@@ -29,6 +28,12 @@
         .tab.active { color: var(--blue); border-bottom: 3px solid var(--blue); background: #fafafa; }
 
         .card { background: white; border-radius: 15px; padding: 18px; margin: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        
+        /* New Large Absence Card Style */
+        .big-report-card { background: #fff5f5; border: 2px solid var(--red); border-radius: 15px; padding: 20px; margin-top: 15px; }
+        .big-report-header { font-size: 18px; font-weight: 900; color: var(--red); border-bottom: 2px solid #feb2b2; padding-bottom: 10px; margin-bottom: 15px; text-transform: uppercase; }
+        .absent-list-item { font-size: 15px; font-weight: 700; color: #444; padding: 10px 0; border-bottom: 1px dashed #feb2b2; display: flex; justify-content: space-between; }
+
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         .hidden { display: none !important; }
         
@@ -40,19 +45,16 @@
 <div id="loginGate">
     <h1 style="color:white; margin:0;">PROGRESSIVE MOTHERS</h1>
     <p style="color:var(--gold); font-weight:700; font-size:12px; margin-bottom:30px;">SCHOOL MANAGEMENT SYSTEM</p>
-    
     <div class="pass-wrapper">
         <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; height:65px; font-size:18px; letter-spacing:2px;">
         <span id="togglePass" onclick="togglePassword()">SHOW</span>
     </div>
-    
     <button id="loginBtn" onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:320px; border:none; border-radius:12px; font-weight:900; margin-top:10px; font-size:16px;">AUTHENTICATE</button>
-    <p id="loginMsg" style="color:white; font-size:12px; margin-top:15px;"></p>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span style="font-size:9px; color:var(--gold);">PMS PROFESSIONAL v49.2</span></div>
+        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span style="font-size:9px; color:var(--gold);">PMS PROFESSIONAL v49.3</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
 
@@ -76,16 +78,16 @@
     </div>
 
     <div id="v-sum" class="hidden">
-        <div class="card" style="background:var(--blue); color:white;">
-            <h4 style="margin:0 0 10px 0; color:var(--gold);">FINANCIAL SUMMARY</h4>
-            <div style="display:flex; justify-content:space-between;"><span>Expected:</span> <b id="s-exp">0</b></div>
-            <div style="display:flex; justify-content:space-between; margin:8px 0;"><span>Collected:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
-            <div style="display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.2); padding-top:8px;"><span>Debt:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
+        <div class="card" style="background:var(--blue); color:white; padding: 25px;">
+            <h4 style="margin:0 0 15px 0; color:var(--gold); font-size: 16px;">FINANCIAL SUMMARY</h4>
+            <div style="display:flex; justify-content:space-between; font-size: 15px;"><span>Expected:</span> <b id="s-exp">0</b></div>
+            <div style="display:flex; justify-content:space-between; margin:12px 0; font-size: 15px;"><span>Collected:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
+            <div style="display:flex; justify-content:space-between; border-top:2px solid rgba(255,255,255,0.2); padding-top:12px; font-size: 16px;"><span>Debt:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
         </div>
 
         <div class="card">
             <h4 style="margin:0 0 10px 0; color:var(--blue);">ABSENCE BY CLASS</h4>
-            <select id="dirClass" onchange="renderDirectorAbsence()">
+            <select id="dirClass" onchange="renderDirectorAbsence()" style="border: 2px solid var(--blue);">
                 <option value="">-- Choose Class --</option>
                 <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
@@ -166,33 +168,16 @@
 
     async function secureLogin() {
         const val = document.getElementById('key').value.trim().toUpperCase();
-        const btn = document.getElementById('loginBtn');
-        const msg = document.getElementById('loginMsg');
-        
-        if (!["JESUS CARES", "FINANCE 256", "TEACH2026"].includes(val)) {
-            return alert("INCORRECT ACCESS KEY");
-        }
-
-        btn.innerText = "CONNECTING...";
-        msg.innerText = "Fetching school records, please wait...";
-
-        try {
+        if (["JESUS CARES", "FINANCE 256", "TEACH2026"].includes(val)) {
             await loadData();
             document.getElementById('loginGate').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
-        } catch (e) {
-            alert("Connection Error. Please check your internet.");
-            btn.innerText = "AUTHENTICATE";
-        }
+        } else alert("ACCESS DENIED");
     }
 
     async function loadData() {
-        const { data, error } = await _client.from('students').select('*').order('name');
-        if(error) throw error;
-        cachedData = data;
-        renderUI();
-        updateFinance();
-        renderDirectorAbsence();
+        const { data } = await _client.from('students').select('*').order('name');
+        if(data) { cachedData = data; renderUI(); updateFinance(); renderDirectorAbsence(); }
     }
 
     function updateFinance() {
@@ -208,9 +193,14 @@
         const target = document.getElementById('dirReport');
         if(!cls) return target.innerHTML = "";
         const abs = cachedData.filter(s => s.class === cls && s.is_absent === true);
-        let h = `<div style="background:#fff5f5; padding:12px; border-radius:10px; margin-top:10px; border:1px solid #feb2b2;">
-            <b style="color:var(--red); font-size:13px;">${cls} - ${abs.length} ABSENT</b><br>`;
-        abs.forEach(a => h += `<div style="font-size:11px; margin-top:5px;">• ${a.name} (${a.contact || 'No Contact'})</div>`);
+        
+        let h = `<div class="big-report-card">
+            <div class="big-report-header">${cls} - ${abs.length} PUPILS ABSENT</div>`;
+        if(abs.length > 0) {
+            abs.forEach(a => h += `<div class="absent-list-item"><span>${a.name}</span> <span style="color:var(--blue); font-size:12px;">${a.contact || ''}</span></div>`);
+        } else {
+            h += `<div style="text-align:center; padding:20px; color:gray; font-weight:700;">ALL PUPILS PRESENT</div>`;
+        }
         target.innerHTML = h + `</div>`;
     }
 
@@ -243,8 +233,8 @@
     }
 
     async function markAtt(id, status) {
-        const { error } = await _client.from('students').update({ is_absent: status }).eq('id', id);
-        if(!error) loadData(); else alert("Error updating cloud.");
+        await _client.from('students').update({ is_absent: status }).eq('id', id);
+        loadData();
     }
 
     function tab(t) {
@@ -273,7 +263,7 @@
     function clearForm() {
         document.getElementById('editId').value = "";
         document.getElementById('name').value = "";
-        document.getElementById('lin').value = "PMS-" + Math.floor(100000 + Math.random()*899999);
+        document.getElementById('lin').value = "PMA-" + Math.floor(1000 + Math.random()*8999);
         document.getElementById('age').value = "";
         document.getElementById('dob').value = "";
         document.getElementById('location').value = "";
@@ -298,13 +288,13 @@
         if(newAmt > 0 && newDate) { hist.push({ date: newDate, amount: newAmt }); total += newAmt; }
 
         const payload = {
-            name: document.getElementById('name').value,
+            name: document.getElementById('name').value || "Unnamed",
             class: document.getElementById('cls').value,
-            contact: document.getElementById('contact').value,
-            age: document.getElementById('age').value,
-            dob: document.getElementById('dob').value,
-            location: document.getElementById('location').value,
-            health: document.getElementById('health').value,
+            contact: document.getElementById('contact').value || "",
+            age: document.getElementById('age').value || null,
+            dob: document.getElementById('dob').value || null,
+            location: document.getElementById('location').value || "",
+            health: document.getElementById('health').value || "Normal",
             lin: document.getElementById('lin').value,
             fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
             fees_paid: total,
@@ -312,8 +302,8 @@
         };
 
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("Successfully Saved."); loadData(); tab('rec'); }
-        else { alert("Could not save record."); }
+        if(!error) { alert("Record Saved Successfully."); loadData(); tab('rec'); }
+        else { console.error(error); alert("Database Error: Could not save record."); }
     }
 
     setInterval(() => {
