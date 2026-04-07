@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v49.9 | Underscore Sync</title>
+    <title>Progressive Mothers PMS v50.1 | Full Recovery</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -19,16 +19,17 @@
         .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); display: block; }
         .stat-lbl { font-size: 8px; font-weight: 800; color: #999; text-transform: uppercase; }
 
-        .nav-tabs { display: flex; background: white; position: sticky; top: 68px; z-index: 999; border-bottom: 1px solid #ddd; }
-        .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 10px; font-weight: 800; color: #aaa; cursor: pointer; display: none; }
+        .nav-tabs { display: flex; background: white; position: sticky; top: 68px; z-index: 999; border-bottom: 1px solid #ddd; overflow-x: auto; }
+        .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 10px; font-weight: 800; color: #aaa; cursor: pointer; display: none; min-width: 80px; }
         .tab.active { color: var(--blue); border-bottom: 3px solid var(--blue); background: #fafafa; }
         .visible-tab { display: block !important; }
 
         .card { background: white; border-radius: 15px; padding: 18px; margin: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .routine-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-weight: 700; font-size: 13px; }
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         
         .profile-detail { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 13px; }
-        .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
         .history-table th { text-align: left; color: #aaa; padding: 5px; }
         .history-table td { padding: 8px 5px; border-top: 1px solid #eee; }
 
@@ -47,7 +48,7 @@
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PMS v49.9</span></div>
+        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PMS v50.1</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
 
@@ -63,29 +64,43 @@
 
     <div class="nav-tabs">
         <div class="tab" id="tab-sum" onclick="tab('sum')">Director</div>
+        <div class="tab" id="tab-cal" onclick="tab('cal')">Calendar</div>
         <div class="tab" id="tab-rec" onclick="tab('rec')">Records</div>
         <div class="tab" id="tab-adm" onclick="tab('adm')">Admission</div>
         <div class="tab" id="tab-roll" onclick="tab('roll')">Attendance</div>
     </div>
 
+    <div id="v-cal" class="hidden">
+        <div class="card">
+            <h3 style="color:var(--blue); margin-top:0;">DAILY ROUTINE</h3>
+            <div class="routine-item"><span>Arrival & Cleaning</span><span>07:00 AM</span></div>
+            <div class="routine-item"><span>Assembly</span><span>08:00 AM</span></div>
+            <div class="routine-item"><span>Lesson Block 1</span><span>08:30 AM</span></div>
+            <div class="routine-item"><span>Breakfast Break</span><span>10:30 AM</span></div>
+            <div class="routine-item"><span>Lesson Block 2</span><span>11:00 AM</span></div>
+            <div class="routine-item"><span>Lunch Break</span><span>01:00 PM</span></div>
+            <div class="routine-item"><span>Departure</span><span>04:30 PM</span></div>
+        </div>
+    </div>
+
     <div id="v-sum" class="hidden">
         <div class="card" style="background:var(--blue); color:white; padding: 25px;">
-            <h4 style="margin:0 0 15px 0; color:var(--gold);">FINANCIAL OVERVIEW</h4>
-            <div class="profile-detail" style="border-color:rgba(255,255,255,0.1)"><span>Total Expected:</span> <b id="s-exp">0</b></div>
-            <div class="profile-detail" style="border-color:rgba(255,255,255,0.1)"><span>Total Collected:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
-            <div class="profile-detail" style="border-bottom:none"><span>Total Arrears:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
+            <h4 style="margin:0 0 15px 0; color:var(--gold);">FINANCIAL SUMMARY</h4>
+            <div class="profile-detail" style="border-color:rgba(255,255,255,0.1)"><span>Total Fees Expected:</span> <b id="s-exp">0</b></div>
+            <div class="profile-detail" style="border-color:rgba(255,255,255,0.1)"><span>Total Fees Collected:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
+            <div class="profile-detail" style="border-bottom:none"><span>Outstanding Debt:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
         </div>
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Name, LIN, or Class..." oninput="renderUI()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Pupil..." oninput="renderUI()"></div>
         <div id="dataList"></div>
     </div>
 
     <div id="v-adm" class="hidden">
         <div class="card">
             <button onclick="clearForm()" id="newEnrollBtn" class="btn-main" style="background:var(--gold); color:var(--blue); margin-bottom:20px;">+ NEW ENROLLMENT</button>
-            <h3 id="admTitle" style="margin:0; color:var(--blue);">STUDENT DATA</h3>
+            <h3 id="admTitle" style="margin:0; color:var(--blue);">STUDENT FILE</h3>
             <input type="hidden" id="editId">
             <label>Full Name</label><input id="name">
             <label>LIN Number</label><input id="lin" readonly style="background:#f1f1f1;">
@@ -95,25 +110,26 @@
             </div>
             <label>Class</label>
             <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Physical Location</label><input id="location_field">
+            <label>Location</label><input id="location_field">
             <label>Health Status</label><input id="health_field">
-            <label>Parent/Guardian Contact</label><input id="contact">
+            <label>Contact Number</label><input id="contact">
             <hr>
-            <label style="color:var(--red)">Total Fees to be Paid (UGX)</label><input id="f_exp" type="number">
+            <label style="color:var(--red)">Expected Fees (UGX)</label><input id="f_exp" type="number">
             
             <div id="paySection" class="hidden" style="background:#f0f7ff; padding:15px; border-radius:12px;">
-                <b style="font-size:11px; color:var(--blue)">UPDATE PAYMENTS:</b>
-                <input id="pay_amt" type="number" placeholder="Amount Paid">
+                <b style="font-size:11px; color:var(--blue)">FINANCIALS & HISTORY:</b>
+                <div id="absentSummary" style="font-size:11px; color:var(--red); margin:10px 0; font-weight:800;"></div>
+                <input id="pay_amt" type="number" placeholder="Enter New Payment">
                 <input id="pay_date" type="date">
                 <div id="payHistoryDisplay" style="margin-top:10px;"></div>
             </div>
             
-            <button onclick="submitData()" id="saveBtn" class="btn-main" style="margin-top:20px;">SAVE TO CLOUD</button>
+            <button onclick="submitData()" id="saveBtn" class="btn-main" style="margin-top:20px;">SYNC TO CLOUD</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
-        <div style="padding:15px;"><select id="rollClass" onchange="renderUI()"><option value="">-- Choose Class --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
+        <div style="padding:15px;"><select id="rollClass" onchange="renderUI()"><option value="">-- Select Class --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
         <div id="rollData"></div>
     </div>
 
@@ -134,7 +150,7 @@
         if (val === "JESUS CARES") currentUserRole = "Director";
         else if (val === "FINANCE 256") currentUserRole = "Finance";
         else if (val === "TEACH2026") currentUserRole = "Teacher";
-        else return alert("INVALID KEY");
+        else return alert("ACCESS DENIED");
 
         setupAccess();
         await loadData();
@@ -143,8 +159,12 @@
     }
 
     function setupAccess() {
-        document.getElementById('userRoleBadge').innerText = "SYSTEM | " + currentUserRole;
-        const tabs = { Director: ['tab-sum', 'tab-rec', 'tab-adm', 'tab-roll'], Finance: ['tab-sum', 'tab-adm'], Teacher: ['tab-adm', 'tab-roll'] };
+        document.getElementById('userRoleBadge').innerText = "PORTAL | " + currentUserRole;
+        const tabs = { 
+            Director: ['tab-sum', 'tab-cal', 'tab-rec', 'tab-adm', 'tab-roll'], 
+            Finance: ['tab-sum', 'tab-cal', 'tab-rec', 'tab-adm'], 
+            Teacher: ['tab-cal', 'tab-adm', 'tab-roll'] 
+        };
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('visible-tab'));
         tabs[currentUserRole].forEach(id => document.getElementById(id).classList.add('visible-tab'));
         tab(tabs[currentUserRole][0].split('-')[1]);
@@ -192,18 +212,18 @@
     }
 
     async function submitData() {
-        const btn = document.getElementById('saveBtn'); btn.innerText = "SAVING...";
+        const btn = document.getElementById('saveBtn'); btn.innerText = "SYNCHRONIZING...";
         const id = document.getElementById('editId').value;
         const newAmt = parseInt(document.getElementById('pay_amt').value) || 0;
         const newDate = document.getElementById('pay_date').value;
-        let hist = []; let currentPaid = 0;
+        let p_hist = []; let currentPaid = 0;
 
         if(id) {
             const existing = cachedData.find(s => s.id == id);
-            if(existing.payment_history) hist = JSON.parse(existing.payment_history);
+            if(existing.payment_history) p_hist = JSON.parse(existing.payment_history);
             currentPaid = existing.fees_paid || 0;
         }
-        if(newAmt > 0 && newDate) { hist.push({ date: newDate, amount: newAmt }); currentPaid += newAmt; }
+        if(newAmt > 0 && newDate) { p_hist.push({ date: newDate, amount: newAmt }); currentPaid += newAmt; }
 
         const payload = {
             name: document.getElementById('name').value,
@@ -216,16 +236,16 @@
             lin: document.getElementById('lin').value,
             fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
             fees_paid: currentPaid,
-            payment_history: JSON.stringify(hist)
+            payment_history: JSON.stringify(p_hist)
         };
 
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("Record Synced"); await loadData(); clearForm(); tab('rec'); }
-        else alert("DB Error: " + error.message);
+        if(!error) { alert("SUCCESS"); await loadData(); clearForm(); tab('rec'); }
+        else alert("Error: " + error.message);
     }
 
     function editMode(id) {
-        if(currentUserRole === "Teacher") return alert("TEACHERS CANNOT EDIT.");
+        if(currentUserRole === "Teacher") return alert("Teachers cannot edit records.");
         const s = cachedData.find(st => st.id == id);
         document.getElementById('editId').value = s.id;
         document.getElementById('name').value = s.name;
@@ -238,12 +258,15 @@
         document.getElementById('contact').value = s.contact || "";
         document.getElementById('f_exp').value = s.fees_expected || 0;
         
-        let hTable = `<table class="history-table"><tr><th>Date</th><th>Amount</th></tr>`;
+        let hTable = `<table class="history-table"><tr><th>Payment Date</th><th>Amount</th></tr>`;
         if(s.payment_history) {
             JSON.parse(s.payment_history).forEach(h => {
                 hTable += `<tr><td>${h.date}</td><td>${h.amount.toLocaleString()}</td></tr>`;
             });
         }
+        
+        const a_hist = s.absent_history ? JSON.parse(s.absent_history) : [];
+        document.getElementById('absentSummary').innerText = "Total Days Absent: " + a_hist.length;
         document.getElementById('payHistoryDisplay').innerHTML = hTable + `</table>`;
         document.getElementById('paySection').classList.remove('hidden');
         tab('adm');
@@ -253,15 +276,31 @@
         document.getElementById('editId').value = "";
         document.getElementById('name').value = "";
         document.getElementById('lin').value = "PMA-" + Math.floor(1000 + Math.random()*8999);
-        document.getElementById('age').value = ""; document.getElementById('dob').value = "";
-        document.getElementById('location_field').value = ""; document.getElementById('health_field').value = "";
-        document.getElementById('contact').value = ""; document.getElementById('f_exp').value = 0;
-        document.getElementById('pay_amt').value = ""; document.getElementById('payHistoryDisplay').innerHTML = "";
-        document.getElementById('saveBtn').innerText = "SAVE TO CLOUD";
+        document.getElementById('age').value = ""; 
+        document.getElementById('location_field').value = ""; 
+        document.getElementById('health_field').value = "";
+        document.getElementById('contact').value = "";
+        document.getElementById('pay_amt').value = "";
+        document.getElementById('absentSummary').innerText = "";
+        tab('adm');
     }
 
-    async function markAtt(id, status) { await _client.from('students').update({ is_absent: status }).eq('id', id); loadData(); }
-    function tab(t) { ['v-adm','v-rec','v-roll','v-sum'].forEach(v => document.getElementById(v).classList.add('hidden')); document.getElementById('v-'+t).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); }
+    async function markAtt(id, status) { 
+        const s = cachedData.find(st => st.id == id);
+        let a_hist = s.absent_history ? JSON.parse(s.absent_history) : [];
+        const today = new Date().toISOString().split('T')[0];
+        
+        if(status === true && !a_hist.includes(today)) a_hist.push(today);
+        else if(status === false) a_hist = a_hist.filter(d => d !== today);
+
+        await _client.from('students').update({ 
+            is_absent: status, 
+            absent_history: JSON.stringify(a_hist) 
+        }).eq('id', id); 
+        loadData(); 
+    }
+
+    function tab(t) { ['v-adm','v-rec','v-roll','v-sum','v-cal'].forEach(v => document.getElementById(v).classList.add('hidden')); document.getElementById('v-'+t).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); }
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 </script>
 </body>
