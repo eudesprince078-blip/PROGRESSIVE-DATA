@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v49.7 | Master Edition</title>
+    <title>Progressive Mothers PMS v49.8 | lowercase Sync</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -50,7 +50,7 @@
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PMS v49.7</span></div>
+        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PMS v49.8</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
 
@@ -98,8 +98,8 @@
             </div>
             <label>Class</label>
             <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Physical Location</label><input id="location">
-            <label>Health Status</label><input id="health">
+            <label>Physical Location</label><input id="location_field">
+            <label>Health Status</label><input id="health_field">
             <label>Parent/Guardian Contact</label><input id="contact">
             <hr>
             <label style="color:var(--red)">Total Fees to be Paid (UGX)</label><input id="f_exp" type="number">
@@ -167,18 +167,16 @@
     }
 
     function renderUI() {
-        // Records List
         const list = document.getElementById('dataList'); list.innerHTML = "";
         const q = document.getElementById('searchBar').value.toLowerCase();
         cachedData.filter(s => s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q)).forEach(s => {
             const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
             list.innerHTML += `<div class="card" onclick="editMode('${s.id}')" style="border-left:5px solid var(--blue)">
                 <div style="display:flex; justify-content:space-between"><b>${s.name}</b> <span style="color:var(--red); font-weight:800; font-size:10px">BAL: ${bal.toLocaleString()}</span></div>
-                <div style="font-size:11px; color:#666; margin-top:5px;">${s.class} | LIN: ${s.lin} | Loc: ${s.physical_location || 'N/A'}</div>
+                <div style="font-size:11px; color:#666; margin-top:5px;">${s.class} | LIN: ${s.lin} | Loc: ${s.location || 'N/A'}</div>
             </div>`;
         });
 
-        // Attendance List
         const rCls = document.getElementById('rollClass').value;
         const rList = document.getElementById('rollData'); rList.innerHTML = "";
         if(rCls) {
@@ -209,59 +207,7 @@
             contact: document.getElementById('contact').value,
             age: parseInt(document.getElementById('age').value) || 0,
             dob: document.getElementById('dob').value || null,
-            physical_location: document.getElementById('location').value,
-            health_status: document.getElementById('health').value,
+            location: document.getElementById('location_field').value,
+            health_status: document.getElementById('health_field').value,
             lin: document.getElementById('lin').value,
             fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
-            fees_paid: currentPaid,
-            "payment-history": JSON.stringify(hist)
-        };
-
-        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("SUCCESS"); await loadData(); clearForm(); tab('rec'); }
-        else alert("ERROR: " + error.message);
-    }
-
-    function editMode(id) {
-        if(currentUserRole === "Teacher") return alert("TEACHERS CANNOT EDIT RECORDS.");
-        const s = cachedData.find(st => st.id == id);
-        document.getElementById('editId').value = s.id;
-        document.getElementById('name').value = s.name;
-        document.getElementById('lin').value = s.lin || "";
-        document.getElementById('age').value = s.age || "";
-        document.getElementById('dob').value = s.dob || "";
-        document.getElementById('cls').value = s.class;
-        document.getElementById('location').value = s.physical_location || "";
-        document.getElementById('health').value = s.health_status || "";
-        document.getElementById('contact').value = s.contact || "";
-        document.getElementById('f_exp').value = s.fees_expected || 0;
-        
-        // Show History table in editing panel
-        let hTable = `<table class="history-table"><tr><th>Date</th><th>Amount</th></tr>`;
-        if(s['payment-history']) {
-            JSON.parse(s['payment-history']).forEach(h => {
-                hTable += `<tr><td>${h.date}</td><td>${h.amount.toLocaleString()}</td></tr>`;
-            });
-        }
-        document.getElementById('payHistoryDisplay').innerHTML = hTable + `</table>`;
-        document.getElementById('paySection').classList.remove('hidden');
-        tab('adm');
-    }
-
-    function clearForm() {
-        document.getElementById('editId').value = "";
-        document.getElementById('name').value = "";
-        document.getElementById('lin').value = "PMA-" + Math.floor(1000 + Math.random()*8999);
-        document.getElementById('age').value = ""; document.getElementById('dob').value = "";
-        document.getElementById('location').value = ""; document.getElementById('health').value = "";
-        document.getElementById('contact').value = ""; document.getElementById('f_exp').value = 0;
-        document.getElementById('pay_amt').value = ""; document.getElementById('payHistoryDisplay').innerHTML = "";
-        document.getElementById('saveBtn').innerText = "SAVE TO CLOUD";
-    }
-
-    async function markAtt(id, status) { await _client.from('students').update({ is_absent: status }).eq('id', id); loadData(); }
-    function tab(t) { ['v-adm','v-rec','v-roll','v-sum'].forEach(v => document.getElementById(v).classList.add('hidden')); document.getElementById('v-'+t).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); }
-    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
-</script>
-</body>
-</html>
