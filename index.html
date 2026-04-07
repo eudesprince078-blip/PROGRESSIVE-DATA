@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v51.0</title>
+    <title>Progressive Mothers PMS v51.1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -39,13 +39,15 @@
         .history-table th { text-align: left; padding: 8px; border-bottom: 2px solid #eee; }
         .history-table td { padding: 8px; border-bottom: 1px solid #eee; }
         .hidden { display: none !important; }
+
+        .finance-pill { font-size: 10px; padding: 4px 8px; border-radius: 5px; font-weight: 800; margin-top: 5px; display: inline-block; }
     </style>
 </head>
 <body>
 
 <div id="loginGate">
     <h1 style="color:white; margin:0;">PROGRESSIVE MOTHERS</h1>
-    <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SCHOOL MANAGEMENT SYSTEM v51.0</p>
+    <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SCHOOL MANAGEMENT SYSTEM v51.1</p>
     <div class="pass-container">
         <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; height:60px;">
         <span class="toggle-pass" onclick="togglePass()">SHOW</span>
@@ -89,7 +91,7 @@
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search pupil by name..." oninput="renderUI()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search pupil or LIN..." oninput="renderUI()"></div>
         <div id="dataList"></div>
     </div>
 
@@ -97,6 +99,7 @@
         <div class="card">
             <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue);">NEW ADMISSION</h3>
             <input type="hidden" id="editId">
+            <label>LIN (Learner Identification Number)</label><input id="lin_field" placeholder="Enter LIN">
             <label>Pupil Full Name</label><input id="name">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label>Age</label><input id="age" type="number"></div>
@@ -113,8 +116,9 @@
             <label>Parent Contact</label><input id="contact">
             
             <div id="financeBox" style="background:#f0f4f8; padding:15px; border-radius:12px; margin-top:15px; border:1px solid var(--blue);">
-                <label style="color:var(--red)">Total Tuition Expected (UGX)</label>
-                <input id="f_exp" type="number">
+                <label style="color:var(--red)">Total Tuition he/she has to pay (UGX)</label>
+                <input id="f_exp" type="number" placeholder="Enter Full Amount">
+                
                 <label>Add New Payment</label>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
                     <input id="new_pay_amt" type="number" placeholder="Amount">
@@ -196,11 +200,17 @@
     function renderUI() {
         const list = document.getElementById('dataList'); list.innerHTML = "";
         const q = document.getElementById('searchBar').value.toLowerCase();
-        cachedData.filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
-            const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
+        cachedData.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))).forEach(s => {
+            const exp = s.fees_expected || 0;
+            const paid = s.fees_paid || 0;
+            const bal = exp - paid;
             list.innerHTML += `<div class="card" onclick="editMode('${s.id}')" style="border-left:5px solid var(--blue)">
-                <div style="display:flex; justify-content:space-between"><b>${s.name.toUpperCase()}</b> <span style="color:${bal>0?'var(--red)':'var(--green)'}; font-weight:800; font-size:11px">BAL: ${bal.toLocaleString()}</span></div>
-                <small>${s.class} | ${s.contact || 'N/A'}</small>
+                <div style="display:flex; justify-content:space-between">
+                    <b>${s.name.toUpperCase()}</b> 
+                    <span style="color:${bal>0?'var(--red)':'var(--green)'}; font-weight:800; font-size:11px">BAL: ${bal.toLocaleString()}</span>
+                </div>
+                <div style="font-size:10px; color:#555; margin-top:2px;">LIN: ${s.lin || 'N/A'} | ${s.class}</div>
+                <div class="finance-pill" style="background:#eee; color:#333;">Paid: ${paid.toLocaleString()} / Total: ${exp.toLocaleString()}</div>
             </div>`;
         });
 
@@ -243,7 +253,6 @@
             totalPaid += newAmt;
         }
 
-        // Prepare Payload - Only send finance if limited, otherwise send all
         const payload = {
             fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
             fees_paid: totalPaid,
@@ -251,6 +260,7 @@
         };
 
         if(currentUserRole !== "Finance") {
+            payload.lin = document.getElementById('lin_field').value;
             payload.name = document.getElementById('name').value;
             payload.age = parseInt(document.getElementById('age').value);
             payload.dob = document.getElementById('dob').value;
@@ -269,8 +279,8 @@
         document.getElementById('admTitle').innerText = "EDIT PUPIL FILE";
         document.getElementById('editId').value = s.id;
         
-        // Populate Fields
-        const fields = ['name', 'age', 'dob', 'cls', 'location_field', 'health_field', 'contact'];
+        const bioFields = ['lin_field', 'name', 'age', 'dob', 'cls', 'location_field', 'health_field', 'contact'];
+        document.getElementById('lin_field').value = s.lin || '';
         document.getElementById('name').value = s.name;
         document.getElementById('age').value = s.age;
         document.getElementById('dob').value = s.dob;
@@ -281,8 +291,7 @@
         document.getElementById('f_exp').value = s.fees_expected || 0;
         document.getElementById('new_pay_amt').value = "";
         
-        // FINANCE LOCK: If Finance, disable bio fields
-        fields.forEach(f => document.getElementById(f).disabled = (currentUserRole === "Finance"));
+        bioFields.forEach(f => document.getElementById(f).disabled = (currentUserRole === "Finance"));
 
         let histHtml = `<table class="history-table"><tr><th>Date</th><th>Amount</th></tr>`;
         if(s.payment_history) {
