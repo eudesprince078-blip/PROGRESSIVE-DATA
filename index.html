@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v47.7</title>
+    <title>Progressive Mothers PMS v47.8</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -27,6 +27,12 @@
         
         .finance-box { background: var(--blue); color: white; padding: 15px; border-radius: 15px; margin: 15px; }
         .history-list { font-size: 11px; background: #fff; color: #333; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid #ddd; }
+        
+        /* Attendance Report Table */
+        .absent-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+        .absent-table th { text-align: left; background: #f0f0f0; padding: 8px; border: 1px solid #ddd; }
+        .absent-table td { padding: 8px; border: 1px solid #ddd; font-weight: 600; }
+        
         .hidden { display: none !important; }
     </style>
 </head>
@@ -40,7 +46,7 @@
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div style="line-height:1.1;"><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span style="font-size:9px;">PMS v47.7</span></div>
+        <div style="line-height:1.1;"><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span style="font-size:9px;">PMS v47.8</span></div>
         <button onclick="location.reload()" style="background:white; color:var(--red); border:none; padding:6px 10px; border-radius:6px; font-weight:900; font-size: 10px;">LOGOUT</button>
     </div>
 
@@ -69,9 +75,9 @@
             <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Fees Paid:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
             <div style="display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.2); padding-top:5px;"><span>Total Debt:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
         </div>
-        <div id="directorAbsentList" style="padding:15px; background:white; margin:15px; border-radius:10px; border:1px solid #eee;">
-            <b style="color:var(--red); font-size:12px;">ABSENT PUPILS TODAY:</b>
-            <div id="absentNamesDisplay" style="font-size:11px; margin-top:5px; font-weight:600;">None</div>
+        <div style="padding:15px; background:white; margin:15px; border-radius:10px; border:1px solid #eee;">
+            <b style="color:var(--red); font-size:12px;">GLOBAL ABSENT LIST:</b>
+            <div id="absentNamesDisplay" style="font-size:10px; margin-top:5px; line-height:1.4;">None</div>
         </div>
     </div>
 
@@ -81,31 +87,36 @@
     </div>
 
     <div id="v-adm" class="hidden" style="padding:15px;">
-        <button onclick="clearForm()" style="width:100%; background:var(--gold); border:none; padding:12px; border-radius:10px; font-weight:900; margin-bottom:15px;">+ NEW REGISTRATION (CLEAR FORM)</button>
+        <button onclick="clearForm()" style="width:100%; background:var(--gold); border:none; padding:12px; border-radius:10px; font-weight:900; margin-bottom:15px;">+ NEW REGISTRATION</button>
         <div style="background:white; padding:15px; border-radius:15px; border:1px solid #ddd;">
             <h3 id="admTitle" style="margin:0 0 10px 0; font-size:14px; color:var(--blue);">PUPIL DATA</h3>
             <input type="hidden" id="editId">
-            <label>Name</label><input id="name">
+            <label>Full Name</label><input id="name">
             <label>LIN</label><input id="lin" readonly style="background:#f4f4f4;">
             <label>Class</label>
             <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Contact</label><input id="contact">
+            <label>Parent Contact</label><input id="contact">
             <hr>
-            <label style="color:var(--red)">Total Fees Supposed to be Paid</label><input id="f_exp" type="number">
+            <label style="color:var(--red)">Fees Supposed to be Paid</label><input id="f_exp" type="number">
             
-            <div id="paySection" class="hidden" style="background:#f9f9f9; padding:10px; border-radius:10px; border:1px dashed var(--green);">
+            <div id="paySection" class="hidden" style="background:#f9f9f9; padding:10px; border-radius:10px;">
                 <b style="font-size:11px; color:var(--green)">RECORD INSTALLMENT:</b>
-                <input id="pay_amt" type="number" placeholder="Amount Paid Now">
+                <input id="pay_amt" type="number" placeholder="Amount Paid">
                 <input id="pay_date" type="date">
-                <div id="payHistory" class="history-list">No history yet.</div>
+                <div id="payHistory" class="history-list"></div>
             </div>
             
-            <button onclick="submitData()" class="btn-save" style="margin-top:10px;">SAVE / UPDATE RECORD</button>
+            <button onclick="submitData()" class="btn-save" style="margin-top:10px;">SAVE RECORD</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
-        <div style="padding:15px;"><select id="rollClass" onchange="renderUI()" style="border:2px solid var(--blue);"><option value="">-- Choose Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
+        <div style="padding:15px;">
+            <select id="rollClass" onchange="renderUI()" style="border:2px solid var(--blue);"><option value="">-- Select Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+        </div>
+        
+        <div id="classAbsenceReport" style="padding:0 15px;"></div>
+
         <div id="rollData"></div>
     </div>
 </div>
@@ -156,12 +167,38 @@
 
         const rCls = document.getElementById('rollClass').value;
         const rList = document.getElementById('rollData'); rList.innerHTML = "";
-        cachedData.filter(s => s.class === rCls).forEach(s => {
-            const isA = s.is_absent === true;
-            rList.innerHTML += `<div class="item-card" style="border-left-color:${isA?'var(--red)':'var(--green)'}">
-                <b>${s.name}</b> <button onclick="markAtt('${s.id}', ${!isA})" style="float:right; background:${isA?'var(--red)':'var(--green)'}; color:white; border:none; padding:8px; border-radius:8px;">${isA?'ABSENT':'PRESENT'}</button>
-            </div>`;
-        });
+        const rReport = document.getElementById('classAbsenceReport');
+        
+        if(rCls) {
+            const clsPupils = cachedData.filter(s => s.class === rCls);
+            const absents = clsPupils.filter(s => s.is_absent);
+            
+            // Build the Class-by-Class report
+            let reportHtml = `<div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--red); margin-bottom:15px;">
+                <b style="color:var(--red); font-size:12px;">${rCls.toUpperCase()} ABSENTEE REPORT:</b>
+                <table class="absent-table">
+                    <tr><th>Full Name</th><th>Parent Contact</th></tr>`;
+            
+            if(absents.length > 0) {
+                absents.forEach(a => {
+                    reportHtml += `<tr><td>${a.name}</td><td>${a.contact || 'No Contact'}</td></tr>`;
+                });
+            } else {
+                reportHtml += `<tr><td colspan="2" style="text-align:center; color:gray;">All pupils in ${rCls} are present.</td></tr>`;
+            }
+            reportHtml += `</table></div>`;
+            rReport.innerHTML = reportHtml;
+
+            // Render the Attendance toggles
+            clsPupils.forEach(s => {
+                const isA = s.is_absent === true;
+                rList.innerHTML += `<div class="item-card" style="border-left-color:${isA?'var(--red)':'var(--green)'}">
+                    <b>${s.name}</b> <button onclick="markAtt('${s.id}', ${!isA})" style="float:right; background:${isA?'var(--red)':'var(--green)'}; color:white; border:none; padding:8px; border-radius:8px;">${isA?'MARK ABSENT':'MARK PRESENT'}</button>
+                </div>`;
+            });
+        } else {
+            rReport.innerHTML = "";
+        }
     }
 
     async function markAtt(id, status) { await _client.from('students').update({ is_absent: status }).eq('id', id); loadData(); }
@@ -182,7 +219,7 @@
         document.getElementById('contact').value = s.contact || "";
         document.getElementById('f_exp').value = s.fees_expected || 0;
         document.getElementById('paySection').classList.remove('hidden');
-        document.getElementById('admTitle').innerText = "UPDATING: " + s.name;
+        document.getElementById('admTitle').innerText = "EDITING: " + s.name;
         
         let h = "<b>PAYMENT HISTORY:</b><br>";
         if(s.payment_history) {
@@ -201,7 +238,7 @@
         document.getElementById('pay_amt').value = "";
         document.getElementById('paySection').classList.add('hidden');
         document.getElementById('admTitle').innerText = "NEW REGISTRATION";
-        alert("Form cleared for new entry.");
+        alert("Form cleared.");
     }
 
     async function submitData() {
@@ -232,7 +269,7 @@
         };
 
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("Successfully Saved!"); loadData(); tab('rec'); }
+        if(!error) { alert("Data Updated!"); loadData(); tab('rec'); }
     }
 
     setInterval(() => {
