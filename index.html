@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v50.9</title>
+    <title>Progressive Mothers PMS v51.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -30,26 +30,22 @@
         .visible-tab { display: block !important; }
 
         .card { background: white; border-radius: 15px; padding: 18px; margin: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        
-        .absent-table { width: 100%; border-collapse: collapse; background: white; }
-        .absent-table th { background: #f1f4f9; color: var(--blue); text-align: left; padding: 10px; font-size: 10px; text-transform: uppercase; }
-        .absent-table td { padding: 12px 10px; border-bottom: 1px solid #edf2f7; font-weight: 700; font-size: 13px; }
-
-        .hidden { display: none !important; }
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         input, select { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; font-size: 14px; }
+        input:disabled, select:disabled { background: #f8f9fa; color: #999; border-color: #eee; cursor: not-allowed; }
         label { font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
         
         .history-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
         .history-table th { text-align: left; padding: 8px; border-bottom: 2px solid #eee; }
         .history-table td { padding: 8px; border-bottom: 1px solid #eee; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div id="loginGate">
     <h1 style="color:white; margin:0;">PROGRESSIVE MOTHERS</h1>
-    <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SCHOOL MANAGEMENT SYSTEM v50.9</p>
+    <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SCHOOL MANAGEMENT SYSTEM v51.0</p>
     <div class="pass-container">
         <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; height:60px;">
         <span class="toggle-pass" onclick="togglePass()">SHOW</span>
@@ -89,27 +85,17 @@
             <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Total Paid:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
             <div style="display:flex; justify-content:space-between; padding:8px 0;"><span>Balance:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
         </div>
-
-        <div class="card">
-            <h4 style="color:var(--blue); font-size:16px; margin:0 0 10px 0;">PROFESSIONAL ABSENTEE REPORT</h4>
-            <select id="absentFilter" onchange="renderAbsence()" style="border:2px solid var(--red);">
-                <option value="ALL">ALL CLASSES (FULL LIST)</option>
-                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                <option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-            <div id="absenceListContainer" style="margin-top:15px;"></div>
-        </div>
+        <div id="absenceListContainer" style="margin-top:15px;"></div>
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search pupil name..." oninput="renderUI()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search pupil by name..." oninput="renderUI()"></div>
         <div id="dataList"></div>
     </div>
 
     <div id="v-adm" class="hidden">
         <div class="card">
-            <h3 style="margin:0 0 15px 0; color:var(--blue);">STUDENT FILE & FINANCE</h3>
+            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue);">NEW ADMISSION</h3>
             <input type="hidden" id="editId">
             <label>Pupil Full Name</label><input id="name">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
@@ -144,7 +130,7 @@
     <div id="v-roll" class="hidden">
         <div style="padding:15px;">
             <select id="rollClass" onchange="renderUI()">
-                <option value="">-- Select Class to Mark --</option>
+                <option value="">-- Select Class --</option>
                 <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
@@ -186,7 +172,11 @@
 
     function setupAccess() {
         document.getElementById('userRoleBadge').innerText = currentUserRole.toUpperCase();
-        const tMap = { Director: ['tab-sum','tab-rec','tab-adm','tab-roll'], Finance: ['tab-sum','tab-adm','tab-roll'], Teacher: ['tab-adm','tab-roll'] };
+        const tMap = { 
+            Director: ['tab-sum','tab-rec','tab-adm','tab-roll'], 
+            Finance: ['tab-rec','tab-adm','tab-roll'], 
+            Teacher: ['tab-adm','tab-roll'] 
+        };
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('visible-tab'));
         tMap[currentUserRole].forEach(id => document.getElementById(id).classList.add('visible-tab'));
         tab(tMap[currentUserRole][0].split('-')[1]);
@@ -199,7 +189,7 @@
             document.getElementById('c-tot').innerText = data.length;
             document.getElementById('c-pres').innerText = data.filter(s => !s.is_absent).length;
             document.getElementById('c-abs').innerText = data.filter(s => s.is_absent).length;
-            renderUI(); renderAbsence(); updateFinanceTotals();
+            renderUI(); updateFinanceTotals();
         }
     }
 
@@ -208,8 +198,7 @@
         const q = document.getElementById('searchBar').value.toLowerCase();
         cachedData.filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
             const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
-            const blockFinanceEdit = currentUserRole === "Finance"; // Finance can only edit via Admission
-            list.innerHTML += `<div class="card" onclick="${currentUserRole!=='Finance' ? `editMode('${s.id}')` : 'tab(\'adm\');editMode(\''+s.id+'\')'}" style="border-left:5px solid var(--blue)">
+            list.innerHTML += `<div class="card" onclick="editMode('${s.id}')" style="border-left:5px solid var(--blue)">
                 <div style="display:flex; justify-content:space-between"><b>${s.name.toUpperCase()}</b> <span style="color:${bal>0?'var(--red)':'var(--green)'}; font-weight:800; font-size:11px">BAL: ${bal.toLocaleString()}</span></div>
                 <small>${s.class} | ${s.contact || 'N/A'}</small>
             </div>`;
@@ -220,39 +209,21 @@
         if(rCls) {
             cachedData.filter(s => s.class === rCls).forEach(s => {
                 const isA = s.is_absent === true;
-                const controls = currentUserRole === "Finance" ? `<span style="font-size:10px; color:${isA?'var(--red)':'var(--green)'}; font-weight:800">${isA?'ABSENT':'PRESENT'}</span>` : 
+                const controls = currentUserRole === "Finance" ? 
+                `<span style="float:right; font-size:11px; font-weight:800; color:${isA?'var(--red)':'var(--green)'}">${isA?'ABSENT':'PRESENT'}</span>` : 
                 `<button onclick="markAtt('${s.id}', ${!isA})" style="float:right; background:${isA?'var(--red)':'var(--green)'}; border:none; padding:8px 12px; color:white; border-radius:8px; font-weight:900;">${isA?'ABSENT':'PRESENT'}</button>`;
                 rList.innerHTML += `<div class="card"><b>${s.name}</b> ${controls}</div>`;
             });
         }
     }
 
-    function renderAbsence() {
-        const cont = document.getElementById('absenceListContainer'); cont.innerHTML = "";
-        const filter = document.getElementById('absentFilter').value;
-        const classes = ["Baby Class","Middle Class","Top Class","P.1","P.2","P.3","P.4","P.5","P.6","P.7"];
-        
-        classes.forEach(cls => {
-            if(filter !== "ALL" && cls !== filter) return;
-            const clsAbs = cachedData.filter(s => s.is_absent && s.class === cls);
-            if(clsAbs.length > 0) {
-                let html = `<div style="background:var(--blue); color:white; padding:10px; font-size:12px; font-weight:800; border-radius:10px 10px 0 0;">${cls} - ${clsAbs.length} MISSING</div>
-                <table class="absent-table" style="margin-bottom:15px; box-shadow:0 4px 6px rgba(0,0,0,0.05)">
-                <thead><tr><th>Student Name</th><th>Parent Contact</th></tr></thead><tbody>`;
-                clsAbs.forEach(s => { html += `<tr><td>${s.name.toUpperCase()}</td><td><span style="color:var(--red)">${s.contact || 'N/A'}</span></td></tr>`; });
-                html += `</tbody></table>`;
-                cont.innerHTML += html;
-            }
-        });
-    }
-
     function updateFinanceTotals() {
         if(currentUserRole === "Teacher") return;
         let tE = 0, tP = 0;
         cachedData.forEach(s => { tE += (s.fees_expected || 0); tP += (s.fees_paid || 0); });
-        document.getElementById('s-exp').innerText = "UGX " + tE.toLocaleString();
-        document.getElementById('s-paid').innerText = "UGX " + tP.toLocaleString();
-        document.getElementById('s-debt').innerText = "UGX " + (tE - tP).toLocaleString();
+        const eSum = document.getElementById('s-exp'); if(eSum) eSum.innerText = "UGX " + tE.toLocaleString();
+        const pSum = document.getElementById('s-paid'); if(pSum) pSum.innerText = "UGX " + tP.toLocaleString();
+        const dSum = document.getElementById('s-debt'); if(dSum) dSum.innerText = "UGX " + (tE - tP).toLocaleString();
     }
 
     async function submitData() {
@@ -272,37 +243,48 @@
             totalPaid += newAmt;
         }
 
+        // Prepare Payload - Only send finance if limited, otherwise send all
         const payload = {
-            name: document.getElementById('name').value,
-            age: parseInt(document.getElementById('age').value),
-            dob: document.getElementById('dob').value,
-            class: document.getElementById('cls').value,
-            location: document.getElementById('location_field').value,
-            health_status: document.getElementById('health_field').value,
-            contact: document.getElementById('contact').value,
             fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
             fees_paid: totalPaid,
             payment_history: JSON.stringify(p_hist)
         };
 
+        if(currentUserRole !== "Finance") {
+            payload.name = document.getElementById('name').value;
+            payload.age = parseInt(document.getElementById('age').value);
+            payload.dob = document.getElementById('dob').value;
+            payload.class = document.getElementById('cls').value;
+            payload.location = document.getElementById('location_field').value;
+            payload.health_status = document.getElementById('health_field').value;
+            payload.contact = document.getElementById('contact').value;
+        }
+
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("DATA SYNCED"); loadData(); tab(currentUserRole==='Teacher'?'roll':'rec'); }
+        if(!error) { alert("SUCCESSFUL UPDATE"); loadData(); tab(currentUserRole==='Teacher'?'roll':'rec'); }
     }
 
     function editMode(id) {
         const s = cachedData.find(st => st.id == id);
+        document.getElementById('admTitle').innerText = "EDIT PUPIL FILE";
         document.getElementById('editId').value = s.id;
+        
+        // Populate Fields
+        const fields = ['name', 'age', 'dob', 'cls', 'location_field', 'health_field', 'contact'];
         document.getElementById('name').value = s.name;
         document.getElementById('age').value = s.age;
         document.getElementById('dob').value = s.dob;
         document.getElementById('cls').value = s.class;
-        document.getElementById('location_field').value = s.location;
-        document.getElementById('health_field').value = s.health_status;
-        document.getElementById('contact').value = s.contact;
-        document.getElementById('f_exp').value = s.fees_expected;
+        document.getElementById('location_field').value = s.location || '';
+        document.getElementById('health_field').value = s.health_status || '';
+        document.getElementById('contact').value = s.contact || '';
+        document.getElementById('f_exp').value = s.fees_expected || 0;
         document.getElementById('new_pay_amt').value = "";
         
-        let histHtml = `<table class="history-table"><tr><th>Date</th><th>Amount (UGX)</th></tr>`;
+        // FINANCE LOCK: If Finance, disable bio fields
+        fields.forEach(f => document.getElementById(f).disabled = (currentUserRole === "Finance"));
+
+        let histHtml = `<table class="history-table"><tr><th>Date</th><th>Amount</th></tr>`;
         if(s.payment_history) {
             JSON.parse(s.payment_history).forEach(p => { histHtml += `<tr><td>${p.date}</td><td>${p.amount.toLocaleString()}</td></tr>`; });
         }
@@ -340,7 +322,7 @@
         bar.style.color = s.includes("PROGRESS") ? "var(--blue)" : "white";
     }
 
-    function tab(t) { ['v-adm','v-rec','v-roll','v-sum'].forEach(v => { const el = document.getElementById(v); if(el) el.classList.add('hidden'); }); document.getElementById('v-'+t).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); }
+    function tab(t) { ['v-adm','v-rec','v-roll','v-sum'].forEach(v => { const el = document.getElementById(v); if(el) el.classList.add('hidden'); }); document.getElementById('v-'+t).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); if(t==='adm' && !document.getElementById('editId').value) document.getElementById('admTitle').innerText = "NEW ADMISSION"; }
 </script>
 </body>
 </html>
