@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v50.4 | Live Status</title>
+    <title>Progressive Mothers PMS v50.5 | Data Restored</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -11,15 +11,14 @@
         
         #loginGate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; }
         .pass-container { position: relative; width: 100%; max-width: 320px; }
-        .toggle-pass { position: absolute; right: 15px; top: 22px; color: var(--blue); font-weight: 800; cursor: pointer; font-size: 12px; }
+        .toggle-pass { position: absolute; right: 15px; top: 22px; color: var(--blue); font-weight: 800; cursor: pointer; font-size: 11px; }
         
         .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .hero { background: #001a33; padding: 25px 15px; text-align: center; color: white; }
         #clock { font-size: 38px; font-weight: 800; color: var(--white); line-height: 1; }
         #fullDate { font-size: 14px; color: var(--gold); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
         
-        /* THE STATUS BAR */
-        #liveStatusBar { background: var(--gold); color: var(--blue); display: inline-block; padding: 8px 20px; border-radius: 50px; font-weight: 900; font-size: 12px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase; }
+        #liveStatusBar { background: var(--gold); color: var(--blue); display: inline-block; padding: 10px 25px; border-radius: 50px; font-weight: 900; font-size: 13px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase; }
 
         .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
@@ -37,13 +36,14 @@
         .hidden { display: none !important; }
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         input, select { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; font-size: 14px; }
+        label { font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div id="loginGate">
     <h1 style="color:white; margin:0; letter-spacing: 1px;">PROGRESSIVE MOTHERS</h1>
-    <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SCHOOL MANAGEMENT SYSTEM v50.4</p>
+    <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SCHOOL MANAGEMENT SYSTEM v50.5</p>
     <div class="pass-container">
         <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; height:60px;">
         <span class="toggle-pass" onclick="togglePass()">SHOW</span>
@@ -53,20 +53,20 @@
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">DIRECTOR PORTAL</span></div>
+        <div><b style="font-size:11px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PORTAL</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
 
     <div class="hero">
-        <div id="fullDate">TUESDAY, 07 APRIL 2026</div>
+        <div id="fullDate">-- -- ----</div>
         <div id="clock">00:00:00</div>
-        <div id="liveStatusBar">CHECKING STATUS...</div>
+        <div id="liveStatusBar">LOADING DATA...</div>
     </div>
 
     <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="c-tot">135</span><span class="stat-lbl">Pupils</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-pres" style="color:var(--green)">120</span><span class="stat-lbl">Present</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-abs" style="color:var(--red)">15</span><span class="stat-lbl">Absent</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Pupils</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent</span></div>
     </div>
 
     <div class="nav-tabs">
@@ -78,135 +78,203 @@
 
     <div id="v-sum" class="hidden">
         <div class="card" style="background:var(--blue); color:white; padding: 25px;">
-            <h4 style="margin:0 0 15px 0; color:var(--gold); font-size:20px; letter-spacing:1px;">FINANCIAL SUMMARY</h4>
-            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Expected:</span> <b>UGX 555,000</b></div>
-            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Collected:</span> <b style="color:var(--green)">UGX 150,000</b></div>
-            <div style="display:flex; justify-content:space-between; padding:10px 0;"><span>Debt:</span> <b style="color:var(--red)">UGX 405,000</b></div>
+            <h4 style="margin:0 0 15px 0; color:var(--gold); font-size:20px;">FINANCIAL SUMMARY</h4>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Total Expected:</span> <b id="s-exp">0</b></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Total Collected:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0;"><span>Total Debt:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
         </div>
 
         <div class="card">
-            <h4 style="color:var(--red); font-size:20px; margin-top:0;">ABSENT PUPILS BY CLASS</h4>
-            <div id="absenceListContainer">
-                </div>
+            <h4 style="color:var(--red); font-size:20px; margin-top:0;">ABSENT PUPILS CLASS BY CLASS</h4>
+            <div id="absenceListContainer"></div>
         </div>
+    </div>
+
+    <div id="v-rec" class="hidden">
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Pupil..." oninput="renderUI()"></div>
+        <div id="dataList"></div>
     </div>
 
     <div id="v-adm" class="hidden">
         <div class="card">
-            <h3 style="margin:0 0 15px 0; color:var(--blue);">STUDENT REGISTRATION</h3>
-            <label>Name</label><input id="name">
-            <label>Age</label><input id="age" type="number">
-            <label>Date of Birth</label><input id="dob" type="date">
+            <h3 style="margin:0 0 15px 0; color:var(--blue);">PUPIL REGISTRATION</h3>
+            <input type="hidden" id="editId">
+            <label>Full Name</label><input id="name">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label>Age</label><input id="age" type="number"></div>
+                <div><label>Date of Birth</label><input id="dob" type="date"></div>
+            </div>
             <label>Class</label>
-            <select id="cls"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Physical Location</label><input id="location">
-            <label>Health Status</label><input id="health" placeholder="e.g. Normal, Asthma">
+            <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <label>Physical Location</label><input id="location_field">
+            <label>Health Status</label><input id="health_field">
             <label>Contact Number</label><input id="contact">
-            <button onclick="saveStudent()" class="btn-main" style="margin-top:20px;">SAVE RECORD</button>
+            <label>Expected Fees (UGX)</label><input id="f_exp" type="number">
+            
+            <button onclick="submitData()" id="saveBtn" class="btn-main" style="margin-top:20px;">SYNC TO CLOUD</button>
         </div>
     </div>
 
-    <div style="text-align:center; padding:30px; font-size:10px; font-weight:800; color:#bbb; letter-spacing:1px;">
-        POWERED BY EUDES MEDIA | +256762992440
+    <div id="v-roll" class="hidden">
+        <div style="padding:15px;"><select id="rollClass" onchange="renderUI()"><option value="">-- Select Class --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
+        <div id="rollData"></div>
+    </div>
+
+    <div style="text-align:center; padding:30px; font-size:10px; font-weight:800; color:#bbb;">
+        EUDES MEDIA | +256762992440
     </div>
 </div>
 
 <script>
-    // Configuration
-    const HOLIDAYS = ["2026-04-03", "2026-04-06", "2026-05-01"];
-    
+    const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
+    const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
+    let cachedData = [];
+    let currentUserRole = "";
+
     function togglePass() {
         const input = document.getElementById('key');
         const btn = document.querySelector('.toggle-pass');
-        if (input.type === "password") {
-            input.type = "text";
-            btn.innerText = "HIDE";
-        } else {
-            input.type = "password";
-            btn.innerText = "SHOW";
-        }
+        if (input.type === "password") { input.type = "text"; btn.innerText = "HIDE"; }
+        else { input.type = "password"; btn.innerText = "SHOW"; }
     }
 
-    function secureLogin() {
+    async function secureLogin() {
         const val = document.getElementById('key').value.trim().toUpperCase();
-        if (val === "JESUS CARES" || val === "FINANCE 256" || val === "TEACH2026") {
-            document.getElementById('loginGate').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            setupTabs(val);
-            startClock();
-        } else {
-            alert("WRONG ACCESS KEY");
+        if (val === "JESUS CARES") currentUserRole = "Director";
+        else if (val === "FINANCE 256") currentUserRole = "Finance";
+        else if (val === "TEACH2026") currentUserRole = "Teacher";
+        else return alert("INVALID ACCESS KEY");
+
+        setupAccess();
+        await loadData();
+        document.getElementById('loginGate').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        startClock();
+    }
+
+    function setupAccess() {
+        document.getElementById('userRoleBadge').innerText = currentUserRole.toUpperCase();
+        const tabs = { Director: ['tab-sum','tab-rec','tab-adm','tab-roll'], Finance: ['tab-sum','tab-rec','tab-adm'], Teacher: ['tab-roll'] };
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('visible-tab'));
+        tabs[currentUserRole].forEach(id => document.getElementById(id).classList.add('visible-tab'));
+        tab(tabs[currentUserRole][0].split('-')[1]);
+    }
+
+    async function loadData() {
+        const { data } = await _client.from('students').select('*').order('name');
+        if(data) { 
+            cachedData = data; 
+            document.getElementById('c-tot').innerText = data.length;
+            document.getElementById('c-pres').innerText = data.filter(s => !s.is_absent).length;
+            document.getElementById('c-abs').innerText = data.filter(s => s.is_absent).length;
+            renderUI(); renderAbsence(); updateFinance();
         }
     }
 
-    function setupTabs(role) {
-        const tabs = document.querySelectorAll('.tab');
-        if (role === "JESUS CARES") {
-            tabs.forEach(t => t.classList.add('visible-tab'));
-            tab('sum');
-        } else if (role === "FINANCE 256") {
-            document.getElementById('tab-sum').classList.add('visible-tab');
-            document.getElementById('tab-adm').classList.add('visible-tab');
-            tab('sum');
-        } else {
-            document.getElementById('tab-roll').classList.add('visible-tab');
-            tab('roll');
+    function renderUI() {
+        const list = document.getElementById('dataList'); list.innerHTML = "";
+        const q = document.getElementById('searchBar').value.toLowerCase();
+        cachedData.filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
+            list.innerHTML += `<div class="card" onclick="editMode('${s.id}')" style="border-left:5px solid var(--blue)"><b>${s.name.toUpperCase()}</b><br><small>${s.class} | ${s.contact || 'No Contact'}</small></div>`;
+        });
+
+        const rCls = document.getElementById('rollClass').value;
+        const rList = document.getElementById('rollData'); rList.innerHTML = "";
+        if(rCls) {
+            cachedData.filter(s => s.class === rCls).forEach(s => {
+                const isA = s.is_absent === true;
+                rList.innerHTML += `<div class="card"><b>${s.name}</b> <button onclick="markAtt('${s.id}', ${!isA})" style="float:right; background:${isA?'var(--red)':'var(--green)'}; border:none; padding:8px 12px; color:white; border-radius:8px; font-weight:900;">${isA?'ABSENT':'PRESENT'}</button></div>`;
+            });
         }
     }
+
+    function renderAbsence() {
+        const cont = document.getElementById('absenceListContainer'); cont.innerHTML = "";
+        const classes = ["P.7","P.6","P.5","P.4","P.3","P.2","P.1","Top Class","Middle Class","Baby Class"];
+        classes.forEach(cls => {
+            const clsAbs = cachedData.filter(s => s.is_absent && s.class === cls);
+            if(clsAbs.length > 0) {
+                cont.innerHTML += `<div style="font-weight:900; color:var(--red); margin:15px 0 5px 0; font-size:18px;">${cls}</div>`;
+                clsAbs.forEach(s => { cont.innerHTML += `<div class="absentee-row">${s.name.toUpperCase()} <br><small>Contact: ${s.contact || 'N/A'}</small></div>`; });
+            }
+        });
+    }
+
+    function updateFinance() {
+        let tE = 0, tP = 0;
+        cachedData.forEach(s => { tE += (s.fees_expected || 0); tP += (s.fees_paid || 0); });
+        document.getElementById('s-exp').innerText = "UGX " + tE.toLocaleString();
+        document.getElementById('s-paid').innerText = "UGX " + tP.toLocaleString();
+        document.getElementById('s-debt').innerText = "UGX " + (tE - tP).toLocaleString();
+    }
+
+    async function submitData() {
+        const payload = {
+            name: document.getElementById('name').value,
+            age: parseInt(document.getElementById('age').value),
+            dob: document.getElementById('dob').value,
+            class: document.getElementById('cls').value,
+            location: document.getElementById('location_field').value,
+            health_status: document.getElementById('health_field').value,
+            contact: document.getElementById('contact').value,
+            fees_expected: parseInt(document.getElementById('f_exp').value) || 0
+        };
+        const id = document.getElementById('editId').value;
+        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
+        if(!error) { alert("SUCCESS"); loadData(); tab('rec'); }
+    }
+
+    function editMode(id) {
+        if(currentUserRole === "Teacher") return;
+        const s = cachedData.find(st => st.id == id);
+        document.getElementById('editId').value = s.id;
+        document.getElementById('name').value = s.name;
+        document.getElementById('age').value = s.age;
+        document.getElementById('dob').value = s.dob;
+        document.getElementById('cls').value = s.class;
+        document.getElementById('location_field').value = s.location;
+        document.getElementById('health_field').value = s.health_status;
+        document.getElementById('contact').value = s.contact;
+        document.getElementById('f_exp').value = s.fees_expected;
+        tab('adm');
+    }
+
+    async function markAtt(id, status) { await _client.from('students').update({ is_absent: status }).eq('id', id); loadData(); }
 
     function startClock() {
         setInterval(() => {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
             document.getElementById('fullDate').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-            updateLiveStatus(now);
+            updateStatus(now);
         }, 1000);
     }
 
-    function updateLiveStatus(now) {
+    function updateStatus(now) {
         const hr = now.getHours();
         const min = now.getMinutes();
         const time = hr + (min/60);
         const day = now.getDay();
-        const dateStr = now.toISOString().split('T')[0];
-        
-        let status = "SCHOOL CLOSED";
+        let s = "SCHOOL CLOSED";
 
-        if (HOLIDAYS.includes(dateStr)) {
-            status = "OFFICIAL PUBLIC HOLIDAY - NO SCHOOL";
-        } else if (day === 6) {
-            status = "SABBATH DAY - PREP LESSONS ONLY";
-        } else {
-            if (time >= 5 && time < 10.5) status = "CLASS LESSONS IN PROGRESS";
-            else if (time >= 10.5 && time < 11) status = "TIME FOR BREAK AND BREAKFAST";
-            else if (time >= 11 && time < 13) status = "CLASS LESSONS IN PROGRESS";
-            else if (time >= 13 && time < 14) status = "TIME FOR LUNCH";
-            else if (time >= 14 && time < 16) status = "CLASS LESSONS IN PROGRESS";
-            else if (time >= 16 && time < 19) status = "PREPARATION & REST TIME";
-            else if (time >= 19 && time < 21) {
-                status = (day === 5) ? "WEEKEND REST - NO PREP" : "PREP LESSONS IN PROGRESS";
-            }
-            else status = "TIME FOR SLEEPING / RESTING";
+        if(day === 6) s = "SABBATH - NO LESSONS";
+        else {
+            if(time >= 5 && time < 10.5) s = "CLASS LESSONS IN PROGRESS";
+            else if(time >= 10.5 && time < 11) s = "TIME FOR BREAK AND BREAKFAST";
+            else if(time >= 11 && time < 13) s = "CLASS LESSONS IN PROGRESS";
+            else if(time >= 13 && time < 14) s = "TIME FOR LUNCH";
+            else if(time >= 14 && time < 16) s = "CLASS LESSONS IN PROGRESS";
+            else if(time >= 19 && time < 21 && day !== 5) s = "PREP LESSONS IN PROGRESS";
+            else s = "PREPARATION / REST TIME";
         }
-        
         const bar = document.getElementById('liveStatusBar');
-        bar.innerText = status;
-        // Color change based on status
-        if(status.includes("PROGRESS")) bar.style.background = "#ffc107";
-        else if(status.includes("LUNCH") || status.includes("BREAKFAST")) bar.style.background = "#2b9348";
-        else bar.style.background = "#d90429";
-        bar.style.color = (status.includes("PROGRESS")) ? "#002d5b" : "white";
+        bar.innerText = s;
+        bar.style.background = s.includes("PROGRESS") ? "var(--gold)" : (s.includes("LUNCH") ? "var(--green)" : "var(--red)");
+        bar.style.color = s.includes("PROGRESS") ? "var(--blue)" : "white";
     }
 
-    function tab(t) {
-        ['v-adm','v-rec','v-roll','v-sum'].forEach(v => {
-            const el = document.getElementById(v);
-            if(el) el.classList.add('hidden');
-        });
-        document.getElementById('v-'+t).classList.remove('hidden');
-        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-'+t).classList.add('active');
-    }
+    function tab(t) { ['v-adm','v-rec','v-roll','v-sum'].forEach(v => document.getElementById(v).classList.add('hidden')); document.getElementById('v-'+t).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); }
 </script>
 </body>
 </html>
