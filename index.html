@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v49.4 | Secure Edition</title>
+    <title>Progressive Mothers PMS v49.5 | Force Save Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -29,15 +29,10 @@
         .visible-tab { display: block !important; }
 
         .card { background: white; border-radius: 15px; padding: 18px; margin: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .big-report-card { background: #fff5f5; border: 2px solid var(--red); border-radius: 15px; padding: 20px; margin-top: 15px; }
-        .big-report-header { font-size: 18px; font-weight: 900; color: var(--red); border-bottom: 2px solid #feb2b2; padding-bottom: 10px; margin-bottom: 15px; text-transform: uppercase; }
-        .absent-list-item { font-size: 15px; font-weight: 700; color: #444; padding: 10px 0; border-bottom: 1px dashed #feb2b2; display: flex; justify-content: space-between; }
-
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         .hidden { display: none !important; }
         
         input, select, textarea { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; font-size: 14px; }
-        .read-only-field { background: #f9f9f9; pointer-events: none; color: #999; }
     </style>
 </head>
 <body>
@@ -54,7 +49,7 @@
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PMS v49.4</span></div>
+        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PMS v49.5</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
 
@@ -77,18 +72,54 @@
         <div class="tab" id="tab-roll" onclick="tab('roll')">Attendance</div>
     </div>
 
+    <div id="v-adm" class="hidden">
+        <div class="card">
+            <button onclick="clearForm()" id="newEnrollBtn" class="btn-main" style="background:var(--gold); color:var(--blue); margin-bottom:20px;">+ NEW ENROLLMENT</button>
+            <h3 id="admTitle" style="margin:0; color:var(--blue);">STUDENT PROFILE</h3>
+            <input type="hidden" id="editId">
+            
+            <label>Name</label><input id="name" placeholder="Enter Full Name">
+            <label>LIN</label><input id="lin" readonly style="background:#f9f9f9;">
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div><label>Age</label><input id="age" type="number" placeholder="Years"></div>
+                <div><label>DOB</label><input id="dob" type="date"></div>
+            </div>
+            
+            <label>Class</label>
+            <select id="cls">
+                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                <option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
+            
+            <label>Physical Location</label><input id="location" placeholder="Where they stay">
+            <label>Health Status</label><input id="health" placeholder="e.g. Normal, Asthma">
+            <label>Parent Contact</label><input id="contact" placeholder="07xx xxx xxx">
+            
+            <hr>
+            <label style="color:var(--red)">Total Term Fees (UGX)</label>
+            <input id="f_exp" type="number" placeholder="0">
+            
+            <div id="paySection" class="hidden" style="background:#f0f7ff; padding:15px; border-radius:12px;">
+                <b style="font-size:11px;">ADD PAYMENT:</b>
+                <input id="pay_amt" type="number" placeholder="Amount Paid Now">
+                <input id="pay_date" type="date">
+                <div id="payHistory" style="font-size:11px; margin-top:5px; color:var(--blue);"></div>
+            </div>
+            
+            <button onclick="submitData()" id="saveBtn" class="btn-main" style="margin-top:20px;">SAVE RECORD</button>
+        </div>
+    </div>
+
     <div id="v-sum" class="hidden">
         <div class="card" style="background:var(--blue); color:white; padding: 25px;">
-            <h4 style="margin:0 0 15px 0; color:var(--gold); font-size: 16px;">FINANCIAL SUMMARY</h4>
+            <h4 style="margin:0 0 15px 0; color:var(--gold);">FINANCIAL SUMMARY</h4>
             <div style="display:flex; justify-content:space-between;"><span>Expected:</span> <b id="s-exp">0</b></div>
             <div style="display:flex; justify-content:space-between; margin:12px 0;"><span>Collected:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
-            <div style="display:flex; justify-content:space-between; border-top:2px solid rgba(255,255,255,0.2); padding-top:12px;"><span>Debt:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
+            <div style="display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.2); padding-top:12px;"><span>Debt:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
         </div>
-        <div class="card">
-            <h4 style="margin:0 0 10px 0; color:var(--blue);">ABSENCE BY CLASS</h4>
-            <select id="dirClass" onchange="renderDirectorAbsence()"><option value="">-- Choose Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <div id="dirReport"></div>
-        </div>
+        <div id="dirReportContainer" style="padding:0 15px;"></div>
     </div>
 
     <div id="v-rec" class="hidden">
@@ -96,37 +127,9 @@
         <div id="dataList"></div>
     </div>
 
-    <div id="v-adm" class="hidden">
-        <div class="card">
-            <button onclick="clearForm()" id="newEnrollBtn" class="btn-main" style="background:var(--gold); color:var(--blue); margin-bottom:20px;">+ NEW ENROLLMENT</button>
-            <h3 id="admTitle" style="margin:0; color:var(--blue);">STUDENT PROFILE</h3>
-            <input type="hidden" id="editId">
-            <label>Name</label><input id="name">
-            <label>LIN</label><input id="lin" readonly class="read-only-field">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div><label>Age</label><input id="age" type="number"></div>
-                <div><label>DOB</label><input id="dob" type="date"></div>
-            </div>
-            <label>Class</label>
-            <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Physical Location</label><input id="location">
-            <label>Health Status</label><input id="health">
-            <label>Parent Contact</label><input id="contact">
-            <hr>
-            <label style="color:var(--red)">Total Fees</label><input id="f_exp" type="number">
-            <div id="paySection" class="hidden" style="background:#f0f7ff; padding:15px; border-radius:12px;">
-                <b style="font-size:11px;">ADD PAYMENT:</b>
-                <input id="pay_amt" type="number" placeholder="Amount">
-                <input id="pay_date" type="date">
-                <div id="payHistory" style="font-size:11px; margin-top:5px;"></div>
-            </div>
-            <button onclick="submitData()" id="saveDataBtn" class="btn-main" style="margin-top:20px;">SAVE DATA</button>
-        </div>
-    </div>
-
     <div id="v-roll" class="hidden">
         <div style="padding:15px;">
-            <select id="rollClass" onchange="renderUI()" style="border:2px solid var(--blue);"><option value="">-- Mark Attendance --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <select id="rollClass" onchange="renderUI()" style="border:2px solid var(--blue);"><option value="">-- Choose Class to Mark --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         </div>
         <div id="rollData"></div>
     </div>
@@ -143,24 +146,6 @@
     let cachedData = [];
     let currentUserRole = "";
 
-    const routine = [
-        { start: "07:00", end: "08:00", task: "Arrival & Cleaning" },
-        { start: "08:00", end: "08:30", task: "Morning Assembly" },
-        { start: "08:30", end: "10:30", task: "Lesson Block 1" },
-        { start: "10:30", end: "11:00", task: "Breakfast Break" },
-        { start: "11:00", end: "13:00", task: "Lesson Block 2" },
-        { start: "13:00", end: "14:00", task: "Lunch Break" },
-        { start: "14:00", end: "16:30", task: "Lesson Block 3" },
-        { start: "16:30", end: "23:59", task: "Departure" }
-    ];
-
-    function togglePassword() {
-        const x = document.getElementById("key");
-        const t = document.getElementById("togglePass");
-        if (x.type === "password") { x.type = "text"; t.innerText = "HIDE"; }
-        else { x.type = "password"; t.innerText = "SHOW"; }
-    }
-
     async function secureLogin() {
         const val = document.getElementById('key').value.trim().toUpperCase();
         if (val === "JESUS CARES") currentUserRole = "Director";
@@ -175,25 +160,20 @@
     }
 
     function setupAccess() {
-        document.getElementById('userRoleBadge').innerText = "PMS v49.4 | " + currentUserRole.toUpperCase();
+        document.getElementById('userRoleBadge').innerText = "PMS v49.5 | " + currentUserRole.toUpperCase();
         const tabs = {
             Director: ['tab-sum', 'tab-rec', 'tab-adm', 'tab-roll'],
             Finance: ['tab-sum', 'tab-adm'],
             Teacher: ['tab-adm', 'tab-roll']
         };
-        
-        // Hide all tabs first
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('visible-tab'));
-        // Show allowed tabs
         tabs[currentUserRole].forEach(id => document.getElementById(id).classList.add('visible-tab'));
-        
-        // Default to first available tab
         tab(tabs[currentUserRole][0].split('-')[1]);
     }
 
     async function loadData() {
-        const { data } = await _client.from('students').select('*').order('name');
-        if(data) { cachedData = data; renderUI(); updateFinance(); renderDirectorAbsence(); }
+        const { data, error } = await _client.from('students').select('*').order('name');
+        if(data) { cachedData = data; renderUI(); updateFinance(); }
     }
 
     function updateFinance() {
@@ -204,54 +184,66 @@
         document.getElementById('s-debt').innerText = "UGX " + (tE - tP).toLocaleString();
     }
 
-    function renderDirectorAbsence() {
-        const cls = document.getElementById('dirClass').value;
-        const target = document.getElementById('dirReport');
-        if(!cls) return target.innerHTML = "";
-        const abs = cachedData.filter(s => s.class === cls && s.is_absent === true);
-        let h = `<div class="big-report-card"><div class="big-report-header">${cls} - ${abs.length} ABSENT</div>`;
-        abs.forEach(a => h += `<div class="absent-list-item"><span>${a.name}</span> <span style="color:var(--blue); font-size:12px;">${a.contact || ''}</span></div>`);
-        target.innerHTML = h + `</div>`;
-    }
+    async function submitData() {
+        const saveBtn = document.getElementById('saveBtn');
+        saveBtn.innerText = "SAVING... PLEASE WAIT";
+        saveBtn.style.background = "gray";
 
-    function renderUI() {
-        document.getElementById('c-tot').innerText = cachedData.length;
-        document.getElementById('c-abs').innerText = cachedData.filter(s => s.is_absent).length;
-        document.getElementById('c-pres').innerText = cachedData.length - cachedData.filter(s => s.is_absent).length;
+        const id = document.getElementById('editId').value;
+        const newAmt = parseInt(document.getElementById('pay_amt').value) || 0;
+        const newDate = document.getElementById('pay_date').value;
+        
+        let hist = []; 
+        let currentPaid = 0;
 
-        const list = document.getElementById('dataList'); list.innerHTML = "";
-        const q = document.getElementById('searchBar').value.toLowerCase();
-        cachedData.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q)) || (s.class && s.class.toLowerCase().includes(q))).forEach(s => {
-            list.innerHTML += `<div class="card" onclick="editMode('${s.id}')" style="margin:8px 15px; border-left:6px solid var(--blue); padding:12px;">
-                <b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin}</small></div>`;
-        });
+        if(id) {
+            const existing = cachedData.find(s => s.id == id);
+            if(existing.payment_history) hist = JSON.parse(existing.payment_history);
+            currentPaid = existing.fees_paid || 0;
+        }
 
-        const rCls = document.getElementById('rollClass').value;
-        const rList = document.getElementById('rollData'); rList.innerHTML = "";
-        if(rCls) {
-            cachedData.filter(s => s.class === rCls).forEach(s => {
-                const isA = s.is_absent === true;
-                rList.innerHTML += `<div class="card" style="margin:8px 15px; padding:12px; border-left:6px solid ${isA?'var(--red)':'var(--green)'}">
-                    <b>${s.name}</b> <button onclick="markAtt('${s.id}', ${!isA})" style="float:right; border:none; padding:10px 15px; border-radius:10px; color:white; font-weight:900; background:${isA?'var(--red)':'var(--green)'}">${isA?'ABSENT':'PRESENT'}</button></div>`;
-            });
+        if(newAmt > 0 && newDate) {
+            hist.push({ date: newDate, amount: newAmt });
+            currentPaid += newAmt;
+        }
+
+        const payload = {
+            name: document.getElementById('name').value || "No Name",
+            class: document.getElementById('cls').value,
+            contact: document.getElementById('contact').value || "",
+            age: parseInt(document.getElementById('age').value) || 0,
+            dob: document.getElementById('dob').value || null,
+            location: document.getElementById('location').value || "",
+            health: document.getElementById('health').value || "Normal",
+            lin: document.getElementById('lin').value || "PMA-TEMP",
+            fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
+            fees_paid: currentPaid,
+            payment_history: JSON.stringify(hist)
+        };
+
+        try {
+            const { error } = id 
+                ? await _client.from('students').update(payload).eq('id', id) 
+                : await _client.from('students').insert([payload]);
+
+            if(!error) {
+                alert("SUCCESS: Record synchronized with cloud.");
+                await loadData();
+                clearForm();
+                tab('rec');
+            } else {
+                alert("DATABASE ERROR: " + error.message);
+                saveBtn.innerText = "RETRY SAVE";
+                saveBtn.style.background = "var(--red)";
+            }
+        } catch (err) {
+            alert("NETWORK ERROR: Check internet connection.");
+            saveBtn.innerText = "RETRY SAVE";
         }
     }
 
-    async function markAtt(id, status) {
-        await _client.from('students').update({ is_absent: status }).eq('id', id);
-        loadData();
-    }
-
-    function tab(t) {
-        ['v-adm','v-rec','v-roll','v-sum'].forEach(v => document.getElementById(v).classList.add('hidden'));
-        document.getElementById('v-'+t).classList.remove('hidden');
-        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-'+t).classList.add('active');
-    }
-
     function editMode(id) {
-        if(currentUserRole === "Teacher") return alert("TEACHERS ARE NOT ALLOWED TO EDIT RECORDS. Please contact the Director.");
-        
+        if(currentUserRole === "Teacher") return alert("TEACHERS CANNOT EDIT. CONTACT DIRECTOR.");
         const s = cachedData.find(st => st.id == id);
         document.getElementById('editId').value = s.id;
         document.getElementById('name').value = s.name;
@@ -278,48 +270,46 @@
         document.getElementById('contact').value = "";
         document.getElementById('f_exp').value = 0;
         document.getElementById('pay_amt').value = "";
-        document.getElementById('paySection').classList.add('hidden');
+        document.getElementById('saveBtn').innerText = "SAVE RECORD";
+        document.getElementById('saveBtn').style.background = "var(--blue)";
     }
 
-    async function submitData() {
-        const id = document.getElementById('editId').value;
-        const newAmt = parseInt(document.getElementById('pay_amt').value) || 0;
-        const newDate = document.getElementById('pay_date').value;
-        let hist = []; let total = 0;
+    function renderUI() {
+        const list = document.getElementById('dataList'); list.innerHTML = "";
+        const q = document.getElementById('searchBar').value.toLowerCase();
+        cachedData.filter(s => s.name.toLowerCase().includes(q) || s.lin.toLowerCase().includes(q) || s.class.toLowerCase().includes(q)).forEach(s => {
+            list.innerHTML += `<div class="card" onclick="editMode('${s.id}')" style="border-left:5px solid var(--blue)"><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin}</small></div>`;
+        });
 
-        if(id) {
-            const s = cachedData.find(st => st.id == id);
-            if(s.payment_history) hist = JSON.parse(s.payment_history);
-            total = s.fees_paid || 0;
+        const rCls = document.getElementById('rollClass').value;
+        const rList = document.getElementById('rollData'); rList.innerHTML = "";
+        if(rCls) {
+            cachedData.filter(s => s.class === rCls).forEach(s => {
+                const isA = s.is_absent === true;
+                rList.innerHTML += `<div class="card" style="border-left:5px solid ${isA?'var(--red)':'var(--green)'}"><b>${s.name}</b> <button onclick="markAtt('${s.id}', ${!isA})" style="float:right; border:none; padding:8px; border-radius:8px; color:white; background:${isA?'var(--red)':'var(--green)'}">${isA?'ABSENT':'PRESENT'}</button></div>`;
+            });
         }
-        if(newAmt > 0 && newDate) { hist.push({ date: newDate, amount: newAmt }); total += newAmt; }
+    }
 
-        const payload = {
-            name: document.getElementById('name').value || "Unnamed",
-            class: document.getElementById('cls').value,
-            contact: document.getElementById('contact').value || "",
-            age: document.getElementById('age').value || null,
-            dob: document.getElementById('dob').value || null,
-            location: document.getElementById('location').value || "",
-            health: document.getElementById('health').value || "Normal",
-            lin: document.getElementById('lin').value,
-            fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
-            fees_paid: total,
-            payment_history: JSON.stringify(hist)
-        };
+    async function markAtt(id, status) {
+        await _client.from('students').update({ is_absent: status }).eq('id', id);
+        loadData();
+    }
 
-        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("Record Saved."); loadData(); tab('rec'); }
-        else alert("Error saving record.");
+    function tab(t) {
+        ['v-adm','v-rec','v-roll','v-sum'].forEach(v => document.getElementById(v).classList.add('hidden'));
+        document.getElementById('v-'+t).classList.remove('hidden');
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-'+t).classList.add('active');
+    }
+
+    function togglePassword() {
+        const x = document.getElementById("key");
+        x.type = x.type === "password" ? "text" : "password";
     }
 
     setInterval(() => {
-        const now = new Date();
-        const tS = now.toTimeString().substring(0, 5);
-        document.getElementById('full-date').innerText = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-        const task = routine.find(r => tS >= r.start && tS < r.end);
-        document.getElementById('routineStatus').innerText = task ? task.task : "School Closed";
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB');
     }, 1000);
 </script>
 </body>
