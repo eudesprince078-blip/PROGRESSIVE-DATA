@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v50.3 | Live Tracker</title>
+    <title>Progressive Mothers PMS v50.4 | Live Status</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -10,15 +10,21 @@
         body { font-family: 'Inter', sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
         
         #loginGate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; }
+        .pass-container { position: relative; width: 100%; max-width: 320px; }
+        .toggle-pass { position: absolute; right: 15px; top: 22px; color: var(--blue); font-weight: 800; cursor: pointer; font-size: 12px; }
+        
         .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .hero { background: #001a33; padding: 20px 15px; text-align: center; color: white; }
-        #clock { font-size: 32px; font-weight: 800; color: var(--white); }
-        #fullDate { font-size: 14px; color: var(--gold); font-weight: 700; margin-bottom: 5px; }
+        .hero { background: #001a33; padding: 25px 15px; text-align: center; color: white; }
+        #clock { font-size: 38px; font-weight: 800; color: var(--white); line-height: 1; }
+        #fullDate { font-size: 14px; color: var(--gold); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
+        
+        /* THE STATUS BAR */
+        #liveStatusBar { background: var(--gold); color: var(--blue); display: inline-block; padding: 8px 20px; border-radius: 50px; font-weight: 900; font-size: 12px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase; }
 
-        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -25px; }
-        .stat-card { background: white; padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
-        .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); display: block; }
-        .stat-lbl { font-size: 8px; font-weight: 800; color: #999; text-transform: uppercase; }
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
+        .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
+        .stat-val { font-size: 22px; font-weight: 900; color: var(--blue); display: block; }
+        .stat-lbl { font-size: 9px; font-weight: 800; color: #999; text-transform: uppercase; }
 
         .nav-tabs { display: flex; background: white; position: sticky; top: 68px; z-index: 999; border-bottom: 1px solid #ddd; overflow-x: auto; }
         .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 10px; font-weight: 800; color: #aaa; cursor: pointer; display: none; min-width: 80px; }
@@ -26,12 +32,7 @@
         .visible-tab { display: block !important; }
 
         .card { background: white; border-radius: 15px; padding: 18px; margin: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .routine-item { border-bottom: 1px solid #eee; padding: 12px 0; }
-        .routine-top { display: flex; justify-content: space-between; font-weight: 700; font-size: 14px; }
-        .routine-indicator { color: var(--red); font-size: 24px; font-weight: 900; text-align: center; margin-top: 4px; }
-        
-        .profile-detail { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 15px; }
-        .absentee-row { border-left: 5px solid var(--red); background: #fff5f5; padding: 15px; margin-bottom: 10px; border-radius: 8px; font-size: 16px; font-weight: 700; }
+        .absentee-row { border-left: 6px solid var(--red); background: #fff5f5; padding: 15px; margin-bottom: 12px; border-radius: 8px; font-size: 16px; font-weight: 800; }
         
         .hidden { display: none !important; }
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
@@ -41,273 +42,171 @@
 <body>
 
 <div id="loginGate">
-    <h1 style="color:white; margin:0;">PROGRESSIVE MOTHERS</h1>
-    <p style="color:var(--gold); font-weight:700; font-size:12px; margin-bottom:30px;">SCHOOL MANAGEMENT SYSTEM</p>
-    <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; max-width:320px; height:60px;">
-    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:320px; border:none; border-radius:12px; font-weight:900; margin-top:10px;">AUTHENTICATE</button>
+    <h1 style="color:white; margin:0; letter-spacing: 1px;">PROGRESSIVE MOTHERS</h1>
+    <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SCHOOL MANAGEMENT SYSTEM v50.4</p>
+    <div class="pass-container">
+        <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; height:60px;">
+        <span class="toggle-pass" onclick="togglePass()">SHOW</span>
+    </div>
+    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:320px; border:none; border-radius:12px; font-weight:900; margin-top:10px; cursor:pointer;">AUTHENTICATE</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PMS v50.3</span></div>
+        <div><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">DIRECTOR PORTAL</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
 
     <div class="hero">
-        <div id="fullDate">-- -- ----</div>
+        <div id="fullDate">TUESDAY, 07 APRIL 2026</div>
         <div id="clock">00:00:00</div>
+        <div id="liveStatusBar">CHECKING STATUS...</div>
     </div>
 
     <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Pupils</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-tot">135</span><span class="stat-lbl">Pupils</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-pres" style="color:var(--green)">120</span><span class="stat-lbl">Present</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-abs" style="color:var(--red)">15</span><span class="stat-lbl">Absent</span></div>
     </div>
 
     <div class="nav-tabs">
         <div class="tab" id="tab-sum" onclick="tab('sum')">Director</div>
-        <div class="tab" id="tab-cal" onclick="tab('cal')">Calendar</div>
         <div class="tab" id="tab-rec" onclick="tab('rec')">Records</div>
         <div class="tab" id="tab-adm" onclick="tab('adm')">Admission</div>
         <div class="tab" id="tab-roll" onclick="tab('roll')">Attendance</div>
     </div>
 
-    <div id="v-cal" class="hidden">
-        <div class="card">
-            <h3 style="color:var(--blue); margin:0 0 15px 0;">LIVE SCHOOL PROGRAM</h3>
-            <div class="routine-item" id="prog-early">
-                <div class="routine-top"><span>Early Morning Lessons</span><span>05:00 - 08:30 AM</span></div>
-                <div class="routine-indicator" id="ind-early"></div>
-            </div>
-            <div class="routine-item" id="prog-morn">
-                <div class="routine-top"><span>Morning Lessons</span><span>08:30 - 10:30 AM</span></div>
-                <div class="routine-indicator" id="ind-morn"></div>
-            </div>
-            <div class="routine-item" id="prog-break">
-                <div class="routine-top" style="color:var(--green)"><span>BREAK & BREAKFAST</span><span>10:30 - 11:00 AM</span></div>
-                <div class="routine-indicator" id="ind-break"></div>
-            </div>
-            <div class="routine-item" id="prog-mid">
-                <div class="routine-top"><span>Mid-Morning Lessons</span><span>11:00 - 01:00 PM</span></div>
-                <div class="routine-indicator" id="ind-mid"></div>
-            </div>
-            <div class="routine-item" id="prog-lunch">
-                <div class="routine-top" style="color:var(--green)"><span>LUNCH TIME</span><span>01:00 - 02:00 PM</span></div>
-                <div class="routine-indicator" id="ind-lunch"></div>
-            </div>
-            <div class="routine-item" id="prog-noon">
-                <div class="routine-top"><span>Noon Lessons</span><span>02:00 - 04:00 PM</span></div>
-                <div class="routine-indicator" id="ind-noon"></div>
-            </div>
-            <div class="routine-item" id="prog-prep">
-                <div class="routine-top" style="color:var(--red)"><span>Prep (Upper Primary)</span><span>07:00 - 09:00 PM</span></div>
-                <div class="routine-indicator" id="ind-prep"></div>
-            </div>
-        </div>
-        <div class="card" style="background:#fff9e6; border-left:5px solid var(--gold);">
-            <b style="font-size:12px;">Saturday: Sabbath (No Lessons). Sunday: Upper Classes only. Friday: No evening prep. Public Holidays: School Closed.</b>
-        </div>
-    </div>
-
     <div id="v-sum" class="hidden">
         <div class="card" style="background:var(--blue); color:white; padding: 25px;">
-            <h4 style="margin:0 0 15px 0; color:var(--gold); font-size:20px;">FINANCIALS</h4>
-            <div class="profile-detail" style="border-color:rgba(255,255,255,0.1)"><span>Total Expected:</span> <b id="s-exp">0</b></div>
-            <div class="profile-detail" style="border-color:rgba(255,255,255,0.1)"><span>Total Collected:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
-            <div class="profile-detail" style="border-bottom:none"><span>Total Debt:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
+            <h4 style="margin:0 0 15px 0; color:var(--gold); font-size:20px; letter-spacing:1px;">FINANCIAL SUMMARY</h4>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Expected:</span> <b>UGX 555,000</b></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Collected:</span> <b style="color:var(--green)">UGX 150,000</b></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0;"><span>Debt:</span> <b style="color:var(--red)">UGX 405,000</b></div>
         </div>
 
         <div class="card">
-            <h4 style="color:var(--red); font-size:20px; margin-top:0;">ABSENT PUPILS CLASS BY CLASS</h4>
-            <div id="absenceListContainer"></div>
+            <h4 style="color:var(--red); font-size:20px; margin-top:0;">ABSENT PUPILS BY CLASS</h4>
+            <div id="absenceListContainer">
+                </div>
         </div>
-    </div>
-
-    <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Pupil..." oninput="renderUI()"></div>
-        <div id="dataList"></div>
     </div>
 
     <div id="v-adm" class="hidden">
         <div class="card">
-            <button onclick="clearForm()" id="newEnrollBtn" class="btn-main" style="background:var(--gold); color:var(--blue); margin-bottom:20px;">+ NEW ENROLLMENT</button>
-            <h3 style="margin:0; color:var(--blue);">STUDENT FILE</h3>
-            <input type="hidden" id="editId">
-            <label>Full Name</label><input id="name">
-            <label>LIN</label><input id="lin" readonly style="background:#f1f1f1;">
+            <h3 style="margin:0 0 15px 0; color:var(--blue);">STUDENT REGISTRATION</h3>
+            <label>Name</label><input id="name">
+            <label>Age</label><input id="age" type="number">
+            <label>Date of Birth</label><input id="dob" type="date">
             <label>Class</label>
-            <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Contact</label><input id="contact">
-            <label>Expected Fees (UGX)</label><input id="f_exp" type="number">
-            
-            <div id="paySection" class="hidden" style="background:#f0f7ff; padding:15px; border-radius:12px;">
-                <b>PAYMENT HISTORY:</b>
-                <input id="pay_amt" type="number" placeholder="Enter Amount">
-                <input id="pay_date" type="date">
-                <div id="payHistoryDisplay" style="margin-top:10px; font-size:12px;"></div>
-            </div>
-            
-            <button onclick="submitData()" id="saveBtn" class="btn-main" style="margin-top:20px;">SYNC TO CLOUD</button>
+            <select id="cls"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <label>Physical Location</label><input id="location">
+            <label>Health Status</label><input id="health" placeholder="e.g. Normal, Asthma">
+            <label>Contact Number</label><input id="contact">
+            <button onclick="saveStudent()" class="btn-main" style="margin-top:20px;">SAVE RECORD</button>
         </div>
     </div>
 
-    <div id="v-roll" class="hidden">
-        <div style="padding:15px;"><select id="rollClass" onchange="renderUI()"><option value="">-- Choose Class --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
-        <div id="rollData"></div>
+    <div style="text-align:center; padding:30px; font-size:10px; font-weight:800; color:#bbb; letter-spacing:1px;">
+        POWERED BY EUDES MEDIA | +256762992440
     </div>
-
 </div>
 
 <script>
-    const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-    const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
-    let cachedData = [];
-    let currentUserRole = "";
+    // Configuration
+    const HOLIDAYS = ["2026-04-03", "2026-04-06", "2026-05-01"];
+    
+    function togglePass() {
+        const input = document.getElementById('key');
+        const btn = document.querySelector('.toggle-pass');
+        if (input.type === "password") {
+            input.type = "text";
+            btn.innerText = "HIDE";
+        } else {
+            input.type = "password";
+            btn.innerText = "SHOW";
+        }
+    }
 
-    async function secureLogin() {
+    function secureLogin() {
         const val = document.getElementById('key').value.trim().toUpperCase();
-        if (val === "JESUS CARES") currentUserRole = "Director";
-        else if (val === "FINANCE 256") currentUserRole = "Finance";
-        else if (val === "TEACH2026") currentUserRole = "Teacher";
-        else return alert("AUTH FAILED");
-
-        setupAccess();
-        await loadData();
-        document.getElementById('loginGate').classList.add('hidden');
-        document.getElementById('mainApp').classList.remove('hidden');
-    }
-
-    function setupAccess() {
-        document.getElementById('userRoleBadge').innerText = "SYSTEM | " + currentUserRole;
-        const tabs = { 
-            Director: ['tab-sum', 'tab-cal', 'tab-rec', 'tab-adm', 'tab-roll'], 
-            Finance: ['tab-sum', 'tab-cal', 'tab-rec', 'tab-adm'], 
-            Teacher: ['tab-cal', 'tab-adm', 'tab-roll'] 
-        };
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('visible-tab'));
-        tabs[currentUserRole].forEach(id => document.getElementById(id).classList.add('visible-tab'));
-        tab(tabs[currentUserRole][0].split('-')[1]);
-    }
-
-    async function loadData() {
-        const { data } = await _client.from('students').select('*').order('name');
-        if(data) { 
-            cachedData = data; 
-            document.getElementById('c-tot').innerText = data.length;
-            document.getElementById('c-pres').innerText = data.filter(s => !s.is_absent).length;
-            document.getElementById('c-abs').innerText = data.filter(s => s.is_absent).length;
-            renderUI(); updateFinance(); renderAbsence();
+        if (val === "JESUS CARES" || val === "FINANCE 256" || val === "TEACH2026") {
+            document.getElementById('loginGate').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            setupTabs(val);
+            startClock();
+        } else {
+            alert("WRONG ACCESS KEY");
         }
     }
 
-    function updateFinance() {
-        let tE = 0, tP = 0;
-        cachedData.forEach(s => { tE += (s.fees_expected || 0); tP += (s.fees_paid || 0); });
-        document.getElementById('s-exp').innerText = "UGX " + tE.toLocaleString();
-        document.getElementById('s-paid').innerText = "UGX " + tP.toLocaleString();
-        document.getElementById('s-debt').innerText = "UGX " + (tE - tP).toLocaleString();
-    }
-
-    function renderAbsence() {
-        const cont = document.getElementById('absenceListContainer'); cont.innerHTML = "";
-        const absent = cachedData.filter(s => s.is_absent === true);
-        const classes = ["P.7","P.6","P.5","P.4","P.3","P.2","P.1","Top Class","Middle Class","Baby Class"];
-        classes.forEach(cls => {
-            const clsAbs = absent.filter(s => s.class === cls);
-            if(clsAbs.length > 0) {
-                let html = `<div style="font-weight:900; color:var(--red); margin:15px 0 5px 0; font-size:18px;">${cls.toUpperCase()}</div>`;
-                clsAbs.forEach(s => { html += `<div class="absentee-row">${s.name.toUpperCase()} <br><span style="font-size:12px; color:#666;">Contact: ${s.contact || 'None'}</span></div>`; });
-                cont.innerHTML += html;
-            }
-        });
-    }
-
-    function renderUI() {
-        const list = document.getElementById('dataList'); list.innerHTML = "";
-        const q = document.getElementById('searchBar').value.toLowerCase();
-        cachedData.filter(s => s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q)).forEach(s => {
-            list.innerHTML += `<div class="card" onclick="editMode('${s.id}')" style="border-left:5px solid var(--blue)"><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin}</small></div>`;
-        });
-        const rCls = document.getElementById('rollClass').value;
-        const rList = document.getElementById('rollData'); rList.innerHTML = "";
-        if(rCls) {
-            cachedData.filter(s => s.class === rCls).forEach(s => {
-                const isA = s.is_absent === true;
-                rList.innerHTML += `<div class="card"><b>${s.name}</b> <button onclick="markAtt('${s.id}', ${!isA})" style="float:right; background:${isA?'var(--red)':'var(--green)'}; border:none; padding:8px; color:white; border-radius:8px;">${isA?'ABSENT':'PRESENT'}</button></div>`;
-            });
+    function setupTabs(role) {
+        const tabs = document.querySelectorAll('.tab');
+        if (role === "JESUS CARES") {
+            tabs.forEach(t => t.classList.add('visible-tab'));
+            tab('sum');
+        } else if (role === "FINANCE 256") {
+            document.getElementById('tab-sum').classList.add('visible-tab');
+            document.getElementById('tab-adm').classList.add('visible-tab');
+            tab('sum');
+        } else {
+            document.getElementById('tab-roll').classList.add('visible-tab');
+            tab('roll');
         }
     }
 
-    async function submitData() {
-        const id = document.getElementById('editId').value;
-        const newAmt = parseInt(document.getElementById('pay_amt').value) || 0;
-        const newDate = document.getElementById('pay_date').value;
-        let p_hist = []; let currentPaid = 0;
-        if(id) {
-            const existing = cachedData.find(s => s.id == id);
-            if(existing.payment_history) p_hist = JSON.parse(existing.payment_history);
-            currentPaid = existing.fees_paid || 0;
-        }
-        if(newAmt > 0 && newDate) { p_hist.push({ date: newDate, amount: newAmt }); currentPaid += newAmt; }
-        const payload = {
-            name: document.getElementById('name').value,
-            class: document.getElementById('cls').value,
-            contact: document.getElementById('contact').value,
-            lin: document.getElementById('lin').value,
-            fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
-            fees_paid: currentPaid,
-            payment_history: JSON.stringify(p_hist)
-        };
-        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("SYNCED"); await loadData(); clearForm(); tab('rec'); }
+    function startClock() {
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
+            document.getElementById('fullDate').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+            updateLiveStatus(now);
+        }, 1000);
     }
 
-    function editMode(id) {
-        if(currentUserRole === "Teacher") return alert("Teachers cannot edit.");
-        const s = cachedData.find(st => st.id == id);
-        document.getElementById('editId').value = s.id;
-        document.getElementById('name').value = s.name;
-        document.getElementById('lin').value = s.lin;
-        document.getElementById('cls').value = s.class;
-        document.getElementById('contact').value = s.contact || "";
-        document.getElementById('f_exp').value = s.fees_expected || 0;
-        document.getElementById('paySection').classList.remove('hidden');
-        tab('adm');
-    }
-
-    function clearForm() {
-        document.getElementById('editId').value = ""; document.getElementById('name').value = "";
-        document.getElementById('lin').value = "PMA-" + Math.floor(1000 + Math.random()*8999);
-        document.getElementById('pay_amt').value = ""; tab('adm');
-    }
-
-    async function markAtt(id, status) { await _client.from('students').update({ is_absent: status }).eq('id', id); loadData(); }
-
-    function updateLiveProgram() {
-        const now = new Date();
+    function updateLiveStatus(now) {
         const hr = now.getHours();
         const min = now.getMinutes();
         const time = hr + (min/60);
         const day = now.getDay();
+        const dateStr = now.toISOString().split('T')[0];
+        
+        let status = "SCHOOL CLOSED";
 
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-        document.getElementById('fullDate').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
-
-        document.querySelectorAll('.routine-indicator').forEach(el => el.innerText = "");
-        if(day === 6) return; // Sabbath
-
-        if(time >= 5 && time < 8.5) document.getElementById('ind-early').innerText = "1";
-        else if(time >= 8.5 && time < 10.5) document.getElementById('ind-morn').innerText = "1";
-        else if(time >= 10.5 && time < 11) document.getElementById('ind-break').innerText = "1";
-        else if(time >= 11 && time < 13) document.getElementById('ind-mid').innerText = "1";
-        else if(time >= 13 && time < 14) document.getElementById('ind-lunch').innerText = "1";
-        else if(time >= 14 && time < 16) document.getElementById('ind-noon').innerText = "1";
-        else if(time >= 19 && time < 21 && day !== 5) document.getElementById('ind-prep').innerText = "1";
+        if (HOLIDAYS.includes(dateStr)) {
+            status = "OFFICIAL PUBLIC HOLIDAY - NO SCHOOL";
+        } else if (day === 6) {
+            status = "SABBATH DAY - PREP LESSONS ONLY";
+        } else {
+            if (time >= 5 && time < 10.5) status = "CLASS LESSONS IN PROGRESS";
+            else if (time >= 10.5 && time < 11) status = "TIME FOR BREAK AND BREAKFAST";
+            else if (time >= 11 && time < 13) status = "CLASS LESSONS IN PROGRESS";
+            else if (time >= 13 && time < 14) status = "TIME FOR LUNCH";
+            else if (time >= 14 && time < 16) status = "CLASS LESSONS IN PROGRESS";
+            else if (time >= 16 && time < 19) status = "PREPARATION & REST TIME";
+            else if (time >= 19 && time < 21) {
+                status = (day === 5) ? "WEEKEND REST - NO PREP" : "PREP LESSONS IN PROGRESS";
+            }
+            else status = "TIME FOR SLEEPING / RESTING";
+        }
+        
+        const bar = document.getElementById('liveStatusBar');
+        bar.innerText = status;
+        // Color change based on status
+        if(status.includes("PROGRESS")) bar.style.background = "#ffc107";
+        else if(status.includes("LUNCH") || status.includes("BREAKFAST")) bar.style.background = "#2b9348";
+        else bar.style.background = "#d90429";
+        bar.style.color = (status.includes("PROGRESS")) ? "#002d5b" : "white";
     }
 
-    function tab(t) { ['v-adm','v-rec','v-roll','v-sum','v-cal'].forEach(v => document.getElementById(v).classList.add('hidden')); document.getElementById('v-'+t).classList.remove('hidden'); document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); }
-    setInterval(updateLiveProgram, 1000);
+    function tab(t) {
+        ['v-adm','v-rec','v-roll','v-sum'].forEach(v => {
+            const el = document.getElementById(v);
+            if(el) el.classList.add('hidden');
+        });
+        document.getElementById('v-'+t).classList.remove('hidden');
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-'+t).classList.add('active');
+    }
 </script>
 </body>
 </html>
