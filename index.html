@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v47.6</title>
+    <title>Progressive Mothers PMS v47.7</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #001a33; --red: #e63946; --gold: #ffc107; --white: #ffffff; --green: #25D366; --light: #f4f7f9; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
-        .header { background: var(--red); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); }
+        .header { background: var(--red); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--gold); }
         .hero { background: var(--blue); color: white; padding: 15px; text-align: center; border-bottom: 5px solid var(--gold); }
         #clock { font-size: 30px; font-weight: 900; margin: 5px 0; }
         
@@ -21,26 +21,26 @@
         .tab { flex: 1; text-align: center; padding: 12px 5px; font-weight: 900; font-size: 9px; color: #bbb; cursor: pointer; text-transform: uppercase; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); }
 
-        .item-card { background: white; border-radius: 12px; padding: 12px; margin: 8px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); position: relative; }
+        .item-card { background: white; border-radius: 12px; padding: 12px; margin: 8px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); }
         input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 14px; margin: 5px 0 10px 0; box-sizing: border-box; }
-        .btn-save { width: 100%; background: var(--blue); color: white; padding: 15px; border: none; border-radius: 10px; font-weight: 900; cursor: pointer; margin-top: 10px; }
+        .btn-save { width: 100%; background: var(--blue); color: white; padding: 15px; border: none; border-radius: 10px; font-weight: 900; cursor: pointer; }
         
-        .history-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; font-size: 11px; font-weight: 600; }
-        .summary-box { background: var(--blue); color: white; padding: 15px; border-radius: 12px; margin: 15px; }
+        .finance-box { background: var(--blue); color: white; padding: 15px; border-radius: 15px; margin: 15px; }
+        .history-list { font-size: 11px; background: #fff; color: #333; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid #ddd; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div id="loginGate" style="position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
-    <h2 style="color:white; font-weight:900;">SCHOOL DATA ACCESS</h2>
+    <h2 style="color:white; font-weight:900;">PROGRESSIVE MOTHERS</h2>
     <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; max-width:280px; border:2px solid var(--gold);">
     <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:15px; width:100%; max-width:280px; border:none; border-radius:10px; font-weight:900; margin-top:10px;">LOGIN</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div style="line-height:1.1;"><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span style="font-size:9px;">Nursery & Primary School</span></div>
+        <div style="line-height:1.1;"><b style="font-size:12px;">PROGRESSIVE MOTHER'S</b><br><span style="font-size:9px;">PMS v47.7</span></div>
         <button onclick="location.reload()" style="background:white; color:var(--red); border:none; padding:6px 10px; border-radius:6px; font-weight:900; font-size: 10px;">LOGOUT</button>
     </div>
 
@@ -50,7 +50,7 @@
     </div>
 
     <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Pupils</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Total</span></div>
         <div class="stat-card"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present</span></div>
         <div class="stat-card"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent</span></div>
     </div>
@@ -63,46 +63,49 @@
     </div>
 
     <div id="v-sum" class="hidden">
-        <div class="summary-box">
-            <h4 style="margin:0 0 10px 0; color:var(--gold);">FINANCIAL OVERVIEW</h4>
-            <div style="display:flex; justify-content:space-between;"><span>Total Expected:</span> <b id="s-exp">0</b></div>
-            <div style="display:flex; justify-content:space-between; margin:8px 0;"><span>Total Collected:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
-            <div style="display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.2); padding-top:8px;"><span>Total Debt:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
+        <div class="finance-box">
+            <h4 style="margin:0 0 10px 0; color:var(--gold);">SCHOOL FINANCE TRACKER</h4>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Fees Expected:</span> <b id="s-exp">0</b></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Fees Paid:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
+            <div style="display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.2); padding-top:5px;"><span>Total Debt:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
         </div>
-        <div id="absentAlert" style="padding:15px; font-weight:bold; color:var(--red);"></div>
+        <div id="directorAbsentList" style="padding:15px; background:white; margin:15px; border-radius:10px; border:1px solid #eee;">
+            <b style="color:var(--red); font-size:12px;">ABSENT PUPILS TODAY:</b>
+            <div id="absentNamesDisplay" style="font-size:11px; margin-top:5px; font-weight:600;">None</div>
+        </div>
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search pupil name..." oninput="renderUI()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search pupil..." oninput="renderUI()"></div>
         <div id="dataList"></div>
     </div>
 
     <div id="v-adm" class="hidden" style="padding:15px;">
-        <button onclick="clearForm()" style="width:100%; background:var(--gold); border:none; padding:12px; border-radius:10px; font-weight:900; margin-bottom:15px;">+ RESET FOR NEW REGISTRATION</button>
+        <button onclick="clearForm()" style="width:100%; background:var(--gold); border:none; padding:12px; border-radius:10px; font-weight:900; margin-bottom:15px;">+ NEW REGISTRATION (CLEAR FORM)</button>
         <div style="background:white; padding:15px; border-radius:15px; border:1px solid #ddd;">
-            <h3 id="admTitle" style="margin:0 0 10px 0; font-size:14px; color:var(--blue);">STUDENT PROFILE</h3>
+            <h3 id="admTitle" style="margin:0 0 10px 0; font-size:14px; color:var(--blue);">PUPIL DATA</h3>
             <input type="hidden" id="editId">
             <label>Name</label><input id="name">
-            <label>LIN</label><input id="lin" readonly style="background:#f0f0f0;">
+            <label>LIN</label><input id="lin" readonly style="background:#f4f4f4;">
             <label>Class</label>
             <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Parent Contact</label><input id="contact">
+            <label>Contact</label><input id="contact">
             <hr>
             <label style="color:var(--red)">Total Fees Supposed to be Paid</label><input id="f_exp" type="number">
             
-            <div id="installmentArea" class="hidden" style="background:#f9f9f9; padding:10px; border-radius:10px; margin-top:10px;">
-                <b style="font-size:11px; color:var(--green)">ADD PAYMENT INSTALLMENT:</b>
-                <input id="pay_amt" type="number" placeholder="Amount Paid">
+            <div id="paySection" class="hidden" style="background:#f9f9f9; padding:10px; border-radius:10px; border:1px dashed var(--green);">
+                <b style="font-size:11px; color:var(--green)">RECORD INSTALLMENT:</b>
+                <input id="pay_amt" type="number" placeholder="Amount Paid Now">
                 <input id="pay_date" type="date">
-                <div id="payHistory" style="margin-top:10px; max-height:150px; overflow-y:auto;"></div>
+                <div id="payHistory" class="history-list">No history yet.</div>
             </div>
             
-            <button onclick="submitData()" class="btn-save">SAVE STUDENT DATA</button>
+            <button onclick="submitData()" class="btn-save" style="margin-top:10px;">SAVE / UPDATE RECORD</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
-        <div style="padding:15px;"><select id="rollClass" onchange="renderUI()" style="border:2px solid var(--blue);"><option value="">-- Select Class for Roll Call --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
+        <div style="padding:15px;"><select id="rollClass" onchange="renderUI()" style="border:2px solid var(--blue);"><option value="">-- Choose Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
         <div id="rollData"></div>
     </div>
 </div>
@@ -118,7 +121,7 @@
         if (val === "JESUS CARES") role = "Admin";
         else if (val === "FINANCE 256") role = "Finance";
         else if (val === "TEACH2026") role = "Teacher";
-        else return alert("INVALID KEY");
+        else return alert("ACCESS DENIED");
         document.getElementById('loginGate').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         loadData();
@@ -126,30 +129,29 @@
 
     async function loadData() {
         const { data } = await _client.from('students').select('*').order('name');
-        if(data) { cachedData = data; renderUI(); updateDirectorDash(); }
+        if(data) { cachedData = data; renderUI(); updateFinance(); }
     }
 
-    function updateDirectorDash() {
+    function updateFinance() {
         let tE = 0, tP = 0;
         cachedData.forEach(s => { tE += (s.fees_expected || 0); tP += (s.fees_paid || 0); });
         document.getElementById('s-exp').innerText = "UGX " + tE.toLocaleString();
         document.getElementById('s-paid').innerText = "UGX " + tP.toLocaleString();
         document.getElementById('s-debt').innerText = "UGX " + (tE - tP).toLocaleString();
         
-        const absents = cachedData.filter(s => s.is_absent === true).map(s => s.name);
-        document.getElementById('absentAlert').innerText = absents.length > 0 ? "ABSENT TODAY: " + absents.join(", ") : "All students present.";
+        const absNames = cachedData.filter(s => s.is_absent).map(s => s.name);
+        document.getElementById('absentNamesDisplay').innerText = absNames.length > 0 ? absNames.join(", ") : "All Present";
     }
 
     function renderUI() {
         document.getElementById('c-tot').innerText = cachedData.length;
-        document.getElementById('c-abs').innerText = cachedData.filter(s => s.is_absent === true).length;
-        document.getElementById('c-pres').innerText = cachedData.length - cachedData.filter(s => s.is_absent === true).length;
+        document.getElementById('c-abs').innerText = cachedData.filter(s => s.is_absent).length;
+        document.getElementById('c-pres').innerText = cachedData.length - cachedData.filter(s => s.is_absent).length;
 
         const list = document.getElementById('dataList'); list.innerHTML = "";
         const q = document.getElementById('searchBar').value.toLowerCase();
         cachedData.filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
-            const debt = (s.fees_expected || 0) - (s.fees_paid || 0);
-            list.innerHTML += `<div class="item-card" onclick="editMode('${s.id}')"><b>${s.name}</b><br><small>Paid: ${s.fees_paid.toLocaleString()} | Debt: ${debt.toLocaleString()}</small></div>`;
+            list.innerHTML += `<div class="item-card" onclick="editMode('${s.id}')"><b>${s.name}</b><br><small>Class: ${s.class} | Debt: UGX ${((s.fees_expected||0)-(s.fees_paid||0)).toLocaleString()}</small></div>`;
         });
 
         const rCls = document.getElementById('rollClass').value;
@@ -179,45 +181,44 @@
         document.getElementById('cls').value = s.class;
         document.getElementById('contact').value = s.contact || "";
         document.getElementById('f_exp').value = s.fees_expected || 0;
-        document.getElementById('admTitle').innerText = "EDITING: " + s.name;
-        document.getElementById('installmentArea').classList.remove('hidden');
+        document.getElementById('paySection').classList.remove('hidden');
+        document.getElementById('admTitle').innerText = "UPDATING: " + s.name;
         
-        let histHtml = "";
+        let h = "<b>PAYMENT HISTORY:</b><br>";
         if(s.payment_history) {
-            JSON.parse(s.payment_history).forEach(h => {
-                histHtml += `<div class="history-row"><span>${h.date}</span><span>UGX ${h.amount.toLocaleString()}</span></div>`;
-            });
-        }
-        document.getElementById('payHistory').innerHTML = histHtml;
+            JSON.parse(s.payment_history).forEach(row => { h += `${row.date}: UGX ${row.amount.toLocaleString()}<br>`; });
+        } else { h = "No installments recorded."; }
+        document.getElementById('payHistory').innerHTML = h;
         tab('adm');
     }
 
     function clearForm() {
         document.getElementById('editId').value = "";
         document.getElementById('name').value = "";
-        document.getElementById('lin').value = "PMA-" + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('lin').value = "PMA-" + Math.floor(1000 + Math.random()*9000);
+        document.getElementById('contact').value = "";
         document.getElementById('f_exp').value = 0;
-        document.getElementById('installmentArea').classList.add('hidden');
+        document.getElementById('pay_amt').value = "";
+        document.getElementById('paySection').classList.add('hidden');
         document.getElementById('admTitle').innerText = "NEW REGISTRATION";
+        alert("Form cleared for new entry.");
     }
 
     async function submitData() {
         const id = document.getElementById('editId').value;
         const newAmt = parseInt(document.getElementById('pay_amt').value) || 0;
         const newDate = document.getElementById('pay_date').value;
-        
-        let existingHistory = [];
-        let totalPaid = 0;
+        let hist = []; let total = 0;
 
         if(id) {
             const s = cachedData.find(st => st.id == id);
-            if(s.payment_history) existingHistory = JSON.parse(s.payment_history);
-            totalPaid = s.fees_paid || 0;
+            if(s.payment_history) hist = JSON.parse(s.payment_history);
+            total = s.fees_paid || 0;
         }
 
         if(newAmt > 0 && newDate) {
-            existingHistory.push({ date: newDate, amount: newAmt });
-            totalPaid += newAmt;
+            hist.push({ date: newDate, amount: newAmt });
+            total += newAmt;
         }
 
         const payload = {
@@ -226,12 +227,12 @@
             contact: document.getElementById('contact').value,
             lin: document.getElementById('lin').value,
             fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
-            fees_paid: totalPaid,
-            payment_history: JSON.stringify(existingHistory)
+            fees_paid: total,
+            payment_history: JSON.stringify(hist)
         };
 
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("Data Saved Successfully"); loadData(); tab('rec'); }
+        if(!error) { alert("Successfully Saved!"); loadData(); tab('rec'); }
     }
 
     setInterval(() => {
