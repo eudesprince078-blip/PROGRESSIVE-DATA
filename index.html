@@ -2,41 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Progressive Mothers Master System</title>
+    <title>Eudes Media | Progressive Mothers Management</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #002d5b; --gold: #ffc107; --white: #ffffff; --light: #f1f4f9; --red: #d90429; --green: #2b9348; }
+        :root { --blue: #002d5b; --gold: #ffc107; --white: #ffffff; --light: #f1f4f9; --red: #d90429; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); margin: 0; padding: 0; }
         
         .header { background: var(--blue); color: white; padding: 15px; border-bottom: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .hero { background: #001a33; padding: 15px; text-align: center; color: white; border-bottom: 2px solid var(--gold); }
-        #clock { font-size: 26px; font-weight: 900; color: var(--gold); }
-        #date-display { font-size: 12px; font-weight: bold; opacity: 0.8; }
+        #clock { font-size: 24px; font-weight: 900; color: var(--gold); }
 
         .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 75px; z-index: 999; }
-        .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 11px; font-weight: 900; color: #999; cursor: pointer; }
+        .tab { flex: 1; text-align: center; padding: 15px; font-size: 12px; font-weight: 900; color: #999; cursor: pointer; text-transform: uppercase; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f0f4ff; }
 
         .container { padding: 15px; }
-        .search-bar { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 12px; box-sizing: border-box; }
+        .search-bar { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 12px; box-sizing: border-box; font-size: 14px; }
         
         .pupil-card { background: white; margin-bottom: 12px; padding: 12px; border-radius: 15px; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); position: relative; }
         .pupil-photo { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 2px solid var(--blue); background: #eee; }
         .pupil-info { flex: 1; }
         .pupil-name { font-weight: 900; color: var(--blue); font-size: 13px; text-transform: uppercase; }
+        .pupil-meta { font-size: 11px; color: #555; font-weight: 700; }
         
-        .action-btns { display: flex; gap: 5px; margin-top: 8px; }
-        .btn-sm { padding: 6px 12px; border-radius: 6px; border: none; font-size: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .action-btns { display: flex; gap: 8px; margin-top: 8px; }
+        .btn-sm { padding: 8px 15px; border-radius: 6px; border: none; font-size: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         .btn-edit { background: var(--gold); color: black; }
         .btn-del { background: var(--red); color: white; }
 
-        label { font-weight: 900; font-size: 11px; color: var(--blue); display: block; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
-        .btn-main { background: var(--blue); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; }
-
-        .routine-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 8px; border-left: 5px solid #ccc; display: flex; justify-content: space-between; align-items: center; }
-        .routine-card.active { border-left: 8px solid var(--green); background: #e8f5e9; }
+        .form-box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        label { font-weight: 900; font-size: 11px; color: var(--blue); display: block; margin-bottom: 5px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; font-size: 14px; }
+        .btn-main { background: var(--blue); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; font-size: 14px; }
 
         .hidden { display: none !important; }
     </style>
@@ -45,43 +43,53 @@
 
 <div class="header">
     <div><b>PROGRESSIVE MOTHERS</b><br><span style="font-size:9px; color:var(--gold);">EUDES MEDIA | +256762992440</span></div>
-    <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900; font-size:10px;">REFRESH</button>
+    <button onclick="location.reload()" style="background:rgba(255,255,255,0.2); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900; font-size:10px;">REFRESH</button>
 </div>
 
 <div class="hero">
     <div id="clock">00:00:00</div>
-    <div id="date-display">...</div>
+    <div id="date-display" style="font-size:11px; opacity:0.8; font-weight:bold;"></div>
 </div>
 
 <div class="nav-tabs">
-    <div class="tab active" id="t-rec" onclick="tab('rec')">Pupils</div>
-    <div class="tab" id="t-rou" onclick="tab('rou')">Routine</div>
-    <div class="tab" id="t-adm" onclick="tab('adm')">Admission</div>
+    <div class="tab active" id="t-rec" onclick="tab('rec')">Pupil Ledger</div>
+    <div class="tab" id="t-adm" onclick="tab('adm')">New Admission</div>
 </div>
 
 <div id="v-rec" class="container">
-    <input type="text" id="sb" class="search-bar" placeholder="🔍 Search Pupil..." oninput="render()">
+    <input type="text" id="sb" class="search-bar" placeholder="🔍 Search Pupil by Name..." oninput="render()">
     <div id="list"></div>
 </div>
 
-<div id="v-rou" class="container hidden">
-    <div id="routine-list"></div>
-</div>
-
 <div id="v-adm" class="container hidden">
-    <div style="background:white; padding:20px; border-radius:15px;">
+    <div class="form-box">
+        <h3 id="form-title" style="margin-top:0; color:var(--blue);">New Pupil Registration</h3>
         <input type="hidden" id="edit-id">
-        <label>Full Name</label><input id="name">
-        <label>Age</label><input id="age" type="number">
-        <label>Physical Location</label><input id="loc">
-        <label>Health Status</label><input id="health">
-        <label>Class</label>
-        <select id="cls">
-            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-            <option>P.5</option><option>P.6</option><option>P.7</option>
-        </select>
-        <label>Student Photo</label><input type="file" id="photoFile" accept="image/*">
-        <button class="btn-main" id="saveBtn" onclick="saveData()">SAVE STUDENT</button>
+        
+        <label>Full Name</label>
+        <input id="name" placeholder="Enter Pupil's Name">
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div><label>Age</label><input id="age" type="number"></div>
+            <div><label>Class</label>
+                <select id="cls">
+                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                    <option>P.5</option><option>P.6</option><option>P.7</option>
+                </select>
+            </div>
+        </div>
+
+        <label>Physical Location</label>
+        <input id="loc" placeholder="Village / Residence">
+        
+        <label>Health Status</label>
+        <input id="health" placeholder="e.g. Normal, Asthma, etc.">
+        
+        <label>Update Photo (Optional)</label>
+        <input type="file" id="photoFile" accept="image/*">
+        
+        <button class="btn-main" id="saveBtn" onclick="saveData()">SAVE PUPIL RECORD</button>
+        <button id="cancelBtn" class="hidden" onclick="resetForm()" style="background:none; border:none; color:var(--red); width:100%; margin-top:10px; font-weight:bold; cursor:pointer;">Cancel Edit</button>
     </div>
 </div>
 
@@ -89,80 +97,73 @@
     const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
-    let data = [];
-
-    const schedule = [
-        { start: "07:00", end: "08:00", task: "Arrival & Cleaning" },
-        { start: "08:00", end: "08:30", task: "Morning Assembly" },
-        { start: "08:30", end: "10:30", task: "Morning Lessons" },
-        { start: "10:30", end: "11:00", task: "Break Time" },
-        { start: "11:00", end: "13:00", task: "Mid-Day Lessons" },
-        { start: "13:00", end: "14:00", task: "Lunch Break" },
-        { start: "14:00", end: "16:30", task: "Afternoon Lessons" },
-        { start: "16:30", end: "17:00", task: "Departure" }
-    ];
+    const BUCKET = 'student-photos'; 
+    let cachedData = [];
 
     function init() {
         setInterval(() => {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
             document.getElementById('date-display').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-            updateRoutineUI();
         }, 1000);
         load();
     }
 
-    function updateRoutineUI() {
-        const container = document.getElementById('routine-list');
-        const now = new Date();
-        const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-        container.innerHTML = "";
-        schedule.forEach(item => {
-            const isActive = currentTime >= item.start && currentTime < item.end;
-            container.innerHTML += `<div class="routine-card ${isActive ? 'active' : ''}"><div><b>${item.start}</b></div><div>${item.task}</div></div>`;
-        });
-    }
-
     async function load() {
         const { data: pupils } = await _client.from('students').select('*').order('name');
-        if(pupils) { data = pupils; render(); }
+        if(pupils) { cachedData = pupils; render(); }
     }
 
     function render() {
         const container = document.getElementById('list');
         const query = document.getElementById('sb').value.toLowerCase();
         container.innerHTML = "";
-        data.filter(s => s.name.toLowerCase().includes(query)).forEach(s => {
-            const photo = s['photo-url'] || s['photo_url'] || 'https://via.placeholder.com/65';
+        
+        cachedData.filter(s => s.name.toLowerCase().includes(query)).forEach(s => {
+            const photo = s['photo-url'] || s['photo_url'] || 'https://via.placeholder.com/65?text=No+Img';
             container.innerHTML += `
                 <div class="pupil-card">
-                    <img src="${photo}" class="pupil-photo">
+                    <img src="${photo}" class="pupil-photo" onerror="this.src='https://via.placeholder.com/65?text=Error'">
                     <div class="pupil-info">
                         <div class="pupil-name">${s.name}</div>
-                        <div class="pupil-meta">CLASS: ${s.class} | LIN: ${s.lin || '---'}</div>
+                        <div class="pupil-meta">CLASS: ${s.class} | LIN: ${s.lin || 'N/A'}</div>
                         <div class="action-btns">
-                            <button class="btn-sm btn-edit" onclick="editStudent('${s.id}')">Edit</button>
-                            <button class="btn-sm btn-del" onclick="deleteStudent('${s.id}', '${s.name}')">Delete</button>
+                            <button class="btn-sm btn-edit" onclick="editMode('${s.id}')">Edit</button>
+                            <button class="btn-sm btn-del" onclick="deletePupil('${s.id}', '${s.name}')">Delete</button>
                         </div>
                     </div>
                 </div>`;
         });
     }
 
-    function editStudent(id) {
-        const s = data.find(x => x.id == id);
+    function editMode(id) {
+        const s = cachedData.find(x => x.id == id);
         document.getElementById('edit-id').value = s.id;
         document.getElementById('name').value = s.name;
-        document.getElementById('age').value = s.age;
+        document.getElementById('age').value = s.age || '';
         document.getElementById('loc').value = s.location || '';
         document.getElementById('health').value = s.health_status || '';
         document.getElementById('cls').value = s.class;
+        
+        document.getElementById('form-title').innerText = "Edit Pupil Details";
+        document.getElementById('saveBtn').innerText = "UPDATE RECORD";
+        document.getElementById('cancelBtn').classList.remove('hidden');
         tab('adm');
-        document.getElementById('saveBtn').innerText = "UPDATE STUDENT DETAILS";
     }
 
-    async function deleteStudent(id, name) {
-        if(confirm("Are you sure you want to delete " + name + "?")) {
+    function resetForm() {
+        document.getElementById('edit-id').value = "";
+        document.getElementById('name').value = "";
+        document.getElementById('age').value = "";
+        document.getElementById('loc').value = "";
+        document.getElementById('health').value = "";
+        document.getElementById('form-title').innerText = "New Pupil Registration";
+        document.getElementById('saveBtn').innerText = "SAVE PUPIL RECORD";
+        document.getElementById('cancelBtn').classList.add('hidden');
+    }
+
+    async function deletePupil(id, name) {
+        if(confirm("Delete record for " + name + "? This cannot be undone.")) {
             await _client.from('students').delete().eq('id', id);
             location.reload();
         }
@@ -172,13 +173,15 @@
         const btn = document.getElementById('saveBtn');
         const editId = document.getElementById('edit-id').value;
         const file = document.getElementById('photoFile').files[0];
+        
         btn.disabled = true;
+        btn.innerText = "SAVING TO CLOUD...";
         
         let url = null;
         if(file) {
             const fName = `p_${Date.now()}.jpg`;
-            const { data: up } = await _client.storage.from('student-photos').upload(fName, file);
-            if(up) url = `${SUPA_URL}/storage/v1/object/public/student-photos/${fName}`;
+            const { data: up } = await _client.storage.from(BUCKET).upload(fName, file);
+            if(up) url = `${SUPA_URL}/storage/v1/object/public/${BUCKET}/${fName}`;
         }
 
         const payload = {
@@ -188,14 +191,23 @@
             health_status: document.getElementById('health').value,
             class: document.getElementById('cls').value
         };
-        if(url) payload['photo-url'] = url;
+        if(url) { payload['photo-url'] = url; payload['photo_url'] = url; }
 
+        let response;
         if(editId) {
-            await _client.from('students').update(payload).eq('id', editId);
+            response = await _client.from('students').update(payload).eq('id', editId);
         } else {
-            await _client.from('students').insert([payload]);
+            response = await _client.from('students').insert([payload]);
         }
-        location.reload();
+
+        if(!response.error) {
+            alert("Success!");
+            location.reload();
+        } else {
+            alert("Error: " + response.error.message);
+            btn.disabled = false;
+            btn.innerText = "RETRY SAVE";
+        }
     }
 
     function tab(t) {
@@ -203,6 +215,7 @@
         document.getElementById('v-'+t).classList.remove('hidden');
         document.querySelectorAll('.tab').forEach(tb => tb.classList.remove('active'));
         document.getElementById('t-'+t).classList.add('active');
+        if(t === 'adm' && !document.getElementById('edit-id').value) resetForm();
     }
 
     init();
