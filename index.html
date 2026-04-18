@@ -3,311 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESMS Ultra | Eudes Media</title>
+    <title>ESMS Pro Hub | Eudes Media</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0047AB;
-            --sidebar-bg: #0f172a;
-            --main-bg: #f8fafc;
-            --white: #ffffff;
-            --card-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            --primary: #0047AB; --sidebar: #0f172a; --bg: #f8fafc;
+            --admin-gold: #fbbf24; --teacher-green: #10b981; --finance-blue: #3b82f6;
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--main-bg);
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            color: #1e293b;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
         /* --- SIDEBAR --- */
-        .sidebar {
-            width: 280px;
-            background: var(--sidebar-bg);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            padding: 40px 25px;
-            box-sizing: border-box;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+        .sidebar { width: 280px; background: var(--sidebar); color: white; padding: 40px 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .brand { font-weight: 800; font-size: 1.4rem; margin-bottom: 40px; border-left: 4px solid var(--primary); padding-left: 15px; }
+        
+        .nav-group { margin-bottom: 30px; display: none; } 
+        .nav-label { font-size: 0.7rem; color: #475569; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        
+        .nav-item { 
+            padding: 12px 15px; border-radius: 10px; cursor: pointer; color: #94a3b8; 
+            margin-bottom: 5px; transition: 0.3s; font-weight: 600;
         }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: var(--primary) !important; }
 
-        .brand {
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--white);
-            margin-bottom: 50px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        /* --- MAIN AREA --- */
+        .main { flex-grow: 1; padding: 40px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+        
+        #live-clock { font-size: 2.2rem; font-weight: 800; margin: 0; color: var(--sidebar); letter-spacing: -1px; }
+        #live-date { color: #64748b; font-weight: 600; margin: 0; }
 
-        .brand span { color: var(--primary); }
+        .role-badge { padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; color: white; margin-top: 10px; display: inline-block; }
 
-        .nav-link {
-            padding: 14px 18px;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-bottom: 8px;
-            color: #94a3b8;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            font-weight: 600;
-        }
+        .panel { display: none; background: white; padding: 35px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .visible { display: block; }
 
-        .nav-link:hover, .nav-link.active {
-            background: rgba(255,255,255,0.05);
-            color: white;
-        }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
+        .stat-card b { font-size: 2rem; color: var(--sidebar); display: block; }
 
-        .nav-link.active {
-            background: var(--primary);
-            box-shadow: 0 4px 15px rgba(0, 71, 171, 0.4);
-        }
-
-        /* --- MAIN CONTENT --- */
-        .main {
-            flex-grow: 1;
-            padding: 40px;
-            overflow-y: auto;
-            box-sizing: border-box;
-        }
-
-        /* --- TOP HEADER & CLOCK --- */
-        .header-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 40px;
-        }
-
-        #live-clock {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin: 0;
-            color: var(--sidebar-bg);
-            letter-spacing: -1px;
-        }
-
-        #live-date {
-            color: #64748b;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        /* --- DASHBOARD CARDS --- */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: var(--white);
-            padding: 30px;
-            border-radius: 24px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(255,255,255,0.7);
-        }
-
-        .stat-card small { color: #64748b; font-weight: 600; font-size: 0.85rem; }
-        .stat-card h2 { margin: 10px 0 0; font-size: 2.5rem; font-weight: 800; color: var(--sidebar-bg); }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 2fr;
-            gap: 30px;
-        }
-
-        .panel {
-            background: var(--white);
-            padding: 35px;
-            border-radius: 24px;
-            box-shadow: var(--card-shadow);
-        }
-
-        /* --- FORM & TABLES --- */
-        h3 { margin-top: 0; font-size: 1.3rem; margin-bottom: 25px; }
-
-        input {
-            width: 100%;
-            padding: 15px;
-            background: #f1f5f9;
-            border: 2px solid transparent;
-            border-radius: 14px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            font-family: inherit;
-            transition: 0.2s;
-        }
-
-        input:focus { border-color: var(--primary); outline: none; background: white; }
-
-        .btn-main {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 16px;
-            width: 100%;
-            border-radius: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 71, 171, 0.2);
-        }
+        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; margin-bottom: 15px; font-family: inherit; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; padding: 15px; }
-        td { padding: 18px 15px; border-bottom: 1px solid #f1f5f9; font-weight: 500; }
-        
-        .badge {
-            background: #ecfdf5;
-            color: #059669;
-            padding: 6px 14px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-
+        th { text-align: left; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; padding: 15px; border-bottom: 1px solid #f1f5f9; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-weight: 500; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="brand">EUDES<span>MEDIA</span></div>
-        <div class="nav-menu">
-            <div class="nav-link active">🏠 Dashboard</div>
-            <div class="nav-link">🎓 Students</div>
-            <div class="nav-link">📑 Mark Sheets</div>
-            <div class="nav-link">⚙️ System Config</div>
-        </div>
-        <div style="margin-top: auto; padding-top: 20px;">
-            <button onclick="location.reload()" style="background:rgba(255,255,255,0.1); border:none; color:white; width:100%; padding:12px; border-radius:10px; cursor:pointer;">Logout</button>
-        </div>
-    </div>
-
-    <div class="main">
-        <header class="header-bar">
-            <div>
-                <p id="live-date">---</p>
-                <h1 id="live-clock">00:00:00</h1>
-            </div>
-            <div style="text-align: right;">
-                <h2 id="school-name" style="margin:0; font-size: 1.5rem;">---</h2>
-                <p id="school-motto" style="margin:0; color:#64748b;">---</p>
-            </div>
-        </header>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <small>ENROLLED PUPILS</small>
-                <h2 id="pupil-count">0</h2>
-            </div>
-            <div class="stat-card">
-                <small>LICENSE STATUS</small>
-                <h2 style="color: #10b981; font-size: 1.6rem;">PREMIUM ACTIVE</h2>
-            </div>
-            <div class="stat-card">
-                <small>SYSTEM ID</small>
-                <h2 id="sys-id" style="font-size: 1.2rem; color: #94a3b8;">---</h2>
-            </div>
+    <aside class="sidebar" id="mainSidebar">
+        <div class="brand">EUDES MEDIA</div>
+        
+        <div id="admin-nav" class="nav-group">
+            <span class="nav-label">Administration</span>
+            <div class="nav-item active" onclick="showSection('admin-panel')">🏢 Dashboard</div>
+            <div class="nav-item">👥 Staff List</div>
         </div>
 
-        <div class="content-grid">
-            <div class="panel">
-                <h3>Quick Admission</h3>
-                <input type="text" id="pName" placeholder="Full Name">
-                <input type="text" id="pLoc" placeholder="Physical Location">
-                <button class="btn-main" onclick="register()">Add Student</button>
+        <div id="teacher-nav" class="nav-group">
+            <span class="nav-label">Academic Portal</span>
+            <div class="nav-item active" onclick="showSection('teacher-panel')">✍️ Mark Sheets</div>
+            <div class="nav-item">📅 Attendance</div>
+        </div>
+
+        <div id="finance-nav" class="nav-group">
+            <span class="nav-label">Bursar Office</span>
+            <div class="nav-item active" onclick="showSection('finance-panel')">💰 Fees Desk</div>
+            <div class="nav-item">📜 Reports</div>
+        </div>
+
+        <button onclick="location.reload()" style="margin-top:auto; background:#ef4444; border:none; color:white; padding:12px; border-radius:10px; font-weight:700; cursor:pointer;">Logout</button>
+    </aside>
+
+    <main class="main">
+        <div id="login-screen" style="max-width: 400px; margin: 80px auto;" class="panel visible">
+            <h2 style="text-align: center; margin-bottom: 30px;">School Authority Hub</h2>
+            <label style="font-size: 0.8rem; font-weight: 700;">SCHOOL ID</label>
+            <input type="number" id="loginID" placeholder="Enter ID (1)">
+            <label style="font-size: 0.8rem; font-weight: 700;">ACCESS KEY</label>
+            <input type="password" id="loginKey" placeholder="Enter Key">
+            <label style="font-size: 0.8rem; font-weight: 700;">SELECT ROLE</label>
+            <select id="loginRole">
+                <option value="Admin">Headteacher / Admin</option>
+                <option value="Teacher">Teacher / Academic</option>
+                <option value="Finance">Bursar / Finance</option>
+            </select>
+            <button class="btn-main" onclick="handleLogin()">Sign In to Dashboard</button>
+        </div>
+
+        <div id="dashboard-area" style="display: none;">
+            <header class="header">
+                <div>
+                    <p id="live-date"></p>
+                    <h1 id="live-clock">00:00:00</h1>
+                    <div id="role-tag" class="role-badge">---</div>
+                </div>
+                <div style="text-align: right;">
+                    <h2 id="sName" style="margin:0; font-size: 1.6rem;">---</h2>
+                    <p id="sMotto" style="margin:0; color:#64748b; font-size: 0.9rem; font-weight: 600;"></p>
+                </div>
+            </header>
+
+            <div class="stat-grid">
+                <div class="stat-card"><small>TOTAL PUPILS</small><b id="count">0</b></div>
+                <div class="stat-card"><small>COLLECTED FEES</small><b>UGX 0</b></div>
+                <div class="stat-card"><small>TERM STATUS</small><b style="color: #10b981; font-size: 1.4rem;">TERM 1 ACTIVE</b></div>
             </div>
 
-            <div class="panel">
-                <h3>Recent Activity</h3>
-                <table>
-                    <thead>
-                        <tr><th>Student Name</th><th>Location</th><th>Status</th></tr>
-                    </thead>
-                    <tbody id="student-list">
-                        <tr><td colspan="3" style="text-align:center; padding:30px;">Loading Data...</td></tr>
-                    </tbody>
+            <div id="admin-panel" class="panel">
+                <h3 style="margin-top:0">Quick Enrollment</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <input type="text" id="pName" placeholder="Full Name">
+                    <input type="text" id="pLoc" placeholder="Location">
+                </div>
+                <button class="btn-main" onclick="addStudent()">Register Student</button>
+            </div>
+
+            <div id="teacher-panel" class="panel">
+                <h3 style="margin-top:0">Assessment Mark Sheet</h3>
+                <table style="width:100%;">
+                    <thead><tr><th>Name</th><th>English</th><th>Math</th><th>SST</th><th>Sci</th></tr></thead>
+                    <tbody id="markList"></tbody>
                 </table>
             </div>
+
+            <div id="finance-panel" class="panel">
+                <h3 style="margin-top:0">Bursar Desk</h3>
+                <input type="text" placeholder="Search pupil to record payment...">
+            </div>
         </div>
-    </div>
+    </main>
 
     <script>
         const SUPABASE_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const SUPABASE_KEY = 'YOUR_ANON_KEY';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // This ID is used for Progressive Mothers
-        const activeSchoolID = "EUDES-PM-2026";
+        let currentRole = "";
+        let currentSchool = "";
 
-        // LIVE CLOCK FUNCTION
-        function updateClock() {
+        // LIVE CLOCK
+        setInterval(() => {
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
-            const dateStr = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-            
-            document.getElementById('live-clock').innerText = timeStr;
-            document.getElementById('live-date').innerText = dateStr;
+            document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-GB');
+            document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        }, 1000);
+
+        async function handleLogin() {
+            const id = parseInt(document.getElementById('loginID').value);
+            const key = document.getElementById('loginKey').value;
+            currentRole = document.getElementById('loginRole').value;
+
+            // Query using numeric ID
+            const { data: school } = await _supabase.from('schools').select('*').eq('id', id).eq('access_key', key).single();
+
+            if (school) {
+                currentSchool = id;
+                document.getElementById('login-screen').classList.remove('visible');
+                document.getElementById('dashboard-area').style.display = 'block';
+                setupUI(school);
+                loadDashboardData();
+            } else { alert("Invalid Credentials"); }
         }
-        setInterval(updateClock, 1000);
-        updateClock();
 
-        // LOAD DASHBOARD DATA
-        async function loadData() {
-            // Get School Info
-            const { data: school } = await _supabase.from('schools').select('*').eq('school_id', activeSchoolID).single();
-            if(school) {
-                document.getElementById('school-name').innerText = school.school_name;
-                document.getElementById('school-motto').innerText = school.motto;
-                document.getElementById('sys-id').innerText = school.school_id;
-            }
+        function setupUI(school) {
+            document.getElementById('sName').innerText = school.school_name;
+            document.getElementById('sMotto').innerText = school.motto;
+            const tag = document.getElementById('role-tag');
+            tag.innerText = currentRole.toUpperCase();
 
-            // Get Students
-            const { count, data: students } = await _supabase.from('students').select('*', {count: 'exact'}).eq('school_id', activeSchoolID);
-            document.getElementById('pupil-count').innerText = count || 0;
-
-            const tbody = document.getElementById('student-list');
-            if(students && students.length > 0) {
-                tbody.innerHTML = students.slice(-5).reverse().map(s => `
-                    <tr>
-                        <td style="font-weight:700;">${s.name}</td>
-                        <td style="color:#64748b;">${s.location || 'N/A'}</td>
-                        <td><span class="badge">ACTIVE</span></td>
-                    </tr>
-                `).join('');
+            document.querySelectorAll('.nav-group').forEach(n => n.style.display = 'none');
+            if(currentRole === 'Admin') {
+                tag.style.background = 'var(--admin-gold)';
+                document.getElementById('admin-nav').style.display = 'block';
+                showSection('admin-panel');
+            } else if(currentRole === 'Teacher') {
+                tag.style.background = 'var(--teacher-green)';
+                document.getElementById('teacher-nav').style.display = 'block';
+                showSection('teacher-panel');
             } else {
-                tbody.innerHTML = "<tr><td colspan='3' style='text-align:center'>No students yet.</td></tr>";
+                tag.style.background = 'var(--finance-blue)';
+                document.getElementById('finance-nav').style.display = 'block';
+                showSection('finance-panel');
             }
         }
 
-        async function register() {
+        function showSection(id) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('visible'));
+            document.getElementById(id).classList.add('visible');
+        }
+
+        async function loadDashboardData() {
+            const { count, data: students } = await _supabase.from('students').select('*', {count:'exact'}).eq('school_id', currentSchool);
+            document.getElementById('count').innerText = count || 0;
+            
+            if(students) {
+                document.getElementById('markList').innerHTML = students.map(s => `<tr><td>${s.name}</td><td><input type="number" style="width:50px; margin:0;"></td><td><input type="number" style="width:50px; margin:0;"></td><td><input type="number" style="width:50px; margin:0;"></td><td><input type="number" style="width:50px; margin:0;"></td></tr>`).join('');
+            }
+        }
+
+        async function addStudent() {
             const name = document.getElementById('pName').value;
-            const loc = document.getElementById('pLoc').value;
-            if(!name) return alert("Enter Student Name");
-
-            const { error } = await _supabase.from('students').insert([{
-                name: name,
-                location: loc,
-                school_id: activeSchoolID
-            }]);
-
-            if(!error) {
-                document.getElementById('pName').value = '';
-                document.getElementById('pLoc').value = '';
-                loadData();
-            }
+            if(!name) return;
+            await _supabase.from('students').insert([{ name, location: document.getElementById('pLoc').value, school_id: currentSchool }]);
+            loadDashboardData();
         }
-
-        loadData();
     </script>
 </body>
 </html>
