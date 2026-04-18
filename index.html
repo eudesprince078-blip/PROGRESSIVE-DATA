@@ -9,39 +9,20 @@
     <style>
         :root { --primary: #0047AB; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; }
         * { box-sizing: border-box; text-transform: uppercase; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; }
-
-        /* HEADER & TABS */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
         .top-nav { background: var(--danger); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; }
         .tab-bar { background: white; display: flex; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 1000; }
-        .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.7rem; font-weight: 800; color: #64748b; cursor: pointer; }
+        .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.65rem; font-weight: 800; color: #64748b; cursor: pointer; }
         .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: #f8fafc; }
-
-        /* STATS */
-        .hero { background: var(--dark); color: white; padding: 30px 20px; text-align: center; }
-        #live-clock { font-size: 2.5rem; font-weight: 800; margin: 0; }
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -25px; }
-        .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        .stat-card b { display: block; font-size: 1.4rem; }
-
-        /* FORMS */
         .container { padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
         label { display: block; font-size: 0.6rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
         input, select { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; }
-        
-        /* BUTTONS */
-        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; }
-        .btn-save { background: var(--primary); width: 100%; font-size: 1rem; margin-top: 15px; }
-        .btn-edit { background: var(--primary); font-size: 0.6rem; padding: 6px 10px; }
-        .btn-del { background: var(--danger); font-size: 0.6rem; padding: 6px 10px; }
-        
-        /* TABLE */
-        .table-wrap { overflow-x: auto; background: white; border-radius: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th { background: #f8fafc; padding: 12px; text-align: left; font-size: 0.65rem; color: #94a3b8; }
-        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; font-weight: 700; }
+        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; width: 100%; }
+        .btn-edit { background: var(--primary); font-size: 0.6rem; width: auto; padding: 6px 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        td, th { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -53,22 +34,15 @@
 
     <div class="tab-bar">
         <div class="tab active" id="tab-dash" onclick="showTab('dash')">DASHBOARD</div>
-        <div class="tab" id="tab-admission" onclick="showTab('admission')">ADMISSION</div>
+        <div class="tab" id="tab-adm" onclick="showTab('admission')">ADMISSION</div>
     </div>
 
-    <div id="dash" class="tab-content">
-        <div class="hero"><h1 id="live-clock">00:00:00</h1></div>
-        <div class="stat-grid">
-            <div class="stat-card"><b><span id="countT">0</span></b><span>PUPILS</span></div>
-            <div class="stat-card"><b style="color:var(--success);"><span id="countP">0</span></b><span>CLEARED</span></div>
-            <div class="stat-card"><b style="color:var(--danger);"><span id="countB">0</span></b><span>OWING</span></div>
-        </div>
-        <div class="container">
-            <div class="card"><input type="text" id="searchBox" placeholder="SEARCH BY NAME OR LIN..." onkeyup="doSearch()"></div>
-            <div class="table-wrap card">
+    <div id="dash" class="tab-content container">
+        <div class="card">
+            <div style="overflow-x:auto;">
                 <table>
                     <thead>
-                        <tr><th>LIN</th><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>EXPECTED</th><th>PAID</th><th>STATUS</th><th>ACTION</th></tr>
+                        <tr><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>EXPECTED</th><th>STATUS</th><th>ACTION</th></tr>
                     </thead>
                     <tbody id="dashBody"></tbody>
                 </table>
@@ -78,25 +52,22 @@
 
     <div id="admission" class="tab-content container" style="display:none;">
         <div class="card">
-            <h2 id="formTitle" style="color:var(--primary); margin-top:0;">NEW ENROLLMENT</h2>
+            <h3 id="formTitle">NEW ENROLLMENT</h3>
             <div class="form-grid">
                 <div><label>FULL NAME</label><input type="text" id="inName"></div>
                 <div><label>CLASS</label><input type="text" id="inClass"></div>
-                <div><label>CONTACT (PARENT)</label><input type="text" id="inContact"></div>
+                <div><label>CONTACT</label><input type="text" id="inContact"></div>
                 <div><label>FEES EXPECTED</label><input type="number" id="inExp"></div>
                 <div><label>FEES PAID</label><input type="number" id="inPaid"></div>
                 <div>
-                    <label>FEES STATUS</label>
+                    <label>STATUS</label>
                     <select id="inStatus">
                         <option value="OWING">OWING</option>
                         <option value="CLEARED">CLEARED</option>
-                        <option value="PARTIAL">PARTIAL</option>
                     </select>
                 </div>
-                <div><label>HEALTH STATUS</label><input type="text" id="inHealth" placeholder="NORMAL"></div>
             </div>
-            <button class="btn btn-save" id="saveBtn" onclick="handleDatabaseSave()">SAVE RECORD</button>
-            <button class="btn" style="background:#64748b; width:100%; margin-top:10px; display:none;" id="cancelBtn" onclick="resetAdmission()">CANCEL EDIT</button>
+            <button class="btn" style="background:var(--primary); margin-top:15px;" id="saveBtn" onclick="processSave()">SAVE RECORD</button>
         </div>
     </div>
 
@@ -106,125 +77,81 @@
         const client = supabase.createClient(_URL, _KEY);
         
         let allStudents = [];
-        let globalEditId = null;
-
-        setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
+        let currentEditId = null;
 
         function showTab(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.style.display='none');
             document.querySelectorAll('.tab').forEach(c => c.classList.remove('active'));
             document.getElementById(t).style.display='block';
-            document.getElementById('tab-' + t).classList.add('active');
-            if(t === 'dash') fetchAll();
+            document.getElementById(t === 'dash' ? 'tab-dash' : 'tab-adm').classList.add('active');
+            if(t === 'dash') fetch();
         }
 
-        async function fetchAll() {
+        async function fetch() {
             const { data } = await client.from('students').select('*').order('name');
             allStudents = data || [];
-            renderDash();
-        }
-
-        function renderDash() {
-            let p = 0, b = 0;
             const body = document.getElementById('dashBody');
-            body.innerHTML = "";
-            allStudents.forEach(s => {
-                const status = s.fees_status || 'OWING';
-                if(status === 'CLEARED') p++; else b++;
-                
-                const row = `<tr>
-                    <td>${s.lin || '---'}</td>
-                    <td style="color:var(--primary)">${s.name}</td>
+            body.innerHTML = allStudents.map(s => `
+                <tr>
+                    <td>${s.name}</td>
                     <td>${s.class}</td>
                     <td>${s.contact || '--'}</td>
-                    <td>${(s.fees_expected || 0).toLocaleString()}</td>
-                    <td>${(s.fees_paid || 0).toLocaleString()}</td>
-                    <td style="color:${status === 'CLEARED' ? 'green' : 'red'}">${status}</td>
-                    <td>
-                        <button class="btn btn-edit" onclick="triggerEditMode('${s.id}')">EDIT</button>
-                        <button class="btn btn-del" onclick="triggerDelete('${s.id}')">DEL</button>
-                    </td>
-                </tr>`;
-                body.innerHTML += row;
-            });
-            document.getElementById('countT').innerText = allStudents.length;
-            document.getElementById('countP').innerText = p;
-            document.getElementById('countB').innerText = b;
+                    <td>${s.fees_expected || 0}</td>
+                    <td>${s.fees_status || 'OWING'}</td>
+                    <td><button class="btn btn-edit" onclick="editMode('${s.id}')">EDIT</button></td>
+                </tr>
+            `).join('');
         }
 
-        function triggerEditMode(id) {
-            const s = allStudents.find(x => x.id === id);
-            if(!s) return alert("STUDENT NOT FOUND");
+        function editMode(id) {
+            const s = allStudents.find(x => x.id == id);
+            if(!s) return alert("CANNOT FIND STUDENT ID: " + id);
 
-            globalEditId = id;
+            currentEditId = id;
             document.getElementById('inName').value = s.name || "";
             document.getElementById('inClass').value = s.class || "";
-            document.getElementById('inContact').value = s.contact || ""; 
+            document.getElementById('inContact').value = s.contact || "";
             document.getElementById('inExp').value = s.fees_expected || "";
             document.getElementById('inPaid').value = s.fees_paid || "";
             document.getElementById('inStatus').value = s.fees_status || "OWING";
-            document.getElementById('inHealth').value = s.health_status || "";
             
-            document.getElementById('formTitle').innerText = "EDITING RECORD";
-            document.getElementById('saveBtn').innerText = "UPDATE STUDENT NOW";
-            document.getElementById('cancelBtn').style.display = "block";
-            
+            document.getElementById('formTitle').innerText = "EDITING: " + s.name;
+            document.getElementById('saveBtn').innerText = "UPDATE NOW";
             showTab('admission');
         }
 
-        async function handleDatabaseSave() {
+        async function processSave() {
             const btn = document.getElementById('saveBtn');
-            btn.disabled = true; btn.innerText = "SAVING...";
-
-            const payload = {
+            btn.innerText = "WAIT...";
+            
+            const row = {
                 name: document.getElementById('inName').value,
                 class: document.getElementById('inClass').value,
                 contact: document.getElementById('inContact').value,
                 fees_expected: document.getElementById('inExp').value,
                 fees_paid: document.getElementById('inPaid').value,
-                fees_status: document.getElementById('inStatus').value,
-                health_status: document.getElementById('inHealth').value
+                fees_status: document.getElementById('inStatus').value
             };
 
             let res;
-            if(globalEditId) {
-                res = await client.from('students').update(payload).eq('id', globalEditId);
+            if(currentEditId) {
+                res = await client.from('students').update(row).eq('id', currentEditId);
             } else {
-                res = await client.from('students').insert([payload]);
+                res = await client.from('students').insert([row]);
             }
 
             if(!res.error) {
                 alert("SUCCESS");
-                resetAdmission();
+                currentEditId = null;
+                document.getElementById('formTitle').innerText = "NEW ENROLLMENT";
+                document.getElementById('saveBtn').innerText = "SAVE RECORD";
                 showTab('dash');
             } else {
-                alert("DB ERROR: " + res.error.message);
-            }
-            btn.disabled = false; btn.innerText = "SAVE RECORD";
-        }
-
-        async function triggerDelete(id) {
-            if(confirm("DELETE PERMANENTLY?")) {
-                await client.from('students').delete().eq('id', id);
-                fetchAll();
+                alert("ERROR: " + res.error.message);
             }
         }
 
-        function resetAdmission() {
-            globalEditId = null;
-            document.querySelectorAll('#admission input').forEach(i => i.value = "");
-            document.getElementById('formTitle').innerText = "NEW ENROLLMENT";
-            document.getElementById('saveBtn').innerText = "SAVE RECORD";
-            document.getElementById('cancelBtn').style.display = "none";
-        }
-
-        function doSearch() {
-            let f = document.getElementById('searchBox').value.toUpperCase();
-            let rows = document.getElementById('dashBody').getElementsByTagName('tr');
-            for(let row of rows) row.style.display = row.innerText.toUpperCase().includes(f) ? "" : "none";
-        }
-
-        fetchAll();
+        fetch();
     </script>
 </body>
 </html>
