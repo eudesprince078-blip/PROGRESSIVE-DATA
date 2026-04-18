@@ -7,60 +7,31 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #0047AB; /* Eudes Media Blue */
-            --sidebar: #0f172a; 
-            --bg: #f1f5f9; 
-            --white: #ffffff;
-        }
-
+        :root { --primary: #0047AB; --sidebar: #0f172a; --bg: #f1f5f9; --white: #ffffff; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; color: #1e293b; overflow-x: hidden; }
 
-        /* --- NAVIGATION --- */
-        .mobile-nav {
-            display: none; background: var(--white); padding: 12px 20px;
-            justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 1001;
-        }
+        /* --- MOBILE NAV --- */
+        .mobile-nav { display: none; background: var(--white); padding: 12px 20px; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 1001; }
 
-        .sidebar { 
-            width: 280px; background: var(--sidebar); color: white; padding: 40px 20px; 
-            display: flex; flex-direction: column; height: 100vh; position: fixed;
-            left: 0; top: 0; transition: transform 0.3s ease; z-index: 1000;
-        }
-
+        /* --- SIDEBAR --- */
+        .sidebar { width: 280px; background: var(--sidebar); color: white; padding: 40px 20px; display: flex; flex-direction: column; height: 100vh; position: fixed; left: 0; top: 0; transition: 0.3s ease; z-index: 1000; }
         .brand { font-weight: 800; font-size: 1.4rem; margin-bottom: 40px; border-left: 4px solid var(--primary); padding-left: 15px; }
         .nav-group { margin-bottom: 25px; display: none; } 
         .nav-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
         .nav-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; color: #94a3b8; margin-bottom: 5px; font-weight: 600; }
         .nav-item.active { background: var(--primary); color: white; }
 
-        /* --- MAIN AREA --- */
+        /* --- MAIN CONTENT --- */
         .main { margin-left: 280px; padding: 40px 30px; transition: 0.3s; min-height: 100vh; }
-
-        .login-card { 
-            max-width: 420px; margin: 40px auto; background: var(--white); 
-            padding: 35px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
-        }
-
+        .login-card { max-width: 420px; margin: 40px auto; background: var(--white); padding: 35px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .panel { display: none; background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .visible { display: block; }
 
-        /* --- INPUTS & BUTTONS --- */
-        input, select { 
-            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; 
-            margin-bottom: 15px; font-size: 1rem; font-family: inherit;
-        }
-        input:focus { border-color: var(--primary); outline: none; background: #fff; }
-        
-        .btn-primary { 
-            background: var(--primary); color: white; border: none; padding: 16px; 
-            width: 100%; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; 
-        }
-        .btn-primary:active { transform: scale(0.98); }
+        /* --- INPUTS --- */
+        input, select { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px; font-size: 1rem; font-family: inherit; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
 
-        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 1024px) {
             .mobile-nav { display: flex; }
             .sidebar { transform: translateX(-100%); width: 260px; }
@@ -71,8 +42,7 @@
         .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: var(--white); padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: center; }
         .stat-card b { font-size: 1.6rem; display: block; color: var(--sidebar); }
-
-        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 500px; }
         th { text-align: left; padding: 12px; border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 0.75rem; text-transform: uppercase; }
         td { padding: 15px 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
@@ -82,71 +52,68 @@
 
     <header class="mobile-nav">
         <div style="font-weight: 800; color: var(--primary);">EUDES MEDIA</div>
-        <button onclick="toggleSidebar()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">☰</button>
+        <button onclick="toggleSidebar()" style="background:none; border:none; font-size:1.5rem;">☰</button>
     </header>
 
     <aside class="sidebar" id="sidebar">
         <div class="brand">EUDES MEDIA</div>
-        
         <div id="admin-menu" class="nav-group">
             <span class="nav-label">Management</span>
             <div class="nav-item active" onclick="switchSection('admin-panel')">Dashboard</div>
         </div>
-        
         <div id="teacher-menu" class="nav-group">
-            <span class="nav-label">Academic Portal</span>
+            <span class="nav-label">Academics</span>
             <div class="nav-item active" onclick="switchSection('teacher-panel')">Mark Sheet</div>
         </div>
-        
         <div id="finance-menu" class="nav-group">
-            <span class="nav-label">Bursar Office</span>
-            <div class="nav-item active" onclick="switchSection('finance-panel')">Fees Desk</div>
+            <span class="nav-label">Finance</span>
+            <div class="nav-item active" onclick="switchSection('finance-panel')">Bursar Desk</div>
         </div>
-
         <button onclick="location.reload()" style="margin-top:auto; padding:12px; background:#ef4444; border:none; color:white; border-radius:10px; font-weight:700; cursor:pointer;">Logout</button>
     </aside>
 
     <main class="main">
         <div id="login-section" class="login-card">
-            <h2 style="text-align: center; margin-top: 0; color: var(--sidebar);">System Authorization</h2>
+            <h2 style="text-align: center; margin-top: 0;">ESMS Authority</h2>
             
-            <label style="font-weight:700; font-size:0.75rem; color:#64748b;">SCHOOL ID</label>
+            <label style="font-weight:700; font-size:0.75rem;">SCHOOL ID</label>
             <input type="text" id="loginID" placeholder="e.g. PM001" style="text-transform: uppercase;">
             
-            <label style="font-weight:700; font-size:0.75rem; color:#64748b;">ACCESS KEY</label>
-            <input type="password" id="loginKey" placeholder="Enter PM2026">
+            <label style="font-weight:700; font-size:0.75rem;">ACCESS KEY</label>
+            <input type="password" id="loginKey" placeholder="Enter Key">
             
-            <label style="font-weight:700; font-size:0.75rem; color:#64748b;">LOGIN ROLE</label>
+            <label style="font-weight:700; font-size:0.75rem;">YOUR ROLE</label>
             <select id="loginRole">
                 <option value="Admin">Administrator</option>
                 <option value="Teacher">Teacher</option>
                 <option value="Finance">Bursar</option>
             </select>
             
-            <button class="btn-primary" onclick="doLogin()">Sign In to Dashboard</button>
+            <button class="btn-primary" onclick="doLogin()">Authorize Access</button>
+            <p id="debug-msg" style="color:red; font-size:0.7rem; margin-top:10px; text-align:center;"></p>
         </div>
 
         <div id="dashboard-section" style="display:none;">
             <div style="margin-bottom: 25px;">
-                <h1 id="clock" style="margin:0; font-size: 2.2rem; letter-spacing: -1.5px; color: var(--sidebar);">00:00</h1>
-                <p id="date" style="margin:0; color:#64748b; font-weight:600; font-size: 0.9rem;"></p>
+                <h1 id="clock" style="margin:0; font-size: 2.2rem; letter-spacing: -1.5px;">00:00</h1>
+                <p id="date" style="margin:0; color:#64748b; font-weight:600;"></p>
                 <div id="role-pill" style="display:inline-block; padding:5px 14px; border-radius:20px; background:var(--primary); color:white; font-size:0.65rem; font-weight:800; margin-top:10px; text-transform:uppercase;">---</div>
             </div>
 
             <div class="stat-grid">
-                <div class="stat-card"><small style="font-size:0.7rem; font-weight:700; color:#94a3b8;">STUDENTS</small><b id="pupilCount">0</b></div>
-                <div class="stat-card"><small style="font-size:0.7rem; font-weight:700; color:#94a3b8;">SCHOOL</small><b id="schoolDisplay" style="font-size:1rem;">---</b></div>
+                <div class="stat-card"><small>PUPILS</small><b id="pupilCount">0</b></div>
+                <div class="stat-card"><small>INSTITUTION</small><b id="schoolDisplay" style="font-size:1rem;">---</b></div>
             </div>
 
             <div id="admin-panel" class="panel">
-                <h3 style="margin-top:0">Quick Enrollment</h3>
-                <input type="text" id="stuName" placeholder="Full Name of Student">
-                <button class="btn-primary" onclick="saveStudent()">Add Student</button>
+                <h3 style="margin-top:0">New Registration</h3>
+                <input type="text" id="stuName" placeholder="Full Student Name">
+                <button class="btn-primary" onclick="saveStudent()">Register Pupil</button>
             </div>
 
             <div id="teacher-panel" class="panel">
-                <h3 style="margin-top:0">Assessment Marks</h3>
-                <div class="table-container">
+                <h3 style="margin-top:0">Mark Sheet</h3>
+                <div class="table-wrap">
                     <table>
                         <thead><tr><th>Name</th><th>ENG</th><th>MAT</th><th>SST</th><th>SCI</th></tr></thead>
                         <tbody id="stuTable"></tbody>
@@ -155,59 +122,57 @@
             </div>
 
             <div id="finance-panel" class="panel">
-                <h3 style="margin-top:0">Fees Management</h3>
-                <p style="color:#64748b;">Search for a student to record fee payments.</p>
+                <h3 style="margin-top:0">Bursar Desk</h3>
+                <p>Welcome to the financial control panel.</p>
             </div>
         </div>
     </main>
 
     <script>
-        // Supabase Configuration
-        const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-        const _KEY = 'YOUR_ANON_KEY'; 
+        const _URL = 'https://YOUR_SUPABASE_URL.supabase.co'; // REPLACE THIS
+        const _KEY = 'YOUR_ANON_KEY'; // REPLACE THIS
         const supabaseClient = supabase.createClient(_URL, _KEY);
 
         let activeSchoolID = "";
         let activeRole = "";
 
-        // UI Controls
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 
-        // Live Clock
         setInterval(() => {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
             document.getElementById('date').innerText = now.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
         }, 1000);
 
-        // Authentication
         async function doLogin() {
             const idInput = document.getElementById('loginID').value.trim().toUpperCase();
             const keyInput = document.getElementById('loginKey').value.trim();
             activeRole = document.getElementById('loginRole').value;
+            const debug = document.getElementById('debug-msg');
 
-            // Querying database
+            debug.innerText = "Checking database...";
+
             const { data, error } = await supabaseClient.from('schools')
                 .select('*')
                 .eq('id', idInput)
                 .eq('access_key', keyInput)
-                .single();
+                .maybeSingle();
 
-            if (data) {
+            if (error) {
+                debug.innerText = "Connection Error: " + error.message;
+            } else if (data) {
                 activeSchoolID = idInput;
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('dashboard-section').style.display = 'block';
                 document.getElementById('schoolDisplay').innerText = data.school_name;
                 document.getElementById('role-pill').innerText = activeRole;
                 
-                // Set Up Menu Based on Role
                 document.querySelectorAll('.nav-group').forEach(g => g.style.display = 'none');
                 document.getElementById(activeRole.toLowerCase() + '-menu').style.display = 'block';
                 switchSection(activeRole.toLowerCase() + '-panel');
-                
                 loadPupils();
             } else {
-                alert("Invalid Credentials. Please check your School ID and Access Key (PM2026).");
+                debug.innerText = "Invalid ID or Key. Try PM001 and PM2026.";
             }
         }
 
@@ -217,20 +182,18 @@
             if(window.innerWidth <= 1024) document.getElementById('sidebar').classList.remove('open');
         }
 
-        // Data Management
         async function loadPupils() {
             const { count, data } = await supabaseClient.from('students')
                 .select('*', {count:'exact'}).eq('school_id', activeSchoolID);
-            
             document.getElementById('pupilCount').innerText = count || 0;
             if(data) {
                 document.getElementById('stuTable').innerHTML = data.map(s => `
                     <tr>
                         <td style="font-weight:600;">${s.name}</td>
-                        <td><input type="number" style="width:55px; margin:0; padding:6px; font-size:0.8rem;"></td>
-                        <td><input type="number" style="width:55px; margin:0; padding:6px; font-size:0.8rem;"></td>
-                        <td><input type="number" style="width:55px; margin:0; padding:6px; font-size:0.8rem;"></td>
-                        <td><input type="number" style="width:55px; margin:0; padding:6px; font-size:0.8rem;"></td>
+                        <td><input type="number" style="width:50px; padding:5px;"></td>
+                        <td><input type="number" style="width:50px; padding:5px;"></td>
+                        <td><input type="number" style="width:50px; padding:5px;"></td>
+                        <td><input type="number" style="width:50px; padding:5px;"></td>
                     </tr>
                 `).join('');
             }
@@ -238,20 +201,9 @@
 
         async function saveStudent() {
             const name = document.getElementById('stuName').value.trim();
-            if(!name) return alert("Please enter a name");
-
-            const { error } = await supabaseClient.from('students').insert([{ 
-                name: name, 
-                school_id: activeSchoolID 
-            }]);
-
-            if(!error) {
-                document.getElementById('stuName').value = '';
-                loadPupils();
-                alert("Student added successfully!");
-            } else {
-                alert("Error adding student. Check database connection.");
-            }
+            if(!name) return;
+            const { error } = await supabaseClient.from('students').insert([{ name, school_id: activeSchoolID }]);
+            if(!error) { document.getElementById('stuName').value = ''; loadPupils(); }
         }
     </script>
 </body>
