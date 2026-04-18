@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Supreme Management System</title>
+    <title>Eudes Media | Supreme Management System V62</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -11,12 +11,12 @@
         
         .header { background: var(--blue); color: white; padding: 20px 15px; border-bottom: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .hero { background: #001a33; padding: 25px 15px; text-align: center; color: white; }
-        #clock { font-size: 36px; font-weight: 900; }
+        #clock { font-size: 32px; font-weight: 900; }
         
         .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -35px; }
         .stat-card { background: white; padding: 15px 5px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
-        .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); display: block; }
-        .stat-lbl { font-size: 9px; font-weight: 800; color: #777; text-transform: uppercase; }
+        .stat-val { font-size: 18px; font-weight: 900; color: var(--blue); display: block; }
+        .stat-lbl { font-size: 8px; font-weight: 800; color: #777; text-transform: uppercase; }
         
         .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 1000; }
         .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 12px; font-weight: 900; color: #999; cursor: pointer; text-transform: uppercase; }
@@ -24,55 +24,60 @@
         
         .card { background: white; border-radius: 12px; padding: 15px; margin: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
-        /* Table Styling for Line Numbers and Classes */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 500px; }
-        th { text-align: left; padding: 10px; background: #f0f4f8; font-size: 11px; font-weight: 900; color: var(--blue); text-transform: uppercase; border: 1px solid #ddd; }
-        td { padding: 12px 10px; border: 1px solid #eee; font-size: 13px; font-weight: 700; }
-        .line-no { color: var(--blue); font-weight: 900; width: 30px; text-align: center; }
-        .status-paid { color: var(--green); font-weight: 900; }
-        .status-pending { color: var(--red); font-weight: 900; }
+        .search-container { padding: 10px 15px; background: #fff; border-bottom: 1px solid #eee; }
+        .search-bar { width: 100%; padding: 12px; border: 2px solid var(--blue); border-radius: 8px; font-size: 14px; font-weight: 600; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 600px; }
+        th { text-align: left; padding: 12px; background: var(--blue); font-size: 11px; font-weight: 900; color: white; text-transform: uppercase; border: 1px solid #001a33; }
+        td { padding: 12px; border: 1px solid #eee; font-size: 13px; font-weight: 700; }
+        .lin-cell { color: var(--blue); font-weight: 900; text-align: center; background: #f0f4f8; }
+        .debt-cell { color: var(--red); font-weight: 900; }
 
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 10px; font-size: 15px; font-weight: 900; cursor: pointer; }
         input, select { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 10px; margin-bottom: 12px; font-size: 15px; font-weight: 600; box-sizing: border-box; }
         label { font-weight: 900; font-size: 12px; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 4px; }
         
         .hidden { display: none !important; }
-        .scroll-box { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .scroll-box { overflow-x: auto; }
     </style>
 </head>
 <body>
 
 <div id="mainApp">
     <div class="header">
-        <div><b id="headerSchoolName" style="font-size: 16px;">LOADING...</b><br><span style="font-size:10px; color:var(--gold); font-weight: 800;">MASTER DIRECTOR PANEL</span></div>
-        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900; font-size:11px;">LOGOUT</button>
+        <div><b id="headerSchoolName" style="font-size: 16px;">PROGRESSIVE MOTHERS</b><br><span style="font-size:10px; color:var(--gold); font-weight: 800;">EUDES MEDIA MANAGEMENT</span></div>
+        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900;">LOGOUT</button>
     </div>
     
     <div class="hero"><div id="clock">00:00:00</div></div>
     
     <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Registered</span></div>
-        <div class="stat-card"><span class="stat-val" style="color:var(--green)">SECURE</span><span class="stat-lbl">Access</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-fees" style="color:var(--gold)">0</span><span class="stat-lbl">Total Fees</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Pupils</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-paid" style="color:var(--green)">0</span><span class="stat-lbl">Paid (UGX)</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-debt" style="color:var(--red)">0</span><span class="stat-lbl">Debt (UGX)</span></div>
     </div>
 
     <div class="nav-tabs">
-        <div class="tab active" id="t-rec" onclick="tab('rec')">Master Records</div>
+        <div class="tab active" id="t-rec" onclick="tab('rec')">Master Ledger</div>
         <div class="tab" id="t-adm" onclick="tab('adm')">New Registration</div>
     </div>
 
     <div id="v-rec" class="p-view">
-        <div class="card">
-            <h3 style="color:var(--blue); margin-top:0;">CENTRAL STUDENT LEDGER</h3>
+        <div class="search-container">
+            <input type="text" id="searchBar" class="search-bar" placeholder="🔍 Search Pupil by Name..." oninput="renderUI()">
+        </div>
+        <div class="card" style="padding:10px;">
             <div class="scroll-box">
                 <table>
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Full Name</th>
+                            <th>LIN #</th>
+                            <th>Student Name</th>
                             <th>Class</th>
-                            <th>Fees Status</th>
-                            <th>Parent Contact</th>
+                            <th>Total Fees</th>
+                            <th>Paid</th>
+                            <th>Debt</th>
+                            <th>Contact</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -83,23 +88,24 @@
 
     <div id="v-adm" class="hidden p-view">
         <div class="card">
-            <h3 style="color:var(--blue); margin-top:0;">REGISTER NEW STUDENT</h3>
+            <h3 style="color:var(--blue); margin-top:0;">ADMISSION FORM</h3>
             <label>Student Full Name</label><input id="name" placeholder="John Doe">
-            <label>Class / Level</label>
+            <label>Class</label>
             <select id="cls">
                 <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <label>Registration/Photo Fee (UGX)</label><input id="fees" type="number" placeholder="Enter Amount">
-            <label>Physical Location</label><input id="loc" placeholder="Current Residence">
+            <label>Required Fees (UGX)</label><input id="f_exp" type="number" placeholder="Total Expected">
+            <label>Amount Paid (UGX)</label><input id="f_paid" type="number" placeholder="Current Payment">
+            <label>Physical Location</label><input id="loc" placeholder="Home Village">
             <label>Parent Contact</label><input id="contact" placeholder="+256...">
-            <button onclick="submitData()" class="btn-main" id="saveBtn">SUBMIT TO DATABASE</button>
+            <button onclick="submitData()" class="btn-main" id="saveBtn">AUTHENTICATE & SAVE</button>
         </div>
     </div>
 
     <div style="text-align:center; padding:25px; color:#999; font-size:11px; font-weight:900;">
-        EUDES MEDIA | OFFICIAL SOFTWARE | +256762992440
+        EUDES MEDIA SOFTWARE | +256762992440
     </div>
 </div>
 
@@ -108,40 +114,53 @@
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
     let cachedData = [];
-
     window.currentSchool = {id: 1, school_name: "Progressive Mothers", brand_color: "#002d5b"};
 
     async function init() {
-        document.getElementById('headerSchoolName').innerText = window.currentSchool.school_name.toUpperCase();
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
         await loadData();
     }
 
     async function loadData() {
-        const { data } = await _client.from('students').select('*').eq('school_id', window.currentSchool.id).order('created_at', { ascending: true });
+        // Fetch and Sort Alphabetically by Name
+        const { data } = await _client.from('students')
+            .select('*')
+            .eq('school_id', window.currentSchool.id)
+            .order('name', { ascending: true });
         if(data) { cachedData = data; renderUI(); }
     }
 
     function renderUI() {
         const body = document.getElementById('tableBody');
+        const searchQ = document.getElementById('searchBar').value.toLowerCase();
         body.innerHTML = "";
-        let totalCollected = 0;
+        
+        let tPaid = 0;
+        let tDebt = 0;
 
-        cachedData.forEach((s, index) => {
-            const feeVal = s.fees_paid || 0;
-            totalCollected += parseInt(feeVal);
+        cachedData.filter(s => s.name.toLowerCase().includes(searchQ)).forEach((s, index) => {
+            const exp = parseInt(s.fees_expected || 0);
+            const paid = parseInt(s.fees_paid || 0);
+            const debt = exp - paid;
             
+            tPaid += paid;
+            tDebt += debt;
+
             body.innerHTML += `
                 <tr>
-                    <td class="line-no">${index + 1}</td>
+                    <td class="lin-cell">${index + 1}</td>
                     <td><b style="text-transform:uppercase;">${s.name}</b></td>
                     <td>${s.class || 'N/A'}</td>
-                    <td class="${feeVal > 0 ? 'status-paid' : 'status-pending'}">${feeVal > 0 ? feeVal + ' UGX' : 'PENDING'}</td>
+                    <td>${exp.toLocaleString()}</td>
+                    <td style="color:var(--green)">${paid.toLocaleString()}</td>
+                    <td class="debt-cell">${debt.toLocaleString()}</td>
                     <td>${s.contact}</td>
                 </tr>`;
         });
+
         document.getElementById('c-tot').innerText = cachedData.length;
-        document.getElementById('c-fees').innerText = totalCollected.toLocaleString();
+        document.getElementById('c-paid').innerText = tPaid.toLocaleString();
+        document.getElementById('c-debt').innerText = tDebt.toLocaleString();
     }
 
     async function submitData() {
@@ -150,22 +169,23 @@
             school_id: window.currentSchool.id,
             name: document.getElementById('name').value,
             class: document.getElementById('cls').value,
-            fees_paid: document.getElementById('fees').value,
+            fees_expected: document.getElementById('f_exp').value || 0,
+            fees_paid: document.getElementById('f_paid').value || 0,
             location: document.getElementById('loc').value,
             contact: document.getElementById('contact').value
         };
         
-        if(!payload.name || !payload.contact) return alert("NAME AND CONTACT ARE REQUIRED");
+        if(!payload.name || !payload.contact) return alert("Fill Name and Contact!");
         
-        btn.innerText = "SAVING...";
+        btn.innerText = "AUTHENTICATING...";
         const { error } = await _client.from('students').insert([payload]);
         if(!error) {
-            alert("STUDENT SAVED SUCCESSFULLY");
+            alert("RECORD SAVED");
             document.querySelectorAll('input').forEach(i => i.value = "");
             await loadData();
             tab('rec');
-        } else { alert("Error: " + error.message); }
-        btn.innerText = "SUBMIT TO DATABASE";
+        }
+        btn.innerText = "AUTHENTICATE & SAVE";
     }
 
     function tab(t) { 
