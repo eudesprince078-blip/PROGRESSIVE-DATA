@@ -6,93 +6,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #002d5b; --gold: #ffc107; --red: #d90429; --white: #ffffff; --light: #f1f4f9; }
+        :root { --blue: #002d5b; --gold: #ffc107; --red: #d90429; --white: #ffffff; --light: #f1f4f9; --green: #2b9348; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
         
-        /* High Visibility Headers */
         .header { background: var(--blue); color: white; padding: 20px 15px; border-bottom: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .hero { background: #001a33; padding: 30px 15px; text-align: center; color: white; }
-        #clock { font-size: 42px; font-weight: 900; letter-spacing: 2px; }
+        .hero { background: #001a33; padding: 25px 15px; text-align: center; color: white; }
+        #clock { font-size: 36px; font-weight: 900; }
         
-        /* Bold Dashboard Stats */
-        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px; margin-top: -40px; }
-        .stat-card { background: white; padding: 20px 10px; border-radius: 15px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); border-top: 5px solid var(--blue); }
-        .stat-val { font-size: 24px; font-weight: 900; color: var(--blue); display: block; }
-        .stat-lbl { font-size: 10px; font-weight: 800; color: #777; text-transform: uppercase; margin-top: 5px; }
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -35px; }
+        .stat-card { background: white; padding: 15px 5px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
+        .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); display: block; }
+        .stat-lbl { font-size: 9px; font-weight: 800; color: #777; text-transform: uppercase; }
         
-        /* Bigger Navigation */
         .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 1000; }
-        .tab { flex: 1; text-align: center; padding: 18px 5px; font-size: 14px; font-weight: 900; color: #999; cursor: pointer; text-transform: uppercase; }
+        .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 12px; font-weight: 900; color: #999; cursor: pointer; text-transform: uppercase; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #fdfdfd; }
         
-        /* Large Readable Table */
-        .card { background: white; border-radius: 15px; padding: 20px; margin: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; padding: 12px 8px; background: #eee; font-size: 13px; font-weight: 900; color: var(--blue); text-transform: uppercase; }
-        td { padding: 14px 8px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: 700; }
-        tr:nth-child(even) { background-color: #fcfcfc; }
+        .card { background: white; border-radius: 12px; padding: 15px; margin: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        
+        /* Table Styling for Line Numbers and Classes */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 500px; }
+        th { text-align: left; padding: 10px; background: #f0f4f8; font-size: 11px; font-weight: 900; color: var(--blue); text-transform: uppercase; border: 1px solid #ddd; }
+        td { padding: 12px 10px; border: 1px solid #eee; font-size: 13px; font-weight: 700; }
+        .line-no { color: var(--blue); font-weight: 900; width: 30px; text-align: center; }
+        .status-paid { color: var(--green); font-weight: 900; }
+        .status-pending { color: var(--red); font-weight: 900; }
 
-        /* Professional Buttons and Inputs */
-        .btn-main { width: 100%; background: var(--blue); color: white; padding: 20px; border: none; border-radius: 12px; font-size: 16px; font-weight: 900; cursor: pointer; }
-        input { width: 100%; padding: 16px; border: 2px solid #ddd; border-radius: 12px; margin-bottom: 15px; font-size: 16px; font-weight: 600; box-sizing: border-box; }
-        label { font-weight: 900; font-size: 13px; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .btn-main { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 10px; font-size: 15px; font-weight: 900; cursor: pointer; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 10px; margin-bottom: 12px; font-size: 15px; font-weight: 600; box-sizing: border-box; }
+        label { font-weight: 900; font-size: 12px; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 4px; }
         
         .hidden { display: none !important; }
+        .scroll-box { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     </style>
 </head>
 <body>
 
 <div id="mainApp">
     <div class="header">
-        <div><b id="headerSchoolName" style="font-size: 18px;">SYSTEM PORTAL</b><br><span style="font-size:11px; color:var(--gold); font-weight: 800;">ADMINISTRATION ACCESS</span></div>
-        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:8px; font-weight:900;">LOGOUT</button>
+        <div><b id="headerSchoolName" style="font-size: 16px;">LOADING...</b><br><span style="font-size:10px; color:var(--gold); font-weight: 800;">MASTER DIRECTOR PANEL</span></div>
+        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900; font-size:11px;">LOGOUT</button>
     </div>
     
     <div class="hero"><div id="clock">00:00:00</div></div>
     
     <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Pupils</span></div>
-        <div class="stat-card"><span class="stat-val" style="color:#2b9348">LIVE</span><span class="stat-lbl">Server</span></div>
-        <div class="stat-card"><span class="stat-val" style="color:var(--gold)">1</span><span class="stat-lbl">Entity</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Registered</span></div>
+        <div class="stat-card"><span class="stat-val" style="color:var(--green)">SECURE</span><span class="stat-lbl">Access</span></div>
+        <div class="stat-card"><span class="stat-val" id="c-fees" style="color:var(--gold)">0</span><span class="stat-lbl">Total Fees</span></div>
     </div>
 
     <div class="nav-tabs">
         <div class="tab active" id="t-rec" onclick="tab('rec')">Master Records</div>
-        <div class="tab" id="t-adm" onclick="tab('adm')">New Entry</div>
+        <div class="tab" id="t-adm" onclick="tab('adm')">New Registration</div>
     </div>
 
     <div id="v-rec" class="p-view">
-        <div class="card" style="padding:10px; overflow-x:auto;">
-            <h2 style="color:var(--blue); text-align:center; margin-bottom:20px;">STUDENT MASTER LEDGER</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Student Name</th>
-                        <th>Age</th>
-                        <th>Location</th>
-                        <th>Contact</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    </tbody>
-            </table>
+        <div class="card">
+            <h3 style="color:var(--blue); margin-top:0;">CENTRAL STUDENT LEDGER</h3>
+            <div class="scroll-box">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Full Name</th>
+                            <th>Class</th>
+                            <th>Fees Status</th>
+                            <th>Parent Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <div id="v-adm" class="hidden p-view">
         <div class="card">
-            <h2 style="color:var(--blue); margin-top:0;">PUPIL REGISTRATION</h2>
-            <label>Full Name</label><input id="name" placeholder="Full Name">
-            <label>Age</label><input id="age" type="number" placeholder="Enter Age">
+            <h3 style="color:var(--blue); margin-top:0;">REGISTER NEW STUDENT</h3>
+            <label>Student Full Name</label><input id="name" placeholder="John Doe">
+            <label>Class / Level</label>
+            <select id="cls">
+                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                <option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
+            <label>Registration/Photo Fee (UGX)</label><input id="fees" type="number" placeholder="Enter Amount">
             <label>Physical Location</label><input id="loc" placeholder="Current Residence">
-            <label>Guardian Contact</label><input id="contact" placeholder="+256...">
-            <button onclick="submitData()" class="btn-main" id="saveBtn">SUBMIT TO SYSTEM</button>
+            <label>Parent Contact</label><input id="contact" placeholder="+256...">
+            <button onclick="submitData()" class="btn-main" id="saveBtn">SUBMIT TO DATABASE</button>
         </div>
     </div>
 
-    <div style="text-align:center; padding:30px; color:#999; font-size:12px; font-weight:900;">
-        EUDES MEDIA SOFTWARE | +256762992440
+    <div style="text-align:center; padding:25px; color:#999; font-size:11px; font-weight:900;">
+        EUDES MEDIA | OFFICIAL SOFTWARE | +256762992440
     </div>
 </div>
 
@@ -102,7 +109,6 @@
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
     let cachedData = [];
 
-    // Auto-Login for Director (Your Credentials)
     window.currentSchool = {id: 1, school_name: "Progressive Mothers", brand_color: "#002d5b"};
 
     async function init() {
@@ -112,24 +118,30 @@
     }
 
     async function loadData() {
-        const { data } = await _client.from('students').select('*').eq('school_id', window.currentSchool.id).order('name', { ascending: true });
+        const { data } = await _client.from('students').select('*').eq('school_id', window.currentSchool.id).order('created_at', { ascending: true });
         if(data) { cachedData = data; renderUI(); }
     }
 
     function renderUI() {
         const body = document.getElementById('tableBody');
         body.innerHTML = "";
+        let totalCollected = 0;
+
         cachedData.forEach((s, index) => {
+            const feeVal = s.fees_paid || 0;
+            totalCollected += parseInt(feeVal);
+            
             body.innerHTML += `
                 <tr>
-                    <td style="color:var(--blue)">${index+1}</td>
+                    <td class="line-no">${index + 1}</td>
                     <td><b style="text-transform:uppercase;">${s.name}</b></td>
-                    <td>${s.age || '-'}</td>
-                    <td style="font-size:12px;">${s.location || '-'}</td>
-                    <td style="color:#555;">${s.contact || '-'}</td>
+                    <td>${s.class || 'N/A'}</td>
+                    <td class="${feeVal > 0 ? 'status-paid' : 'status-pending'}">${feeVal > 0 ? feeVal + ' UGX' : 'PENDING'}</td>
+                    <td>${s.contact}</td>
                 </tr>`;
         });
         document.getElementById('c-tot').innerText = cachedData.length;
+        document.getElementById('c-fees').innerText = totalCollected.toLocaleString();
     }
 
     async function submitData() {
@@ -137,21 +149,23 @@
         const payload = {
             school_id: window.currentSchool.id,
             name: document.getElementById('name').value,
-            age: document.getElementById('age').value,
+            class: document.getElementById('cls').value,
+            fees_paid: document.getElementById('fees').value,
             location: document.getElementById('loc').value,
             contact: document.getElementById('contact').value
         };
-        if(!payload.name) return alert("Please enter a name");
+        
+        if(!payload.name || !payload.contact) return alert("NAME AND CONTACT ARE REQUIRED");
         
         btn.innerText = "SAVING...";
         const { error } = await _client.from('students').insert([payload]);
         if(!error) {
-            alert("SUCCESSFULLY REGISTERED");
+            alert("STUDENT SAVED SUCCESSFULLY");
             document.querySelectorAll('input').forEach(i => i.value = "");
             await loadData();
             tab('rec');
-        }
-        btn.innerText = "SUBMIT TO SYSTEM";
+        } else { alert("Error: " + error.message); }
+        btn.innerText = "SUBMIT TO DATABASE";
     }
 
     function tab(t) { 
