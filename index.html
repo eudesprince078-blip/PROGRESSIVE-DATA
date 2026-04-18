@@ -17,32 +17,31 @@
         .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.65rem; font-weight: 800; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #f8fafc; }
 
-        /* DASHBOARD HERO */
+        /* STATS */
         .hero { background: var(--dark); color: white; padding: 30px 20px; text-align: center; }
         #live-clock { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -25px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-bottom: 4px solid #cbd5e1; }
         .stat-card b { display: block; font-size: 1.4rem; }
 
-        /* ADMISSION FORM */
+        /* FORMS & UI */
         .container { padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-        label { display: block; font-size: 0.65rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
+        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        label { display: block; font-size: 0.6rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
         input { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; font-family: inherit; }
         
         /* BUTTONS */
-        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; text-align: center; }
-        .btn-main { background: var(--primary); width: 100%; font-size: 1rem; margin-top: 10px; }
-        .btn-edit { background: var(--primary); font-size: 0.6rem; padding: 6px 10px; margin-right: 4px; }
+        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; }
+        .btn-save { background: var(--primary); width: 100%; font-size: 1rem; }
+        .btn-edit { background: var(--primary); font-size: 0.6rem; padding: 6px 10px; }
         .btn-del { background: var(--danger); font-size: 0.6rem; padding: 6px 10px; }
-        .btn-cancel { background: #64748b; width: 100%; margin-top: 10px; }
+        .btn-cancel { background: #64748b; width: 100%; margin-top: 10px; display: none; }
 
-        /* LIST TABLE */
-        .stu-pic { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; border: 1px solid #ddd; }
+        /* LIST */
         .table-wrap { overflow-x: auto; background: white; border-radius: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th { background: #f8fafc; padding: 12px; text-align: left; font-size: 0.65rem; color: #94a3b8; border-bottom: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: #f8fafc; padding: 12px; text-align: left; font-size: 0.65rem; color: #94a3b8; }
         td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; font-weight: 700; }
     </style>
 </head>
@@ -61,18 +60,16 @@
     <div id="dash" class="tab-content">
         <div class="hero"><h1 id="live-clock">00:00:00</h1></div>
         <div class="stat-grid">
-            <div class="stat-card" style="border-color:var(--accent);"><b id="countT">0</b><span>PUPILS</span></div>
-            <div class="stat-card" style="border-color:var(--success);"><b id="countP" style="color:var(--success);">0</b><span>CLEARED</span></div>
-            <div class="stat-card" style="border-color:var(--danger);"><b id="countB" style="color:var(--danger);">0</b><span>OWING</span></div>
+            <div class="stat-card"><b id="countT">0</b><span>PUPILS</span></div>
+            <div class="stat-card"><b id="countP" style="color:var(--success);">0</b><span>CLEARED</span></div>
+            <div class="stat-card"><b id="countB" style="color:var(--danger);">0</b><span>OWING</span></div>
         </div>
         <div class="container">
-            <div class="card">
-                <input type="text" id="searchBox" placeholder="SEARCH BY NAME OR LIN..." onkeyup="doSearch()" style="border: 2px solid var(--primary); padding:15px;">
-            </div>
+            <div class="card"><input type="text" id="searchBox" placeholder="SEARCH BY NAME OR LIN..." onkeyup="doSearch()"></div>
             <div class="table-wrap card">
                 <table>
                     <thead>
-                        <tr><th>LIN</th><th>PHOTO</th><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>HEALTH</th><th>BALANCE</th><th>ACTION</th></tr>
+                        <tr><th>LIN</th><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>HEALTH</th><th>BALANCE</th><th>ACTION</th></tr>
                     </thead>
                     <tbody id="dashBody"></tbody>
                 </table>
@@ -82,20 +79,17 @@
 
     <div id="admission" class="tab-content container" style="display:none;">
         <div class="card">
-            <h3 id="formTitle" style="margin:0 0 20px 0; color:var(--primary);">STUDENT REGISTRATION FORM</h3>
+            <h3 id="formTitle" style="color:var(--primary);">NEW ENROLLMENT</h3>
             <div class="form-grid">
                 <div><label>FULL NAME</label><input type="text" id="inName"></div>
                 <div><label>CLASS</label><input type="text" id="inClass"></div>
-                <div><label>DATE OF BIRTH</label><input type="date" id="inDOB"></div>
+                <div><label>CONTACT NUMBER</label><input type="text" id="inContact"></div>
+                <div><label>HEALTH STATUS</label><input type="text" id="inHealth"></div>
                 <div><label>AGE</label><input type="number" id="inAge"></div>
-                <div><label>PARENT CONTACT</label><input type="text" id="inContact"></div>
-                <div><label>LOCATION</label><input type="text" id="inLoc"></div>
-                <div><label>HEALTH STATUS</label><input type="text" id="inHealth" placeholder="NORMAL"></div>
                 <div><label>TOTAL FEES</label><input type="number" id="inFees"></div>
-                <div><label>PHOTO</label><input type="file" id="inPhoto" accept="image/*" style="border:none;"></div>
             </div>
-            <button class="btn btn-main" id="saveBtn" onclick="handleFinalSave()">SAVE STUDENT RECORD</button>
-            <button class="btn btn-cancel" id="cancelBtn" style="display:none;" onclick="resetAdmission()">CANCEL EDIT</button>
+            <button class="btn btn-save" id="saveBtn" onclick="handleDatabaseAction()">SAVE RECORD</button>
+            <button class="btn btn-cancel" id="cancelBtn" onclick="clearAdmission()">CANCEL EDIT</button>
         </div>
     </div>
 
@@ -105,7 +99,7 @@
         const client = supabase.createClient(_URL, _KEY);
         
         let allStudents = [];
-        let editModeId = null;
+        let activeEditId = null;
 
         setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
@@ -129,16 +123,15 @@
                 const bal = (s.total_fees || 0) - (s.paid_fees || 0);
                 if(bal <= 0) cleared++; else owing++;
                 return `<tr>
-                    <td style="color:var(--danger); font-family:monospace;">${s.lin || '---'}</td>
-                    <td><img src="${s.photo_url || ''}" class="stu-pic"></td>
+                    <td>${s.lin || '---'}</td>
                     <td style="color:var(--primary)">${s.name}</td>
                     <td>${s.class}</td>
                     <td>${s.contact_number || '--'}</td>
-                    <td style="font-size:0.7rem;">${s.health_status || 'NORMAL'}</td>
+                    <td>${s.health_status || 'GOOD'}</td>
                     <td style="color:${bal > 0 ? 'red' : 'green'}">${bal.toLocaleString()}</td>
                     <td>
-                        <button class="btn btn-edit" onclick="triggerEdit('${s.id}')">EDIT</button>
-                        <button class="btn btn-del" onclick="triggerDelete('${s.id}')">DEL</button>
+                        <button class="btn btn-edit" onclick="setupEdit('${s.id}')">EDIT</button>
+                        <button class="btn btn-del" onclick="setupDelete('${s.id}')">DEL</button>
                     </td>
                 </tr>`;
             }).join('');
@@ -147,96 +140,64 @@
             document.getElementById('countB').innerText = owing;
         }
 
-        async function compress(file) {
-            return new Promise(res => {
-                const r = new FileReader(); r.readAsDataURL(file);
-                r.onload = e => {
-                    const img = new Image(); img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = 300; canvas.height = 300;
-                        canvas.getContext('2d').drawImage(img, 0, 0, 300, 300);
-                        canvas.toBlob(b => res(b), 'image/jpeg', 0.7);
-                    }
-                }
-            });
-        }
-
-        async function handleFinalSave() {
+        async function handleDatabaseAction() {
             const btn = document.getElementById('saveBtn');
-            btn.innerText = "UPDATING..."; btn.disabled = true;
-
-            const file = document.getElementById('inPhoto').files[0];
-            let pUrl = undefined;
-
-            if(file) {
-                const blob = await compress(file);
-                const path = `stu_${Date.now()}.jpg`;
-                const { data } = await client.storage.from('student-photos').upload(path, blob);
-                if(data) pUrl = client.storage.from('student-photos').getPublicUrl(path).data.publicUrl;
-            }
+            btn.innerText = "WAIT..."; btn.disabled = true;
 
             const payload = {
                 name: document.getElementById('inName').value,
                 class: document.getElementById('inClass').value,
-                age: document.getElementById('inAge').value,
-                date_of_birth: document.getElementById('inDOB').value,
                 contact_number: document.getElementById('inContact').value,
-                location: document.getElementById('inLoc').value,
                 health_status: document.getElementById('inHealth').value,
+                age: document.getElementById('inAge').value,
                 total_fees: document.getElementById('inFees').value
             };
-            if(pUrl) payload.photo_url = pUrl;
 
-            let error;
-            if(editModeId) {
-                const res = await client.from('students').update(payload).eq('id', editModeId);
-                error = res.error;
+            let res;
+            if(activeEditId) {
+                res = await client.from('students').update(payload).eq('id', activeEditId);
             } else {
-                const res = await client.from('students').insert([payload]);
-                error = res.error;
+                res = await client.from('students').insert([payload]);
             }
 
-            if(!error) {
-                alert("SUCCESSFULLY SAVED");
-                resetAdmission();
+            if(!res.error) {
+                alert("SUCCESS");
+                clearAdmission();
                 showTab('dash');
             } else {
-                alert("DATABASE ERROR: " + error.message);
+                alert("ERROR: " + res.error.message);
             }
-            btn.innerText = "SAVE STUDENT RECORD"; btn.disabled = false;
+            btn.innerText = "SAVE RECORD"; btn.disabled = false;
         }
 
-        function triggerEdit(id) {
+        function setupEdit(id) {
             const s = allStudents.find(x => x.id === id);
-            editModeId = id;
+            activeEditId = id;
             document.getElementById('inName').value = s.name || "";
             document.getElementById('inClass').value = s.class || "";
-            document.getElementById('inAge').value = s.age || "";
-            document.getElementById('inDOB').value = s.date_of_birth || "";
             document.getElementById('inContact').value = s.contact_number || "";
-            document.getElementById('inLoc').value = s.location || "";
             document.getElementById('inHealth').value = s.health_status || "";
+            document.getElementById('inAge').value = s.age || "";
             document.getElementById('inFees').value = s.total_fees || "";
             
-            document.getElementById('formTitle').innerText = "EDITING: " + s.name;
-            document.getElementById('saveBtn').innerText = "UPDATE STUDENT INFO";
+            document.getElementById('formTitle').innerText = "EDITING STUDENT";
+            document.getElementById('saveBtn').innerText = "UPDATE RECORD";
             document.getElementById('cancelBtn').style.display = "block";
             showTab('admission');
         }
 
-        async function triggerDelete(id) {
-            if(confirm("ARE YOU SURE YOU WANT TO DELETE THIS STUDENT?")) {
+        async function setupDelete(id) {
+            if(confirm("DELETE PERMANENTLY?")) {
                 await client.from('students').delete().eq('id', id);
                 fetchAll();
             }
         }
 
-        function resetAdmission() {
-            editModeId = null;
+        function clearAdmission() {
+            activeEditId = null;
             document.querySelectorAll('#admission input').forEach(i => i.value = "");
-            document.getElementById('formTitle').innerText = "STUDENT REGISTRATION FORM";
-            document.getElementById('saveBtn').innerText = "SAVE STUDENT RECORD";
+            document.getElementById('formTitle').innerText = "NEW ENROLLMENT";
+            document.getElementById('saveBtn').innerText = "SAVE RECORD";
             document.getElementById('cancelBtn').style.display = "none";
         }
 
