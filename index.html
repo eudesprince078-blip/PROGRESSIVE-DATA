@@ -8,30 +8,20 @@
     <style>
         :root { --blue: #002d5b; --gold: #ffc107; --red: #d90429; --white: #ffffff; --green: #2b9348; --light: #f1f4f9; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
-        
         #loginGate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; }
-        .pass-container { position: relative; width: 100%; max-width: 320px; }
-        
         .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .hero { background: #001a33; padding: 25px 15px; text-align: center; color: white; }
-        #clock { font-size: 38px; font-weight: 800; color: var(--white); line-height: 1; }
-        #fullDate { font-size: 13px; color: var(--gold); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        #liveStatusBar { background: var(--gold); color: var(--blue); display: inline-block; padding: 10px 25px; border-radius: 50px; font-weight: 900; font-size: 13px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase; }
-
+        #clock { font-size: 38px; font-weight: 800; color: var(--white); }
         .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
         .stat-val { font-size: 18px; font-weight: 900; color: var(--blue); display: block; }
         .stat-lbl { font-size: 8px; font-weight: 800; color: #999; text-transform: uppercase; }
-
-        .nav-tabs { display: flex; background: white; position: sticky; top: 68px; z-index: 999; border-bottom: 1px solid #ddd; overflow-x: auto; }
-        .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 10px; font-weight: 800; color: #aaa; cursor: pointer; min-width: 85px; }
+        .nav-tabs { display: flex; background: white; position: sticky; top: 68px; z-index: 999; border-bottom: 1px solid #ddd; }
+        .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 10px; font-weight: 800; color: #aaa; cursor: pointer; }
         .tab.active { color: var(--blue); border-bottom: 3px solid var(--blue); background: #fafafa; }
-
         .card { background: white; border-radius: 15px; padding: 18px; margin: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--blue); }
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
-        input, select { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; font-size: 14px; }
-        
-        .rec-info { font-size: 11px; margin-top: 6px; color: #444; line-height: 1.5; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -40,9 +30,7 @@
 <div id="loginGate">
     <h1 style="color:white; margin:0;">EUDES MEDIA</h1>
     <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SUPREME MANAGEMENT SYSTEM</p>
-    <div class="pass-container">
-        <input id="key" type="password" placeholder="ENTER SYSTEM KEY" style="text-align:center; height:60px;">
-    </div>
+    <input id="key" type="password" placeholder="ENTER SYSTEM KEY" style="text-align:center; height:60px; max-width:320px;">
     <button onclick="secureLogin()" id="authBtn" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:320px; border:none; border-radius:12px; font-weight:900; margin-top:10px;">AUTHENTICATE</button>
 </div>
 
@@ -51,231 +39,122 @@
         <div><b id="headerSchoolName">SYSTEM PORTAL</b><br><span style="font-size:9px; color:var(--gold);">DIRECTOR ACCESS</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
-
-    <div class="hero">
-        <div id="fullDate">-- -- ----</div>
-        <div id="clock">00:00:00</div>
-        <div id="liveStatusBar">LOADING...</div>
-    </div>
-
+    <div class="hero"><div id="clock">00:00:00</div></div>
     <div class="dashboard">
         <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Pupils</span></div>
         <div class="stat-card"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present</span></div>
         <div class="stat-card"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent</span></div>
     </div>
-
     <div class="nav-tabs">
-        <div class="tab active" id="tab-sum" onclick="tab('sum')">Director</div>
-        <div class="tab" id="tab-rec" onclick="tab('rec')">Records</div>
-        <div class="tab" id="tab-adm" onclick="tab('adm')">Admission</div>
-        <div class="tab" id="tab-roll" onclick="tab('roll')">Attendance</div>
+        <div class="tab active" onclick="tab('sum')">Director</div>
+        <div class="tab" onclick="tab('rec')">Records</div>
+        <div class="tab" onclick="tab('adm')">Admission</div>
+        <div class="tab" onclick="tab('roll')">Attendance</div>
     </div>
-
     <div id="v-sum" class="">
         <div class="card" style="background:var(--blue); color:white; border-left:none;">
-            <h4 style="margin:0 0 10px 0; color:var(--gold);">FINANCIAL SUMMARY</h4>
-            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Expected:</span> <b id="s-exp">0</b></div>
-            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Total Paid:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
-            <div style="display:flex; justify-content:space-between; padding:8px 0;"><span>Balance:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
+            <h4 style="margin:0 0 10px 0; color:var(--gold);">FINANCE SUMMARY</h4>
+            <div style="display:flex; justify-content:space-between;"><span>Balance:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
         </div>
-        <div class="card" style="border-left:none;">
-            <h4 style="color:var(--blue); margin-bottom:10px;">DAILY ABSENTEE REPORT</h4>
-            <div id="absenceListContainer"></div>
-        </div>
+        <div class="card" id="absenceListContainer"></div>
     </div>
-
     <div id="v-rec" class="hidden">
         <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Pupil..." oninput="renderUI()"></div>
         <div id="dataList"></div>
     </div>
-
     <div id="v-adm" class="hidden">
-        <div class="card" style="border-left:none;">
-            <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue);">NEW ADMISSION</h3>
+        <div class="card">
             <input type="hidden" id="editId">
-            <label>Full Name</label><input id="name">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label>Age</label><input id="age" type="number"></div>
-                <div><label>DOB</label><input id="dob" type="date"></div>
-            </div>
+            <label>Name</label><input id="name">
+            <label>Age</label><input id="age" type="number">
             <label>Class</label>
-            <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Physical Location</label><input id="location_field">
-            <label>Health Status</label><input id="health_field">
-            <label>Parent Contact</label><input id="contact">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label>Total Tuition</label><input id="f_exp" type="number"></div>
-                <div><label>Amount Paid</label><input id="f_paid" type="number"></div>
-            </div>
-            <button onclick="submitData()" id="saveBtn" class="btn-main" style="margin-top:20px;">SAVE RECORD</button>
+            <select id="cls"><option>Baby Class</option><option>P.1</option><option>P.7</option></select>
+            <label>Location</label><input id="location_field">
+            <label>Health</label><input id="health_field">
+            <label>Contact</label><input id="contact">
+            <button onclick="submitData()" class="btn-main">SAVE RECORD</button>
         </div>
     </div>
-
     <div id="v-roll" class="hidden">
-        <div style="padding:15px;"><select id="rollClass" onchange="renderUI()"><option value="">-- Select Class --</option><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
         <div id="rollData"></div>
     </div>
-
-    <div style="text-align:center; padding:30px; font-size:10px; font-weight:800; color:#bbb;">EUDES MEDIA | +256762992440</div>
 </div>
 
 <script>
     const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
-    
     let cachedData = [];
     window.currentSchool = {}; 
 
     async function secureLogin() {
         const btn = document.getElementById('authBtn');
-        const val = document.getElementById('key').value.trim();
-        if(!val) return alert("ENTER KEY");
+        const inputKey = document.getElementById('key').value.trim().toUpperCase();
+        if(!inputKey) return alert("ENTER KEY");
         btn.innerText = "CONNECTING...";
         btn.disabled = true;
 
         try {
-            const { data: schools, error } = await _client
-                .from('schools')
-                .select('*')
-                .ilike('access_key', val)
-                .limit(1);
+            // This pulls all keys to find a match, ignoring spaces/case
+            const { data: schools } = await _client.from('schools').select('*');
+            
+            const match = schools.find(s => s.access_key.trim().toUpperCase() === inputKey);
 
-            if (error) {
-                alert("LOGIN ERROR: " + error.message);
-                btn.innerText = "AUTHENTICATE";
-                btn.disabled = false;
-                return;
-            }
-
-            if (schools && schools.length > 0) {
-                const school = schools[0];
-                window.currentSchool = school;
-                document.getElementById('headerSchoolName').innerText = school.school_name.toUpperCase();
-                document.documentElement.style.setProperty('--blue', school.brand_color);
+            if (match) {
+                window.currentSchool = match;
+                document.getElementById('headerSchoolName').innerText = match.school_name.toUpperCase();
+                document.documentElement.style.setProperty('--blue', match.brand_color);
                 await loadData();
                 document.getElementById('loginGate').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
-                startClock();
+                setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
             } else {
-                alert("INVALID KEY. CHECK SPELLING.");
+                alert("ACCESS DENIED. PLEASE RE-TYPE CAREFULLY.");
                 btn.innerText = "AUTHENTICATE";
                 btn.disabled = false;
             }
         } catch (e) {
-            alert("SYSTEM ERROR. CHECK INTERNET.");
+            alert("NETWORK ERROR");
             btn.innerText = "AUTHENTICATE";
             btn.disabled = false;
         }
     }
 
     async function loadData() {
-        const { data } = await _client.from('students').select('*').eq('school_id', window.currentSchool.id).order('name');
-        if(data) { cachedData = data; updateStats(); renderUI(); renderAbsence(); updateFinanceTotals(); }
-    }
-
-    function updateStats() {
-        document.getElementById('c-tot').innerText = cachedData.length;
-        document.getElementById('c-pres').innerText = cachedData.filter(s => !s.is_absent).length;
-        document.getElementById('c-abs').innerText = cachedData.filter(s => s.is_absent).length;
+        const { data } = await _client.from('students').select('*').eq('school_id', window.currentSchool.id);
+        if(data) { cachedData = data; renderUI(); updateFinance(); }
     }
 
     function renderUI() {
         const list = document.getElementById('dataList'); if(!list) return;
         list.innerHTML = "";
-        const q = document.getElementById('searchBar').value.toLowerCase();
-        cachedData.filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
-            const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
-            list.innerHTML += `<div class="card" onclick="editMode('${s.id}')">
-                <b>${s.name.toUpperCase()}</b><br>
-                <span style="font-size:10px; font-weight:800; color:#777;">${s.class}</span>
-                <div class="rec-info">LOC: ${s.location || 'N/A'} | HEALTH: ${s.health_status || 'OK'}</div>
-                <div style="margin-top:8px; font-size:11px; font-weight:800; color:${bal>0?'var(--red)':'var(--green)'}">BAL: ${bal.toLocaleString()} UGX</div>
-            </div>`;
+        cachedData.forEach(s => {
+            list.innerHTML += `<div class="card" onclick="editMode('${s.id}')"><b>${s.name}</b><br><small>${s.class} | ${s.location || ''}</small></div>`;
         });
-        const rCls = document.getElementById('rollClass').value;
-        const rList = document.getElementById('rollData'); if(!rList) return;
-        rList.innerHTML = "";
-        if(rCls) {
-            cachedData.filter(s => s.class === rCls).forEach(s => {
-                const isA = s.is_absent === true;
-                rList.innerHTML += `<div class="card"><b>${s.name}</b> 
-                    <button onclick="markAtt('${s.id}', ${!isA})" style="float:right; background:${isA?'var(--red)':'var(--green)'}; border:none; padding:8px 12px; color:white; border-radius:8px; font-weight:900;">${isA?'ABSENT':'PRESENT'}</button>
-                </div>`;
-            });
-        }
     }
 
     async function submitData() {
-        const id = document.getElementById('editId').value;
         const payload = {
             school_id: window.currentSchool.id,
             name: document.getElementById('name').value,
-            age: parseInt(document.getElementById('age').value),
-            dob: document.getElementById('dob').value,
+            age: document.getElementById('age').value,
             class: document.getElementById('cls').value,
             location: document.getElementById('location_field').value,
             health_status: document.getElementById('health_field').value,
-            contact: document.getElementById('contact').value,
-            fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
-            fees_paid: parseInt(document.getElementById('f_paid').value) || 0
+            contact: document.getElementById('contact').value
         };
-        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("SAVED SUCCESSFULLY"); resetForm(); loadData(); tab('sum'); }
-    }
-
-    function editMode(id) {
-        const s = cachedData.find(st => st.id == id);
-        document.getElementById('editId').value = s.id;
-        document.getElementById('name').value = s.name;
-        document.getElementById('age').value = s.age;
-        document.getElementById('dob').value = s.dob;
-        document.getElementById('cls').value = s.class;
-        document.getElementById('location_field').value = s.location || '';
-        document.getElementById('health_status').value = s.health_status || '';
-        document.getElementById('contact').value = s.contact || '';
-        document.getElementById('f_exp').value = s.fees_expected || 0;
-        document.getElementById('f_paid').value = s.fees_paid || 0;
-        tab('adm');
-    }
-
-    function resetForm() {
-        document.getElementById('editId').value = "";
-        ['name','age','dob','location_field','health_field','contact','f_exp','f_paid'].forEach(id=>document.getElementById(id).value="");
-    }
-
-    async function markAtt(id, status) { await _client.from('students').update({ is_absent: status }).eq('id', id); loadData(); }
-
-    function updateFinanceTotals() {
-        let tE = 0, tP = 0; cachedData.forEach(s => { tE += (s.fees_expected || 0); tP += (s.fees_paid || 0); });
-        document.getElementById('s-exp').innerText = tE.toLocaleString();
-        document.getElementById('s-paid').innerText = tP.toLocaleString();
-        document.getElementById('s-debt').innerText = (tE - tP).toLocaleString();
-    }
-
-    function renderAbsence() {
-        const cont = document.getElementById('absenceListContainer'); 
-        const abs = cachedData.filter(s => s.is_absent);
-        if(abs.length === 0) { cont.innerHTML = "<p style='font-size:12px; color:#999;'>No absences today.</p>"; return; }
-        let h = `<table style="width:100%; font-size:12px; border-collapse:collapse;">`;
-        abs.forEach(s => h += `<tr style="border-bottom:1px solid #eee;"><td style="padding:10px 0;">${s.name}</td><td style='color:var(--red); text-align:right;'>${s.contact || ''}</td></tr>`);
-        cont.innerHTML = h + `</table>`;
-    }
-
-    function startClock() {
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-            document.getElementById('fullDate').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-            document.getElementById('liveStatusBar').innerText = (now.getHours() >= 8 && now.getHours() < 17) ? "CLASS IN SESSION" : "SCHOOL CLOSED";
-        }, 1000);
+        await _client.from('students').insert([payload]);
+        alert("SAVED"); loadData();
     }
 
     function tab(t) { 
         ['v-adm','v-rec','v-roll','v-sum'].forEach(v => document.getElementById(v).classList.add('hidden')); 
         document.getElementById('v-'+t).classList.remove('hidden'); 
-        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active')); 
-        document.getElementById('tab-'+t).classList.add('active'); 
+    }
+    
+    function updateFinance() {
+        let total = 0; cachedData.forEach(s => total += (s.fees_expected - s.fees_paid));
+        document.getElementById('s-debt').innerText = total.toLocaleString() + " UGX";
     }
 </script>
 </body>
