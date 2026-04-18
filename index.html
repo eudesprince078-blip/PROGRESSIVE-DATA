@@ -7,7 +7,7 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #002d5b; --gold: #ffc107; --red: #d90429; --white: #ffffff; --green: #2b9348; --light: #f1f4f9; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); margin: 0; padding: 0; }
         #loginGate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; }
         .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .hero { background: #001a33; padding: 25px 15px; text-align: center; color: white; }
@@ -21,7 +21,7 @@
         .tab.active { color: var(--blue); border-bottom: 3px solid var(--blue); background: #fafafa; }
         .card { background: white; border-radius: 15px; padding: 18px; margin: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--blue); }
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
-        input, select { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; font-size: 14px; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -51,12 +51,12 @@
         <div class="tab" onclick="tab('adm')">Admission</div>
         <div class="tab" onclick="tab('roll')">Attendance</div>
     </div>
-    <div id="v-sum" class="">
+    <div id="v-sum">
         <div class="card" style="background:var(--blue); color:white; border-left:none;">
             <h4 style="margin:0 0 10px 0; color:var(--gold);">FINANCE SUMMARY</h4>
-            <div style="display:flex; justify-content:space-between;"><span>Balance:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
+            <div style="display:flex; justify-content:space-between;"><span>Balance:</span> <b id="s-debt">0 UGX</b></div>
         </div>
-        <div class="card" id="absenceListContainer"></div>
+        <div class="card" id="absenceListContainer">No Recent Activity</div>
     </div>
     <div id="v-rec" class="hidden">
         <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Pupil..." oninput="renderUI()"></div>
@@ -65,13 +65,10 @@
     <div id="v-adm" class="hidden">
         <div class="card">
             <input type="hidden" id="editId">
-            <label>Name</label><input id="name">
-            <label>Age</label><input id="age" type="number">
+            <label>Full Name</label><input id="name">
             <label>Class</label>
             <select id="cls"><option>Baby Class</option><option>P.1</option><option>P.7</option></select>
-            <label>Location</label><input id="location_field">
-            <label>Health</label><input id="health_field">
-            <label>Contact</label><input id="contact">
+            <label>Parent Contact</label><input id="contact">
             <button onclick="submitData()" class="btn-main">SAVE RECORD</button>
         </div>
     </div>
@@ -85,20 +82,18 @@
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
     let cachedData = [];
-    window.currentSchool = {}; 
 
     async function secureLogin() {
         const btn = document.getElementById('authBtn');
-        const inputKey = document.getElementById('key').value.trim().toUpperCase();
+        // This removes ALL spaces to prevent mismatch
+        const inputKey = document.getElementById('key').value.replace(/\s/g, '').toUpperCase();
         if(!inputKey) return alert("ENTER KEY");
         btn.innerText = "CONNECTING...";
         btn.disabled = true;
 
         try {
-            // This pulls all keys to find a match, ignoring spaces/case
             const { data: schools } = await _client.from('schools').select('*');
-            
-            const match = schools.find(s => s.access_key.trim().toUpperCase() === inputKey);
+            const match = schools.find(s => s.access_key.replace(/\s/g, '').toUpperCase() === inputKey);
 
             if (match) {
                 window.currentSchool = match;
@@ -122,25 +117,24 @@
 
     async function loadData() {
         const { data } = await _client.from('students').select('*').eq('school_id', window.currentSchool.id);
-        if(data) { cachedData = data; renderUI(); updateFinance(); }
+        if(data) { cachedData = data; renderUI(); }
     }
 
     function renderUI() {
-        const list = document.getElementById('dataList'); if(!list) return;
+        const list = document.getElementById('dataList');
+        if(!list) return;
         list.innerHTML = "";
         cachedData.forEach(s => {
-            list.innerHTML += `<div class="card" onclick="editMode('${s.id}')"><b>${s.name}</b><br><small>${s.class} | ${s.location || ''}</small></div>`;
+            list.innerHTML += `<div class="card"><b>${s.name}</b><br><small>${s.class}</small></div>`;
         });
+        document.getElementById('c-tot').innerText = cachedData.length;
     }
 
     async function submitData() {
         const payload = {
             school_id: window.currentSchool.id,
             name: document.getElementById('name').value,
-            age: document.getElementById('age').value,
             class: document.getElementById('cls').value,
-            location: document.getElementById('location_field').value,
-            health_status: document.getElementById('health_field').value,
             contact: document.getElementById('contact').value
         };
         await _client.from('students').insert([payload]);
@@ -150,11 +144,6 @@
     function tab(t) { 
         ['v-adm','v-rec','v-roll','v-sum'].forEach(v => document.getElementById(v).classList.add('hidden')); 
         document.getElementById('v-'+t).classList.remove('hidden'); 
-    }
-    
-    function updateFinance() {
-        let total = 0; cachedData.forEach(s => total += (s.fees_expected - s.fees_paid));
-        document.getElementById('s-debt').innerText = total.toLocaleString() + " UGX";
     }
 </script>
 </body>
