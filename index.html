@@ -11,33 +11,37 @@
         * { box-sizing: border-box; text-transform: uppercase; transition: 0.2s; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
 
-        /* HEADER & TABS */
+        /* NAVIGATION & DASHBOARD */
         .top-nav { background: var(--danger); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; border-bottom: 4px solid var(--dark); }
         .tab-bar { background: white; display: flex; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 1000; }
         .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.65rem; font-weight: 800; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #f8fafc; }
 
-        /* DASHBOARD STATS */
         .hero { background: var(--dark); color: white; padding: 30px 20px; text-align: center; }
         #live-clock { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -25px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-bottom: 4px solid #cbd5e1; }
         .stat-card b { display: block; font-size: 1.4rem; }
 
-        /* FORMS & TABLES */
+        /* FORMS */
         .container { padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        input { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; font-family: inherit; }
+        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.65rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
+        input, select { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; font-family: inherit; }
         
-        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; }
-        .btn-save { background: var(--primary); width: 100%; }
-        .btn-edit { background: var(--primary); font-size: 0.6rem; padding: 6px 10px; }
+        /* BUTTONS */
+        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; text-align: center; }
+        .btn-main { background: var(--primary); width: 100%; font-size: 1rem; }
+        .btn-edit { background: var(--primary); font-size: 0.6rem; padding: 6px 10px; margin-right: 4px; }
         .btn-del { background: var(--danger); font-size: 0.6rem; padding: 6px 10px; }
+        .btn-cancel { background: #64748b; width: 100%; margin-top: 10px; }
 
-        .stu-pic { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; border: 1px solid #e2e8f0; }
+        /* TABLE */
+        .stu-pic { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; border: 1px solid #ddd; }
         .table-wrap { overflow-x: auto; background: white; border-radius: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { background: #f8fafc; padding: 12px; text-align: left; font-size: 0.65rem; color: #94a3b8; border-bottom: 1px solid #e2e8f0; }
         td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; font-weight: 700; }
     </style>
@@ -57,8 +61,8 @@
     <div id="dash" class="tab-content">
         <div class="hero"><h1 id="live-clock">00:00:00</h1></div>
         <div class="stat-grid">
-            <div class="stat-card" style="border-color:var(--accent);"><b id="countT">0</b><span>TOTAL</span></div>
-            <div class="stat-card" style="border-color:var(--success);"><b id="countP" style="color:var(--success);">0</b><span>PAID</span></div>
+            <div class="stat-card" style="border-color:var(--accent);"><b id="countT">0</b><span>PUPILS</span></div>
+            <div class="stat-card" style="border-color:var(--success);"><b id="countP" style="color:var(--success);">0</b><span>CLEARED</span></div>
             <div class="stat-card" style="border-color:var(--danger);"><b id="countB" style="color:var(--danger);">0</b><span>OWING</span></div>
         </div>
         <div class="container">
@@ -68,7 +72,7 @@
             <div class="table-wrap card">
                 <table>
                     <thead>
-                        <tr><th>LIN</th><th>PHOTO</th><th>NAME</th><th>CLASS</th><th>BALANCE</th><th>ACTION</th></tr>
+                        <tr><th>LIN</th><th>PHOTO</th><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>HEALTH</th><th>BALANCE</th><th>ACTION</th></tr>
                     </thead>
                     <tbody id="dashBody"></tbody>
                 </table>
@@ -78,15 +82,20 @@
 
     <div id="admission" class="tab-content container" style="display:none;">
         <div class="card">
-            <h3 id="formTitle" style="margin-top:0; font-size:0.8rem; color:var(--primary);">STUDENT ENROLLMENT</h3>
-            <div class="input-grid">
-                <input type="text" id="inName" placeholder="NAME">
-                <input type="text" id="inClass" placeholder="CLASS">
-                <input type="number" id="inTotal" placeholder="FEES">
-                <input type="file" id="inPhoto" accept="image/*" style="border:none;">
+            <h3 id="formTitle" style="margin:0 0 20px 0; color:var(--primary);">STUDENT REGISTRATION FORM</h3>
+            <div class="form-grid">
+                <div class="input-group"><label>FULL NAME</label><input type="text" id="inName"></div>
+                <div class="input-group"><label>CLASS</label><input type="text" id="inClass"></div>
+                <div class="input-group"><label>DATE OF BIRTH</label><input type="date" id="inDOB"></div>
+                <div class="input-group"><label>AGE</label><input type="number" id="inAge"></div>
+                <div class="input-group"><label>PARENT CONTACT</label><input type="text" id="inContact"></div>
+                <div class="input-group"><label>PHYSICAL LOCATION</label><input type="text" id="inLoc"></div>
+                <div class="input-group"><label>HEALTH STATUS</label><input type="text" id="inHealth" placeholder="Normal/Allergies/Etc"></div>
+                <div class="input-group"><label>TOTAL FEES</label><input type="number" id="inFees"></div>
+                <div class="input-group"><label>UPLOAD PHOTO</label><input type="file" id="inPhoto" accept="image/*" style="border:none;"></div>
             </div>
-            <button class="btn btn-save" id="saveBtn" onclick="handleSave()">SAVE RECORD</button>
-            <button class="btn btn-del" id="cancelBtn" style="display:none; width:100%; margin-top:10px;" onclick="cancelEdit()">CANCEL EDIT</button>
+            <button class="btn btn-main" id="saveBtn" onclick="processSave()">SAVE STUDENT RECORD</button>
+            <button class="btn btn-cancel" id="cancelBtn" style="display:none;" onclick="cancelEdit()">CANCEL EDIT</button>
         </div>
     </div>
 
@@ -115,27 +124,30 @@
         }
 
         function renderDash() {
-            let p = 0, b = 0;
+            let cleared = 0, owing = 0;
             document.getElementById('dashBody').innerHTML = allStudents.map(s => {
                 const bal = (s.total_fees || 0) - (s.paid_fees || 0);
-                if(bal <= 0) p++; else b++;
+                if(bal <= 0) cleared++; else owing++;
                 return `<tr>
-                    <td>${s.lin || '---'}</td>
+                    <td style="color:var(--danger); font-family:monospace;">${s.lin || '---'}</td>
                     <td><img src="${s.photo_url || ''}" class="stu-pic"></td>
                     <td style="color:var(--primary)">${s.name}</td>
                     <td>${s.class}</td>
+                    <td>${s.contact_number || '--'}</td>
+                    <td><span style="font-size:0.65rem;">${s.health_status || 'NORMAL'}</span></td>
                     <td style="color:${bal > 0 ? 'red' : 'green'}">${bal.toLocaleString()}</td>
                     <td>
-                        <button class="btn btn-edit" onclick="prepEdit('${s.id}')">EDIT</button>
-                        <button class="btn btn-del" onclick="handleDelete('${s.id}')">DEL</button>
+                        <button class="btn btn-edit" onclick="startEdit('${s.id}')">EDIT</button>
+                        <button class="btn btn-del" onclick="startDelete('${s.id}')">DEL</button>
                     </td>
                 </tr>`;
             }).join('');
             document.getElementById('countT').innerText = allStudents.length;
-            document.getElementById('countP').innerText = p;
-            document.getElementById('countB').innerText = b;
+            document.getElementById('countP').innerText = cleared;
+            document.getElementById('countB').innerText = owing;
         }
 
+        // IMAGE COMPRESSION (FIXES CONNECTION ERRORS)
         async function compress(file) {
             return new Promise(res => {
                 const r = new FileReader(); r.readAsDataURL(file);
@@ -151,13 +163,17 @@
             });
         }
 
-        async function handleSave() {
+        async function processSave() {
+            const btn = document.getElementById('saveBtn');
+            btn.innerText = "SAVING TO DATABASE...";
+            btn.disabled = true;
+
             const file = document.getElementById('inPhoto').files[0];
             let pUrl = undefined;
 
             if(file) {
                 const blob = await compress(file);
-                const path = `img_${Date.now()}.jpg`;
+                const path = `stu_${Date.now()}.jpg`;
                 const { data } = await client.storage.from('student-photos').upload(path, blob);
                 if(data) pUrl = client.storage.from('student-photos').getPublicUrl(path).data.publicUrl;
             }
@@ -165,35 +181,52 @@
             const payload = {
                 name: document.getElementById('inName').value,
                 class: document.getElementById('inClass').value,
-                total_fees: document.getElementById('inTotal').value
+                age: document.getElementById('inAge').value,
+                date_of_birth: document.getElementById('inDOB').value,
+                contact_number: document.getElementById('inContact').value,
+                location: document.getElementById('inLoc').value,
+                health_status: document.getElementById('inHealth').value,
+                total_fees: document.getElementById('inFees').value
             };
             if(pUrl) payload.photo_url = pUrl;
 
+            let response;
             if(editId) {
-                await client.from('students').update(payload).eq('id', editId);
-                editId = null;
+                response = await client.from('students').update(payload).eq('id', editId);
             } else {
-                await client.from('students').insert([payload]);
+                response = await client.from('students').insert([payload]);
             }
-            
-            alert("SUCCESS");
-            cancelEdit();
+
+            if(!response.error) {
+                alert("SUCCESS!");
+                cancelEdit();
+            } else {
+                alert("ERROR: " + response.error.message);
+            }
+            btn.innerText = "SAVE STUDENT RECORD";
+            btn.disabled = false;
         }
 
-        function prepEdit(id) {
+        function startEdit(id) {
             const s = allStudents.find(x => x.id === id);
             editId = id;
             document.getElementById('inName').value = s.name;
             document.getElementById('inClass').value = s.class;
-            document.getElementById('inTotal').value = s.total_fees;
+            document.getElementById('inAge').value = s.age || "";
+            document.getElementById('inDOB').value = s.date_of_birth || "";
+            document.getElementById('inContact').value = s.contact_number || "";
+            document.getElementById('inLoc').value = s.location || "";
+            document.getElementById('inHealth').value = s.health_status || "";
+            document.getElementById('inFees').value = s.total_fees;
+            
             document.getElementById('formTitle').innerText = "EDITING: " + s.name;
-            document.getElementById('saveBtn').innerText = "UPDATE STUDENT";
+            document.getElementById('saveBtn').innerText = "UPDATE STUDENT RECORD";
             document.getElementById('cancelBtn').style.display = "block";
             showTab('admission');
         }
 
-        async function handleDelete(id) {
-            if(confirm("DELETE PERMANENTLY?")) {
+        async function startDelete(id) {
+            if(confirm("PERMANENTLY DELETE THIS STUDENT?")) {
                 await client.from('students').delete().eq('id', id);
                 fetchAll();
             }
@@ -201,11 +234,9 @@
 
         function cancelEdit() {
             editId = null;
-            document.getElementById('inName').value = "";
-            document.getElementById('inClass').value = "";
-            document.getElementById('inTotal').value = "";
-            document.getElementById('formTitle').innerText = "STUDENT ENROLLMENT";
-            document.getElementById('saveBtn').innerText = "SAVE RECORD";
+            document.querySelectorAll('input').forEach(i => i.value = "");
+            document.getElementById('formTitle').innerText = "STUDENT REGISTRATION FORM";
+            document.getElementById('saveBtn').innerText = "SAVE STUDENT RECORD";
             document.getElementById('cancelBtn').style.display = "none";
             showTab('dash');
         }
