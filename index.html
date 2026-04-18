@@ -2,39 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Progressive Mothers Management</title>
+    <title>Progressive Mothers | Master Management V84</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #002d5b; --gold: #ffc107; --white: #ffffff; --light: #f1f4f9; --red: #d90429; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); margin: 0; padding: 0; }
         
+        /* Premium Header */
         .header { background: var(--blue); color: white; padding: 15px; border-bottom: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .hero { background: #001a33; padding: 15px; text-align: center; color: white; border-bottom: 2px solid var(--gold); }
         #clock { font-size: 24px; font-weight: 900; color: var(--gold); }
 
+        /* Navigation */
         .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 75px; z-index: 999; }
         .tab { flex: 1; text-align: center; padding: 15px; font-size: 12px; font-weight: 900; color: #999; cursor: pointer; text-transform: uppercase; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f0f4ff; }
 
+        /* Pupil Display */
         .container { padding: 15px; }
         .search-bar { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 12px; box-sizing: border-box; font-size: 14px; }
-        
         .pupil-card { background: white; margin-bottom: 12px; padding: 12px; border-radius: 15px; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); position: relative; }
-        .pupil-photo { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 2px solid var(--blue); background: #eee; }
+        .pupil-photo { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 3px solid var(--blue); background: #eee; }
         .pupil-info { flex: 1; }
-        .pupil-name { font-weight: 900; color: var(--blue); font-size: 13px; text-transform: uppercase; }
+        .pupil-name { font-weight: 900; color: var(--blue); font-size: 14px; text-transform: uppercase; margin-bottom: 3px; }
         .pupil-meta { font-size: 11px; color: #555; font-weight: 700; }
-        
-        .action-btns { display: flex; gap: 8px; margin-top: 8px; }
-        .btn-sm { padding: 8px 15px; border-radius: 6px; border: none; font-size: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
-        .btn-edit { background: var(--gold); color: black; }
-        .btn-del { background: var(--red); color: white; }
+        .lin-tag { background: var(--gold); color: black; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 5px; }
 
-        .form-box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        /* Action Buttons */
+        .action-row { display: flex; gap: 8px; margin-top: 10px; }
+        .btn-action { flex: 1; padding: 8px; border-radius: 6px; border: none; font-size: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .edit { background: #e9ecef; color: var(--blue); border: 1px solid #dee2e6; }
+        .delete { background: #fff5f5; color: var(--red); border: 1px solid #ffc9c9; }
+
+        /* Form Styling */
+        .form-box { background: white; padding: 20px; border-radius: 15px; }
         label { font-weight: 900; font-size: 11px; color: var(--blue); display: block; margin-bottom: 5px; text-transform: uppercase; }
         input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; font-size: 14px; }
-        .btn-main { background: var(--blue); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; font-size: 14px; }
+        .btn-save { background: var(--blue); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; }
 
         .hidden { display: none !important; }
     </style>
@@ -42,183 +47,174 @@
 <body>
 
 <div class="header">
-    <div><b>PROGRESSIVE MOTHERS</b><br><span style="font-size:9px; color:var(--gold);">EUDES MEDIA | +256762992440</span></div>
-    <button onclick="location.reload()" style="background:rgba(255,255,255,0.2); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900; font-size:10px;">REFRESH</button>
+    <div><b>PROGRESSIVE MOTHERS</b><br><span style="font-size:9px; color:var(--gold);">EUDES MEDIA | SYSTEM V84</span></div>
+    <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900; font-size:10px;">REFRESH</button>
 </div>
 
 <div class="hero">
     <div id="clock">00:00:00</div>
-    <div id="date-display" style="font-size:11px; opacity:0.8; font-weight:bold;"></div>
+    <div id="date-text" style="font-size:11px; font-weight:bold; opacity:0.8;"></div>
 </div>
 
 <div class="nav-tabs">
-    <div class="tab active" id="t-rec" onclick="tab('rec')">Pupil Ledger</div>
-    <div class="tab" id="t-adm" onclick="tab('adm')">New Admission</div>
+    <div class="tab active" id="t-list" onclick="tab('list')">Pupil Ledger</div>
+    <div class="tab" id="t-form" onclick="tab('form')">New Admission</div>
 </div>
 
-<div id="v-rec" class="container">
-    <input type="text" id="sb" class="search-bar" placeholder="🔍 Search Pupil by Name..." oninput="render()">
-    <div id="list"></div>
+<div id="v-list" class="container">
+    <input type="text" id="sb" class="search-bar" placeholder="🔍 Search Name or LIN..." oninput="render()">
+    <div id="pupil-container"></div>
 </div>
 
-<div id="v-adm" class="container hidden">
+<div id="v-form" class="container hidden">
     <div class="form-box">
-        <h3 id="form-title" style="margin-top:0; color:var(--blue);">New Pupil Registration</h3>
+        <h3 id="form-head" style="margin-top:0; color:var(--blue);">Student Registration</h3>
         <input type="hidden" id="edit-id">
         
         <label>Full Name</label>
-        <input id="name" placeholder="Enter Pupil's Name">
+        <input id="in-name" placeholder="Enter Full Name">
         
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div><label>Age</label><input id="age" type="number"></div>
             <div><label>Class</label>
-                <select id="cls">
+                <select id="in-cls">
                     <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                     <option>P.5</option><option>P.6</option><option>P.7</option>
                 </select>
             </div>
+            <div><label>LIN Number</label><input id="in-lin" placeholder="e.g. PMA-1234"></div>
         </div>
 
-        <label>Physical Location</label>
-        <input id="loc" placeholder="Village / Residence">
+        <label>Physical Location</label><input id="in-loc" placeholder="Village / Residence">
+        <label>Health Status</label><input id="in-health" value="Good">
         
-        <label>Health Status</label>
-        <input id="health" placeholder="e.g. Normal, Asthma, etc.">
+        <label>Upload/Change Photo</label>
+        <input type="file" id="in-photo" accept="image/*">
         
-        <label>Update Photo (Optional)</label>
-        <input type="file" id="photoFile" accept="image/*">
-        
-        <button class="btn-main" id="saveBtn" onclick="saveData()">SAVE PUPIL RECORD</button>
-        <button id="cancelBtn" class="hidden" onclick="resetForm()" style="background:none; border:none; color:var(--red); width:100%; margin-top:10px; font-weight:bold; cursor:pointer;">Cancel Edit</button>
+        <button class="btn-save" id="save-btn" onclick="saveRecord()">SAVE DATA TO CLOUD</button>
+        <button id="cancel-btn" class="hidden" onclick="clearForm()" style="background:none; border:none; color:var(--red); width:100%; margin-top:15px; font-weight:bold; cursor:pointer;">Cancel Edit</button>
     </div>
 </div>
 
 <script>
-    const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-    const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
-    const BUCKET = 'student-photos'; 
-    let cachedData = [];
+    const S_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
+    const _db = supabase.createClient(S_URL, S_KEY);
+    const BKT = 'student-photos';
+    let pupils = [];
 
-    function init() {
+    function start() {
         setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-            document.getElementById('date-display').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+            const d = new Date();
+            document.getElementById('clock').innerText = d.toLocaleTimeString('en-GB');
+            document.getElementById('date-text').innerText = d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
         }, 1000);
-        load();
+        fetchData();
     }
 
-    async function load() {
-        const { data: pupils } = await _client.from('students').select('*').order('name');
-        if(pupils) { cachedData = pupils; render(); }
+    async function fetchData() {
+        const { data } = await _db.from('students').select('*').order('name', { ascending: true });
+        if(data) { pupils = data; render(); }
     }
 
     function render() {
-        const container = document.getElementById('list');
-        const query = document.getElementById('sb').value.toLowerCase();
-        container.innerHTML = "";
+        const box = document.getElementById('pupil-container');
+        const q = document.getElementById('sb').value.toLowerCase();
+        box.innerHTML = "";
         
-        cachedData.filter(s => s.name.toLowerCase().includes(query)).forEach(s => {
-            const photo = s['photo-url'] || s['photo_url'] || 'https://via.placeholder.com/65?text=No+Img';
-            container.innerHTML += `
+        pupils.filter(p => p.name.toLowerCase().includes(q) || (p.lin && p.lin.toLowerCase().includes(q))).forEach(p => {
+            // Smart Image Pathing
+            const imgPath = p['photo-url'] || p['photo_url'] || 'https://via.placeholder.com/100?text=No+Photo';
+            
+            box.innerHTML += `
                 <div class="pupil-card">
-                    <img src="${photo}" class="pupil-photo" onerror="this.src='https://via.placeholder.com/65?text=Error'">
+                    <img src="${imgPath}" class="pupil-photo" onerror="this.src='https://via.placeholder.com/100?text=Image+Error'">
                     <div class="pupil-info">
-                        <div class="pupil-name">${s.name}</div>
-                        <div class="pupil-meta">CLASS: ${s.class} | LIN: ${s.lin || 'N/A'}</div>
-                        <div class="action-btns">
-                            <button class="btn-sm btn-edit" onclick="editMode('${s.id}')">Edit</button>
-                            <button class="btn-sm btn-del" onclick="deletePupil('${s.id}', '${s.name}')">Delete</button>
+                        <div class="pupil-name">${p.name} <span class="lin-tag">${p.lin || 'NEW'}</span></div>
+                        <div class="pupil-meta">CLASS: ${p.class} | HEALTH: ${p.health_status || 'Good'}</div>
+                        <div class="pupil-meta">LOCATION: ${p.location || 'Unknown'}</div>
+                        <div class="action-row">
+                            <button class="btn-action edit" onclick="prepEdit('${p.id}')">Edit</button>
+                            <button class="btn-action delete" onclick="killRecord('${p.id}', '${p.name}')">Delete</button>
                         </div>
                     </div>
                 </div>`;
         });
     }
 
-    function editMode(id) {
-        const s = cachedData.find(x => x.id == id);
-        document.getElementById('edit-id').value = s.id;
-        document.getElementById('name').value = s.name;
-        document.getElementById('age').value = s.age || '';
-        document.getElementById('loc').value = s.location || '';
-        document.getElementById('health').value = s.health_status || '';
-        document.getElementById('cls').value = s.class;
+    function prepEdit(id) {
+        const p = pupils.find(x => x.id == id);
+        document.getElementById('edit-id').value = p.id;
+        document.getElementById('in-name').value = p.name;
+        document.getElementById('in-cls').value = p.class;
+        document.getElementById('in-lin').value = p.lin || "";
+        document.getElementById('in-loc').value = p.location || "";
+        document.getElementById('in-health').value = p.health_status || "Good";
         
-        document.getElementById('form-title').innerText = "Edit Pupil Details";
-        document.getElementById('saveBtn').innerText = "UPDATE RECORD";
-        document.getElementById('cancelBtn').classList.remove('hidden');
-        tab('adm');
+        document.getElementById('form-head').innerText = "Update Record";
+        document.getElementById('save-btn').innerText = "CONFIRM CHANGES";
+        document.getElementById('cancel-btn').classList.remove('hidden');
+        tab('form');
     }
 
-    function resetForm() {
+    function clearForm() {
         document.getElementById('edit-id').value = "";
-        document.getElementById('name').value = "";
-        document.getElementById('age').value = "";
-        document.getElementById('loc').value = "";
-        document.getElementById('health').value = "";
-        document.getElementById('form-title').innerText = "New Pupil Registration";
-        document.getElementById('saveBtn').innerText = "SAVE PUPIL RECORD";
-        document.getElementById('cancelBtn').classList.add('hidden');
+        document.getElementById('in-name').value = "";
+        document.getElementById('in-lin').value = "";
+        document.getElementById('in-loc').value = "";
+        document.getElementById('form-head').innerText = "Student Registration";
+        document.getElementById('save-btn').innerText = "SAVE DATA TO CLOUD";
+        document.getElementById('cancel-btn').classList.add('hidden');
     }
 
-    async function deletePupil(id, name) {
-        if(confirm("Delete record for " + name + "? This cannot be undone.")) {
-            await _client.from('students').delete().eq('id', id);
+    async function killRecord(id, name) {
+        if(confirm(`Delete record for ${name}?`)) {
+            await _db.from('students').delete().eq('id', id);
             location.reload();
         }
     }
 
-    async function saveData() {
-        const btn = document.getElementById('saveBtn');
-        const editId = document.getElementById('edit-id').value;
-        const file = document.getElementById('photoFile').files[0];
+    async function saveRecord() {
+        const btn = document.getElementById('save-btn');
+        const file = document.getElementById('in-photo').files[0];
+        const eid = document.getElementById('edit-id').value;
         
         btn.disabled = true;
-        btn.innerText = "SAVING TO CLOUD...";
-        
-        let url = null;
+        btn.innerText = "SYNCING WITH SUPABASE...";
+
+        let finalUrl = null;
         if(file) {
-            const fName = `p_${Date.now()}.jpg`;
-            const { data: up } = await _client.storage.from(BUCKET).upload(fName, file);
-            if(up) url = `${SUPA_URL}/storage/v1/object/public/${BUCKET}/${fName}`;
+            const fileName = `img_${Date.now()}.jpg`;
+            const { data: uploadInfo } = await _db.storage.from(BKT).upload(fileName, file);
+            if(uploadInfo) finalUrl = `${S_URL}/storage/v1/object/public/${BKT}/${fileName}`;
         }
 
-        const payload = {
-            name: document.getElementById('name').value,
-            age: document.getElementById('age').value,
-            location: document.getElementById('loc').value,
-            health_status: document.getElementById('health').value,
-            class: document.getElementById('cls').value
+        const row = {
+            name: document.getElementById('in-name').value,
+            class: document.getElementById('in-cls').value,
+            lin: document.getElementById('in-lin').value,
+            location: document.getElementById('in-loc').value,
+            health_status: document.getElementById('in-health').value
         };
-        if(url) { payload['photo-url'] = url; payload['photo_url'] = url; }
+        
+        if(finalUrl) { row['photo-url'] = finalUrl; row['photo_url'] = finalUrl; }
 
-        let response;
-        if(editId) {
-            response = await _client.from('students').update(payload).eq('id', editId);
+        if(eid) {
+            await _db.from('students').update(row).eq('id', eid);
         } else {
-            response = await _client.from('students').insert([payload]);
+            await _db.from('students').insert([row]);
         }
-
-        if(!response.error) {
-            alert("Success!");
-            location.reload();
-        } else {
-            alert("Error: " + response.error.message);
-            btn.disabled = false;
-            btn.innerText = "RETRY SAVE";
-        }
+        
+        location.reload();
     }
 
-    function tab(t) {
-        document.querySelectorAll('.container').forEach(v => v.classList.add('hidden'));
-        document.getElementById('v-'+t).classList.remove('hidden');
-        document.querySelectorAll('.tab').forEach(tb => tb.classList.remove('active'));
-        document.getElementById('t-'+t).classList.add('active');
-        if(t === 'adm' && !document.getElementById('edit-id').value) resetForm();
+    function tab(v) {
+        document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+        document.getElementById('v-'+v).classList.remove('hidden');
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('t-'+v).classList.add('active');
     }
 
-    init();
+    start();
 </script>
 </body>
 </html>
