@@ -2,247 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Supreme Management V69</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Progressive Mothers | Eudes Media System</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #002d5b; --gold: #ffc107; --red: #d90429; --white: #ffffff; --light: #f1f4f9; --green: #2b9348; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
-        .header { background: var(--blue); color: white; padding: 15px; border-bottom: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .hero { background: #001a33; padding: 20px; text-align: center; color: white; }
-        #clock { font-size: 28px; font-weight: 900; }
-        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
-        .stat-card { background: white; padding: 12px 5px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
-        .stat-val { font-size: 16px; font-weight: 900; color: var(--blue); display: block; }
-        .stat-lbl { font-size: 8px; font-weight: 800; color: #777; text-transform: uppercase; }
-        .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; }
-        .tab { flex: 1; text-align: center; padding: 15px; font-size: 12px; font-weight: 900; color: #999; cursor: pointer; text-transform: uppercase; }
-        .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #fdfdfd; }
-        .scroll-box { overflow-x: auto; margin: 15px; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th { text-align: left; padding: 12px; background: var(--blue); color: white; font-size: 11px; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; font-weight: 700; }
-        .lin-badge { background: var(--gold); color: var(--blue); padding: 5px 10px; border-radius: 6px; font-weight: 900; }
-        .photo-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--blue); background: #eee; }
-        .btn-edit { background: var(--blue); color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 10px; font-weight: 800; cursor: pointer; }
-        .btn-del { background: var(--red); color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 10px; font-weight: 800; cursor: pointer; }
-        input, select { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 10px; margin-bottom: 12px; font-size: 15px; font-weight: 600; box-sizing: border-box; }
-        label { font-weight: 900; font-size: 12px; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 4px; }
-        .hidden { display: none !important; }
-        #editOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .modal { background: white; width: 100%; max-width: 500px; border-radius: 15px; padding: 20px; position: relative; max-height: 90vh; overflow-y: auto; }
+        :root { --blue: #002d5b; --gold: #ffc107; --light: #f1f4f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
+        .header { background: var(--blue); color: white; padding: 15px; border-bottom: 5px solid var(--gold); text-align: center; }
+        .container { padding: 15px; }
+        .search-bar { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 15px; box-sizing: border-box; font-weight: bold; }
+        .pupil-card { background: white; margin-bottom: 10px; padding: 10px; border-radius: 12px; display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid var(--blue); }
+        .pupil-photo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px; background: #eee; border: 2px solid var(--blue); }
+        .pupil-info { flex-grow: 1; }
+        .pupil-name { font-weight: 900; color: var(--blue); font-size: 14px; text-transform: uppercase; }
+        .pupil-meta { font-size: 11px; color: #666; font-weight: 700; }
+        .lin-badge { background: var(--gold); padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 5px; }
     </style>
 </head>
 <body>
 
-<div id="mainApp">
-    <div class="header">
-        <div><b>PROGRESSIVE MOTHERS</b><br><span style="font-size:9px; color:var(--gold); font-weight: 800;">EUDES MEDIA MASTER PANEL</span></div>
-        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900;">LOGOUT</button>
-    </div>
-    
-    <div class="hero"><div id="clock">00:00:00</div></div>
-    
-    <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Pupils</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-paid" style="color:var(--green)">0</span><span class="stat-lbl">Paid</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-debt" style="color:var(--red)">0</span><span class="stat-lbl">Debt</span></div>
-    </div>
-
-    <div class="nav-tabs">
-        <div class="tab active" id="t-rec" onclick="tab('rec')">Student Ledger</div>
-        <div class="tab" id="t-adm" onclick="tab('adm')">Admission</div>
-    </div>
-
-    <div id="v-rec" class="p-view">
-        <div style="padding:10px 15px;"><input type="text" id="sb" style="margin:0;" placeholder="🔍 Search Name or LIN..." oninput="renderUI()"></div>
-        <div class="scroll-box">
-            <table>
-                <thead>
-                    <tr><th>LIN #</th><th>Photo</th><th>Student Name</th><th>Class</th><th>Paid</th><th>Debt</th><th>Actions</th></tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="v-adm" class="hidden p-view">
-        <div style="padding: 20px;">
-            <label>LIN Number</label><input id="lin">
-            <label>Full Name</label><input id="name">
-            <label>Class</label><select id="cls"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Expected Fees</label><input id="f_exp" type="number" value="0">
-            <label>Paid Amount</label><input id="f_paid" type="number" value="0">
-            <label>Contact</label><input id="contact">
-            <label>Upload Photo (Auto-Resized)</label><input type="file" id="photoFile" accept="image/*">
-            <button onclick="saveData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:10px; font-weight:900;" id="saveBtn">SUBMIT TO SYSTEM</button>
-        </div>
-    </div>
+<div class="header">
+    <div style="font-size: 18px; font-weight: 900;">PROGRESSIVE MOTHERS</div>
+    <div style="font-size: 10px; font-weight: 700;">DIGITAL LEDGER | EUDES MEDIA</div>
 </div>
 
-<div id="editOverlay" class="hidden">
-    <div class="modal">
-        <h2 style="color:var(--blue); margin-top:0;">EDIT STUDENT</h2>
-        <input type="hidden" id="editId">
-        <label>LIN Number</label><input id="eLin">
-        <label>Name</label><input id="eName">
-        <label>Class</label><input id="eCls">
-        <label>Paid Amount</label><input id="ePaid" type="number">
-        <label>Change Photo</label><input type="file" id="editPhotoFile" accept="image/*">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-            <button onclick="updateData()" id="updateBtn" style="background:var(--green); color:white; padding:15px; border-radius:8px; border:none; font-weight:900;">UPDATE</button>
-            <button onclick="document.getElementById('editOverlay').classList.add('hidden')" style="background:var(--red); color:white; padding:15px; border-radius:8px; border:none; font-weight:900;">CANCEL</button>
-        </div>
-    </div>
+<div class="container">
+    <input type="text" id="sb" class="search-bar" placeholder="🔍 Search pupil name or LIN..." oninput="render()">
+    <div id="list"></div>
 </div>
 
 <script>
     const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
-    const BUCKET = 'student-photos'; 
-    let cachedData = [];
+    let data = [];
 
-    async function init() {
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
-        await loadData();
+    async function load() {
+        const { data: pupils } = await _client.from('students').select('*').order('name');
+        if(pupils) { data = pupils; render(); }
     }
 
-    async function loadData() {
-        const { data } = await _client.from('students').select('*').order('name', { ascending: true });
-        if(data) { cachedData = data; renderUI(); }
-    }
-
-    function renderUI() {
-        const body = document.getElementById('tableBody');
-        const q = document.getElementById('sb').value.toLowerCase();
-        body.innerHTML = "";
-        let p=0, d=0;
-
-        cachedData.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toString().includes(q))).forEach((s, i) => {
-            const exp = parseInt(s.fees_expected || 0), paid = parseInt(s.fees_paid || 0), debt = exp - paid;
-            p += paid; d += debt;
-            const photo = s['photo-url'] || 'https://via.placeholder.com/50?text=No+Img';
-
-            body.innerHTML += `
-                <tr>
-                    <td><span class="lin-badge">${s.lin || 'N/A'}</span></td>
-                    <td><img src="${photo}" class="photo-img"></td>
-                    <td>${s.name.toUpperCase()}</td>
-                    <td>${s.class || 'N/A'}</td>
-                    <td style="color:var(--green)">${paid.toLocaleString()}</td>
-                    <td style="color:var(--red)">${debt.toLocaleString()}</td>
-                    <td>
-                        <button class="btn-edit" onclick="openEdit('${s.id}')">EDIT</button>
-                        <button class="btn-del" onclick="deleteRow('${s.id}')">DEL</button>
-                    </td>
-                </tr>`;
-        });
-        document.getElementById('c-tot').innerText = cachedData.length;
-        document.getElementById('c-paid').innerText = p.toLocaleString();
-        document.getElementById('c-debt').innerText = d.toLocaleString();
-    }
-
-    // NEW: IMAGE COMPRESSOR FUNCTION
-    async function compressImage(file) {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 500;
-                    const scaleSize = MAX_WIDTH / img.width;
-                    canvas.width = MAX_WIDTH;
-                    canvas.height = img.height * scaleSize;
-
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                    canvas.toBlob((blob) => {
-                        resolve(new File([blob], file.name, { type: 'image/jpeg' }));
-                    }, 'image/jpeg', 0.7); // 70% quality
-                };
-            };
+    function render() {
+        const container = document.getElementById('list');
+        const query = document.getElementById('sb').value.toLowerCase();
+        container.innerHTML = "";
+        
+        data.filter(s => s.name.toLowerCase().includes(query) || (s.lin && s.lin.includes(query))).forEach(s => {
+            const photo = s['photo-url'] || s['photo_url'] || 'https://via.placeholder.com/60?text=No+Img';
+            container.innerHTML += `
+                <div class="pupil-card">
+                    <img src="${photo}" class="pupil-photo" onerror="this.src='https://via.placeholder.com/60?text=Error'">
+                    <div class="pupil-info">
+                        <div class="pupil-name">${s.name} <span class="lin-badge">LIN: ${s.lin || '---'}</span></div>
+                        <div class="pupil-meta">CLASS: ${s.class} | HEALTH: ${s.health_status || 'Normal'}</div>
+                        <div class="pupil-meta">LOCATION: ${s.location || 'Not Set'}</div>
+                    </div>
+                </div>`;
         });
     }
 
-    async function uploadCompressed(file) {
-        if(!file) return null;
-        const compressed = await compressImage(file);
-        const fName = `${Date.now()}.jpg`;
-        const { data } = await _client.storage.from(BUCKET).upload(fName, compressed);
-        return data ? `${SUPA_URL}/storage/v1/object/public/${BUCKET}/${fName}` : null;
-    }
-
-    async function saveData() {
-        const btn = document.getElementById('saveBtn');
-        btn.innerText = "COMPRESSING & UPLOADING...";
-        const url = await uploadCompressed(document.getElementById('photoFile').files[0]);
-
-        const payload = {
-            lin: document.getElementById('lin').value,
-            name: document.getElementById('name').value,
-            class: document.getElementById('cls').value,
-            fees_expected: document.getElementById('f_exp').value,
-            fees_paid: document.getElementById('f_paid').value,
-            contact: document.getElementById('contact').value,
-            school_id: 1
-        };
-        if(url) payload['photo-url'] = url;
-
-        await _client.from('students').insert([payload]);
-        alert("PUPIL SAVED");
-        location.reload();
-    }
-
-    function openEdit(id) {
-        const s = cachedData.find(x => x.id == id);
-        document.getElementById('editId').value = s.id;
-        document.getElementById('eLin').value = s.lin || "";
-        document.getElementById('eName').value = s.name;
-        document.getElementById('eCls').value = s.class;
-        document.getElementById('ePaid').value = s.fees_paid;
-        document.getElementById('editOverlay').classList.remove('hidden');
-    }
-
-    async function updateData() {
-        const btn = document.getElementById('updateBtn');
-        btn.innerText = "UPDATING...";
-        const id = document.getElementById('editId').value;
-        const newPhoto = await uploadCompressed(document.getElementById('editPhotoFile').files[0]);
-
-        const payload = {
-            lin: document.getElementById('eLin').value,
-            name: document.getElementById('eName').value,
-            class: document.getElementById('eCls').value,
-            fees_paid: document.getElementById('ePaid').value
-        };
-        if(newPhoto) payload['photo-url'] = newPhoto;
-
-        await _client.from('students').update(payload).eq('id', id);
-        document.getElementById('editOverlay').classList.add('hidden');
-        await loadData();
-        btn.innerText = "UPDATE";
-    }
-
-    async function deleteRow(id) {
-        if(confirm("Permanently delete?")) {
-            await _client.from('students').delete().eq('id', id);
-            await loadData();
-        }
-    }
-
-    function tab(t) { 
-        document.querySelectorAll('.p-view').forEach(v => v.classList.add('hidden')); 
-        document.getElementById('v-'+t).classList.remove('hidden');
-        document.querySelectorAll('.tab').forEach(tb => tb.classList.remove('active'));
-        document.getElementById('t-'+t).classList.add('active');
-    }
-
-    init();
+    load();
 </script>
 </body>
 </html>
