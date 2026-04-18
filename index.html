@@ -9,82 +9,86 @@
     <style>
         :root { --primary: #0047AB; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; }
         * { box-sizing: border-box; text-transform: uppercase; transition: 0.2s; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
 
-        /* HEADER & HERO */
+        /* HEADER */
         .top-nav { background: var(--danger); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; }
         .hero { background: var(--dark); color: white; padding: 30px 20px; text-align: center; border-bottom: 5px solid var(--primary); }
         #live-clock { font-size: 3rem; font-weight: 800; margin: 0; letter-spacing: -2px; }
 
-        /* SEARCH BAR */
-        .search-container { padding: 20px; }
-        .search-box { background: white; padding: 15px; border-radius: 15px; display: flex; border: 2px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .search-box input { border: none; width: 100%; outline: none; font-weight: 800; font-family: inherit; font-size: 1rem; }
+        /* SEARCH BAR - HIGH VISIBILITY */
+        .search-area { padding: 20px; }
+        .search-bar { background: white; padding: 18px; border-radius: 15px; display: flex; border: 3px solid var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .search-bar input { border: none; width: 100%; outline: none; font-weight: 800; font-family: inherit; font-size: 1.1rem; }
 
-        /* REGISTRATION FORM */
-        .reg-box { background: white; margin: 0 20px 20px; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; }
-        .reg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
-        input, select { padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-weight: 700; font-family: inherit; }
-        .file-input { font-size: 0.7rem; border: none; padding: 5px; }
-        .btn-main { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; margin-top: 10px; font-weight: 800; cursor: pointer; }
+        /* UPLOAD & REGISTRATION */
+        .form-container { background: white; margin: 0 20px 20px; padding: 25px; border-radius: 20px; border: 1px solid #e2e8f0; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        input { padding: 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; font-family: inherit; }
+        .file-label { font-size: 0.65rem; color: var(--primary); font-weight: 800; margin-bottom: 5px; display: block; }
+        .btn-save { background: var(--primary); color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; margin-top: 15px; font-weight: 800; cursor: pointer; font-size: 1rem; }
 
-        /* TABLE */
-        .table-wrap { background: white; margin: 20px; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 15px rgba(0,0,0,0.05); }
+        /* DATA TABLE */
+        .table-container { background: white; margin: 20px; border-radius: 20px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
         .scroll { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.65rem; color: #94a3b8; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; font-weight: 700; }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        th { background: #f8fafc; padding: 18px; text-align: left; font-size: 0.7rem; color: #94a3b8; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 15px 18px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; font-weight: 700; }
         
-        .student-pic { width: 45px; height: 45px; border-radius: 50%; background: #eee; object-fit: cover; border: 2px solid var(--primary); }
-        .btn-action { padding: 8px 12px; border-radius: 8px; border: none; color: white; font-weight: 800; cursor: pointer; font-size: 0.6rem; margin-right: 5px; }
-        .edit { background: var(--primary); }
-        .del { background: var(--danger); }
+        .student-photo { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; border: 2px solid #e2e8f0; background: #eee; }
+        .lin-text { color: var(--danger); font-family: monospace; font-size: 0.9rem; }
+        .btn-act { padding: 8px 15px; border-radius: 8px; border: none; color: white; font-weight: 800; cursor: pointer; font-size: 0.65rem; }
+        .btn-edit { background: var(--primary); margin-right: 5px; }
+        .btn-delete { background: var(--danger); }
     </style>
 </head>
 <body>
 
-    <div id="main-ui">
-        <div class="top-nav">
-            <div>ESMS COMMAND</div>
-            <div style="background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:5px; font-size:0.7rem;">EUDES MEDIA</div>
+    <div class="top-nav">
+        <div>ESMS AUTHORITY HUB</div>
+        <div style="font-size: 0.7rem; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 6px;">EUDES MEDIA</div>
+    </div>
+
+    <div class="hero">
+        <h1 id="live-clock">00:00:00</h1>
+    </div>
+
+    <div class="search-area">
+        <div class="search-bar">
+            <input type="text" id="searchBox" placeholder="SEARCH BY STUDENT NAME OR LIN..." onkeyup="runSearch()">
         </div>
+    </div>
 
-        <div class="hero"><h1 id="live-clock">00:00:00</h1></div>
-
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="SEARCH BY NAME OR LIN NUMBER..." onkeyup="filterTable()">
+    <div class="form-container">
+        <div class="form-grid">
+            <input type="text" id="nameIn" placeholder="FULL NAME">
+            <input type="text" id="classIn" placeholder="CLASS">
+            <input type="number" id="ageIn" placeholder="AGE">
+            <input type="number" id="feesIn" placeholder="TOTAL FEES">
+            <div>
+                <span class="file-label">STUDENT PHOTO</span>
+                <input type="file" id="photoIn" accept="image/*" style="border:none; padding:0;">
             </div>
         </div>
+        <button class="btn-save" onclick="handleUpload()">REGISTER & UPLOAD PHOTO</button>
+    </div>
 
-        <div class="reg-box">
-            <div class="reg-grid">
-                <input type="text" id="inName" placeholder="NAME">
-                <input type="text" id="inClass" placeholder="CLASS">
-                <input type="number" id="inAge" placeholder="AGE">
-                <input type="number" id="inTotal" placeholder="TOTAL FEES">
-                <input type="file" id="inPhoto" class="file-input" accept="image/*">
-            </div>
-            <button class="btn-main" onclick="uploadAndSave()">SAVE NEW RECORD</button>
-        </div>
-
-        <div class="table-wrap">
-            <div class="scroll">
-                <table id="registryTable">
-                    <thead>
-                        <tr>
-                            <th>LIN</th>
-                            <th>PHOTO</th>
-                            <th>NAME</th>
-                            <th>CLASS</th>
-                            <th>AGE</th>
-                            <th>BALANCE</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stuBody"></tbody>
-                </table>
-            </div>
+    <div class="table-container">
+        <div class="scroll">
+            <table id="mainTable">
+                <thead>
+                    <tr>
+                        <th>DATABASE LIN</th>
+                        <th>PHOTO</th>
+                        <th>NAME</th>
+                        <th>CLASS</th>
+                        <th>AGE</th>
+                        <th>BALANCE</th>
+                        <th>MANAGEMENT</th>
+                    </tr>
+                </thead>
+                <tbody id="dataRows"></tbody>
+            </table>
         </div>
     </div>
 
@@ -92,77 +96,80 @@
         const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const supabaseClient = supabase.createClient(_URL, _KEY);
-        const schoolID = "PM001"; // Placeholder, set during login
 
         setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
-        // SEARCH FUNCTION
-        function filterTable() {
-            let input = document.getElementById("searchInput").value.toUpperCase();
-            let rows = document.getElementById("stuBody").getElementsByTagName("tr");
-            for (let i = 0; i < rows.length; i++) {
-                let lin = rows[i].getElementsByTagName("td")[0].textContent.toUpperCase();
-                let name = rows[i].getElementsByTagName("td")[2].textContent.toUpperCase();
-                rows[i].style.display = (name.includes(input) || lin.includes(input)) ? "" : "none";
+        // REAL-TIME SEARCH
+        function runSearch() {
+            let filter = document.getElementById("searchBox").value.toUpperCase();
+            let tr = document.getElementById("dataRows").getElementsByTagName("tr");
+            for (let i = 0; i < tr.length; i++) {
+                let lin = tr[i].cells[0].textContent.toUpperCase();
+                let name = tr[i].cells[2].textContent.toUpperCase();
+                tr[i].style.display = (name.includes(filter) || lin.includes(filter)) ? "" : "none";
             }
         }
 
-        async function fetchRecords() {
-            const { data } = await supabaseClient.from('students').select('*').order('name', {ascending:true});
+        async function fetchAll() {
+            // Pulling data from Supabase
+            const { data, error } = await supabaseClient.from('students').select('*').order('name', {ascending:true});
             if(data) {
-                document.getElementById('stuBody').innerHTML = data.map((s, i) => {
-                    const lin = `#${(i+1).toString().padStart(3,'0')}`;
-                    const bal = (s.total_fees || 0) - (s.paid_fees || 0);
+                document.getElementById('dataRows').innerHTML = data.map(s => {
+                    const balance = (s.total_fees || 0) - (s.paid_fees || 0);
+                    // Use the ACTUAL 'lin' column from your table
+                    const actualLIN = s.lin || "PENDING"; 
+                    
                     return `
                         <tr>
-                            <td>${lin}</td>
-                            <td><img src="${s.photo_url || 'https://via.placeholder.com/50'}" class="student-pic"></td>
+                            <td class="lin-text">${actualLIN}</td>
+                            <td><img src="${s.photo_url || 'https://via.placeholder.com/100'}" class="student-photo"></td>
                             <td style="color:var(--primary)">${s.name}</td>
                             <td>${s.class || '--'}</td>
                             <td>${s.age || '--'}</td>
-                            <td style="color:${bal > 0 ? 'red' : 'green'}">${bal.toLocaleString()}</td>
+                            <td style="color:${balance > 0 ? 'red' : 'green'}">${balance.toLocaleString()}</td>
                             <td>
-                                <button class="btn-action edit" onclick="editRow('${s.id}')">EDIT</button>
-                                <button class="btn-action del" onclick="delRow('${s.id}')">DEL</button>
+                                <button class="btn-act btn-edit" onclick="editStudent('${s.id}')">EDIT</button>
+                                <button class="btn-act btn-delete" onclick="deleteStudent('${s.id}')">DELETE</button>
                             </td>
                         </tr>`;
                 }).join('');
             }
         }
 
-        async function uploadAndSave() {
-            const file = document.getElementById('inPhoto').files[0];
+        async function handleUpload() {
+            const file = document.getElementById('photoIn').files[0];
             let photoUrl = "";
 
             if (file) {
-                const fileName = `${Date.now()}_${file.name}`;
-                const { data, error } = await supabaseClient.storage.from('student-photos').upload(fileName, file);
+                const fName = `${Date.now()}_${file.name}`;
+                const { data } = await supabaseClient.storage.from('student-photos').upload(fName, file);
                 if (data) {
-                    const { data: urlData } = supabaseClient.storage.from('student-photos').getPublicUrl(fileName);
-                    photoUrl = urlData.publicUrl;
+                    const { data: pData } = supabaseClient.storage.from('student-photos').getPublicUrl(fName);
+                    photoUrl = pData.publicUrl;
                 }
             }
 
             const { error } = await supabaseClient.from('students').insert([{
-                name: document.getElementById('inName').value,
-                class: document.getElementById('inClass').value,
-                age: document.getElementById('inAge').value,
-                total_fees: document.getElementById('inTotal').value,
-                photo_url: photoUrl,
-                school_id: schoolID
+                name: document.getElementById('nameIn').value,
+                class: document.getElementById('classIn').value,
+                age: document.getElementById('ageIn').value,
+                total_fees: document.getElementById('feesIn').value,
+                photo_url: photoUrl
             }]);
 
-            if(!error) { alert("SAVED!"); fetchRecords(); }
+            if(!error) { alert("SUCCESSFULLY REGISTERED"); fetchAll(); }
+            else { alert("ERROR: " + error.message); }
         }
 
-        async function delRow(id) {
-            if(confirm("DELETE RECORD?")) {
+        async function deleteStudent(id) {
+            if(confirm("ARE YOU SURE YOU WANT TO DELETE THIS RECORD?")) {
                 await supabaseClient.from('students').delete().eq('id', id);
-                fetchRecords();
+                fetchAll();
             }
         }
 
-        fetchRecords();
+        // Run on load
+        fetchAll();
     </script>
 </body>
 </html>
