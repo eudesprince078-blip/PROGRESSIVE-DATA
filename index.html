@@ -17,19 +17,19 @@
         .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.65rem; font-weight: 800; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #f8fafc; }
 
-        /* STATS */
+        /* DASHBOARD STATS */
         .hero { background: var(--dark); color: white; padding: 30px 20px; text-align: center; }
         #live-clock { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -25px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-bottom: 4px solid #cbd5e1; }
         .stat-card b { display: block; font-size: 1.4rem; }
 
-        /* FORMS & UI */
+        /* ADMISSION FORM */
         .container { padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px; }
         label { display: block; font-size: 0.6rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
-        input { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; font-family: inherit; }
+        input, select { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; font-family: inherit; }
         
         /* BUTTONS */
         .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; }
@@ -38,9 +38,9 @@
         .btn-del { background: var(--danger); font-size: 0.6rem; padding: 6px 10px; }
         .btn-cancel { background: #64748b; width: 100%; margin-top: 10px; display: none; }
 
-        /* LIST */
+        /* TABLE */
         .table-wrap { overflow-x: auto; background: white; border-radius: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { background: #f8fafc; padding: 12px; text-align: left; font-size: 0.65rem; color: #94a3b8; }
         td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; font-weight: 700; }
     </style>
@@ -69,7 +69,7 @@
             <div class="table-wrap card">
                 <table>
                     <thead>
-                        <tr><th>LIN</th><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>HEALTH</th><th>BALANCE</th><th>ACTION</th></tr>
+                        <tr><th>LIN</th><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>EXPECTED</th><th>PAID</th><th>STATUS</th><th>ACTION</th></tr>
                     </thead>
                     <tbody id="dashBody"></tbody>
                 </table>
@@ -79,17 +79,26 @@
 
     <div id="admission" class="tab-content container" style="display:none;">
         <div class="card">
-            <h3 id="formTitle" style="color:var(--primary);">NEW ENROLLMENT</h3>
+            <h3 id="formTitle" style="color:var(--primary);">STUDENT ENROLLMENT</h3>
             <div class="form-grid">
                 <div><label>FULL NAME</label><input type="text" id="inName"></div>
                 <div><label>CLASS</label><input type="text" id="inClass"></div>
                 <div><label>CONTACT NUMBER</label><input type="text" id="inContact"></div>
-                <div><label>HEALTH STATUS</label><input type="text" id="inHealth"></div>
+                <div><label>FEES EXPECTED</label><input type="number" id="inExp"></div>
+                <div><label>FEES PAID</label><input type="number" id="inPaid"></div>
+                <div>
+                    <label>FEES STATUS</label>
+                    <select id="inStatus">
+                        <option value="OWING">OWING</option>
+                        <option value="CLEARED">CLEARED</option>
+                        <option value="PARTIAL">PARTIAL</option>
+                    </select>
+                </div>
+                <div><label>HEALTH STATUS</label><input type="text" id="inHealth" placeholder="GOOD"></div>
                 <div><label>AGE</label><input type="number" id="inAge"></div>
-                <div><label>TOTAL FEES</label><input type="number" id="inFees"></div>
             </div>
-            <button class="btn btn-save" id="saveBtn" onclick="handleDatabaseAction()">SAVE RECORD</button>
-            <button class="btn btn-cancel" id="cancelBtn" onclick="clearAdmission()">CANCEL EDIT</button>
+            <button class="btn btn-save" id="saveBtn" onclick="saveToSupabase()">SAVE STUDENT DATA</button>
+            <button class="btn btn-cancel" id="cancelBtn" onclick="resetForm()">CANCEL EDIT</button>
         </div>
     </div>
 
@@ -99,7 +108,7 @@
         const client = supabase.createClient(_URL, _KEY);
         
         let allStudents = [];
-        let activeEditId = null;
+        let editingStudentId = null;
 
         setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
@@ -107,7 +116,6 @@
             document.querySelectorAll('.tab-content').forEach(c => c.style.display='none');
             document.querySelectorAll('.tab').forEach(c => c.classList.remove('active'));
             document.getElementById(t).style.display='block';
-            event.target.classList.add('active');
             if(t === 'dash') fetchAll();
         }
 
@@ -118,17 +126,18 @@
         }
 
         function renderDash() {
-            let cleared = 0, owing = 0;
+            let clearedCount = 0, owingCount = 0;
             document.getElementById('dashBody').innerHTML = allStudents.map(s => {
-                const bal = (s.total_fees || 0) - (s.paid_fees || 0);
-                if(bal <= 0) cleared++; else owing++;
+                const status = s.fees_status || 'OWING';
+                if(status === 'CLEARED') clearedCount++; else owingCount++;
                 return `<tr>
                     <td>${s.lin || '---'}</td>
                     <td style="color:var(--primary)">${s.name}</td>
                     <td>${s.class}</td>
                     <td>${s.contact_number || '--'}</td>
-                    <td>${s.health_status || 'GOOD'}</td>
-                    <td style="color:${bal > 0 ? 'red' : 'green'}">${bal.toLocaleString()}</td>
+                    <td>${(s.fees_expected || 0).toLocaleString()}</td>
+                    <td>${(s.fees_paid || 0).toLocaleString()}</td>
+                    <td style="color:${status === 'CLEARED' ? 'green' : 'red'}">${status}</td>
                     <td>
                         <button class="btn btn-edit" onclick="setupEdit('${s.id}')">EDIT</button>
                         <button class="btn btn-del" onclick="setupDelete('${s.id}')">DEL</button>
@@ -136,53 +145,61 @@
                 </tr>`;
             }).join('');
             document.getElementById('countT').innerText = allStudents.length;
-            document.getElementById('countP').innerText = cleared;
-            document.getElementById('countB').innerText = owing;
+            document.getElementById('countP').innerText = clearedCount;
+            document.getElementById('countB').innerText = owingCount;
         }
 
-        async function handleDatabaseAction() {
+        async function saveToSupabase() {
             const btn = document.getElementById('saveBtn');
-            btn.innerText = "WAIT..."; btn.disabled = true;
+            btn.innerText = "PROCESSING..."; btn.disabled = true;
 
             const payload = {
                 name: document.getElementById('inName').value,
                 class: document.getElementById('inClass').value,
                 contact_number: document.getElementById('inContact').value,
+                fees_expected: document.getElementById('inExp').value,
+                fees_paid: document.getElementById('inPaid').value,
+                fees_status: document.getElementById('inStatus').value,
                 health_status: document.getElementById('inHealth').value,
-                age: document.getElementById('inAge').value,
-                total_fees: document.getElementById('inFees').value
+                age: document.getElementById('inAge').value
             };
 
-            let res;
-            if(activeEditId) {
-                res = await client.from('students').update(payload).eq('id', activeEditId);
+            let response;
+            if(editingStudentId) {
+                response = await client.from('students').update(payload).eq('id', editingStudentId);
             } else {
-                res = await client.from('students').insert([payload]);
+                response = await client.from('students').insert([payload]);
             }
 
-            if(!res.error) {
-                alert("SUCCESS");
-                clearAdmission();
+            if(!response.error) {
+                alert("SUCCESSFULLY SAVED");
+                resetForm();
                 showTab('dash');
             } else {
-                alert("ERROR: " + res.error.message);
+                alert("DATABASE ERROR: " + response.error.message);
             }
-            btn.innerText = "SAVE RECORD"; btn.disabled = false;
+            btn.innerText = "SAVE STUDENT DATA"; btn.disabled = false;
         }
 
         function setupEdit(id) {
             const s = allStudents.find(x => x.id === id);
-            activeEditId = id;
+            editingStudentId = id;
             document.getElementById('inName').value = s.name || "";
             document.getElementById('inClass').value = s.class || "";
             document.getElementById('inContact').value = s.contact_number || "";
+            document.getElementById('inExp').value = s.fees_expected || "";
+            document.getElementById('inPaid').value = s.fees_paid || "";
+            document.getElementById('inStatus').value = s.fees_status || "OWING";
             document.getElementById('inHealth').value = s.health_status || "";
             document.getElementById('inAge').value = s.age || "";
-            document.getElementById('inFees').value = s.total_fees || "";
             
-            document.getElementById('formTitle').innerText = "EDITING STUDENT";
+            document.getElementById('formTitle').innerText = "EDIT: " + s.name;
             document.getElementById('saveBtn').innerText = "UPDATE RECORD";
             document.getElementById('cancelBtn').style.display = "block";
+            
+            // Highlight the tab manually for the Edit switch
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('[onclick="showTab(\'admission\')"]').classList.add('active');
             showTab('admission');
         }
 
@@ -193,11 +210,12 @@
             }
         }
 
-        function clearAdmission() {
-            activeEditId = null;
+        function resetForm() {
+            editingStudentId = null;
             document.querySelectorAll('#admission input').forEach(i => i.value = "");
-            document.getElementById('formTitle').innerText = "NEW ENROLLMENT";
-            document.getElementById('saveBtn').innerText = "SAVE RECORD";
+            document.getElementById('inStatus').value = "OWING";
+            document.getElementById('formTitle').innerText = "STUDENT ENROLLMENT";
+            document.getElementById('saveBtn').innerText = "SAVE STUDENT DATA";
             document.getElementById('cancelBtn').style.display = "none";
         }
 
