@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Supreme Management System V62</title>
+    <title>Eudes Media | Supreme Management System V63</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -22,30 +22,32 @@
         .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 12px; font-weight: 900; color: #999; cursor: pointer; text-transform: uppercase; }
         .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #fdfdfd; }
         
-        .card { background: white; border-radius: 12px; padding: 15px; margin: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        
         .search-container { padding: 10px 15px; background: #fff; border-bottom: 1px solid #eee; }
         .search-bar { width: 100%; padding: 12px; border: 2px solid var(--blue); border-radius: 8px; font-size: 14px; font-weight: 600; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 600px; }
-        th { text-align: left; padding: 12px; background: var(--blue); font-size: 11px; font-weight: 900; color: white; text-transform: uppercase; border: 1px solid #001a33; }
-        td { padding: 12px; border: 1px solid #eee; font-size: 13px; font-weight: 700; }
-        .lin-cell { color: var(--blue); font-weight: 900; text-align: center; background: #f0f4f8; }
-        .debt-cell { color: var(--red); font-weight: 900; }
+        .scroll-box { overflow-x: auto; margin: 15px; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { text-align: left; padding: 12px; background: var(--blue); font-size: 11px; font-weight: 900; color: white; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; font-weight: 700; }
+        
+        .lin-badge { background: var(--gold); color: var(--blue); padding: 4px 8px; border-radius: 4px; font-weight: 900; }
+        .photo-circle { width: 40px; height: 40px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #777; border: 2px solid var(--blue); }
+        
+        .btn-edit { background: var(--blue); color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; cursor: pointer; margin-right: 5px; }
+        .btn-delete { background: var(--red); color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 10px; font-size: 15px; font-weight: 900; cursor: pointer; }
         input, select { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 10px; margin-bottom: 12px; font-size: 15px; font-weight: 600; box-sizing: border-box; }
         label { font-weight: 900; font-size: 12px; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 4px; }
         
         .hidden { display: none !important; }
-        .scroll-box { overflow-x: auto; }
     </style>
 </head>
 <body>
 
 <div id="mainApp">
     <div class="header">
-        <div><b id="headerSchoolName" style="font-size: 16px;">PROGRESSIVE MOTHERS</b><br><span style="font-size:10px; color:var(--gold); font-weight: 800;">EUDES MEDIA MANAGEMENT</span></div>
+        <div><b id="headerSchoolName">PROGRESSIVE MOTHERS</b><br><span style="font-size:10px; color:var(--gold); font-weight: 800;">EUDES MEDIA MASTER PANEL</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900;">LOGOUT</button>
     </div>
     
@@ -58,54 +60,47 @@
     </div>
 
     <div class="nav-tabs">
-        <div class="tab active" id="t-rec" onclick="tab('rec')">Master Ledger</div>
-        <div class="tab" id="t-adm" onclick="tab('adm')">New Registration</div>
+        <div class="tab active" id="t-rec" onclick="tab('rec')">Student Ledger</div>
+        <div class="tab" id="t-adm" onclick="tab('adm')">Admission</div>
     </div>
 
     <div id="v-rec" class="p-view">
         <div class="search-container">
-            <input type="text" id="searchBar" class="search-bar" placeholder="🔍 Search Pupil by Name..." oninput="renderUI()">
+            <input type="text" id="searchBar" class="search-bar" placeholder="🔍 Search Name or LIN..." oninput="renderUI()">
         </div>
-        <div class="card" style="padding:10px;">
-            <div class="scroll-box">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>LIN #</th>
-                            <th>Student Name</th>
-                            <th>Class</th>
-                            <th>Total Fees</th>
-                            <th>Paid</th>
-                            <th>Debt</th>
-                            <th>Contact</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
+        <div class="scroll-box">
+            <table>
+                <thead>
+                    <tr>
+                        <th>LIN</th>
+                        <th>Photo</th>
+                        <th>Name (Alphabetical)</th>
+                        <th>Class</th>
+                        <th>Paid</th>
+                        <th>Debt</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
         </div>
     </div>
 
     <div id="v-adm" class="hidden p-view">
         <div class="card">
-            <h3 style="color:var(--blue); margin-top:0;">ADMISSION FORM</h3>
-            <label>Student Full Name</label><input id="name" placeholder="John Doe">
+            <h3 style="color:var(--blue); margin-top:0;">NEW ADMISSION</h3>
+            <label>Full Name</label><input id="name" placeholder="John Doe">
             <label>Class</label>
             <select id="cls">
                 <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <label>Required Fees (UGX)</label><input id="f_exp" type="number" placeholder="Total Expected">
-            <label>Amount Paid (UGX)</label><input id="f_paid" type="number" placeholder="Current Payment">
-            <label>Physical Location</label><input id="loc" placeholder="Home Village">
-            <label>Parent Contact</label><input id="contact" placeholder="+256...">
-            <button onclick="submitData()" class="btn-main" id="saveBtn">AUTHENTICATE & SAVE</button>
+            <label>Expected Fees</label><input id="f_exp" type="number" value="0">
+            <label>Amount Paid</label><input id="f_paid" type="number" value="0">
+            <label>Contact</label><input id="contact" placeholder="+256...">
+            <button onclick="submitData()" class="btn-main" id="saveBtn">SAVE RECORD</button>
         </div>
-    </div>
-
-    <div style="text-align:center; padding:25px; color:#999; font-size:11px; font-weight:900;">
-        EUDES MEDIA SOFTWARE | +256762992440
     </div>
 </div>
 
@@ -122,11 +117,7 @@
     }
 
     async function loadData() {
-        // Fetch and Sort Alphabetically by Name
-        const { data } = await _client.from('students')
-            .select('*')
-            .eq('school_id', window.currentSchool.id)
-            .order('name', { ascending: true });
+        const { data } = await _client.from('students').select('*').eq('school_id', window.currentSchool.id).order('name', { ascending: true });
         if(data) { cachedData = data; renderUI(); }
     }
 
@@ -135,26 +126,24 @@
         const searchQ = document.getElementById('searchBar').value.toLowerCase();
         body.innerHTML = "";
         
-        let tPaid = 0;
-        let tDebt = 0;
+        let tPaid = 0, tDebt = 0;
 
         cachedData.filter(s => s.name.toLowerCase().includes(searchQ)).forEach((s, index) => {
-            const exp = parseInt(s.fees_expected || 0);
-            const paid = parseInt(s.fees_paid || 0);
-            const debt = exp - paid;
-            
-            tPaid += paid;
-            tDebt += debt;
+            const exp = parseInt(s.fees_expected || 0), paid = parseInt(s.fees_paid || 0), debt = exp - paid;
+            tPaid += paid; tDebt += debt;
 
             body.innerHTML += `
                 <tr>
-                    <td class="lin-cell">${index + 1}</td>
+                    <td><span class="lin-badge">${index + 1}</span></td>
+                    <td><div class="photo-circle">NO IMG</div></td>
                     <td><b style="text-transform:uppercase;">${s.name}</b></td>
                     <td>${s.class || 'N/A'}</td>
-                    <td>${exp.toLocaleString()}</td>
                     <td style="color:var(--green)">${paid.toLocaleString()}</td>
-                    <td class="debt-cell">${debt.toLocaleString()}</td>
-                    <td>${s.contact}</td>
+                    <td style="color:var(--red)">${debt.toLocaleString()}</td>
+                    <td>
+                        <button class="btn-edit" onclick="alert('Edit Mode Coming Soon')">EDIT</button>
+                        <button class="btn-delete" onclick="deleteRecord('${s.id}')">DEL</button>
+                    </td>
                 </tr>`;
         });
 
@@ -163,29 +152,24 @@
         document.getElementById('c-debt').innerText = tDebt.toLocaleString();
     }
 
+    async function deleteRecord(id) {
+        if(confirm("Permanently Delete this pupil?")) {
+            const { error } = await _client.from('students').delete().eq('id', id);
+            if(!error) loadData();
+        }
+    }
+
     async function submitData() {
-        const btn = document.getElementById('saveBtn');
         const payload = {
             school_id: window.currentSchool.id,
             name: document.getElementById('name').value,
             class: document.getElementById('cls').value,
-            fees_expected: document.getElementById('f_exp').value || 0,
-            fees_paid: document.getElementById('f_paid').value || 0,
-            location: document.getElementById('loc').value,
+            fees_expected: document.getElementById('f_exp').value,
+            fees_paid: document.getElementById('f_paid').value,
             contact: document.getElementById('contact').value
         };
-        
-        if(!payload.name || !payload.contact) return alert("Fill Name and Contact!");
-        
-        btn.innerText = "AUTHENTICATING...";
         const { error } = await _client.from('students').insert([payload]);
-        if(!error) {
-            alert("RECORD SAVED");
-            document.querySelectorAll('input').forEach(i => i.value = "");
-            await loadData();
-            tab('rec');
-        }
-        btn.innerText = "AUTHENTICATE & SAVE";
+        if(!error) { alert("SAVED"); loadData(); tab('rec'); }
     }
 
     function tab(t) { 
