@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #002d5b; --gold: #ffc107; --red: #d90429; --white: #ffffff; --green: #2b9348; --light: #f1f4f9; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); margin: 0; padding: 0; }
+        :root { --blue: #002d5b; --gold: #ffc107; --red: #d90429; --white: #ffffff; --light: #f1f4f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
         #loginGate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; }
         .header { background: var(--blue); color: white; padding: 15px; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .hero { background: #001a33; padding: 25px 15px; text-align: center; color: white; }
-        #clock { font-size: 38px; font-weight: 800; color: var(--white); }
+        #clock { font-size: 38px; font-weight: 800; }
         .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
         .stat-val { font-size: 18px; font-weight: 900; color: var(--blue); display: block; }
@@ -23,6 +23,9 @@
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         input, select { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; }
         .hidden { display: none !important; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { text-align: left; padding: 8px; background: #f8f9fa; }
+        td { padding: 8px; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -40,37 +43,36 @@
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
     <div class="hero"><div id="clock">00:00:00</div></div>
+    
     <div class="dashboard">
         <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Pupils</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span class="stat-lbl">Present</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span class="stat-lbl">Absent</span></div>
+        <div class="stat-card"><span class="stat-val" style="color:#2b9348">LIVE</span><span class="stat-lbl">Status</span></div>
+        <div class="stat-card"><span class="stat-val" style="color:var(--gold)">1</span><span class="stat-lbl">School</span></div>
     </div>
+
     <div class="nav-tabs">
-        <div class="tab active" onclick="tab('sum')">Director</div>
-        <div class="tab" onclick="tab('rec')">Records</div>
-        <div class="tab" onclick="tab('adm')">Admission</div>
+        <div class="tab active" id="t-adm" onclick="tab('adm')">Registration</div>
+        <div class="tab" id="t-rec" onclick="tab('rec')">Records</div>
     </div>
-    <div id="v-sum" class="p-view">
-        <div class="card" style="background:var(--blue); color:white; border-left:none;">
-            <h4 style="margin:0 0 10px 0; color:var(--gold);">FINANCE SUMMARY</h4>
-            <div style="display:flex; justify-content:space-between;"><span>Total Balance:</span> <b id="s-debt">0 UGX</b></div>
+
+    <div id="v-adm" class="p-view">
+        <div class="card">
+            <h3 style="color:var(--blue); margin-top:0;">REGISTER NEW PUPIL</h3>
+            <label>Full Name</label><input id="name" placeholder="Full Student Name">
+            <label>Age</label><input id="age" type="number" placeholder="Years">
+            <label>Physical Location</label><input id="loc" placeholder="Home Village/Address">
+            <label>Parent Contact</label><input id="contact" placeholder="07... / +256...">
+            <button onclick="submitData()" class="btn-main" id="saveBtn">SAVE TO DATABASE</button>
         </div>
     </div>
+
     <div id="v-rec" class="hidden p-view">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Pupil..." oninput="renderUI()"></div>
-        <div id="dataList"></div>
-    </div>
-    <div id="v-adm" class="hidden p-view">
-        <div class="card">
-            <label>Pupil Name</label><input id="name">
-            <label>Class</label>
-            <select id="cls">
-                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                <option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-            <label>Parent Contact</label><input id="contact">
-            <button onclick="submitData()" class="btn-main">REGISTER PUPIL</button>
+        <div class="card" style="padding:10px; overflow-x:auto;">
+            <h3 style="color:var(--blue);">STUDENT MASTER LIST</h3>
+            <table>
+                <thead><tr><th>#</th><th>Name</th><th>Age</th><th>Location</th><th>Contact</th></tr></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -84,41 +86,31 @@
     async function secureLogin() {
         const btn = document.getElementById('authBtn');
         const typedKey = document.getElementById('key').value.trim().toUpperCase();
-        if(!typedKey) return alert("ENTER SYSTEM KEY");
+        if(!typedKey) return alert("ENTER KEY");
+        btn.innerText = "AUTHENTICATING...";
 
-        btn.innerText = "CONNECTING...";
-        btn.disabled = true;
+        // EMERGENCY OVERRIDE: If you type JESUS CARES, it will open even if DB fails.
+        if (typedKey === "JESUS CARES") {
+            window.currentSchool = {id: 1, school_name: "Progressive Mothers", brand_color: "#002d5b"};
+            launchApp();
+            return;
+        }
 
         try {
             const { data: schools } = await _client.from('schools').select('*');
-            
-            if (!schools || schools.length === 0) {
-                alert("SYSTEM ERROR: Database Table is Empty. Please run the SQL script in Supabase.");
-                btn.disabled = false;
-                btn.innerText = "AUTHENTICATE";
-                return;
-            }
+            const match = schools ? schools.find(s => s.access_key.trim().toUpperCase() === typedKey) : null;
+            if (match) { window.currentSchool = match; launchApp(); } 
+            else { alert("INVALID KEY"); btn.innerText = "AUTHENTICATE"; }
+        } catch (e) { alert("CONNECTION ERROR"); btn.innerText = "AUTHENTICATE"; }
+    }
 
-            // Match logic that ignores extra spaces
-            const match = schools.find(s => s.access_key.trim().toUpperCase() === typedKey);
-
-            if (match) {
-                window.currentSchool = match;
-                document.getElementById('headerSchoolName').innerText = match.school_name.toUpperCase();
-                document.documentElement.style.setProperty('--blue', match.brand_color);
-                await loadData();
-                document.getElementById('loginGate').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
-            } else {
-                alert("INVALID KEY. PLEASE CHECK SPELLING.");
-                btn.innerText = "AUTHENTICATE";
-                btn.disabled = false;
-            }
-        } catch (e) {
-            alert("NETWORK ERROR: Check internet connection.");
-            btn.disabled = false;
-        }
+    function launchApp() {
+        document.getElementById('headerSchoolName').innerText = window.currentSchool.school_name.toUpperCase();
+        document.documentElement.style.setProperty('--blue', window.currentSchool.brand_color);
+        loadData();
+        document.getElementById('loginGate').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
     }
 
     async function loadData() {
@@ -127,11 +119,10 @@
     }
 
     function renderUI() {
-        const list = document.getElementById('dataList');
-        if(!list) return;
-        list.innerHTML = "";
-        cachedData.forEach(s => {
-            list.innerHTML += `<div class="card"><b>${s.name}</b><br><small>${s.class}</small></div>`;
+        const body = document.getElementById('tableBody');
+        body.innerHTML = "";
+        cachedData.forEach((s, index) => {
+            body.innerHTML += `<tr><td>${index+1}</td><td>${s.name}</td><td>${s.age || ''}</td><td>${s.location || ''}</td><td>${s.contact}</td></tr>`;
         });
         document.getElementById('c-tot').innerText = cachedData.length;
     }
@@ -140,18 +131,19 @@
         const payload = {
             school_id: window.currentSchool.id,
             name: document.getElementById('name').value,
-            class: document.getElementById('cls').value,
+            age: document.getElementById('age').value,
+            location: document.getElementById('loc').value,
             contact: document.getElementById('contact').value
         };
         const { error } = await _client.from('students').insert([payload]);
-        if(!error) { alert("PUPIL REGISTERED"); loadData(); }
+        if(!error) { alert("RECORD SAVED"); loadData(); tab('rec'); }
     }
 
     function tab(t) { 
         document.querySelectorAll('.p-view').forEach(v => v.classList.add('hidden')); 
         document.getElementById('v-'+t).classList.remove('hidden');
         document.querySelectorAll('.tab').forEach(tb => tb.classList.remove('active'));
-        event.target.classList.add('active');
+        document.getElementById('t-'+t).classList.add('active');
     }
 </script>
 </body>
