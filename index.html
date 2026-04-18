@@ -2,163 +2,158 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers | Eudes Media V86</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESMS - Multi-Tenant Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #002d5b; --gold: #ffc107; --white: #ffffff; --light: #f1f4f9; --red: #d90429; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); margin: 0; padding: 0; }
-        .header { background: var(--blue); color: white; padding: 15px; border-bottom: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 60px; z-index: 999; }
-        .tab { flex: 1; text-align: center; padding: 15px; font-size: 12px; font-weight: 900; color: #999; cursor: pointer; text-transform: uppercase; }
-        .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f0f4ff; }
-        .container { padding: 15px; }
-        .search-bar { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 12px; box-sizing: border-box; }
-        .pupil-card { background: white; margin-bottom: 12px; padding: 12px; border-radius: 15px; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); }
-        .pupil-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 3px solid var(--blue); background: #eee; }
-        .pupil-name { font-weight: 900; color: var(--blue); font-size: 14px; text-transform: uppercase; }
-        .btn-save { background: var(--blue); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; margin-top: 10px; }
-        .hidden { display: none !important; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
-        label { font-weight: 900; font-size: 11px; color: var(--blue); display: block; margin-bottom: 5px; }
+        :root { --eudes-blue: #0047AB; --white: #ffffff; --admin-bg: #1a202c; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f4f7f6; }
+        
+        /* Sidebar for Master Control */
+        .sidebar { 
+            width: 250px; height: 100vh; background: var(--admin-bg); 
+            color: white; position: fixed; padding: 20px; box-sizing: border-box;
+        }
+        
+        .main-content { margin-left: 250px; padding: 40px; }
+
+        /* Tenant Card Styling */
+        .tenant-card {
+            background: var(--white); border-radius: 15px; 
+            padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--eudes-blue); margin-bottom: 30px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Table Design */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 10px; overflow: hidden; }
+        th { background: #edf2f7; color: #4a5568; padding: 15px; text-align: left; }
+        td { padding: 15px; border-bottom: 1px solid #edf2f7; }
+
+        /* Status Toggles */
+        .status-btn { padding: 8px 15px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; }
+        .active { background: #c6f6d5; color: #22543d; }
+        .blocked { background: #fed7d7; color: #822727; }
+
+        /* Master Controls */
+        .master-panel { display: block; } /* Toggle this with JS based on user role */
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div><b>PROGRESSIVE MOTHERS</b><br><span style="font-size:9px; color:var(--gold);">EUDES MEDIA | V86 FIXED</span></div>
-    <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900; font-size:10px;">REFRESH</button>
-</div>
-
-<div class="nav-tabs">
-    <div class="tab active" id="t-list" onclick="tab('list')">Pupils</div>
-    <div class="tab" id="t-form" onclick="tab('form')">Add/Edit Pupil</div>
-</div>
-
-<div id="v-list" class="container">
-    <input type="text" id="sb" class="search-bar" placeholder="🔍 Search Pupil..." oninput="render()">
-    <div id="list-container"></div>
-</div>
-
-<div id="v-form" class="container hidden">
-    <div style="background:white; padding:20px; border-radius:15px;">
-        <input type="hidden" id="edit-id">
-        <label>FULL NAME</label><input id="in-name" placeholder="Name">
-        <label>CLASS</label>
-        <select id="in-cls">
-            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
-        </select>
-        <label>LIN NUMBER</label><input id="in-lin" placeholder="LIN">
-        <label>PHYSICAL LOCATION</label><input id="in-loc" placeholder="Location">
-        <label>HEALTH STATUS</label><input id="in-health" value="Good">
-        
-        <label>UPLOAD PHOTO</label>
-        <input type="file" id="in-photo" accept="image/*">
-        
-        <button class="btn-save" id="save-btn" onclick="saveData()">SAVE & UPDATE CLOUD</button>
+    <div class="sidebar" id="masterSidebar">
+        <h2 style="color: var(--eudes-blue);">EUDES MEDIA</h2>
+        <p style="font-size: 0.8rem; color: #a0aec0;">MASTER COMMAND</p>
+        <hr border="0.1">
+        <nav>
+            <p style="cursor:pointer;" onclick="showSection('overview')">📊 Overview</p>
+            <p style="cursor:pointer;" onclick="showSection('tenants')">🏢 Manage Tenants</p>
+            <p style="cursor:pointer;" onclick="showSection('revenue')">💰 Revenue</p>
+        </nav>
     </div>
-</div>
 
-<script>
-    const S_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-    const _db = supabase.createClient(S_URL, S_KEY);
-    const BKT = 'student-photos';
-    let pupils = [];
-
-    async function load() {
-        const { data } = await _db.from('students').select('*').order('name');
-        if(data) { pupils = data; render(); }
-    }
-
-    function render() {
-        const box = document.getElementById('list-container');
-        const q = document.getElementById('sb').value.toLowerCase();
-        box.innerHTML = "";
+    <div class="main-content">
         
-        pupils.filter(p => p.name.toLowerCase().includes(q)).forEach(p => {
-            // Using the photo_url column from your screenshot
-            const photo = p.photo_url || 'https://via.placeholder.com/100?text=No+Photo';
-            
-            box.innerHTML += `
-                <div class="pupil-card">
-                    <img src="${photo}" class="pupil-photo" onerror="this.src='https://via.placeholder.com/100?text=Wait...'">
-                    <div style="flex:1">
-                        <div class="pupil-name">${p.name}</div>
-                        <div style="font-size:11px; font-weight:bold; color:#555;">
-                            CLASS: ${p.class} | LIN: ${p.lin || 'N/A'}<br>
-                            LOC: ${p.location || 'N/A'} | HEALTH: ${p.health_status || 'Good'}
-                        </div>
-                        <button onclick="prepEdit('${p.id}')" style="margin-top:8px; padding:6px 12px; background:var(--gold); border:none; border-radius:6px; font-weight:900; font-size:10px; cursor:pointer;">EDIT RECORD</button>
-                    </div>
-                </div>`;
-        });
-    }
+        <div id="tenants-section" class="master-panel">
+            <div class="tenant-card">
+                <h2>Register New Tenant (School)</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <input type="text" id="schoolName" placeholder="School Name" style="padding:10px; border-radius:5px; border:1px solid #ccc;">
+                    <input type="text" id="schoolMotto" placeholder="School Motto" style="padding:10px; border-radius:5px; border:1px solid #ccc;">
+                    <input type="date" id="expiryDate" style="padding:10px; border-radius:5px; border:1px solid #ccc;">
+                    <button onclick="registerTenant()" style="background:var(--eudes-blue); color:white; border:none; border-radius:5px; cursor:pointer;">ACTIVATE TENANT</button>
+                </div>
+            </div>
 
-    function prepEdit(id) {
-        const p = pupils.find(x => x.id == id);
-        document.getElementById('edit-id').value = p.id;
-        document.getElementById('in-name').value = p.name;
-        document.getElementById('in-cls').value = p.class;
-        document.getElementById('in-lin').value = p.lin || "";
-        document.getElementById('in-loc').value = p.location || "";
-        document.getElementById('in-health').value = p.health_status || "Good";
-        tab('form');
-    }
+            <div class="tenant-card">
+                <h2>Active School Tenants</h2>
+                <table id="tenantTable">
+                    <thead>
+                        <tr>
+                            <th>Tenant ID</th>
+                            <th>School Name</th>
+                            <th>Expiry Status</th>
+                            <th>Access Control</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tenantBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    async function saveData() {
-        const btn = document.getElementById('save-btn');
-        const file = document.getElementById('in-photo').files[0];
-        const eid = document.getElementById('edit-id').value;
-        
-        btn.disabled = true;
-        btn.innerText = "UPLOADING PHOTO...";
+    <script>
+        const SUPABASE_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+        const SUPABASE_KEY = 'YOUR_ANON_KEY'; 
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let finalUrl = null;
-        if(file) {
-            const fileName = `${Date.now()}_${file.name.replace(/\s/g, '_')}`;
-            const { data: up, error: err } = await _db.storage.from(BKT).upload(fileName, file);
-            
-            if(err) {
-                alert("Storage Error: " + err.message + "\nCheck if Policy is attached to bucket!");
-                btn.disabled = false; btn.innerText = "RETRY";
-                return;
+        // 1. REGISTER NEW TENANT
+        async function registerTenant() {
+            const name = document.getElementById('schoolName').value;
+            const motto = document.getElementById('schoolMotto').value;
+            const expiry = document.getElementById('expiryDate').value;
+            const tenantID = "TENANT-" + Math.floor(1000 + Math.random() * 9000);
+
+            const { error } = await _supabase.from('schools').insert([{
+                school_id: tenantID,
+                school_name: name,
+                motto: motto,
+                expiry_date: expiry,
+                is_active: true
+            }]);
+
+            if (!error) {
+                alert("New Tenant Registered: " + name);
+                fetchTenants(); // Refresh list
+            } else {
+                alert("Error: " + error.message);
             }
-            finalUrl = `${S_URL}/storage/v1/object/public/${BKT}/${fileName}`;
         }
 
-        const payload = {
-            name: document.getElementById('in-name').value,
-            class: document.getElementById('in-cls').value,
-            lin: document.getElementById('in-lin').value,
-            location: document.getElementById('in-loc').value,
-            health_status: document.getElementById('in-health').value
-        };
-        
-        if(finalUrl) payload.photo_url = finalUrl;
+        // 2. FETCH AND DISPLAY ALL TENANTS
+        async function fetchTenants() {
+            const { data: schools, error } = await _supabase.from('schools').select('*');
+            
+            const tbody = document.getElementById('tenantBody');
+            tbody.innerHTML = '';
 
-        btn.innerText = "SAVING DATA...";
-        const { error: dbErr } = eid ? 
-            await _db.from('students').update(payload).eq('id', eid) : 
-            await _db.from('students').insert([payload]);
-
-        if(dbErr) {
-            alert("Database Error: " + dbErr.message);
-            btn.disabled = false;
-        } else {
-            alert("Record Updated Successfully!");
-            location.reload();
+            schools.forEach(school => {
+                const row = `
+                    <tr>
+                        <td><b>${school.school_id}</b></td>
+                        <td>${school.school_name}</td>
+                        <td>${school.expiry_date}</td>
+                        <td>
+                            <button class="status-btn ${school.is_active ? 'active' : 'blocked'}" 
+                                onclick="toggleAccess('${school.school_id}', ${school.is_active})">
+                                ${school.is_active ? 'ENABLED' : 'DISABLED'}
+                            </button>
+                        </td>
+                        <td>
+                            <button style="border:none; background:none; cursor:pointer; color:blue;">Edit</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
         }
-    }
 
-    function tab(v) {
-        document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-        document.getElementById('v-'+v).classList.remove('hidden');
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('t-'+v).classList.add('active');
-    }
+        // 3. KILL-SWITCH LOGIC (Enable/Disable Tenant)
+        async function toggleAccess(id, currentStatus) {
+            const { error } = await _supabase
+                .from('schools')
+                .update({ is_active: !currentStatus })
+                .eq('school_id', id);
+            
+            if(!error) fetchTenants();
+        }
 
-    load();
-</script>
+        // Initial Load
+        fetchTenants();
+    </script>
 </body>
-    </html>
+</html>
