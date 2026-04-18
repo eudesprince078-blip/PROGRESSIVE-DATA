@@ -7,47 +7,37 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; --accent: #f59e0b; }
-        * { box-sizing: border-box; text-transform: uppercase; transition: 0.2s; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
+        :root { --primary: #0047AB; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; }
+        * { box-sizing: border-box; text-transform: uppercase; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; margin: 0; color: #1e293b; }
 
-        /* HEADER & NAVIGATION */
-        .top-nav { background: var(--danger); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; border-bottom: 4px solid var(--dark); }
-        .hero { background: var(--dark); color: white; padding: 30px 20px; text-align: center; }
-        #live-clock { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
+        /* HEADER & TABS */
+        .top-nav { background: var(--danger); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; border-bottom: 4px solid var(--dark); }
+        .tab-bar { background: white; display: flex; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 1000; }
+        .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.7rem; font-weight: 800; color: #64748b; cursor: pointer; }
+        .tab.active { color: var(--primary); border-bottom: 4px solid var(--primary); background: #f1f5f9; }
 
-        /* TAB SYSTEM */
-        .tab-bar { background: white; display: flex; overflow-x: auto; border-bottom: 2px solid #e2e8f0; sticky; top: 0; z-index: 100; }
-        .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.7rem; font-weight: 800; color: #64748b; cursor: pointer; min-width: 120px; }
-        .tab.active { color: var(--primary); border-bottom: 4px solid var(--primary); background: #f8fafc; }
-
-        /* ATTENDANCE PANEL */
-        .attendance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .att-box { background: white; border-radius: 15px; padding: 15px; border-top: 5px solid #ddd; height: 300px; overflow-y: auto; }
-        .att-box h3 { font-size: 0.75rem; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .present-count { color: var(--success); }
-        .absent-count { color: var(--danger); }
-
-        /* CARDS & TABLES */
+        /* FORMS & UI */
         .container { padding: 20px; }
-        .form-box { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        .table-wrap { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .scroll { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.65rem; color: #94a3b8; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; font-weight: 700; }
-        
-        .student-photo { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; background: #eee; }
-        .btn-act { padding: 6px 12px; border-radius: 6px; border: none; color: white; font-weight: 800; cursor: pointer; font-size: 0.6rem; margin: 2px; }
-        .edit { background: var(--primary); }
-        .del { background: var(--danger); }
-        .present { background: var(--success); }
-        .absent { background: var(--accent); }
+        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        input, select { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; font-family: inherit; }
+        .btn { padding: 12px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; width: 100%; }
+        .btn-save { background: var(--primary); }
+        .btn-edit { background: #3b82f6; width: auto; font-size: 0.6rem; }
+        .btn-del { background: var(--danger); width: auto; font-size: 0.6rem; }
 
-        /* PREVIEW MODALS */
-        .preview-pane { background: white; border: 2px dashed var(--primary); border-radius: 15px; padding: 20px; margin-top: 20px; display: none; }
-        .student-id-card { width: 300px; height: 180px; border: 2px solid var(--primary); border-radius: 10px; padding: 10px; position: relative; }
-        .report-card { border: 2px solid var(--dark); padding: 20px; max-width: 500px; }
+        /* TABLE */
+        .table-wrap { background: white; border-radius: 15px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { background: #f1f5f9; padding: 12px; text-align: left; font-size: 0.65rem; color: #64748b; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; font-weight: 700; }
+        .stu-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; }
+
+        /* ID CARD STYLING */
+        #id-preview { width: 320px; height: 200px; background: white; border: 2px solid var(--primary); border-radius: 15px; padding: 15px; position: relative; margin: 20px auto; display: none; }
+        .id-header { font-size: 0.8rem; color: var(--primary); font-weight: 800; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
+        .id-photo { width: 70px; height: 85px; border: 2px solid #eee; position: absolute; right: 15px; top: 50px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -57,37 +47,31 @@
         <div style="font-size:0.6rem;">EUDES MEDIA | 256762992440</div>
     </div>
 
-    <div class="hero"><h1 id="live-clock">00:00:00</h1></div>
-
     <div class="tab-bar">
-        <div class="tab active" onclick="showTab('registry')">REGISTRY</div>
-        <div class="tab" onclick="showTab('rollcall')">ROLLCALL</div>
-        <div class="tab" onclick="showTab('documents')">ID & REPORTS</div>
+        <div class="tab active" onclick="showTab('admission')">ADMISSION</div>
+        <div class="tab" onclick="showTab('rollcall')">ROLL CALL</div>
+        <div class="tab" onclick="showTab('generator')">GENERATOR</div>
     </div>
 
-    <div id="registry" class="tab-content container">
-        <div class="form-box">
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px;">
-                <input type="text" id="inName" placeholder="FULL NAME">
-                <input type="text" id="inClass" placeholder="CLASS">
-                <input type="number" id="inTotal" placeholder="TOTAL FEES">
-                <input type="file" id="inPhoto" accept="image/*">
+    <div id="admission" class="tab-content container">
+        <div class="card">
+            <h3 style="font-size:0.8rem; margin-top:0;">New Student Enrollment</h3>
+            <div class="input-grid">
+                <input type="text" id="nameIn" placeholder="FULL NAME">
+                <input type="text" id="classIn" placeholder="CLASS (E.G. P.6)">
+                <input type="number" id="ageIn" placeholder="AGE">
+                <input type="text" id="healthIn" placeholder="HEALTH STATUS">
+                <input type="number" id="feesIn" placeholder="TOTAL FEES">
+                <input type="file" id="photoIn" accept="image/*" style="border:none; padding:0; font-size:0.6rem;">
             </div>
-            <button class="btn-act edit" style="width:100%; padding:15px; margin-top:10px;" onclick="saveWithCompression()">SAVE STUDENT RECORD</button>
+            <button class="btn btn-save" id="saveBtn" onclick="saveRecord()">REGISTER STUDENT</button>
         </div>
 
-        <div class="table-wrap">
-            <div class="scroll">
+        <div class="table-wrap card">
+            <div style="overflow-x:auto;">
                 <table>
                     <thead>
-                        <tr>
-                            <th>LIN</th>
-                            <th>PHOTO</th>
-                            <th>NAME</th>
-                            <th>CLASS</th>
-                            <th>BALANCE</th>
-                            <th>ACTIONS</th>
-                        </tr>
+                        <tr><th>LIN</th><th>PHOTO</th><th>NAME</th><th>CLASS</th><th>ACTION</th></tr>
                     </thead>
                     <tbody id="stuBody"></tbody>
                 </table>
@@ -96,145 +80,181 @@
     </div>
 
     <div id="rollcall" class="tab-content container" style="display:none;">
-        <div class="attendance-grid">
-            <div class="att-box" style="border-color: var(--success);">
-                <h3 class="present-count">PRESENT TODAY</h3>
-                <div id="listPresent"></div>
-            </div>
-            <div class="att-box" style="border-color: var(--danger);">
-                <h3 class="absent-count">ABSENT / FOLLOW UP</h3>
-                <div id="listAbsent"></div>
-            </div>
+        <div class="card">
+            <select id="rollClass" onchange="filterRoll()">
+                <option value="">SELECT CLASS TO START ROLL CALL</option>
+            </select>
         </div>
-        <div class="table-wrap">
-            <table id="rollTable">
-                <thead><tr><th>NAME</th><th>CLASS</th><th>STATUS</th></tr></thead>
+        <div id="absentList" class="card" style="border-left:5px solid var(--danger); display:none;">
+            <h4 style="color:var(--danger); font-size:0.7rem; margin:0 0 10px;">ABSENT FOR FOLLOW-UP:</h4>
+            <div id="absentNames" style="font-size:0.75rem; font-weight:800;"></div>
+        </div>
+        <div class="table-wrap card">
+            <table>
+                <thead><tr><th>NAME</th><th>STATUS</th></tr></thead>
                 <tbody id="rollBody"></tbody>
             </table>
         </div>
     </div>
 
-    <div id="documents" class="tab-content container" style="display:none;">
-        <h3>DOCUMENT GENERATOR</h3>
-        <select id="selectStudent" style="width:100%; padding:15px; border-radius:10px; margin-bottom:10px; font-weight:800;"></select>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-act edit" style="flex:1; padding:15px;" onclick="genID()">GENERATE ID CARD</button>
-            <button class="btn-act edit" style="flex:1; padding:15px;" onclick="genReport()">GENERATE REPORT CARD</button>
+    <div id="generator" class="tab-content container" style="display:none;">
+        <div class="card">
+            <div class="input-grid">
+                <select id="genClass" onchange="filterGenStudents()"><option value="">SELECT CLASS</option></select>
+                <select id="genStudent"><option value="">SELECT STUDENT</option></select>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-save" onclick="generateID()">GENERATE ID</button>
+                <button class="btn btn-save" style="background:var(--dark);" onclick="alert('REPORT GENERATOR READY')">GENERATE REPORT</button>
+            </div>
         </div>
-        <div id="docPreview" class="preview-pane"></div>
+
+        <div id="id-preview">
+            <div class="id-header">SCHOOL AUTHORITY CARD</div>
+            <img id="id-img" class="id-photo" src="">
+            <div style="margin-top:15px; font-size:0.7rem;">
+                <p>NAME: <span id="id-name" style="color:var(--primary)"></span></p>
+                <p>LIN: <span id="id-lin"></span></p>
+                <p>CLASS: <span id="id-class"></span></p>
+            </div>
+            <div style="position:absolute; bottom:10px; font-size:0.45rem; color:#94a3b8;">VERIFIED BY EUDES MEDIA</div>
+        </div>
     </div>
 
     <script>
         const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        const supabaseClient = supabase.createClient(_URL, _KEY);
-        let students = [];
+        const client = supabase.createClient(_URL, _KEY);
+        let studentData = [];
+        let editingID = null;
 
-        setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
-
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(id).style.display = 'block';
+        function showTab(t) {
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display='none');
+            document.querySelectorAll('.tab').forEach(c => c.classList.remove('active'));
+            document.getElementById(t).style.display='block';
             event.target.classList.add('active');
         }
 
-        // PHOTO COMPRESSION LOGIC
-        async function compressImage(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
+        async function compress(file) {
+            return new Promise(res => {
+                const r = new FileReader(); r.readAsDataURL(file);
+                r.onload = e => {
+                    const img = new Image(); img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 400; // Small size to save Supabase space
-                        const scaleSize = MAX_WIDTH / img.width;
-                        canvas.width = MAX_WIDTH;
-                        canvas.height = img.height * scaleSize;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.7); // 70% quality
-                    };
-                };
+                        canvas.width = 300; canvas.height = 350;
+                        canvas.getContext('2d').drawImage(img, 0,0,300,350);
+                        canvas.toBlob(b => res(b), 'image/jpeg', 0.7);
+                    }
+                }
             });
         }
 
         async function fetchAll() {
-            const { data } = await supabaseClient.from('students').select('*').order('name', {ascending:true});
-            students = data || [];
-            renderRegistry();
-            renderRollcall();
-            fillDropdown();
+            const { data } = await client.from('students').select('*').order('name', {ascending:true});
+            studentData = data || [];
+            renderAll();
         }
 
-        function renderRegistry() {
-            document.getElementById('stuBody').innerHTML = students.map(s => `
+        function renderAll() {
+            // Registry Table
+            document.getElementById('stuBody').innerHTML = studentData.map(s => `
                 <tr>
-                    <td style="color:var(--danger)">${s.lin || '---'}</td>
-                    <td><img src="${s.photo_url || ''}" class="student-photo"></td>
-                    <td>${s.name}</td>
-                    <td>${s.class || '--'}</td>
-                    <td style="color:red">${((s.total_fees||0)-(s.paid_fees||0)).toLocaleString()}</td>
-                    <td>
-                        <button class="btn-act edit" onclick="editStudent('${s.id}')">EDIT</button>
-                        <button class="btn-act del" onclick="deleteStudent('${s.id}')">DEL</button>
-                    </td>
-                </tr>`).join('');
-        }
-
-        function renderRollcall() {
-            document.getElementById('rollBody').innerHTML = students.map(s => `
-                <tr>
+                    <td>${s.lin || '#---'}</td>
+                    <td><img src="${s.photo_url || ''}" class="stu-img"></td>
                     <td>${s.name}</td>
                     <td>${s.class}</td>
                     <td>
-                        <button class="btn-act present" onclick="mark('${s.name}', 'present')">PRESENT</button>
-                        <button class="btn-act absent" onclick="mark('${s.name}', 'absent')">ABSENT</button>
+                        <button class="btn btn-edit" onclick="startEdit('${s.id}')">EDIT</button>
+                        <button class="btn btn-del" onclick="delRec('${s.id}')">DEL</button>
+                    </td>
+                </tr>`).join('');
+
+            // Fill Class Selectors
+            const classes = [...new Set(studentData.map(s => s.class))];
+            const options = '<option value="">SELECT CLASS</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
+            document.getElementById('rollClass').innerHTML = options;
+            document.getElementById('genClass').innerHTML = options;
+        }
+
+        async function saveRecord() {
+            const btn = document.getElementById('saveBtn');
+            btn.innerText = "PROCESSING...";
+            const file = document.getElementById('photoIn').files[0];
+            let pUrl = "";
+
+            if(file) {
+                const blob = await compress(file);
+                const path = `stu_${Date.now()}.jpg`;
+                const { data } = await client.storage.from('student-photos').upload(path, blob);
+                if(data) pUrl = client.storage.from('student-photos').getPublicUrl(path).data.publicUrl;
+            }
+
+            const payload = {
+                name: document.getElementById('nameIn').value,
+                class: document.getElementById('classIn').value,
+                age: document.getElementById('ageIn').value,
+                health_status: document.getElementById('healthIn').value,
+                total_fees: document.getElementById('feesIn').value,
+                photo_url: pUrl || undefined
+            };
+
+            if(editingID) {
+                await client.from('students').update(payload).eq('id', editingID);
+                editingID = null;
+                btn.innerText = "REGISTER STUDENT";
+            } else {
+                await client.from('students').insert([payload]);
+            }
+            
+            fetchAll();
+            alert("SUCCESS");
+        }
+
+        function startEdit(id) {
+            const s = studentData.find(x => x.id === id);
+            editingID = id;
+            document.getElementById('nameIn').value = s.name;
+            document.getElementById('classIn').value = s.class;
+            document.getElementById('saveBtn').innerText = "UPDATE RECORD";
+            showTab('admission');
+        }
+
+        async function delRec(id) { if(confirm("DELETE?")) { await client.from('students').delete().eq('id', id); fetchAll(); } }
+
+        function filterRoll() {
+            const cls = document.getElementById('rollClass').value;
+            const filtered = studentData.filter(s => s.class === cls);
+            document.getElementById('rollBody').innerHTML = filtered.map(s => `
+                <tr>
+                    <td>${s.name}</td>
+                    <td>
+                        <button class="btn btn-edit" style="background:var(--success)" onclick="mark(this, 'PRESENT')">PRESENT</button>
+                        <button class="btn btn-del" onclick="markAbsent('${s.name}', '${s.class}')">ABSENT</button>
                     </td>
                 </tr>`).join('');
         }
 
-        function mark(name, status) {
-            const div = status === 'present' ? 'listPresent' : 'listAbsent';
-            document.getElementById(div).innerHTML += `<div style="font-size:0.7rem; padding:5px; border-bottom:1px solid #eee;">• ${name}</div>`;
+        function markAbsent(name, cls) {
+            document.getElementById('absentList').style.display = 'block';
+            document.getElementById('absentNames').innerHTML += `<div>• ${name} (${cls})</div>`;
         }
 
-        function fillDropdown() {
-            document.getElementById('selectStudent').innerHTML = students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        function filterGenStudents() {
+            const cls = document.getElementById('genClass').value;
+            const filtered = studentData.filter(s => s.class === cls);
+            document.getElementById('genStudent').innerHTML = filtered.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
         }
 
-        async function saveWithCompression() {
-            const file = document.getElementById('inPhoto').files[0];
-            let photoUrl = "";
-            if(file) {
-                const compressedBlob = await compressImage(file);
-                const fName = `compressed_${Date.now()}.jpg`;
-                const { data } = await supabaseClient.storage.from('student-photos').upload(fName, compressedBlob);
-                if(data) photoUrl = supabaseClient.storage.from('student-photos').getPublicUrl(fName).data.publicUrl;
-            }
-            await supabaseClient.from('students').insert([{
-                name: document.getElementById('inName').value,
-                class: document.getElementById('inClass').value,
-                total_fees: document.getElementById('inTotal').value,
-                photo_url: photoUrl
-            }]);
-            fetchAll();
-        }
-
-        async function deleteStudent(id) { if(confirm("DELETE?")) { await supabaseClient.from('students').delete().eq('id', id); fetchAll(); } }
-
-        function genID() {
-            const s = students.find(x => x.id === document.getElementById('selectStudent').value);
-            document.getElementById('docPreview').style.display = 'block';
-            document.getElementById('docPreview').innerHTML = `
-                <div class="student-id-card">
-                    <img src="${s.photo_url}" style="width:60px; height:60px; float:right; border-radius:5px;">
-                    <h4 style="margin:0; color:var(--primary)">STUDENT ID</h4>
-                    <p style="font-size:0.8rem; margin:5px 0;"><b>NAME:</b> ${s.name}<br><b>CLASS:</b> ${s.class}<br><b>LIN:</b> ${s.lin}</p>
-                    <div style="position:absolute; bottom:10px; font-size:0.5rem;">EUDES MEDIA AUTHORITY</div>
-                </div>`;
+        function generateID() {
+            const id = document.getElementById('genStudent').value;
+            const s = studentData.find(x => x.id === id);
+            if(!s) return;
+            document.getElementById('id-preview').style.display = 'block';
+            document.getElementById('id-img').src = s.photo_url;
+            document.getElementById('id-name').innerText = s.name;
+            document.getElementById('id-lin').innerText = s.lin || '#---';
+            document.getElementById('id-class').innerText = s.class;
         }
 
         fetchAll();
