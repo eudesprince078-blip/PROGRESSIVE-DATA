@@ -9,19 +9,19 @@
         :root { --blue: #002d5b; --gold: #ffc107; --red: #d90429; --white: #ffffff; --green: #2b9348; --light: #f1f4f9; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); margin: 0; padding: 0; }
         #loginGate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; }
-        .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .header { background: var(--blue); color: white; padding: 15px; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .hero { background: #001a33; padding: 25px 15px; text-align: center; color: white; }
         #clock { font-size: 38px; font-weight: 800; color: var(--white); }
         .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
         .stat-val { font-size: 18px; font-weight: 900; color: var(--blue); display: block; }
         .stat-lbl { font-size: 8px; font-weight: 800; color: #999; text-transform: uppercase; }
-        .nav-tabs { display: flex; background: white; position: sticky; top: 68px; z-index: 999; border-bottom: 1px solid #ddd; }
+        .nav-tabs { display: flex; background: white; border-bottom: 1px solid #ddd; }
         .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 10px; font-weight: 800; color: #aaa; cursor: pointer; }
         .tab.active { color: var(--blue); border-bottom: 3px solid var(--blue); background: #fafafa; }
         .card { background: white; border-radius: 15px; padding: 18px; margin: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--blue); }
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
-        input, select { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; font-size: 14px; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -49,31 +49,29 @@
         <div class="tab active" onclick="tab('sum')">Director</div>
         <div class="tab" onclick="tab('rec')">Records</div>
         <div class="tab" onclick="tab('adm')">Admission</div>
-        <div class="tab" onclick="tab('roll')">Attendance</div>
     </div>
-    <div id="v-sum">
+    <div id="v-sum" class="p-view">
         <div class="card" style="background:var(--blue); color:white; border-left:none;">
             <h4 style="margin:0 0 10px 0; color:var(--gold);">FINANCE SUMMARY</h4>
-            <div style="display:flex; justify-content:space-between;"><span>Balance:</span> <b id="s-debt">0 UGX</b></div>
+            <div style="display:flex; justify-content:space-between;"><span>Total Balance:</span> <b id="s-debt">0 UGX</b></div>
         </div>
-        <div class="card" id="absenceListContainer">System Online. Waiting for Data.</div>
     </div>
-    <div id="v-rec" class="hidden">
+    <div id="v-rec" class="hidden p-view">
         <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Pupil..." oninput="renderUI()"></div>
         <div id="dataList"></div>
     </div>
-    <div id="v-adm" class="hidden">
+    <div id="v-adm" class="hidden p-view">
         <div class="card">
-            <input type="hidden" id="editId">
-            <label>Full Name</label><input id="name">
+            <label>Pupil Name</label><input id="name">
             <label>Class</label>
-            <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <select id="cls">
+                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                <option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
             <label>Parent Contact</label><input id="contact">
-            <button onclick="submitData()" class="btn-main">SAVE RECORD</button>
+            <button onclick="submitData()" class="btn-main">REGISTER PUPIL</button>
         </div>
-    </div>
-    <div id="v-roll" class="hidden">
-        <div id="rollData"></div>
     </div>
 </div>
 
@@ -85,8 +83,9 @@
 
     async function secureLogin() {
         const btn = document.getElementById('authBtn');
-        const inputKey = document.getElementById('key').value.trim().toUpperCase();
-        if(!inputKey) return alert("ENTER KEY");
+        const typedKey = document.getElementById('key').value.trim().toUpperCase();
+        if(!typedKey) return alert("ENTER SYSTEM KEY");
+
         btn.innerText = "CONNECTING...";
         btn.disabled = true;
 
@@ -94,12 +93,14 @@
             const { data: schools } = await _client.from('schools').select('*');
             
             if (!schools || schools.length === 0) {
-                alert("SYSTEM ERROR: The database is empty. Please run the SQL script in Supabase.");
+                alert("SYSTEM ERROR: Database Table is Empty. Please run the SQL script in Supabase.");
                 btn.disabled = false;
+                btn.innerText = "AUTHENTICATE";
                 return;
             }
 
-            const match = schools.find(s => s.access_key.trim().toUpperCase() === inputKey);
+            // Match logic that ignores extra spaces
+            const match = schools.find(s => s.access_key.trim().toUpperCase() === typedKey);
 
             if (match) {
                 window.currentSchool = match;
@@ -110,13 +111,12 @@
                 document.getElementById('mainApp').classList.remove('hidden');
                 setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
             } else {
-                alert("ACCESS DENIED. CHECK SPELLING.");
+                alert("INVALID KEY. PLEASE CHECK SPELLING.");
                 btn.innerText = "AUTHENTICATE";
                 btn.disabled = false;
             }
         } catch (e) {
-            alert("NETWORK ERROR");
-            btn.innerText = "AUTHENTICATE";
+            alert("NETWORK ERROR: Check internet connection.");
             btn.disabled = false;
         }
     }
@@ -144,12 +144,14 @@
             contact: document.getElementById('contact').value
         };
         const { error } = await _client.from('students').insert([payload]);
-        if(!error) { alert("SAVED SUCCESSFULLY"); loadData(); }
+        if(!error) { alert("PUPIL REGISTERED"); loadData(); }
     }
 
     function tab(t) { 
-        ['v-adm','v-rec','v-roll','v-sum'].forEach(v => document.getElementById(v).classList.add('hidden')); 
-        document.getElementById('v-'+t).classList.remove('hidden'); 
+        document.querySelectorAll('.p-view').forEach(v => v.classList.add('hidden')); 
+        document.getElementById('v-'+t).classList.remove('hidden');
+        document.querySelectorAll('.tab').forEach(tb => tb.classList.remove('active'));
+        event.target.classList.add('active');
     }
 </script>
 </body>
