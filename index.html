@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Supreme Management System V66</title>
+    <title>Eudes Media | Supreme Management V67</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -22,22 +22,22 @@
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { text-align: left; padding: 12px; background: var(--blue); color: white; font-size: 11px; text-transform: uppercase; }
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; font-weight: 700; }
-        .lin-badge { background: var(--gold); color: var(--blue); padding: 5px 10px; border-radius: 6px; font-weight: 900; font-size: 14px; }
+        .lin-badge { background: var(--gold); color: var(--blue); padding: 5px 10px; border-radius: 6px; font-weight: 900; }
         .photo-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--blue); background: #eee; }
-        .btn-edit { background: var(--blue); color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 10px; font-weight: 800; }
-        .btn-del { background: var(--red); color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 10px; font-weight: 800; }
+        .btn-edit { background: var(--blue); color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .btn-del { background: var(--red); color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 10px; font-weight: 800; cursor: pointer; }
         input, select { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 10px; margin-bottom: 12px; font-size: 15px; font-weight: 600; box-sizing: border-box; }
         label { font-weight: 900; font-size: 12px; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 4px; }
         .hidden { display: none !important; }
         #editOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .modal { background: white; width: 100%; max-width: 500px; border-radius: 15px; padding: 20px; position: relative; }
+        .modal { background: white; width: 100%; max-width: 500px; border-radius: 15px; padding: 20px; position: relative; max-height: 90vh; overflow-y: auto; }
     </style>
 </head>
 <body>
 
 <div id="mainApp">
     <div class="header">
-        <div><b style="font-size: 14px;">PROGRESSIVE MOTHERS</b><br><span style="font-size:9px; color:var(--gold); font-weight: 800;">EUDES MEDIA MASTER PANEL</span></div>
+        <div><b>PROGRESSIVE MOTHERS</b><br><span style="font-size:9px; color:var(--gold); font-weight: 800;">EUDES MEDIA MASTER PANEL</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900;">LOGOUT</button>
     </div>
     
@@ -68,13 +68,13 @@
 
     <div id="v-adm" class="hidden p-view">
         <div style="padding: 20px;">
-            <label>LIN Number (Unique ID)</label><input id="lin" placeholder="E.g. 101">
-            <label>Full Name</label><input id="name" placeholder="John Doe">
+            <label>LIN Number</label><input id="lin" placeholder="E.g. 101">
+            <label>Full Name</label><input id="name">
             <label>Class</label><select id="cls"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Total Fees</label><input id="f_exp" type="number" value="0">
+            <label>Expected Fees</label><input id="f_exp" type="number" value="0">
             <label>Paid Amount</label><input id="f_paid" type="number" value="0">
-            <label>Contact</label><input id="contact" placeholder="+256...">
-            <label>Upload Student Photo</label><input type="file" id="photoFile" accept="image/*">
+            <label>Contact</label><input id="contact">
+            <label>Upload Photo</label><input type="file" id="photoFile" accept="image/*">
             <button onclick="saveData()" style="width:100%; background:var(--blue); color:white; padding:18px; border:none; border-radius:10px; font-weight:900;" id="saveBtn">SUBMIT TO SYSTEM</button>
         </div>
     </div>
@@ -82,14 +82,15 @@
 
 <div id="editOverlay" class="hidden">
     <div class="modal">
-        <h2 style="color:var(--blue); margin-top:0;">EDIT RECORD</h2>
+        <h2 style="color:var(--blue); margin-top:0;">EDIT STUDENT</h2>
         <input type="hidden" id="editId">
         <label>LIN Number</label><input id="eLin">
         <label>Name</label><input id="eName">
         <label>Class</label><input id="eCls">
-        <label>Paid</label><input id="ePaid" type="number">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <button onclick="updateData()" style="background:var(--green); color:white; padding:15px; border-radius:8px; border:none; font-weight:900;">UPDATE</button>
+        <label>Paid Amount</label><input id="ePaid" type="number">
+        <label>Update Photo (Optional)</label><input type="file" id="editPhotoFile" accept="image/*">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+            <button onclick="updateData()" id="updateBtn" style="background:var(--green); color:white; padding:15px; border-radius:8px; border:none; font-weight:900;">UPDATE</button>
             <button onclick="document.getElementById('editOverlay').classList.add('hidden')" style="background:var(--red); color:white; padding:15px; border-radius:8px; border:none; font-weight:900;">CANCEL</button>
         </div>
     </div>
@@ -100,6 +101,7 @@
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
     const BUCKET = 'eudes-media-student-photos';
+    let cachedData = [];
 
     async function init() {
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
@@ -141,18 +143,17 @@
         document.getElementById('c-debt').innerText = d.toLocaleString();
     }
 
+    async function uploadPhoto(file) {
+        if(!file) return null;
+        const fName = `${Date.now()}_${file.name.replace(/\s/g, '_')}`;
+        const { data } = await _client.storage.from(BUCKET).upload(fName, file);
+        return data ? `${SUPA_URL}/storage/v1/object/public/${BUCKET}/${fName}` : null;
+    }
+
     async function saveData() {
         const btn = document.getElementById('saveBtn');
-        const file = document.getElementById('photoFile').files[0];
         btn.innerText = "UPLOADING...";
-        
-        let photoUrl = "";
-        if(file) {
-            const fExt = file.name.split('.').pop();
-            const fPath = `${Date.now()}.${fExt}`;
-            const { data: upData } = await _client.storage.from(BUCKET).upload(fPath, file);
-            if(upData) photoUrl = `${SUPA_URL}/storage/v1/object/public/${BUCKET}/${fPath}`;
-        }
+        const url = await uploadPhoto(document.getElementById('photoFile').files[0]);
 
         const payload = {
             lin: document.getElementById('lin').value,
@@ -161,22 +162,13 @@
             fees_expected: document.getElementById('f_exp').value,
             fees_paid: document.getElementById('f_paid').value,
             contact: document.getElementById('contact').value,
-            photo_url: photoUrl,
+            photo_url: url,
             school_id: 1
         };
 
         await _client.from('students').insert([payload]);
-        alert("PUPIL SAVED SUCCESSFULLY");
-        document.querySelectorAll('input').forEach(i => i.value="");
-        await loadData(); tab('rec');
-        btn.innerText = "SUBMIT TO SYSTEM";
-    }
-
-    async function deleteRow(id) {
-        if(confirm("Permanently delete this record?")) {
-            await _client.from('students').delete().eq('id', id);
-            await loadData();
-        }
+        alert("PUPIL SAVED");
+        location.reload();
     }
 
     function openEdit(id) {
@@ -190,16 +182,30 @@
     }
 
     async function updateData() {
+        const btn = document.getElementById('updateBtn');
+        btn.innerText = "UPDATING...";
         const id = document.getElementById('editId').value;
+        const newPhoto = await uploadPhoto(document.getElementById('editPhotoFile').files[0]);
+
         const payload = {
             lin: document.getElementById('eLin').value,
             name: document.getElementById('eName').value,
             class: document.getElementById('eCls').value,
             fees_paid: document.getElementById('ePaid').value
         };
+        if(newPhoto) payload.photo_url = newPhoto;
+
         await _client.from('students').update(payload).eq('id', id);
         document.getElementById('editOverlay').classList.add('hidden');
         await loadData();
+        btn.innerText = "UPDATE";
+    }
+
+    async function deleteRow(id) {
+        if(confirm("Permanently delete record?")) {
+            await _client.from('students').delete().eq('id', id);
+            await loadData();
+        }
     }
 
     function tab(t) { 
