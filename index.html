@@ -9,24 +9,21 @@
     <style>
         :root { --primary: #0047AB; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; }
         * { box-sizing: border-box; text-transform: uppercase; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; }
         
         /* LOGIN SHIELD */
         #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 2px solid #e2e8f0; font-weight: 700; font-family: inherit; }
+        .login-card { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 2px solid #e2e8f0; font-weight: 700; }
 
-        /* BRANDING AREA */
-        .school-header { background: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; }
-        .school-logo { width: 50px; height: 50px; border-radius: 10px; object-fit: contain; }
-        .school-info h2 { margin: 0; font-size: 1rem; color: var(--primary); }
-
-        .top-nav { background: var(--danger); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; font-weight: 800; }
+        /* HEADER & TABS */
+        .school-header { background: white; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; }
+        .school-logo { width: 45px; height: 45px; border-radius: 8px; object-fit: contain; }
         .tab-bar { background: white; display: flex; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 1000; }
         .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.6rem; font-weight: 800; color: #64748b; cursor: pointer; }
         .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
 
-        /* DASHBOARD HERO */
+        /* DASHBOARD STATS */
         .hero { background: var(--dark); color: white; padding: 20px; text-align: center; }
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -15px; }
         .stat-card { background: white; padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
@@ -39,60 +36,43 @@
         th { text-align: left; font-size: 0.55rem; color: #94a3b8; padding: 10px; }
         td { padding: 10px; font-size: 0.75rem; font-weight: 700; border-bottom: 1px solid #f1f5f9; }
         
-        .btn { padding: 10px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; color: white; }
-        .btn-p { background: var(--success); }
-        .btn-a { background: var(--danger); }
+        .btn { padding: 10px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-card">
-            <div style="text-align:center; margin-bottom:20px;">
-                <h1 style="color:var(--primary); margin:0;">ESMS HUB</h1>
-                <p style="font-size:0.6rem; font-weight:800;">EUDES MEDIA INNOVATION</p>
-            </div>
-            <label style="font-size:0.6rem; font-weight:800;">SCHOOL ID</label>
-            <input type="text" id="schIdInput" placeholder="E.G. SCHOOL-001">
-            
-            <label style="font-size:0.6rem; font-weight:800;">STAFF PASSWORD</label>
-            <input type="password" id="passInput" placeholder="****">
-            
-            <button class="btn" style="background:var(--primary); width:100%; padding:15px;" onclick="authenticate()">ENTER SYSTEM</button>
-            <p id="login-err" style="color:var(--danger); font-size:0.6rem; text-align:center; display:none; margin-top:10px;">INVALID ID OR PASSWORD</p>
+            <h2 style="color:var(--primary)">SYSTEM ACCESS</h2>
+            <input type="text" id="schIdInput" placeholder="SCHOOL ID (e.g., SCH-101)">
+            <input type="password" id="passInput" placeholder="ACCESS KEY">
+            <button class="btn" style="width:100%" onclick="authenticate()">LOGIN</button>
+            <p id="login-err" style="color:var(--danger); font-size:0.6rem; display:none; margin-top:10px;"></p>
         </div>
     </div>
 
     <div id="main-app" style="display:none;">
         <div class="school-header">
             <img src="" id="displayLogo" class="school-logo" onerror="this.src='https://via.placeholder.com/50'">
-            <div class="school-info">
-                <h2 id="displayName">LOADING SCHOOL...</h2>
-                <div style="font-size:0.5rem; color:#64748b;">POWERED BY EUDES MEDIA</div>
+            <div>
+                <h2 id="displayName" style="margin:0; font-size:1rem;">SCHOOL NAME</h2>
+                <div id="displayRole" style="font-size:0.5rem; color:var(--primary); font-weight:800;">ROLE: ---</div>
             </div>
-        </div>
-
-        <div class="top-nav">
-            <div id="displayRole">ROLE: ---</div>
-            <div id="live-clock">00:00:00</div>
         </div>
 
         <div class="tab-bar">
             <div class="tab active" onclick="showTab('dash')">DASHBOARD</div>
             <div class="tab" id="tab-adm" onclick="showTab('admission')">ADMISSION</div>
-            <div class="tab" onclick="location.reload()" style="color:var(--danger)">EXIT</div>
+            <div class="tab" onclick="location.reload()" style="color:var(--danger)">LOGOUT</div>
         </div>
 
         <div id="dash" class="tab-content">
-            <div class="hero">
-                <p style="margin:0; font-size:0.6rem; opacity:0.7;">SCHOOL SUMMARY</p>
-            </div>
+            <div class="hero"><h1 id="live-clock" style="margin:0">00:00:00</h1></div>
             <div class="stat-grid">
-                <div class="stat-card"><b id="countT">0</b><span>TOTAL</span></div>
-                <div class="stat-card"><b id="countC" style="color:var(--success);">0</b><span>PAID</span></div>
+                <div class="stat-card"><b id="countT">0</b><span>PUPILS</span></div>
+                <div class="stat-card"><b id="countC" style="color:var(--success);">0</b><span>CLEARED</span></div>
                 <div class="stat-card"><b id="countO" style="color:var(--danger);">0</b><span>OWING</span></div>
             </div>
-
             <div class="container">
                 <div class="card">
                     <table>
@@ -111,18 +91,17 @@
 
         <div id="admission" class="tab-content container" style="display:none;">
             <div class="card">
-                <h3>NEW STUDENT REGISTRATION</h3>
+                <h3>NEW ENROLLMENT</h3>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <input type="text" id="inLin" placeholder="LIN NUMBER">
-                    <input type="text" id="inName" placeholder="STUDENT NAME">
+                    <input type="text" id="inLin" placeholder="LIN">
+                    <input type="text" id="inName" placeholder="FULL NAME">
                     <input type="text" id="inClass" placeholder="CLASS">
-                    <input type="text" id="inContact" placeholder="PARENT CONTACT">
-                    <input type="number" id="inExp" placeholder="FEES EXPECTED">
-                    <input type="number" id="inPaid" placeholder="FEES PAID">
+                    <input type="text" id="inContact" placeholder="CONTACT">
+                    <input type="number" id="inExp" placeholder="TOTAL FEES">
+                    <input type="number" id="inPaid" placeholder="PAID">
                     <select id="inStatus"><option value="OWING">OWING</option><option value="CLEARED">CLEARED</option></select>
-                    <input type="file" id="inPhoto">
                 </div>
-                <button class="btn" style="background:var(--primary); width:100%; margin-top:15px;" onclick="saveStudent()">SAVE STUDENT</button>
+                <button class="btn" style="width:100%; margin-top:15px;" id="saveBtn" onclick="saveStudent()">SAVE DATA</button>
             </div>
         </div>
     </div>
@@ -136,63 +115,49 @@
         let userRole = "";
         let students = [];
 
-        // STAFF PASSWORDS
-        const PASSWORDS = { "ADMIN77": "ADMIN", "FIN88": "FINANCE", "TEACH99": "TEACHER" };
-
         async function authenticate() {
             const schId = document.getElementById('schIdInput').value;
-            const pass = document.getElementById('passInput').value;
+            const inputKey = document.getElementById('passInput').value;
+            const err = document.getElementById('login-err');
 
-            if(schId && PASSWORDS[pass]) {
-                activeSchoolId = schId;
-                userRole = PASSWORDS[pass];
-                
-                // Show App
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-app').style.display = 'block';
-                document.getElementById('displayRole').innerText = "ROLE: " + userRole;
-                document.getElementById('displayName').innerText = schId; // Temporary, can be linked to a 'schools' table
+            const { data: school, error } = await client.from('schools').select('*').eq('school_id', schId).single();
 
-                applySecurity();
-                loadData();
-            } else {
-                document.getElementById('login-err').style.display = 'block';
+            if (error || !school) {
+                err.innerText = "SCHOOL ID NOT FOUND"; err.style.display = 'block'; return;
             }
-        }
 
-        function applySecurity() {
+            if (inputKey === school.admin_key) userRole = "ADMIN";
+            else if (inputKey === school.finance_key) userRole = "FINANCE";
+            else if (inputKey === school.teacher_key) userRole = "TEACHER";
+            else { err.innerText = "INVALID KEY"; err.style.display = 'block'; return; }
+
+            activeSchoolId = schId;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('displayName').innerText = school.school_name;
+            document.getElementById('displayLogo').src = school.logo_url;
+            document.getElementById('displayRole').innerText = "ROLE: " + userRole;
+
             if(userRole === "TEACHER") {
                 document.querySelectorAll('.money').forEach(e => e.style.display = 'none');
                 document.getElementById('tab-adm').style.display = 'none';
             }
-            if(userRole === "FINANCE") {
-                document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'none');
-            }
+            loadData();
         }
 
         async function loadData() {
-            // CRITICAL: We only fetch students for THIS school ID
             const { data } = await client.from('students').select('*').eq('scho_id', activeSchoolId).order('name');
             students = data || [];
-            render();
-        }
-
-        function render() {
-            const body = document.getElementById('dashBody');
             let t=0, c=0, o=0;
-            body.innerHTML = students.map(s => {
+            document.getElementById('dashBody').innerHTML = students.map(s => {
                 t++; s.fees_status === 'CLEARED' ? c++ : o++;
                 return `<tr>
-                    <td><img src="${s.photo_url || ''}" class="stu-img" onerror="this.src='https://via.placeholder.com/40'"></td>
-                    <td>${s.name}</td>
-                    <td>${s.class}</td>
+                    <td><img src="${s.photo_url || ''}" style="width:35px;height:35px;border-radius:4px;" onerror="this.src='https://via.placeholder.com/35'"></td>
+                    <td>${s.name}</td><td>${s.class}</td>
                     ${userRole !== 'TEACHER' ? `<td>${s.fees_expected}</td><td>${s.fees_paid}</td>` : ''}
-                    <td>${s.fees_status}</td>
-                    <td>
-                        <button class="btn btn-p" onclick="mark('${s.id}','P')">P</button>
-                        <button class="btn btn-a" onclick="mark('${s.id}','A')">A</button>
-                    </td>
-                    <td class="admin-only"><button class="btn" style="background:gray; font-size:0.5rem;" onclick="del('${s.id}')">DEL</button></td>
+                    <td style="color:${s.fees_status === 'CLEARED' ? 'green' : 'red'}">${s.fees_status}</td>
+                    <td><button onclick="mark('${s.id}','P')">P</button> <button onclick="mark('${s.id}','A')">A</button></td>
+                    <td class="admin-only">${userRole==='ADMIN' ? `<button onclick="del('${s.id}')">DEL</button>` : '--'}</td>
                 </tr>`;
             }).join('');
             document.getElementById('countT').innerText = t;
@@ -200,13 +165,9 @@
             document.getElementById('countO').innerText = o;
         }
 
-        async function mark(id, status) {
-            await client.from('students').update({ attendance: status }).eq('id', id);
-            alert("RECORDED: " + status);
-            loadData();
-        }
-
         async function saveStudent() {
+            const btn = document.getElementById('saveBtn');
+            btn.innerText = "SAVING..."; btn.disabled = true;
             const obj = {
                 scho_id: activeSchoolId,
                 lin: document.getElementById('inLin').value,
@@ -217,15 +178,15 @@
                 fees_paid: document.getElementById('inPaid').value,
                 fees_status: document.getElementById('inStatus').value
             };
-            await client.from('students').insert([obj]);
-            alert("STUDENT ADDED");
-            showTab('dash');
+            const { error } = await client.from('students').insert([obj]);
+            if(!error) { alert("SUCCESS"); showTab('dash'); } else { alert("ERROR: " + error.message); }
+            btn.innerText = "SAVE DATA"; btn.disabled = false;
         }
 
         function showTab(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.style.display='none');
             document.getElementById(t).style.display='block';
-            if(t === 'dash') loadData();
+            if(t==='dash') loadData();
         }
 
         setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString(); }, 1000);
