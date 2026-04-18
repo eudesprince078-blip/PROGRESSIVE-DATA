@@ -7,92 +7,83 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --accent: #f59e0b; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; text-transform: uppercase; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
+        :root { --primary: #0047AB; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; }
+        * { box-sizing: border-box; text-transform: uppercase; transition: 0.2s; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; }
 
-        /* HEADER */
-        .nav-top { background: var(--danger); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; }
-        .nav-sub { background: #be123c; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; }
-        .hero { background: var(--dark); color: white; padding: 30px 20px; text-align: center; }
+        /* HEADER & HERO */
+        .top-nav { background: var(--danger); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; }
+        .hero { background: var(--dark); color: white; padding: 30px 20px; text-align: center; border-bottom: 5px solid var(--primary); }
         #live-clock { font-size: 3rem; font-weight: 800; margin: 0; letter-spacing: -2px; }
 
-        /* STATS */
-        .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -20px; }
-        .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-bottom: 4px solid #cbd5e1; }
-        .stat-card b { display: block; font-size: 1.4rem; }
+        /* SEARCH BAR */
+        .search-container { padding: 20px; }
+        .search-box { background: white; padding: 15px; border-radius: 15px; display: flex; border: 2px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .search-box input { border: none; width: 100%; outline: none; font-weight: 800; font-family: inherit; font-size: 1rem; }
 
-        /* TABLE STYLING */
-        .container { padding: 20px; }
-        .table-wrap { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        /* REGISTRATION FORM */
+        .reg-box { background: white; margin: 0 20px 20px; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; }
+        .reg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+        input, select { padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-weight: 700; font-family: inherit; }
+        .file-input { font-size: 0.7rem; border: none; padding: 5px; }
+        .btn-main { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; margin-top: 10px; font-weight: 800; cursor: pointer; }
+
+        /* TABLE */
+        .table-wrap { background: white; margin: 20px; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 15px rgba(0,0,0,0.05); }
         .scroll { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.65rem; color: #94a3b8; border-bottom: 1px solid #e2e8f0; }
         td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; font-weight: 700; }
         
-        /* PHOTO & BUTTONS */
-        .student-pic { width: 40px; height: 40px; border-radius: 50%; background: #e2e8f0; object-fit: cover; border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #64748b; }
-        .btn-edit { background: var(--primary); color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.6rem; cursor: pointer; margin-right: 5px; }
-        .btn-del { background: var(--danger); color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.6rem; cursor: pointer; }
-        
-        /* REGISTRATION FORM */
-        .reg-box { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        .reg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-        input { padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-weight: 700; font-family: inherit; }
-        .btn-main { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; margin-top: 10px; font-weight: 800; cursor: pointer; }
+        .student-pic { width: 45px; height: 45px; border-radius: 50%; background: #eee; object-fit: cover; border: 2px solid var(--primary); }
+        .btn-action { padding: 8px 12px; border-radius: 8px; border: none; color: white; font-weight: 800; cursor: pointer; font-size: 0.6rem; margin-right: 5px; }
+        .edit { background: var(--primary); }
+        .del { background: var(--danger); }
     </style>
 </head>
 <body>
 
-    <div id="login-ui" style="padding:100px 20px; text-align:center; max-width:400px; margin:auto;">
-        <h2 style="color:var(--primary)">SYSTEM ACCESS</h2>
-        <input type="text" id="loginID" placeholder="SCHOOL ID" style="width:100%; margin-bottom:10px;">
-        <input type="password" id="loginKey" placeholder="ACCESS KEY" style="width:100%; margin-bottom:10px;">
-        <button onclick="doLogin()" class="btn-main">AUTHORIZE</button>
-    </div>
-
-    <div id="main-ui" style="display:none;">
-        <div class="nav-top">
+    <div id="main-ui">
+        <div class="top-nav">
             <div>ESMS COMMAND</div>
             <div style="background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:5px; font-size:0.7rem;">EUDES MEDIA</div>
         </div>
-        <div class="nav-sub"><div id="dispSchool">---</div><div onclick="location.reload()">LOGOUT</div></div>
 
         <div class="hero"><h1 id="live-clock">00:00:00</h1></div>
 
-        <div class="stat-row">
-            <div class="stat-card"><b><span id="countT">0</span></b><span>TOTAL</span></div>
-            <div class="stat-card"><b><span id="countP" style="color:var(--success);">0</span></b><span>PAID</span></div>
-            <div class="stat-card"><b><span id="countB" style="color:var(--danger);">0</span></b><span>OWING</span></div>
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="SEARCH BY NAME OR LIN NUMBER..." onkeyup="filterTable()">
+            </div>
         </div>
 
-        <div class="container">
-            <div class="reg-box">
-                <div class="reg-grid">
-                    <input type="text" id="inName" placeholder="NAME">
-                    <input type="text" id="inClass" placeholder="CLASS">
-                    <input type="text" id="inPhoto" placeholder="PHOTO URL">
-                    <input type="number" id="inTotal" placeholder="TOTAL FEES">
-                </div>
-                <button class="btn-main" onclick="saveStudent()">REGISTER STUDENT</button>
+        <div class="reg-box">
+            <div class="reg-grid">
+                <input type="text" id="inName" placeholder="NAME">
+                <input type="text" id="inClass" placeholder="CLASS">
+                <input type="number" id="inAge" placeholder="AGE">
+                <input type="number" id="inTotal" placeholder="TOTAL FEES">
+                <input type="file" id="inPhoto" class="file-input" accept="image/*">
             </div>
+            <button class="btn-main" onclick="uploadAndSave()">SAVE NEW RECORD</button>
+        </div>
 
-            <div class="table-wrap">
-                <div class="scroll">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>LIN</th>
-                                <th>PHOTO</th>
-                                <th>NAME</th>
-                                <th>CLASS</th>
-                                <th>BALANCE</th>
-                                <th>ACTION</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stuBody"></tbody>
-                    </table>
-                </div>
+        <div class="table-wrap">
+            <div class="scroll">
+                <table id="registryTable">
+                    <thead>
+                        <tr>
+                            <th>LIN</th>
+                            <th>PHOTO</th>
+                            <th>NAME</th>
+                            <th>CLASS</th>
+                            <th>AGE</th>
+                            <th>BALANCE</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stuBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -101,69 +92,77 @@
         const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const supabaseClient = supabase.createClient(_URL, _KEY);
-        let activeID = "";
+        const schoolID = "PM001"; // Placeholder, set during login
 
         setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
-        async function doLogin() {
-            const id = document.getElementById('loginID').value.trim().toUpperCase();
-            const key = document.getElementById('loginKey').value.trim();
-            const { data } = await supabaseClient.from('schools').select('*').eq('id', id).eq('access_key', key).maybeSingle();
-            if (data) { activeID = id; document.getElementById('login-ui').style.display='none'; document.getElementById('main-ui').style.display='block'; document.getElementById('dispSchool').innerText = data.school_name; fetchRecords(); } 
-            else { alert("DENIED"); }
+        // SEARCH FUNCTION
+        function filterTable() {
+            let input = document.getElementById("searchInput").value.toUpperCase();
+            let rows = document.getElementById("stuBody").getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++) {
+                let lin = rows[i].getElementsByTagName("td")[0].textContent.toUpperCase();
+                let name = rows[i].getElementsByTagName("td")[2].textContent.toUpperCase();
+                rows[i].style.display = (name.includes(input) || lin.includes(input)) ? "" : "none";
+            }
         }
 
         async function fetchRecords() {
-            const { count, data } = await supabaseClient.from('students').select('*', {count:'exact'}).eq('school_id', activeID).order('name', {ascending:true});
-            document.getElementById('countT').innerText = count || 0;
+            const { data } = await supabaseClient.from('students').select('*').order('name', {ascending:true});
             if(data) {
-                let p = 0, b = 0;
                 document.getElementById('stuBody').innerHTML = data.map((s, i) => {
+                    const lin = `#${(i+1).toString().padStart(3,'0')}`;
                     const bal = (s.total_fees || 0) - (s.paid_fees || 0);
-                    if(bal <= 0) p++; else b++;
-                    const photo = s.photo_url ? `<img src="${s.photo_url}" class="student-pic">` : `<div class="student-pic">NO PIC</div>`;
-                    
                     return `
                         <tr>
-                            <td>#${(i+1).toString().padStart(3,'0')}</td>
-                            <td>${photo}</td>
+                            <td>${lin}</td>
+                            <td><img src="${s.photo_url || 'https://via.placeholder.com/50'}" class="student-pic"></td>
                             <td style="color:var(--primary)">${s.name}</td>
-                            <td>${s.class || 'N/A'}</td>
+                            <td>${s.class || '--'}</td>
+                            <td>${s.age || '--'}</td>
                             <td style="color:${bal > 0 ? 'red' : 'green'}">${bal.toLocaleString()}</td>
                             <td>
-                                <button class="btn-edit" onclick="editStudent('${s.id}')">EDIT</button>
-                                <button class="btn-del" onclick="delStudent('${s.id}')">DEL</button>
+                                <button class="btn-action edit" onclick="editRow('${s.id}')">EDIT</button>
+                                <button class="btn-action del" onclick="delRow('${s.id}')">DEL</button>
                             </td>
                         </tr>`;
                 }).join('');
-                document.getElementById('countP').innerText = p; document.getElementById('countB').innerText = b;
             }
         }
 
-        async function saveStudent() {
-            const name = document.getElementById('inName').value;
-            const cls = document.getElementById('inClass').value;
-            const photo = document.getElementById('inPhoto').value;
-            const total = document.getElementById('inTotal').value;
-            if(!name) return alert("NAME REQUIRED");
-            const { error } = await supabaseClient.from('students').insert([{ name, class: cls, photo_url: photo, total_fees: total, school_id: activeID }]);
-            if(!error) { fetchRecords(); }
+        async function uploadAndSave() {
+            const file = document.getElementById('inPhoto').files[0];
+            let photoUrl = "";
+
+            if (file) {
+                const fileName = `${Date.now()}_${file.name}`;
+                const { data, error } = await supabaseClient.storage.from('student-photos').upload(fileName, file);
+                if (data) {
+                    const { data: urlData } = supabaseClient.storage.from('student-photos').getPublicUrl(fileName);
+                    photoUrl = urlData.publicUrl;
+                }
+            }
+
+            const { error } = await supabaseClient.from('students').insert([{
+                name: document.getElementById('inName').value,
+                class: document.getElementById('inClass').value,
+                age: document.getElementById('inAge').value,
+                total_fees: document.getElementById('inTotal').value,
+                photo_url: photoUrl,
+                school_id: schoolID
+            }]);
+
+            if(!error) { alert("SAVED!"); fetchRecords(); }
         }
 
-        async function delStudent(id) {
-            if(confirm("DELETE THIS STUDENT?")) {
-                const { error } = await supabaseClient.from('students').delete().eq('id', id);
-                if(!error) fetchRecords();
+        async function delRow(id) {
+            if(confirm("DELETE RECORD?")) {
+                await supabaseClient.from('students').delete().eq('id', id);
+                fetchRecords();
             }
         }
 
-        async function editStudent(id) {
-            const newName = prompt("ENTER NEW NAME:");
-            if(newName) {
-                const { error } = await supabaseClient.from('students').update({ name: newName }).eq('id', id);
-                if(!error) fetchRecords();
-            }
-        }
+        fetchRecords();
     </script>
 </body>
 </html>
