@@ -11,77 +11,96 @@
         * { box-sizing: border-box; text-transform: uppercase; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
         
-        /* HEADER */
-        .top-nav { background: var(--danger); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; }
+        /* LOGIN SHIELD */
+        #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 2px solid #e2e8f0; font-weight: 700; font-family: inherit; }
+
+        /* BRANDING AREA */
+        .school-header { background: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; }
+        .school-logo { width: 50px; height: 50px; border-radius: 10px; object-fit: contain; }
+        .school-info h2 { margin: 0; font-size: 1rem; color: var(--primary); }
+
+        .top-nav { background: var(--danger); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; font-weight: 800; }
         .tab-bar { background: white; display: flex; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 1000; }
-        .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.65rem; font-weight: 800; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; }
-        .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #f8fafc; }
+        .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.6rem; font-weight: 800; color: #64748b; cursor: pointer; }
+        .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
 
-        /* DASHBOARD HERO CARDS */
-        .hero { background: var(--dark); color: white; padding: 30px 20px; text-align: center; }
-        #live-clock { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -25px; }
-        .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-bottom: 4px solid #cbd5e1; }
-        .stat-card b { display: block; font-size: 1.4rem; line-height: 1; margin-bottom: 5px; }
-        .stat-card span { font-size: 0.6rem; font-weight: 800; color: #64748b; }
+        /* DASHBOARD HERO */
+        .hero { background: var(--dark); color: white; padding: 20px; text-align: center; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -15px; }
+        .stat-card { background: white; padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .stat-card b { display: block; font-size: 1.2rem; }
 
-        /* CONTAINER & TABLES */
         .container { padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-        label { display: block; font-size: 0.6rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
-        input, select { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; font-family: inherit; }
+        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; overflow-x: auto; }
         
-        .btn { padding: 10px 15px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; color: white; }
-        .btn-save { background: var(--primary); width: 100%; font-size: 1rem; margin-top: 20px; }
-        .btn-edit { background: var(--primary); font-size: 0.6rem; }
-        .btn-del { background: var(--danger); font-size: 0.6rem; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { text-align: left; font-size: 0.55rem; color: #94a3b8; padding: 10px; }
+        td { padding: 10px; font-size: 0.75rem; font-weight: 700; border-bottom: 1px solid #f1f5f9; }
         
-        .stu-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; }
-        .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-        th { text-align: left; font-size: 0.6rem; color: #94a3b8; padding: 10px; border-bottom: 2px solid #f1f5f9; }
-        td { padding: 12px 10px; font-size: 0.8rem; font-weight: 700; border-bottom: 1px solid #f1f5f9; }
+        .btn { padding: 10px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; color: white; }
+        .btn-p { background: var(--success); }
+        .btn-a { background: var(--danger); }
     </style>
 </head>
 <body>
 
-    <div class="top-nav">
-        <div>ESMS AUTHORITY HUB</div>
-        <div style="font-size:0.6rem; opacity:0.8;">EUDES MEDIA | +256762992440</div>
+    <div id="login-screen">
+        <div class="login-card">
+            <div style="text-align:center; margin-bottom:20px;">
+                <h1 style="color:var(--primary); margin:0;">ESMS HUB</h1>
+                <p style="font-size:0.6rem; font-weight:800;">EUDES MEDIA INNOVATION</p>
+            </div>
+            <label style="font-size:0.6rem; font-weight:800;">SCHOOL ID</label>
+            <input type="text" id="schIdInput" placeholder="E.G. SCHOOL-001">
+            
+            <label style="font-size:0.6rem; font-weight:800;">STAFF PASSWORD</label>
+            <input type="password" id="passInput" placeholder="****">
+            
+            <button class="btn" style="background:var(--primary); width:100%; padding:15px;" onclick="authenticate()">ENTER SYSTEM</button>
+            <p id="login-err" style="color:var(--danger); font-size:0.6rem; text-align:center; display:none; margin-top:10px;">INVALID ID OR PASSWORD</p>
+        </div>
     </div>
 
-    <div class="tab-bar">
-        <div class="tab active" id="tab-dash" onclick="showTab('dash')">DASHBOARD</div>
-        <div class="tab" id="tab-adm" onclick="showTab('admission')">ADMISSION</div>
-    </div>
-
-    <div id="dash" class="tab-content">
-        <div class="hero">
-            <h1 id="live-clock">00:00:00</h1>
-        </div>
-        
-        <div class="stat-grid">
-            <div class="stat-card"><b id="countTotal">0</b><span>PUPILS</span></div>
-            <div class="stat-card"><b id="countCleared" style="color:var(--success);">0</b><span>CLEARED</span></div>
-            <div class="stat-card"><b id="countOwing" style="color:var(--danger);">0</b><span>OWING</span></div>
+    <div id="main-app" style="display:none;">
+        <div class="school-header">
+            <img src="" id="displayLogo" class="school-logo" onerror="this.src='https://via.placeholder.com/50'">
+            <div class="school-info">
+                <h2 id="displayName">LOADING SCHOOL...</h2>
+                <div style="font-size:0.5rem; color:#64748b;">POWERED BY EUDES MEDIA</div>
+            </div>
         </div>
 
-        <div class="container" style="margin-top:20px;">
-            <div class="card">
-                <div class="table-wrap">
+        <div class="top-nav">
+            <div id="displayRole">ROLE: ---</div>
+            <div id="live-clock">00:00:00</div>
+        </div>
+
+        <div class="tab-bar">
+            <div class="tab active" onclick="showTab('dash')">DASHBOARD</div>
+            <div class="tab" id="tab-adm" onclick="showTab('admission')">ADMISSION</div>
+            <div class="tab" onclick="location.reload()" style="color:var(--danger)">EXIT</div>
+        </div>
+
+        <div id="dash" class="tab-content">
+            <div class="hero">
+                <p style="margin:0; font-size:0.6rem; opacity:0.7;">SCHOOL SUMMARY</p>
+            </div>
+            <div class="stat-grid">
+                <div class="stat-card"><b id="countT">0</b><span>TOTAL</span></div>
+                <div class="stat-card"><b id="countC" style="color:var(--success);">0</b><span>PAID</span></div>
+                <div class="stat-card"><b id="countO" style="color:var(--danger);">0</b><span>OWING</span></div>
+            </div>
+
+            <div class="container">
+                <div class="card">
                     <table>
                         <thead>
                             <tr>
-                                <th>PHOTO</th>
-                                <th>LIN</th>
-                                <th>NAME</th>
-                                <th>CLASS</th>
-                                <th>CONTACT</th>
-                                <th>EXPECTED</th>
-                                <th>PAID</th>
-                                <th>STATUS</th>
-                                <th>ACTION</th>
+                                <th>PHOTO</th><th>NAME</th><th>CLASS</th>
+                                <th class="money">EXPECTED</th><th class="money">PAID</th>
+                                <th>STATUS</th><th>ROLLCALL</th><th class="admin-only">ACTION</th>
                             </tr>
                         </thead>
                         <tbody id="dashBody"></tbody>
@@ -89,33 +108,22 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="admission" class="tab-content container" style="display:none;">
-        <div class="card">
-            <h3 id="formTitle" style="margin-top:0; color:var(--primary);">STUDENT REGISTRATION</h3>
-            <div class="form-grid">
-                <div><label>LIN NUMBER</label><input type="text" id="inLin"></div>
-                <div><label>FULL NAME</label><input type="text" id="inName"></div>
-                <div><label>CLASS</label><input type="text" id="inClass"></div>
-                <div><label>CONTACT (PARENT)</label><input type="text" id="inContact"></div>
-                <div><label>FEES EXPECTED</label><input type="number" id="inExp"></div>
-                <div><label>FEES PAID</label><input type="number" id="inPaid"></div>
-                <div>
-                    <label>FEES STATUS</label>
-                    <select id="inStatus">
-                        <option value="OWING">OWING</option>
-                        <option value="CLEARED">CLEARED</option>
-                        <option value="PARTIAL">PARTIAL</option>
-                    </select>
+        <div id="admission" class="tab-content container" style="display:none;">
+            <div class="card">
+                <h3>NEW STUDENT REGISTRATION</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <input type="text" id="inLin" placeholder="LIN NUMBER">
+                    <input type="text" id="inName" placeholder="STUDENT NAME">
+                    <input type="text" id="inClass" placeholder="CLASS">
+                    <input type="text" id="inContact" placeholder="PARENT CONTACT">
+                    <input type="number" id="inExp" placeholder="FEES EXPECTED">
+                    <input type="number" id="inPaid" placeholder="FEES PAID">
+                    <select id="inStatus"><option value="OWING">OWING</option><option value="CLEARED">CLEARED</option></select>
+                    <input type="file" id="inPhoto">
                 </div>
-                <div style="grid-column: 1 / -1;">
-                    <label>STUDENT PHOTO</label>
-                    <input type="file" id="inPhoto" accept="image/*" style="border:none; padding:0;">
-                </div>
+                <button class="btn" style="background:var(--primary); width:100%; margin-top:15px;" onclick="saveStudent()">SAVE STUDENT</button>
             </div>
-            <button class="btn btn-save" id="saveBtn" onclick="processSave()">SAVE TO DATABASE</button>
-            <button class="btn" style="background:#64748b; width:100%; margin-top:10px; display:none;" id="cancelBtn" onclick="resetForm()">CANCEL EDIT</button>
         </div>
     </div>
 
@@ -123,91 +131,84 @@
         const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const client = supabase.createClient(_URL, _KEY);
-        
-        let allStudents = [];
-        let editTargetId = null;
 
-        // Clock logic
-        setInterval(() => { 
-            document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-GB'); 
-        }, 1000);
+        let activeSchoolId = "";
+        let userRole = "";
+        let students = [];
 
-        async function fetchStudents() {
-            const { data } = await client.from('students').select('*').order('name');
-            allStudents = data || [];
-            renderTable();
+        // STAFF PASSWORDS
+        const PASSWORDS = { "ADMIN77": "ADMIN", "FIN88": "FINANCE", "TEACH99": "TEACHER" };
+
+        async function authenticate() {
+            const schId = document.getElementById('schIdInput').value;
+            const pass = document.getElementById('passInput').value;
+
+            if(schId && PASSWORDS[pass]) {
+                activeSchoolId = schId;
+                userRole = PASSWORDS[pass];
+                
+                // Show App
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('displayRole').innerText = "ROLE: " + userRole;
+                document.getElementById('displayName').innerText = schId; // Temporary, can be linked to a 'schools' table
+
+                applySecurity();
+                loadData();
+            } else {
+                document.getElementById('login-err').style.display = 'block';
+            }
         }
 
-        function renderTable() {
+        function applySecurity() {
+            if(userRole === "TEACHER") {
+                document.querySelectorAll('.money').forEach(e => e.style.display = 'none');
+                document.getElementById('tab-adm').style.display = 'none';
+            }
+            if(userRole === "FINANCE") {
+                document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'none');
+            }
+        }
+
+        async function loadData() {
+            // CRITICAL: We only fetch students for THIS school ID
+            const { data } = await client.from('students').select('*').eq('scho_id', activeSchoolId).order('name');
+            students = data || [];
+            render();
+        }
+
+        function render() {
             const body = document.getElementById('dashBody');
-            let total = 0, cleared = 0, owing = 0;
-
-            body.innerHTML = allStudents.map(s => {
-                total++;
-                if(s.fees_status === 'CLEARED') cleared++; else owing++;
-
+            let t=0, c=0, o=0;
+            body.innerHTML = students.map(s => {
+                t++; s.fees_status === 'CLEARED' ? c++ : o++;
                 return `<tr>
-                    <td><img src="${s.photo_url || ''}" class="stu-img" onerror="this.src='https://via.placeholder.com/50'"></td>
-                    <td>${s.lin || '---'}</td>
-                    <td style="color:var(--primary)">${s.name}</td>
+                    <td><img src="${s.photo_url || ''}" class="stu-img" onerror="this.src='https://via.placeholder.com/40'"></td>
+                    <td>${s.name}</td>
                     <td>${s.class}</td>
-                    <td>${s.contact || '--'}</td>
-                    <td>${(s.fees_expected || 0).toLocaleString()}</td>
-                    <td>${(s.fees_paid || 0).toLocaleString()}</td>
-                    <td style="color:${s.fees_status === 'CLEARED' ? 'green' : 'red'}">${s.fees_status || 'OWING'}</td>
+                    ${userRole !== 'TEACHER' ? `<td>${s.fees_expected}</td><td>${s.fees_paid}</td>` : ''}
+                    <td>${s.fees_status}</td>
                     <td>
-                        <button class="btn btn-edit" onclick="openEditMode('${s.id}')">EDIT</button>
-                        <button class="btn btn-del" onclick="processDelete('${s.id}')">DEL</button>
+                        <button class="btn btn-p" onclick="mark('${s.id}','P')">P</button>
+                        <button class="btn btn-a" onclick="mark('${s.id}','A')">A</button>
                     </td>
+                    <td class="admin-only"><button class="btn" style="background:gray; font-size:0.5rem;" onclick="del('${s.id}')">DEL</button></td>
                 </tr>`;
             }).join('');
-
-            // Update Dashboard Cards
-            document.getElementById('countTotal').innerText = total;
-            document.getElementById('countCleared').innerText = cleared;
-            document.getElementById('countOwing').innerText = owing;
+            document.getElementById('countT').innerText = t;
+            document.getElementById('countC').innerText = c;
+            document.getElementById('countO').innerText = o;
         }
 
-        function showTab(t) {
-            document.querySelectorAll('.tab-content').forEach(c => c.style.display='none');
-            document.querySelectorAll('.tab').forEach(c => c.classList.remove('active'));
-            document.getElementById(t).style.display='block';
-            document.getElementById(t === 'dash' ? 'tab-dash' : 'tab-adm').classList.add('active');
-            if(t === 'dash') fetchStudents();
+        async function mark(id, status) {
+            await client.from('students').update({ attendance: status }).eq('id', id);
+            alert("RECORDED: " + status);
+            loadData();
         }
 
-        function openEditMode(id) {
-            const s = allStudents.find(x => String(x.id) === String(id));
-            if(!s) return;
-            editTargetId = id;
-            document.getElementById('inLin').value = s.lin || "";
-            document.getElementById('inName').value = s.name || "";
-            document.getElementById('inClass').value = s.class || "";
-            document.getElementById('inContact').value = s.contact || "";
-            document.getElementById('inExp').value = s.fees_expected || "";
-            document.getElementById('inPaid').value = s.fees_paid || "";
-            document.getElementById('inStatus').value = s.fees_status || "OWING";
-            
-            document.getElementById('formTitle').innerText = "EDITING: " + s.name;
-            document.getElementById('saveBtn').innerText = "UPDATE RECORD";
-            document.getElementById('cancelBtn').style.display = "block";
-            showTab('admission');
-        }
-
-        async function processSave() {
-            const btn = document.getElementById('saveBtn');
-            btn.innerText = "SAVING..."; btn.disabled = true;
-
-            const photoFile = document.getElementById('inPhoto').files[0];
-            let pUrl = undefined;
-
-            if (photoFile) {
-                const path = `photos/${Date.now()}_${photoFile.name}`;
-                const { data } = await client.storage.from('student-photos').upload(path, photoFile);
-                if (data) pUrl = client.storage.from('student-photos').getPublicUrl(path).data.publicUrl;
-            }
-
-            const dataObj = {
+        async function saveStudent() {
+            const obj = {
+                scho_id: activeSchoolId,
                 lin: document.getElementById('inLin').value,
                 name: document.getElementById('inName').value,
                 class: document.getElementById('inClass').value,
@@ -216,42 +217,18 @@
                 fees_paid: document.getElementById('inPaid').value,
                 fees_status: document.getElementById('inStatus').value
             };
-            if (pUrl) dataObj.photo_url = pUrl;
-
-            let res;
-            if (editTargetId) {
-                res = await client.from('students').update(dataObj).eq('id', editTargetId);
-            } else {
-                res = await client.from('students').insert([dataObj]);
-            }
-
-            if (!res.error) {
-                alert("SUCCESSFUL");
-                resetForm();
-                showTab('dash');
-            } else {
-                alert("ERROR: " + res.error.message);
-            }
-            btn.innerText = "SAVE TO DATABASE"; btn.disabled = false;
+            await client.from('students').insert([obj]);
+            alert("STUDENT ADDED");
+            showTab('dash');
         }
 
-        async function processDelete(id) {
-            if(confirm("PERMANENTLY DELETE THIS STUDENT?")) {
-                const { error } = await client.from('students').delete().eq('id', id);
-                if(!error) fetchStudents(); else alert("ERROR: " + error.message);
-            }
+        function showTab(t) {
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display='none');
+            document.getElementById(t).style.display='block';
+            if(t === 'dash') loadData();
         }
 
-        function resetForm() {
-            editTargetId = null;
-            document.querySelectorAll('#admission input').forEach(i => i.value = "");
-            document.getElementById('inPhoto').value = "";
-            document.getElementById('formTitle').innerText = "STUDENT REGISTRATION";
-            document.getElementById('saveBtn').innerText = "SAVE TO DATABASE";
-            document.getElementById('cancelBtn').style.display = "none";
-        }
-
-        fetchStudents();
+        setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString(); }, 1000);
     </script>
 </body>
 </html>
