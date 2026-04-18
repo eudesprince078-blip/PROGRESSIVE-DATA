@@ -6,39 +6,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #002d5b; --gold: #ffc107; --white: #ffffff; --light: #f1f4f9; --red: #d90429; }
+        :root { --blue: #002d5b; --gold: #ffc107; --white: #ffffff; --light: #f1f4f9; --red: #d90429; --green: #2b9348; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); margin: 0; padding: 0; }
         
-        /* Professional Header */
         .header { background: var(--blue); color: white; padding: 15px; border-bottom: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .hero { background: #001a33; padding: 15px; text-align: center; color: white; border-bottom: 2px solid var(--gold); }
-        #clock { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
-        #date-display { font-size: 12px; color: var(--gold); font-weight: bold; }
+        #clock { font-size: 26px; font-weight: 900; color: var(--gold); }
+        #date-display { font-size: 12px; font-weight: bold; opacity: 0.8; }
 
-        /* Navigation */
         .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 75px; z-index: 999; }
-        .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 10px; font-weight: 900; color: #999; cursor: pointer; text-transform: uppercase; }
-        .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f8f9ff; }
+        .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 11px; font-weight: 900; color: #999; cursor: pointer; }
+        .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f0f4ff; }
 
-        /* Pupil Cards */
-        .container { padding: 10px; }
-        .search-bar { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 10px; box-sizing: border-box; font-size: 14px; }
-        .pupil-card { background: white; margin-bottom: 12px; padding: 12px; border-radius: 15px; display: flex; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); position: relative; }
-        .pupil-photo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid var(--blue); background: #f0f0f0; }
-        .pupil-name { font-weight: 900; color: var(--blue); font-size: 14px; text-transform: uppercase; margin-bottom: 4px; }
-        .pupil-meta { font-size: 11px; color: #555; font-weight: 700; line-height: 1.4; }
-        .lin-badge { background: var(--gold); color: black; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
-        .edit-btn { position: absolute; top: 10px; right: 10px; background: var(--light); border: 1px solid #ddd; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; }
-
-        /* Forms */
-        .form-group { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        label { font-weight: 900; font-size: 11px; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 5px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; margin-bottom: 15px; font-size: 14px; box-sizing: border-box; background: #fafafa; }
-        .btn-main { background: var(--blue); color: white; padding: 16px; border: none; border-radius: 10px; font-weight: 900; width: 100%; cursor: pointer; font-size: 14px; }
+        .container { padding: 15px; }
+        .search-bar { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 12px; box-sizing: border-box; }
         
-        /* Routine Section */
-        .routine-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; }
-        .time { font-weight: 900; color: var(--blue); }
+        .pupil-card { background: white; margin-bottom: 12px; padding: 12px; border-radius: 15px; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); position: relative; }
+        .pupil-photo { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 2px solid var(--blue); background: #eee; }
+        .pupil-info { flex: 1; }
+        .pupil-name { font-weight: 900; color: var(--blue); font-size: 13px; text-transform: uppercase; }
+        
+        .action-btns { display: flex; gap: 5px; margin-top: 8px; }
+        .btn-sm { padding: 6px 12px; border-radius: 6px; border: none; font-size: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .btn-edit { background: var(--gold); color: black; }
+        .btn-del { background: var(--red); color: white; }
+
+        label { font-weight: 900; font-size: 11px; color: var(--blue); display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
+        .btn-main { background: var(--blue); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; }
+
+        .routine-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 8px; border-left: 5px solid #ccc; display: flex; justify-content: space-between; align-items: center; }
+        .routine-card.active { border-left: 8px solid var(--green); background: #e8f5e9; }
 
         .hidden { display: none !important; }
     </style>
@@ -47,68 +45,82 @@
 
 <div class="header">
     <div><b>PROGRESSIVE MOTHERS</b><br><span style="font-size:9px; color:var(--gold);">EUDES MEDIA | +256762992440</span></div>
-    <div style="text-align:right;"><button onclick="location.reload()" style="background:rgba(255,255,255,0.2); color:white; border:none; padding:6px 10px; border-radius:5px; font-size:10px; font-weight:bold;">REFRESH</button></div>
+    <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:900; font-size:10px;">REFRESH</button>
 </div>
 
 <div class="hero">
     <div id="clock">00:00:00</div>
-    <div id="date-display">LOADING DATE...</div>
+    <div id="date-display">...</div>
 </div>
 
 <div class="nav-tabs">
-    <div class="tab active" id="t-rec" onclick="tab('rec')">Pupil Ledger</div>
+    <div class="tab active" id="t-rec" onclick="tab('rec')">Pupils</div>
+    <div class="tab" id="t-rou" onclick="tab('rou')">Routine</div>
     <div class="tab" id="t-adm" onclick="tab('adm')">Admission</div>
-    <div class="tab" id="t-rou" onclick="tab('rou')">Daily Routine</div>
 </div>
 
 <div id="v-rec" class="container">
-    <input type="text" id="sb" class="search-bar" placeholder="🔍 Search by Name or LIN..." oninput="render()">
+    <input type="text" id="sb" class="search-bar" placeholder="🔍 Search Pupil..." oninput="render()">
     <div id="list"></div>
 </div>
 
+<div id="v-rou" class="container hidden">
+    <div id="routine-list"></div>
+</div>
+
 <div id="v-adm" class="container hidden">
-    <div class="form-group">
-        <h3 style="margin-top:0; color:var(--blue);">Student Registration</h3>
-        <label>Full Name</label><input id="name" placeholder="Enter Full Name">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div><label>Age</label><input id="age" type="number"></div>
-            <div><label>Date of Birth</label><input id="dob" type="date"></div>
-        </div>
-        <label>Physical Location</label><input id="loc" placeholder="Village / Street">
-        <label>Health Status</label><input id="health" value="Good" placeholder="Any conditions?">
+    <div style="background:white; padding:20px; border-radius:15px;">
+        <input type="hidden" id="edit-id">
+        <label>Full Name</label><input id="name">
+        <label>Age</label><input id="age" type="number">
+        <label>Physical Location</label><input id="loc">
+        <label>Health Status</label><input id="health">
         <label>Class</label>
         <select id="cls">
             <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
             <option>P.5</option><option>P.6</option><option>P.7</option>
         </select>
         <label>Student Photo</label><input type="file" id="photoFile" accept="image/*">
-        <button class="btn-main" id="saveBtn" onclick="saveData()">SUBMIT TO CLOUD</button>
+        <button class="btn-main" id="saveBtn" onclick="saveData()">SAVE STUDENT</button>
     </div>
-</div>
-
-<div id="v-rou" class="container hidden">
-    <div class="routine-item"><span class="time">07:00 AM</span><span>Arrival & Cleaning</span></div>
-    <div class="routine-item"><span class="time">08:00 AM</span><span>Morning Assembly</span></div>
-    <div class="routine-item"><span class="time">08:30 AM</span><span>Lesson 1</span></div>
-    <div class="routine-item"><span class="time">10:30 AM</span><span>Break Time</span></div>
-    <div class="routine-item"><span class="time">01:00 PM</span><span>Lunch Break</span></div>
-    <div class="routine-item"><span class="time">04:30 PM</span><span>Departure</span></div>
 </div>
 
 <script>
     const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
-    const BUCKET = 'student-photos'; 
     let data = [];
+
+    const schedule = [
+        { start: "07:00", end: "08:00", task: "Arrival & Cleaning" },
+        { start: "08:00", end: "08:30", task: "Morning Assembly" },
+        { start: "08:30", end: "10:30", task: "Morning Lessons" },
+        { start: "10:30", end: "11:00", task: "Break Time" },
+        { start: "11:00", end: "13:00", task: "Mid-Day Lessons" },
+        { start: "13:00", end: "14:00", task: "Lunch Break" },
+        { start: "14:00", end: "16:30", task: "Afternoon Lessons" },
+        { start: "16:30", end: "17:00", task: "Departure" }
+    ];
 
     function init() {
         setInterval(() => {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-            document.getElementById('date-display').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('date-display').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+            updateRoutineUI();
         }, 1000);
         load();
+    }
+
+    function updateRoutineUI() {
+        const container = document.getElementById('routine-list');
+        const now = new Date();
+        const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+        container.innerHTML = "";
+        schedule.forEach(item => {
+            const isActive = currentTime >= item.start && currentTime < item.end;
+            container.innerHTML += `<div class="routine-card ${isActive ? 'active' : ''}"><div><b>${item.start}</b></div><div>${item.task}</div></div>`;
+        });
     }
 
     async function load() {
@@ -120,49 +132,70 @@
         const container = document.getElementById('list');
         const query = document.getElementById('sb').value.toLowerCase();
         container.innerHTML = "";
-        
-        data.filter(s => s.name.toLowerCase().includes(query) || (s.lin && s.lin.toLowerCase().includes(query))).forEach(s => {
-            const photo = s['photo-url'] || s['photo_url'] || 'https://via.placeholder.com/70?text=No+Img';
+        data.filter(s => s.name.toLowerCase().includes(query)).forEach(s => {
+            const photo = s['photo-url'] || s['photo_url'] || 'https://via.placeholder.com/65';
             container.innerHTML += `
                 <div class="pupil-card">
-                    <button class="edit-btn" onclick="alert('Edit logic for ${s.name} ready')">EDIT</button>
-                    <img src="${photo}" class="pupil-photo" onerror="this.src='https://via.placeholder.com/70?text=Error'">
+                    <img src="${photo}" class="pupil-photo">
                     <div class="pupil-info">
-                        <div class="pupil-name">${s.name} <span class="lin-badge">${s.lin || 'N/A'}</span></div>
-                        <div class="pupil-meta"><b>CLASS:</b> ${s.class} | <b>HEALTH:</b> ${s.health_status || 'Good'}</div>
-                        <div class="pupil-meta"><b>LOCATION:</b> ${s.location || 'Not Set'}</div>
-                        <div class="pupil-meta" style="color:var(--blue); font-size:9px; margin-top:5px;">EUDES MEDIA SECURE DATA</div>
+                        <div class="pupil-name">${s.name}</div>
+                        <div class="pupil-meta">CLASS: ${s.class} | LIN: ${s.lin || '---'}</div>
+                        <div class="action-btns">
+                            <button class="btn-sm btn-edit" onclick="editStudent('${s.id}')">Edit</button>
+                            <button class="btn-sm btn-del" onclick="deleteStudent('${s.id}', '${s.name}')">Delete</button>
+                        </div>
                     </div>
                 </div>`;
         });
     }
 
+    function editStudent(id) {
+        const s = data.find(x => x.id == id);
+        document.getElementById('edit-id').value = s.id;
+        document.getElementById('name').value = s.name;
+        document.getElementById('age').value = s.age;
+        document.getElementById('loc').value = s.location || '';
+        document.getElementById('health').value = s.health_status || '';
+        document.getElementById('cls').value = s.class;
+        tab('adm');
+        document.getElementById('saveBtn').innerText = "UPDATE STUDENT DETAILS";
+    }
+
+    async function deleteStudent(id, name) {
+        if(confirm("Are you sure you want to delete " + name + "?")) {
+            await _client.from('students').delete().eq('id', id);
+            location.reload();
+        }
+    }
+
     async function saveData() {
         const btn = document.getElementById('saveBtn');
+        const editId = document.getElementById('edit-id').value;
         const file = document.getElementById('photoFile').files[0];
-        btn.disabled = true; btn.innerText = "PROCESSING...";
+        btn.disabled = true;
         
         let url = null;
         if(file) {
             const fName = `p_${Date.now()}.jpg`;
-            const { data: uploadData, error } = await _client.storage.from(BUCKET).upload(fName, file);
-            if(!error) url = `${SUPA_URL}/storage/v1/object/public/${BUCKET}/${fName}`;
+            const { data: up } = await _client.storage.from('student-photos').upload(fName, file);
+            if(up) url = `${SUPA_URL}/storage/v1/object/public/student-photos/${fName}`;
         }
 
         const payload = {
             name: document.getElementById('name').value,
             age: document.getElementById('age').value,
-            date_of_birth: document.getElementById('dob').value,
             location: document.getElementById('loc').value,
             health_status: document.getElementById('health').value,
-            class: document.getElementById('cls').value,
-            school_id: 1
+            class: document.getElementById('cls').value
         };
-        if(url) { payload['photo-url'] = url; payload['photo_url'] = url; }
+        if(url) payload['photo-url'] = url;
 
-        const { error: dbError } = await _client.from('students').insert([payload]);
-        if(!dbError) { alert("Registration Successful!"); location.reload(); }
-        else { alert("Error: " + dbError.message); btn.disabled = false; btn.innerText = "SUBMIT TO CLOUD"; }
+        if(editId) {
+            await _client.from('students').update(payload).eq('id', editId);
+        } else {
+            await _client.from('students').insert([payload]);
+        }
+        location.reload();
     }
 
     function tab(t) {
