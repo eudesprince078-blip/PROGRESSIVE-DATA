@@ -25,7 +25,7 @@
         .btn-del { background: var(--danger); font-size: 0.6rem; }
         .stu-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; }
         .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         th { text-align: left; font-size: 0.6rem; color: #94a3b8; padding: 10px; border-bottom: 2px solid #f1f5f9; }
         td { padding: 12px 10px; font-size: 0.8rem; font-weight: 700; border-bottom: 1px solid #f1f5f9; }
     </style>
@@ -54,7 +54,7 @@
                             <th>CLASS</th>
                             <th>CONTACT</th>
                             <th>EXPECTED</th>
-                            <th>STATUS</th>
+                            <th>PAID</th> <th>STATUS</th>
                             <th>ACTION</th>
                         </tr>
                     </thead>
@@ -116,7 +116,7 @@
                     <td>${s.class}</td>
                     <td>${s.contact || '--'}</td>
                     <td>${(s.fees_expected || 0).toLocaleString()}</td>
-                    <td style="color:${s.fees_status === 'CLEARED' ? 'green' : 'red'}">${s.fees_status || 'OWING'}</td>
+                    <td style="color:var(--success)">${(s.fees_paid || 0).toLocaleString()}</td> <td style="color:${s.fees_status === 'CLEARED' ? 'green' : 'red'}">${s.fees_status || 'OWING'}</td>
                     <td>
                         <button class="btn btn-edit" onclick="openEditMode('${s.id}')">EDIT</button>
                         <button class="btn btn-del" onclick="processDelete('${s.id}')">DEL</button>
@@ -153,7 +153,7 @@
 
         async function processSave() {
             const btn = document.getElementById('saveBtn');
-            btn.innerText = "UPLOADING..."; btn.disabled = true;
+            btn.innerText = "SAVING..."; btn.disabled = true;
 
             const photoFile = document.getElementById('inPhoto').files[0];
             let pUrl = undefined;
@@ -193,7 +193,7 @@
         }
 
         async function processDelete(id) {
-            if(confirm("ARE YOU SURE YOU WANT TO DELETE THIS RECORD?")) {
+            if(confirm("DELETE THIS RECORD PERMANENTLY?")) {
                 const { error } = await client.from('students').delete().eq('id', id);
                 if(!error) fetchStudents(); else alert("DELETE ERROR: " + error.message);
             }
