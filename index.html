@@ -11,34 +11,34 @@
         * { box-sizing: border-box; text-transform: uppercase; transition: 0.2s; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
 
-        /* NAVIGATION & DASHBOARD */
+        /* HEADER & TABS */
         .top-nav { background: var(--danger); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; border-bottom: 4px solid var(--dark); }
         .tab-bar { background: white; display: flex; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 1000; }
         .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.65rem; font-weight: 800; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #f8fafc; }
 
+        /* DASHBOARD HERO */
         .hero { background: var(--dark); color: white; padding: 30px 20px; text-align: center; }
         #live-clock { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -25px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-bottom: 4px solid #cbd5e1; }
         .stat-card b { display: block; font-size: 1.4rem; }
 
-        /* FORMS */
+        /* ADMISSION FORM */
         .container { padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-        .input-group { margin-bottom: 15px; }
         label { display: block; font-size: 0.65rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
-        input, select { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; font-family: inherit; }
+        input { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; font-family: inherit; }
         
         /* BUTTONS */
         .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; text-align: center; }
-        .btn-main { background: var(--primary); width: 100%; font-size: 1rem; }
+        .btn-main { background: var(--primary); width: 100%; font-size: 1rem; margin-top: 10px; }
         .btn-edit { background: var(--primary); font-size: 0.6rem; padding: 6px 10px; margin-right: 4px; }
         .btn-del { background: var(--danger); font-size: 0.6rem; padding: 6px 10px; }
         .btn-cancel { background: #64748b; width: 100%; margin-top: 10px; }
 
-        /* TABLE */
+        /* LIST TABLE */
         .stu-pic { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; border: 1px solid #ddd; }
         .table-wrap { overflow-x: auto; background: white; border-radius: 15px; }
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
@@ -50,7 +50,7 @@
 
     <div class="top-nav">
         <div>ESMS AUTHORITY HUB</div>
-        <div style="font-size:0.6rem; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:5px;">EUDES MEDIA | 256762992440</div>
+        <div style="font-size:0.6rem; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:5px;">EUDES MEDIA | +256762992440</div>
     </div>
 
     <div class="tab-bar">
@@ -84,18 +84,18 @@
         <div class="card">
             <h3 id="formTitle" style="margin:0 0 20px 0; color:var(--primary);">STUDENT REGISTRATION FORM</h3>
             <div class="form-grid">
-                <div class="input-group"><label>FULL NAME</label><input type="text" id="inName"></div>
-                <div class="input-group"><label>CLASS</label><input type="text" id="inClass"></div>
-                <div class="input-group"><label>DATE OF BIRTH</label><input type="date" id="inDOB"></div>
-                <div class="input-group"><label>AGE</label><input type="number" id="inAge"></div>
-                <div class="input-group"><label>PARENT CONTACT</label><input type="text" id="inContact"></div>
-                <div class="input-group"><label>PHYSICAL LOCATION</label><input type="text" id="inLoc"></div>
-                <div class="input-group"><label>HEALTH STATUS</label><input type="text" id="inHealth" placeholder="Normal/Allergies/Etc"></div>
-                <div class="input-group"><label>TOTAL FEES</label><input type="number" id="inFees"></div>
-                <div class="input-group"><label>UPLOAD PHOTO</label><input type="file" id="inPhoto" accept="image/*" style="border:none;"></div>
+                <div><label>FULL NAME</label><input type="text" id="inName"></div>
+                <div><label>CLASS</label><input type="text" id="inClass"></div>
+                <div><label>DATE OF BIRTH</label><input type="date" id="inDOB"></div>
+                <div><label>AGE</label><input type="number" id="inAge"></div>
+                <div><label>PARENT CONTACT</label><input type="text" id="inContact"></div>
+                <div><label>LOCATION</label><input type="text" id="inLoc"></div>
+                <div><label>HEALTH STATUS</label><input type="text" id="inHealth" placeholder="NORMAL"></div>
+                <div><label>TOTAL FEES</label><input type="number" id="inFees"></div>
+                <div><label>PHOTO</label><input type="file" id="inPhoto" accept="image/*" style="border:none;"></div>
             </div>
-            <button class="btn btn-main" id="saveBtn" onclick="processSave()">SAVE STUDENT RECORD</button>
-            <button class="btn btn-cancel" id="cancelBtn" style="display:none;" onclick="cancelEdit()">CANCEL EDIT</button>
+            <button class="btn btn-main" id="saveBtn" onclick="handleFinalSave()">SAVE STUDENT RECORD</button>
+            <button class="btn btn-cancel" id="cancelBtn" style="display:none;" onclick="resetAdmission()">CANCEL EDIT</button>
         </div>
     </div>
 
@@ -105,7 +105,7 @@
         const client = supabase.createClient(_URL, _KEY);
         
         let allStudents = [];
-        let editId = null;
+        let editModeId = null;
 
         setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
@@ -134,11 +134,11 @@
                     <td style="color:var(--primary)">${s.name}</td>
                     <td>${s.class}</td>
                     <td>${s.contact_number || '--'}</td>
-                    <td><span style="font-size:0.65rem;">${s.health_status || 'NORMAL'}</span></td>
+                    <td style="font-size:0.7rem;">${s.health_status || 'NORMAL'}</td>
                     <td style="color:${bal > 0 ? 'red' : 'green'}">${bal.toLocaleString()}</td>
                     <td>
-                        <button class="btn btn-edit" onclick="startEdit('${s.id}')">EDIT</button>
-                        <button class="btn btn-del" onclick="startDelete('${s.id}')">DEL</button>
+                        <button class="btn btn-edit" onclick="triggerEdit('${s.id}')">EDIT</button>
+                        <button class="btn btn-del" onclick="triggerDelete('${s.id}')">DEL</button>
                     </td>
                 </tr>`;
             }).join('');
@@ -147,7 +147,6 @@
             document.getElementById('countB').innerText = owing;
         }
 
-        // IMAGE COMPRESSION (FIXES CONNECTION ERRORS)
         async function compress(file) {
             return new Promise(res => {
                 const r = new FileReader(); r.readAsDataURL(file);
@@ -163,10 +162,9 @@
             });
         }
 
-        async function processSave() {
+        async function handleFinalSave() {
             const btn = document.getElementById('saveBtn');
-            btn.innerText = "SAVING TO DATABASE...";
-            btn.disabled = true;
+            btn.innerText = "UPDATING..."; btn.disabled = true;
 
             const file = document.getElementById('inPhoto').files[0];
             let pUrl = undefined;
@@ -190,55 +188,56 @@
             };
             if(pUrl) payload.photo_url = pUrl;
 
-            let response;
-            if(editId) {
-                response = await client.from('students').update(payload).eq('id', editId);
+            let error;
+            if(editModeId) {
+                const res = await client.from('students').update(payload).eq('id', editModeId);
+                error = res.error;
             } else {
-                response = await client.from('students').insert([payload]);
+                const res = await client.from('students').insert([payload]);
+                error = res.error;
             }
 
-            if(!response.error) {
-                alert("SUCCESS!");
-                cancelEdit();
+            if(!error) {
+                alert("SUCCESSFULLY SAVED");
+                resetAdmission();
+                showTab('dash');
             } else {
-                alert("ERROR: " + response.error.message);
+                alert("DATABASE ERROR: " + error.message);
             }
-            btn.innerText = "SAVE STUDENT RECORD";
-            btn.disabled = false;
+            btn.innerText = "SAVE STUDENT RECORD"; btn.disabled = false;
         }
 
-        function startEdit(id) {
+        function triggerEdit(id) {
             const s = allStudents.find(x => x.id === id);
-            editId = id;
-            document.getElementById('inName').value = s.name;
-            document.getElementById('inClass').value = s.class;
+            editModeId = id;
+            document.getElementById('inName').value = s.name || "";
+            document.getElementById('inClass').value = s.class || "";
             document.getElementById('inAge').value = s.age || "";
             document.getElementById('inDOB').value = s.date_of_birth || "";
             document.getElementById('inContact').value = s.contact_number || "";
             document.getElementById('inLoc').value = s.location || "";
             document.getElementById('inHealth').value = s.health_status || "";
-            document.getElementById('inFees').value = s.total_fees;
+            document.getElementById('inFees').value = s.total_fees || "";
             
             document.getElementById('formTitle').innerText = "EDITING: " + s.name;
-            document.getElementById('saveBtn').innerText = "UPDATE STUDENT RECORD";
+            document.getElementById('saveBtn').innerText = "UPDATE STUDENT INFO";
             document.getElementById('cancelBtn').style.display = "block";
             showTab('admission');
         }
 
-        async function startDelete(id) {
-            if(confirm("PERMANENTLY DELETE THIS STUDENT?")) {
+        async function triggerDelete(id) {
+            if(confirm("ARE YOU SURE YOU WANT TO DELETE THIS STUDENT?")) {
                 await client.from('students').delete().eq('id', id);
                 fetchAll();
             }
         }
 
-        function cancelEdit() {
-            editId = null;
-            document.querySelectorAll('input').forEach(i => i.value = "");
+        function resetAdmission() {
+            editModeId = null;
+            document.querySelectorAll('#admission input').forEach(i => i.value = "");
             document.getElementById('formTitle').innerText = "STUDENT REGISTRATION FORM";
             document.getElementById('saveBtn').innerText = "SAVE STUDENT RECORD";
             document.getElementById('cancelBtn').style.display = "none";
-            showTab('dash');
         }
 
         function doSearch() {
