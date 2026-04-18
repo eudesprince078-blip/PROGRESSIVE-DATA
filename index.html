@@ -9,12 +9,9 @@
         :root { --blue: #002d5b; --gold: #ffc107; --red: #d90429; --white: #ffffff; --green: #2b9348; --light: #f1f4f9; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
         
-        /* LOGIN SCREEN */
         #loginGate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; }
         .pass-container { position: relative; width: 100%; max-width: 320px; }
-        .toggle-pass { position: absolute; right: 15px; top: 22px; color: var(--blue); font-weight: 800; cursor: pointer; font-size: 11px; }
         
-        /* APP LAYOUT */
         .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .hero { background: #001a33; padding: 25px 15px; text-align: center; color: white; }
         #clock { font-size: 38px; font-weight: 800; color: var(--white); line-height: 1; }
@@ -35,18 +32,16 @@
         input, select { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; font-size: 14px; }
         
         .rec-info { font-size: 11px; margin-top: 6px; color: #444; line-height: 1.5; }
-        .rec-bold { font-weight: 900; color: var(--blue); text-transform: uppercase; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div id="loginGate">
-    <h1 id="brandName" style="color:white; margin:0;">EUDES MEDIA</h1>
+    <h1 style="color:white; margin:0;">EUDES MEDIA</h1>
     <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SUPREME MANAGEMENT SYSTEM</p>
     <div class="pass-container">
         <input id="key" type="password" placeholder="ENTER SYSTEM KEY" style="text-align:center; height:60px;">
-        <span class="toggle-pass" onclick="togglePass()">SHOW</span>
     </div>
     <button onclick="secureLogin()" id="authBtn" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:320px; border:none; border-radius:12px; font-weight:900; margin-top:10px;">AUTHENTICATE</button>
 </div>
@@ -83,14 +78,14 @@
             <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Total Paid:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
             <div style="display:flex; justify-content:space-between; padding:8px 0;"><span>Balance:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
         </div>
-        <div class="card" id="absenteeList" style="border-left:none;">
+        <div class="card" style="border-left:none;">
             <h4 style="color:var(--blue); margin-bottom:10px;">DAILY ABSENTEE REPORT</h4>
             <div id="absenceListContainer"></div>
         </div>
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Name, LIN, or Location..." oninput="renderUI()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Name or LIN..." oninput="renderUI()"></div>
         <div id="dataList"></div>
     </div>
 
@@ -98,8 +93,7 @@
         <div class="card" style="border-left:none;">
             <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue);">NEW ADMISSION</h3>
             <input type="hidden" id="editId">
-            <label>LIN (System ID)</label><input id="lin_field" placeholder="Auto-generated if empty">
-            <label>Full Name</label><input id="name">
+            <label>Name</label><input id="name">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label>Age</label><input id="age" type="number"></div>
                 <div><label>DOB</label><input id="dob" type="date"></div>
@@ -110,8 +104,8 @@
             <label>Health Status</label><input id="health_field">
             <label>Contact Number</label><input id="contact">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label>Total Tuition</label><input id="f_exp" type="number"></div>
-                <div><label>Amount Paid</label><input id="f_paid" type="number"></div>
+                <div><label>Tuition</label><input id="f_exp" type="number"></div>
+                <div><label>Paid</label><input id="f_paid" type="number"></div>
             </div>
             <button onclick="submitData()" id="saveBtn" class="btn-main" style="margin-top:20px;">SAVE FILE</button>
         </div>
@@ -133,22 +127,20 @@
     let cachedData = [];
     window.currentSchool = {}; 
 
-    function togglePass() { const i = document.getElementById('key'); i.type = i.type === "password" ? "text" : "password"; }
-
     async function secureLogin() {
         const btn = document.getElementById('authBtn');
         const val = document.getElementById('key').value.trim();
-        if(!val) return alert("ENTER SYSTEM KEY");
-        
+        if(!val) return alert("ENTER KEY");
         btn.innerText = "CONNECTING...";
         btn.disabled = true;
 
         try {
-            const { data: school, error } = await _client
+            // FIX: Uses .limit(1) to avoid the "single JSON object" error
+            const { data: schools, error } = await _client
                 .from('schools')
                 .select('*')
                 .ilike('access_key', val)
-                .single();
+                .limit(1);
 
             if (error) {
                 alert("LOGIN ERROR: " + error.message);
@@ -157,7 +149,8 @@
                 return;
             }
 
-            if (school) {
+            if (schools && schools.length > 0) {
+                const school = schools[0];
                 window.currentSchool = school;
                 document.getElementById('headerSchoolName').innerText = school.school_name.toUpperCase();
                 document.documentElement.style.setProperty('--blue', school.brand_color);
@@ -166,12 +159,12 @@
                 document.getElementById('mainApp').classList.remove('hidden');
                 startClock();
             } else {
-                alert("INVALID KEY. CHECK SPELLING OR CONTACT EUDES MEDIA.");
+                alert("INVALID KEY. CHECK SPELLING.");
                 btn.innerText = "AUTHENTICATE";
                 btn.disabled = false;
             }
         } catch (e) {
-            alert("CRITICAL ERROR: CHECK INTERNET CONNECTION.");
+            alert("CRITICAL CONNECTION ERROR.");
             btn.innerText = "AUTHENTICATE";
             btn.disabled = false;
         }
@@ -192,17 +185,15 @@
         const list = document.getElementById('dataList'); if(!list) return;
         list.innerHTML = "";
         const q = document.getElementById('searchBar').value.toLowerCase();
-        
-        cachedData.filter(s => s.name.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q))).forEach(s => {
+        cachedData.filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
             const bal = (s.fees_expected || 0) - (s.fees_paid || 0);
             list.innerHTML += `<div class="card" onclick="editMode('${s.id}')">
                 <b>${s.name.toUpperCase()}</b><br>
-                <span style="font-size:10px; font-weight:800; color:#777;">${s.class} | LIN: ${s.lin || 'N/A'}</span>
-                <div class="rec-info">LOC: ${s.location || 'N/A'} | CONTACT: ${s.contact || 'N/A'}</div>
+                <span style="font-size:10px; font-weight:800; color:#777;">${s.class}</span>
+                <div class="rec-info">LOC: ${s.location || 'N/A'} | HEALTH: ${s.health_status || 'OK'}</div>
                 <div style="margin-top:8px; font-size:11px; font-weight:800; color:${bal>0?'var(--red)':'var(--green)'}">BAL: ${bal.toLocaleString()} UGX</div>
             </div>`;
         });
-
         const rCls = document.getElementById('rollClass').value;
         const rList = document.getElementById('rollData'); if(!rList) return;
         rList.innerHTML = "";
@@ -230,11 +221,8 @@
             fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
             fees_paid: parseInt(document.getElementById('f_paid').value) || 0
         };
-
-        if(!id) payload.lin = "LIN" + Math.floor(1000 + Math.random() * 9000);
-
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("SAVED"); resetForm(); loadData(); tab('rec'); }
+        if(!error) { alert("SUCCESS"); resetForm(); loadData(); tab('sum'); }
     }
 
     function editMode(id) {
@@ -250,12 +238,10 @@
         document.getElementById('f_exp').value = s.fees_expected || 0;
         document.getElementById('f_paid').value = s.fees_paid || 0;
         tab('adm');
-        document.getElementById('admTitle').innerText = "EDIT PUPIL";
     }
 
     function resetForm() {
         document.getElementById('editId').value = "";
-        document.getElementById('admTitle').innerText = "NEW ADMISSION";
         ['name','age','dob','location_field','health_field','contact','f_exp','f_paid'].forEach(id=>document.getElementById(id).value="");
     }
 
@@ -271,7 +257,7 @@
     function renderAbsence() {
         const cont = document.getElementById('absenceListContainer'); 
         const abs = cachedData.filter(s => s.is_absent);
-        if(abs.length === 0) { cont.innerHTML = "<p style='font-size:12px; color:#999;'>Everyone is present.</p>"; return; }
+        if(abs.length === 0) { cont.innerHTML = "<p style='font-size:12px; color:#999;'>No absences today.</p>"; return; }
         let h = `<table style="width:100%; font-size:12px; border-collapse:collapse;">`;
         abs.forEach(s => h += `<tr style="border-bottom:1px solid #eee;"><td style="padding:10px 0;">${s.name}</td><td style='color:var(--red); text-align:right;'>${s.contact || ''}</td></tr>`);
         cont.innerHTML = h + `</table>`;
