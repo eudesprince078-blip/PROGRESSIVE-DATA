@@ -74,7 +74,7 @@
     <div id="v-sum" class="">
         <div class="card" style="background:var(--blue); color:white; border-left:none;">
             <h4 style="margin:0 0 10px 0; color:var(--gold);">FINANCIAL SUMMARY</h4>
-            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Total Expected:</span> <b id="s-exp">0</b></div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Expected:</span> <b id="s-exp">0</b></div>
             <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1)"><span>Total Paid:</span> <b id="s-paid" style="color:var(--green)">0</b></div>
             <div style="display:flex; justify-content:space-between; padding:8px 0;"><span>Balance:</span> <b id="s-debt" style="color:var(--red)">0</b></div>
         </div>
@@ -85,7 +85,7 @@
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Name or LIN..." oninput="renderUI()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="🔍 Search Pupil..." oninput="renderUI()"></div>
         <div id="dataList"></div>
     </div>
 
@@ -93,7 +93,7 @@
         <div class="card" style="border-left:none;">
             <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue);">NEW ADMISSION</h3>
             <input type="hidden" id="editId">
-            <label>Name</label><input id="name">
+            <label>Full Name</label><input id="name">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label>Age</label><input id="age" type="number"></div>
                 <div><label>DOB</label><input id="dob" type="date"></div>
@@ -102,12 +102,12 @@
             <select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
             <label>Physical Location</label><input id="location_field">
             <label>Health Status</label><input id="health_field">
-            <label>Contact Number</label><input id="contact">
+            <label>Parent Contact</label><input id="contact">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label>Tuition</label><input id="f_exp" type="number"></div>
-                <div><label>Paid</label><input id="f_paid" type="number"></div>
+                <div><label>Total Tuition</label><input id="f_exp" type="number"></div>
+                <div><label>Amount Paid</label><input id="f_paid" type="number"></div>
             </div>
-            <button onclick="submitData()" id="saveBtn" class="btn-main" style="margin-top:20px;">SAVE FILE</button>
+            <button onclick="submitData()" id="saveBtn" class="btn-main" style="margin-top:20px;">SAVE RECORD</button>
         </div>
     </div>
 
@@ -128,57 +128,25 @@
     window.currentSchool = {}; 
 
     async function secureLogin() {
-    const btn = document.getElementById('authBtn');
-    // .trim() removes accidental spaces at the start or end
-    const val = document.getElementById('key').value.trim();
-    
-    if(!val) return alert("ENTER KEY");
-    btn.innerText = "CONNECTING...";
-    btn.disabled = true;
+        const btn = document.getElementById('authBtn');
+        const val = document.getElementById('key').value.trim();
+        if(!val) return alert("ENTER KEY");
+        btn.innerText = "CONNECTING...";
+        btn.disabled = true;
 
-    try {
-        const { data: schools, error } = await _client
-            .from('schools')
-            .select('*')
-            // This ignores Capital/Small letter differences
-            .ilike('access_key', val) 
-            .limit(1);
+        try {
+            const { data: schools, error } = await _client
+                .from('schools')
+                .select('*')
+                .ilike('access_key', val)
+                .limit(1);
 
-        if (error) {
-            alert("LOGIN ERROR: " + error.message);
-            btn.innerText = "AUTHENTICATE";
-            btn.disabled = false;
-            return;
-        }
-
-        if (schools && schools.length > 0) {
-            const school = schools[0];
-            // Double check: Does the typed key match the database key?
-            // We use .toUpperCase() to ensure a perfect match
-            if(val.toUpperCase() === school.access_key.trim().toUpperCase()) {
-                window.currentSchool = school;
-                document.getElementById('headerSchoolName').innerText = school.school_name.toUpperCase();
-                document.documentElement.style.setProperty('--blue', school.brand_color);
-                await loadData();
-                document.getElementById('loginGate').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                startClock();
-            } else {
-                alert("KEY MISMATCH. PLEASE RE-TYPE CAREFULLY.");
+            if (error) {
+                alert("LOGIN ERROR: " + error.message);
                 btn.innerText = "AUTHENTICATE";
                 btn.disabled = false;
+                return;
             }
-        } else {
-            alert("INVALID KEY. CHECK SPELLING.");
-            btn.innerText = "AUTHENTICATE";
-            btn.disabled = false;
-        }
-    } catch (e) {
-        alert("CONNECTION ERROR.");
-        btn.innerText = "AUTHENTICATE";
-        btn.disabled = false;
-    }
-}
 
             if (schools && schools.length > 0) {
                 const school = schools[0];
@@ -195,7 +163,7 @@
                 btn.disabled = false;
             }
         } catch (e) {
-            alert("CRITICAL CONNECTION ERROR.");
+            alert("SYSTEM ERROR. CHECK INTERNET.");
             btn.innerText = "AUTHENTICATE";
             btn.disabled = false;
         }
@@ -253,7 +221,7 @@
             fees_paid: parseInt(document.getElementById('f_paid').value) || 0
         };
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("SUCCESS"); resetForm(); loadData(); tab('sum'); }
+        if(!error) { alert("SAVED SUCCESSFULLY"); resetForm(); loadData(); tab('sum'); }
     }
 
     function editMode(id) {
@@ -264,7 +232,7 @@
         document.getElementById('dob').value = s.dob;
         document.getElementById('cls').value = s.class;
         document.getElementById('location_field').value = s.location || '';
-        document.getElementById('health_field').value = s.health_status || '';
+        document.getElementById('health_status').value = s.health_status || '';
         document.getElementById('contact').value = s.contact || '';
         document.getElementById('f_exp').value = s.fees_expected || 0;
         document.getElementById('f_paid').value = s.fees_paid || 0;
