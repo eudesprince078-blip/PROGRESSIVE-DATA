@@ -1,15 +1,8 @@
-<title>Eudes Media | School Management Systems Uganda</title>
-<meta name="description" content="Secure digital registration and management for schools. Powered by Eudes Media.">
-<meta name="keywords" content="School system, Uganda, Progressive Mother's, Eudes Media">
-<meta name="author" content="Prince Eudes">
-
-<meta property="og:title" content="Eudes Media Digital Portal">
-<meta property="og:description" content="Managing your school data with supreme authority.">
-<meta property="og:image" content="link-to-your-logo.jpg"><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers PMS v51.6</title>
+    <title>Eudes Media | School Management Systems Uganda</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -42,7 +35,6 @@
         input:disabled, select:disabled { background: #f8f9fa; color: #999; border-color: #eee; }
         label { font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; }
         
-        /* Specific Bold Styles for Records */
         .rec-info { font-size: 11px; margin-top: 6px; color: #444; line-height: 1.5; }
         .rec-bold { font-weight: 900; color: var(--blue); text-transform: uppercase; }
 
@@ -59,18 +51,18 @@
 <body>
 
 <div id="loginGate">
-    <h1 style="color:white; margin:0;">PROGRESSIVE MOTHERS</h1>
-    <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SCHOOL MANAGEMENT SYSTEM v51.6</p>
+    <h1 id="brandName" style="color:white; margin:0;">EUDES MEDIA</h1>
+    <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SUPREME MANAGEMENT SYSTEM</p>
     <div class="pass-container">
-        <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; height:60px;">
+        <input id="key" type="password" placeholder="ENTER SYSTEM KEY" style="text-align:center; height:60px;">
         <span class="toggle-pass" onclick="togglePass()">SHOW</span>
     </div>
-    <button onclick="secureLogin()" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:320px; border:none; border-radius:12px; font-weight:900; margin-top:10px;">AUTHENTICATE</button>
+    <button onclick="secureLogin()" id="authBtn" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:320px; border:none; border-radius:12px; font-weight:900; margin-top:10px;">AUTHENTICATE</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div><b style="font-size:11px;">PROGRESSIVE MOTHER'S</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PORTAL</span></div>
+        <div><b id="headerSchoolName" style="font-size:11px;">SYSTEM PORTAL</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">PORTAL</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:10px;">LOGOUT</button>
     </div>
 
@@ -115,7 +107,7 @@
         <div class="card" style="border-left:none;">
             <h3 id="admTitle" style="margin:0 0 15px 0; color:var(--blue);">NEW ADMISSION</h3>
             <input type="hidden" id="editId">
-            <label>LIN (Auto: PM + Initial + 0000)</label><input id="lin_field" placeholder="Auto-generated if empty">
+            <label>LIN (Auto-generated)</label><input id="lin_field" placeholder="PM + Initial + 0000">
             <label>Pupil Full Name</label><input id="name">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label>Age</label><input id="age" type="number"></div>
@@ -149,20 +141,45 @@
     const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
+    
     let cachedData = [];
     let currentUserRole = "";
+    window.currentSchool = {}; // THE TENANT DATA
 
     function togglePass() { const i = document.getElementById('key'); const b = document.querySelector('.toggle-pass'); i.type = i.type === "password" ? "text" : "password"; b.innerText = i.type === "password" ? "SHOW" : "HIDE"; }
 
     async function secureLogin() {
+        const btn = document.getElementById('authBtn');
         const val = document.getElementById('key').value.trim().toUpperCase();
-        if (["JESUS CARES", "FINANCE 256", "TEACH2026"].includes(val)) {
-            currentUserRole = val === "JESUS CARES" ? "Director" : (val === "FINANCE 256" ? "Finance" : "Teacher");
-            setupAccess(); await loadData();
+        btn.innerText = "AUTHENTICATING...";
+
+        // NEW MULTI-TENANT LOGIC: Ask the schools table
+        const { data: school, error } = await _client
+            .from('schools')
+            .select('*')
+            .eq('access_key', val)
+            .single();
+
+        if (school) {
+            window.currentSchool = school;
+            currentUserRole = "Director"; // Standard role for school key
+            
+            // DYNAMIC BRANDING
+            document.getElementById('headerSchoolName').innerText = school.school_name.toUpperCase();
+            document.getElementById('brandName').innerText = school.school_name.toUpperCase();
+            document.documentElement.style.setProperty('--blue', school.brand_color);
+
+            setupAccess(); 
+            await loadData();
+            
             document.getElementById('loginGate').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             startClock();
-        } else alert("INVALID KEY");
+        } else {
+            // Check for legacy Finance/Teacher keys if needed, else fail
+            alert("INVALID ACCESS KEY. CONTACT EUDES MEDIA.");
+            btn.innerText = "AUTHENTICATE";
+        }
     }
 
     function setupAccess() {
@@ -174,7 +191,13 @@
     }
 
     async function loadData() {
-        const { data } = await _client.from('students').select('*').order('name');
+        // FILTER: Only show students for the logged-in school
+        const { data } = await _client
+            .from('students')
+            .select('*')
+            .eq('school_id', window.currentSchool.id)
+            .order('name');
+            
         if(data) { cachedData = data; updateStats(); renderUI(); renderAbsence(); updateFinanceTotals(); }
     }
 
@@ -204,13 +227,11 @@
                     </div>
                     <span style="color:${bal>0?'var(--red)':'var(--green)'}; font-weight:900; font-size:12px">BAL: ${bal.toLocaleString()}</span>
                 </div>
-                
                 <div class="rec-info">
                     LIN: <span class="rec-bold">${s.lin || 'PENDING'}</span><br>
                     CONTACT: <span class="rec-bold">${s.contact || 'N/A'}</span><br>
                     LOCATION: <span class="rec-bold">${s.location || 'NOT SET'}</span>
                 </div>
-
                 <div class="finance-pill">Paid: ${(s.fees_paid||0).toLocaleString()} / Total: ${(s.fees_expected||0).toLocaleString()}</div>
             </div>`;
         });
@@ -261,22 +282,29 @@
             p_hist = s.payment_history ? JSON.parse(s.payment_history) : [];
             currentPaid = s.fees_paid || 0;
         } else if(!currentLin && name) {
+            // Auto LIN logic (Simplified)
             const initial = name.trim().charAt(0).toUpperCase();
-            const count = cachedData.length + 1;
-            currentLin = "PM" + initial + String(count).padStart(4, '0');
+            currentLin = "LIN" + initial + Math.floor(1000 + Math.random() * 9000);
         }
 
         if(newAmt > 0 && newDate) { p_hist.push({ date: newDate, amount: newAmt }); currentPaid += newAmt; }
 
-        const payload = { fees_expected: parseInt(document.getElementById('f_exp').value) || 0, fees_paid: currentPaid, payment_history: JSON.stringify(p_hist) };
+        const payload = { 
+            school_id: window.currentSchool.id, // LINK TO TENANT
+            fees_expected: parseInt(document.getElementById('f_exp').value) || 0, 
+            fees_paid: currentPaid, 
+            payment_history: JSON.stringify(p_hist) 
+        };
+
         if(currentUserRole !== "Finance") {
             payload.lin = currentLin; payload.name = name; payload.age = parseInt(document.getElementById('age').value);
             payload.dob = document.getElementById('dob').value; payload.class = document.getElementById('cls').value;
             payload.location = document.getElementById('location_field').value; payload.health_status = document.getElementById('health_field').value;
             payload.contact = document.getElementById('contact').value;
         }
+
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("SUCCESS"); resetForm(); await loadData(); } else alert("Error saving.");
+        if(!error) { alert("SUCCESS"); resetForm(); await loadData(); } else alert("Error saving student.");
     }
 
     function editMode(id) {
@@ -289,10 +317,12 @@
         document.getElementById('dob').value = s.dob;
         document.getElementById('cls').value = s.class;
         document.getElementById('location_field').value = s.location || '';
-        document.getElementById('health_field').value = s.health_status || '';
+        document.getElementById('health_status').value = s.health_status || '';
         document.getElementById('contact').value = s.contact || '';
         document.getElementById('f_exp').value = s.fees_expected || 0;
+        
         ['lin_field', 'name', 'age', 'dob', 'cls', 'location_field', 'health_field', 'contact'].forEach(f => document.getElementById(f).disabled = (currentUserRole === "Finance"));
+        
         let hHtml = `<table class="history-table"><tr><th>Date</th><th>Amount</th></tr>`;
         if(s.payment_history) JSON.parse(s.payment_history).forEach(p => { hHtml += `<tr><td>${p.date}</td><td>${p.amount.toLocaleString()}</td></tr>`; });
         document.getElementById('historyTableContainer').innerHTML = hHtml + `</table>`;
@@ -301,8 +331,12 @@
 
     function resetForm() {
         document.getElementById('editId').value = ""; document.getElementById('admTitle').innerText = "NEW ADMISSION";
-        ['lin_field','name','age','dob','location_field','health_field','contact','f_exp','new_pay_amt','new_pay_date'].forEach(id=>document.getElementById(id).value="");
-        ['lin_field', 'name', 'age', 'dob', 'cls', 'location_field', 'health_field', 'contact'].forEach(f => document.getElementById(f).disabled = false);
+        ['lin_field','name','age','dob','location_field','health_field','contact','f_exp','new_pay_amt','new_pay_date'].forEach(id=> {
+            const el = document.getElementById(id); if(el) el.value="";
+        });
+        ['lin_field', 'name', 'age', 'dob', 'cls', 'location_field', 'health_field', 'contact'].forEach(f => {
+            const el = document.getElementById(f); if(el) el.disabled = false;
+        });
         document.getElementById('historyTableContainer').innerHTML = "";
     }
 
