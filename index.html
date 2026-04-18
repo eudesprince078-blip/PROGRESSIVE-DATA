@@ -128,26 +128,57 @@
     window.currentSchool = {}; 
 
     async function secureLogin() {
-        const btn = document.getElementById('authBtn');
-        const val = document.getElementById('key').value.trim();
-        if(!val) return alert("ENTER KEY");
-        btn.innerText = "CONNECTING...";
-        btn.disabled = true;
+    const btn = document.getElementById('authBtn');
+    // .trim() removes accidental spaces at the start or end
+    const val = document.getElementById('key').value.trim();
+    
+    if(!val) return alert("ENTER KEY");
+    btn.innerText = "CONNECTING...";
+    btn.disabled = true;
 
-        try {
-            // FIX: Uses .limit(1) to avoid the "single JSON object" error
-            const { data: schools, error } = await _client
-                .from('schools')
-                .select('*')
-                .ilike('access_key', val)
-                .limit(1);
+    try {
+        const { data: schools, error } = await _client
+            .from('schools')
+            .select('*')
+            // This ignores Capital/Small letter differences
+            .ilike('access_key', val) 
+            .limit(1);
 
-            if (error) {
-                alert("LOGIN ERROR: " + error.message);
+        if (error) {
+            alert("LOGIN ERROR: " + error.message);
+            btn.innerText = "AUTHENTICATE";
+            btn.disabled = false;
+            return;
+        }
+
+        if (schools && schools.length > 0) {
+            const school = schools[0];
+            // Double check: Does the typed key match the database key?
+            // We use .toUpperCase() to ensure a perfect match
+            if(val.toUpperCase() === school.access_key.trim().toUpperCase()) {
+                window.currentSchool = school;
+                document.getElementById('headerSchoolName').innerText = school.school_name.toUpperCase();
+                document.documentElement.style.setProperty('--blue', school.brand_color);
+                await loadData();
+                document.getElementById('loginGate').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                startClock();
+            } else {
+                alert("KEY MISMATCH. PLEASE RE-TYPE CAREFULLY.");
                 btn.innerText = "AUTHENTICATE";
                 btn.disabled = false;
-                return;
             }
+        } else {
+            alert("INVALID KEY. CHECK SPELLING.");
+            btn.innerText = "AUTHENTICATE";
+            btn.disabled = false;
+        }
+    } catch (e) {
+        alert("CONNECTION ERROR.");
+        btn.innerText = "AUTHENTICATE";
+        btn.disabled = false;
+    }
+}
 
             if (schools && schools.length > 0) {
                 const school = schools[0];
