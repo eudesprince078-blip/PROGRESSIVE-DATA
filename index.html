@@ -2,39 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mothers | Eudes Media System</title>
+    <title>Eudes Media | Progressive Mothers Master System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root { --blue: #002d5b; --gold: #ffc107; --light: #f1f4f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
-        .header { background: var(--blue); color: white; padding: 15px; border-bottom: 5px solid var(--gold); text-align: center; }
-        .container { padding: 15px; }
-        .search-bar { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 15px; box-sizing: border-box; font-weight: bold; }
-        .pupil-card { background: white; margin-bottom: 10px; padding: 10px; border-radius: 12px; display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid var(--blue); }
-        .pupil-photo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px; background: #eee; border: 2px solid var(--blue); }
-        .pupil-info { flex-grow: 1; }
-        .pupil-name { font-weight: 900; color: var(--blue); font-size: 14px; text-transform: uppercase; }
-        .pupil-meta { font-size: 11px; color: #666; font-weight: 700; }
-        .lin-badge { background: var(--gold); padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 5px; }
+        :root { --blue: #002d5b; --gold: #ffc107; --white: #ffffff; --light: #f1f4f9; --red: #d90429; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); margin: 0; padding: 0; }
+        
+        /* Professional Header */
+        .header { background: var(--blue); color: white; padding: 15px; border-bottom: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .hero { background: #001a33; padding: 15px; text-align: center; color: white; border-bottom: 2px solid var(--gold); }
+        #clock { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
+        #date-display { font-size: 12px; color: var(--gold); font-weight: bold; }
+
+        /* Navigation */
+        .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 75px; z-index: 999; }
+        .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 10px; font-weight: 900; color: #999; cursor: pointer; text-transform: uppercase; }
+        .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #f8f9ff; }
+
+        /* Pupil Cards */
+        .container { padding: 10px; }
+        .search-bar { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 10px; box-sizing: border-box; font-size: 14px; }
+        .pupil-card { background: white; margin-bottom: 12px; padding: 12px; border-radius: 15px; display: flex; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 6px solid var(--blue); position: relative; }
+        .pupil-photo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid var(--blue); background: #f0f0f0; }
+        .pupil-name { font-weight: 900; color: var(--blue); font-size: 14px; text-transform: uppercase; margin-bottom: 4px; }
+        .pupil-meta { font-size: 11px; color: #555; font-weight: 700; line-height: 1.4; }
+        .lin-badge { background: var(--gold); color: black; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+        .edit-btn { position: absolute; top: 10px; right: 10px; background: var(--light); border: 1px solid #ddd; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; }
+
+        /* Forms */
+        .form-group { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        label { font-weight: 900; font-size: 11px; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; margin-bottom: 15px; font-size: 14px; box-sizing: border-box; background: #fafafa; }
+        .btn-main { background: var(--blue); color: white; padding: 16px; border: none; border-radius: 10px; font-weight: 900; width: 100%; cursor: pointer; font-size: 14px; }
+        
+        /* Routine Section */
+        .routine-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; }
+        .time { font-weight: 900; color: var(--blue); }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div style="font-size: 18px; font-weight: 900;">PROGRESSIVE MOTHERS</div>
-    <div style="font-size: 10px; font-weight: 700;">DIGITAL LEDGER | EUDES MEDIA</div>
+    <div><b>PROGRESSIVE MOTHERS</b><br><span style="font-size:9px; color:var(--gold);">EUDES MEDIA | +256762992440</span></div>
+    <div style="text-align:right;"><button onclick="location.reload()" style="background:rgba(255,255,255,0.2); color:white; border:none; padding:6px 10px; border-radius:5px; font-size:10px; font-weight:bold;">REFRESH</button></div>
 </div>
 
-<div class="container">
-    <input type="text" id="sb" class="search-bar" placeholder="🔍 Search pupil name or LIN..." oninput="render()">
+<div class="hero">
+    <div id="clock">00:00:00</div>
+    <div id="date-display">LOADING DATE...</div>
+</div>
+
+<div class="nav-tabs">
+    <div class="tab active" id="t-rec" onclick="tab('rec')">Pupil Ledger</div>
+    <div class="tab" id="t-adm" onclick="tab('adm')">Admission</div>
+    <div class="tab" id="t-rou" onclick="tab('rou')">Daily Routine</div>
+</div>
+
+<div id="v-rec" class="container">
+    <input type="text" id="sb" class="search-bar" placeholder="🔍 Search by Name or LIN..." oninput="render()">
     <div id="list"></div>
+</div>
+
+<div id="v-adm" class="container hidden">
+    <div class="form-group">
+        <h3 style="margin-top:0; color:var(--blue);">Student Registration</h3>
+        <label>Full Name</label><input id="name" placeholder="Enter Full Name">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div><label>Age</label><input id="age" type="number"></div>
+            <div><label>Date of Birth</label><input id="dob" type="date"></div>
+        </div>
+        <label>Physical Location</label><input id="loc" placeholder="Village / Street">
+        <label>Health Status</label><input id="health" value="Good" placeholder="Any conditions?">
+        <label>Class</label>
+        <select id="cls">
+            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+            <option>P.5</option><option>P.6</option><option>P.7</option>
+        </select>
+        <label>Student Photo</label><input type="file" id="photoFile" accept="image/*">
+        <button class="btn-main" id="saveBtn" onclick="saveData()">SUBMIT TO CLOUD</button>
+    </div>
+</div>
+
+<div id="v-rou" class="container hidden">
+    <div class="routine-item"><span class="time">07:00 AM</span><span>Arrival & Cleaning</span></div>
+    <div class="routine-item"><span class="time">08:00 AM</span><span>Morning Assembly</span></div>
+    <div class="routine-item"><span class="time">08:30 AM</span><span>Lesson 1</span></div>
+    <div class="routine-item"><span class="time">10:30 AM</span><span>Break Time</span></div>
+    <div class="routine-item"><span class="time">01:00 PM</span><span>Lunch Break</span></div>
+    <div class="routine-item"><span class="time">04:30 PM</span><span>Departure</span></div>
 </div>
 
 <script>
     const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
+    const BUCKET = 'student-photos'; 
     let data = [];
+
+    function init() {
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
+            document.getElementById('date-display').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }, 1000);
+        load();
+    }
 
     async function load() {
         const { data: pupils } = await _client.from('students').select('*').order('name');
@@ -46,21 +121,58 @@
         const query = document.getElementById('sb').value.toLowerCase();
         container.innerHTML = "";
         
-        data.filter(s => s.name.toLowerCase().includes(query) || (s.lin && s.lin.includes(query))).forEach(s => {
-            const photo = s['photo-url'] || s['photo_url'] || 'https://via.placeholder.com/60?text=No+Img';
+        data.filter(s => s.name.toLowerCase().includes(query) || (s.lin && s.lin.toLowerCase().includes(query))).forEach(s => {
+            const photo = s['photo-url'] || s['photo_url'] || 'https://via.placeholder.com/70?text=No+Img';
             container.innerHTML += `
                 <div class="pupil-card">
-                    <img src="${photo}" class="pupil-photo" onerror="this.src='https://via.placeholder.com/60?text=Error'">
+                    <button class="edit-btn" onclick="alert('Edit logic for ${s.name} ready')">EDIT</button>
+                    <img src="${photo}" class="pupil-photo" onerror="this.src='https://via.placeholder.com/70?text=Error'">
                     <div class="pupil-info">
-                        <div class="pupil-name">${s.name} <span class="lin-badge">LIN: ${s.lin || '---'}</span></div>
-                        <div class="pupil-meta">CLASS: ${s.class} | HEALTH: ${s.health_status || 'Normal'}</div>
-                        <div class="pupil-meta">LOCATION: ${s.location || 'Not Set'}</div>
+                        <div class="pupil-name">${s.name} <span class="lin-badge">${s.lin || 'N/A'}</span></div>
+                        <div class="pupil-meta"><b>CLASS:</b> ${s.class} | <b>HEALTH:</b> ${s.health_status || 'Good'}</div>
+                        <div class="pupil-meta"><b>LOCATION:</b> ${s.location || 'Not Set'}</div>
+                        <div class="pupil-meta" style="color:var(--blue); font-size:9px; margin-top:5px;">EUDES MEDIA SECURE DATA</div>
                     </div>
                 </div>`;
         });
     }
 
-    load();
+    async function saveData() {
+        const btn = document.getElementById('saveBtn');
+        const file = document.getElementById('photoFile').files[0];
+        btn.disabled = true; btn.innerText = "PROCESSING...";
+        
+        let url = null;
+        if(file) {
+            const fName = `p_${Date.now()}.jpg`;
+            const { data: uploadData, error } = await _client.storage.from(BUCKET).upload(fName, file);
+            if(!error) url = `${SUPA_URL}/storage/v1/object/public/${BUCKET}/${fName}`;
+        }
+
+        const payload = {
+            name: document.getElementById('name').value,
+            age: document.getElementById('age').value,
+            date_of_birth: document.getElementById('dob').value,
+            location: document.getElementById('loc').value,
+            health_status: document.getElementById('health').value,
+            class: document.getElementById('cls').value,
+            school_id: 1
+        };
+        if(url) { payload['photo-url'] = url; payload['photo_url'] = url; }
+
+        const { error: dbError } = await _client.from('students').insert([payload]);
+        if(!dbError) { alert("Registration Successful!"); location.reload(); }
+        else { alert("Error: " + dbError.message); btn.disabled = false; btn.innerText = "SUBMIT TO CLOUD"; }
+    }
+
+    function tab(t) {
+        document.querySelectorAll('.container').forEach(v => v.classList.add('hidden'));
+        document.getElementById('v-'+t).classList.remove('hidden');
+        document.querySelectorAll('.tab').forEach(tb => tb.classList.remove('active'));
+        document.getElementById('t-'+t).classList.add('active');
+    }
+
+    init();
 </script>
 </body>
 </html>
