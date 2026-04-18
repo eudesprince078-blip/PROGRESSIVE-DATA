@@ -7,100 +7,95 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --accent: #f59e0b; --danger: #ef4444; --success: #22c55e; --bg: #f8fafc; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; text-transform: uppercase; transition: 0.3s ease; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; color: #1e293b; }
+        :root { --primary: #0047AB; --accent: #f59e0b; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; text-transform: uppercase; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
 
-        /* HEADER & NAVIGATION */
-        .top-nav { background: var(--danger); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .sub-header { background: #be123c; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 800; }
+        /* PREMIUM TOP NAVIGATION */
+        .nav-top { background: var(--danger); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 0.8rem; }
+        .nav-sub { background: #be123c; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; font-weight: 700; }
         
-        .hero-section { background: #0f172a; color: white; padding: 40px 20px; text-align: center; }
-        #live-date { color: var(--accent); font-weight: 700; font-size: 0.85rem; margin-bottom: 5px; }
-        #live-clock { font-size: 3.5rem; font-weight: 800; margin: 0; letter-spacing: -2px; line-height: 1; }
+        /* HERO SECTION */
+        .hero { background: var(--dark); color: white; padding: 40px 20px; text-align: center; }
+        #live-date { color: var(--accent); font-size: 0.8rem; font-weight: 700; margin-bottom: 5px; }
+        #live-clock { font-size: 3.2rem; font-weight: 800; margin: 0; letter-spacing: -2px; }
 
-        /* QUICK STATS */
-        .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 20px; margin: -25px 0 25px; }
-        .stat-card { background: white; padding: 20px 10px; border-radius: 16px; text-align: center; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-bottom: 5px solid #cbd5e1; }
-        .stat-card b { display: block; font-size: 1.8rem; line-height: 1; margin-bottom: 5px; }
-        .stat-card span { font-size: 0.65rem; font-weight: 800; color: #64748b; }
+        /* COMMAND CENTER (NEW) */
+        .command-center { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; padding: 20px; }
+        .tool-btn { background: white; padding: 15px 5px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; cursor: pointer; }
+        .tool-btn i { display: block; font-size: 1.2rem; margin-bottom: 5px; }
+        .tool-btn span { font-size: 0.6rem; font-weight: 800; color: var(--primary); }
 
-        /* DATA CONTENT */
-        .container { padding: 0 20px 40px; }
-        .search-box { background: white; border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; border: 2px solid #e2e8f0; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .search-box input { border: none; width: 100%; padding: 12px; outline: none; font-weight: 700; font-family: inherit; font-size: 0.9rem; }
+        /* STATS */
+        .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-bottom: 4px solid #cbd5e1; }
+        .stat-card b { display: block; font-size: 1.4rem; }
+        .stat-card span { font-size: 0.55rem; font-weight: 800; color: #64748b; }
 
-        /* FULL REGISTRY TABLE */
-        .table-wrap { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        .scroll-area { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th { background: #f8fafc; padding: 18px; text-align: left; font-size: 0.7rem; color: #94a3b8; font-weight: 800; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 18px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; font-weight: 700; }
+        /* TABLE STYLING */
+        .container { padding: 20px; }
+        .table-wrap { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.65rem; color: #94a3b8; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; font-weight: 700; }
         
-        .lin-cell { color: #94a3b8; font-weight: 800; }
-        .name-cell { color: var(--primary); font-weight: 800; }
-        .badge { padding: 5px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; }
+        .student-pic { width: 35px; height: 35px; border-radius: 50%; background: #e2e8f0; object-fit: cover; border: 2px solid var(--primary); }
+        .lin-no { color: #94a3b8; font-size: 0.7rem; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.6rem; }
         .bg-blue { background: #eff6ff; color: #1e40af; }
-        .bg-green { background: #f0fdf4; color: #15803d; }
     </style>
 </head>
 <body>
 
-    <div id="login-ui" style="padding: 100px 20px; text-align: center; max-width: 400px; margin: auto;">
-        <h1 style="color:var(--primary); font-weight: 800;">ESMS ACCESS</h1>
-        <input type="text" id="loginID" placeholder="SCHOOL ID" style="width:100%; padding:15px; border-radius:12px; border:2px solid #cbd5e1; margin-bottom:15px; font-weight: 700;">
-        <input type="password" id="loginKey" placeholder="ACCESS KEY" style="width:100%; padding:15px; border-radius:12px; border:2px solid #cbd5e1; margin-bottom:15px; font-weight: 700;">
-        <button onclick="doLogin()" style="width:100%; padding:18px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:800; cursor:pointer;">AUTHORIZE LOGIN</button>
+    <div id="login-screen" style="padding:100px 20px; text-align:center; max-width:400px; margin:auto;">
+        <h2 style="color:var(--primary)">SYSTEM ACCESS</h2>
+        <input type="text" id="loginID" placeholder="SCHOOL ID" style="width:100%; padding:15px; border-radius:10px; border:2px solid #ddd; margin-bottom:10px;">
+        <input type="password" id="loginKey" placeholder="ACCESS KEY" style="width:100%; padding:15px; border-radius:10px; border:2px solid #ddd; margin-bottom:10px;">
+        <button onclick="doLogin()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:10px; font-weight:800;">AUTHORIZE</button>
     </div>
 
-    <div id="dashboard-ui" style="display:none;">
-        <div class="top-nav">
-            <div style="font-weight: 800; font-size: 0.9rem; letter-spacing: 1px;">SCHOOL DATA HUB</div>
-            <div style="font-weight: 800; font-size: 0.8rem; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:8px;">EUDES MEDIA</div>
+    <div id="main-ui" style="display:none;">
+        <div class="nav-top">
+            <div>ESMS COMMAND</div>
+            <div style="background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:5px;">EUDES MEDIA</div>
         </div>
-
-        <div class="sub-header">
+        <div class="nav-sub">
             <div id="dispSchool">---</div>
-            <button onclick="location.reload()" style="background:var(--danger); border:none; color:white; padding:6px 12px; border-radius:8px; font-size:0.65rem; font-weight:800; cursor:pointer;">LOGOUT</button>
+            <div onclick="location.reload()">LOGOUT</div>
         </div>
 
-        <div class="hero-section">
+        <div class="hero">
             <div id="live-date">---</div>
             <h1 id="live-clock">00:00:00</h1>
         </div>
 
+        <div class="command-center">
+            <div class="tool-btn"><i>📝</i><span>EXAMS</span></div>
+            <div class="tool-btn"><i>📊</i><span>REPORTS</span></div>
+            <div class="tool-btn"><i>🪪</i><span>IDS</span></div>
+            <div class="tool-btn"><i>📅</i><span>ROLL CALL</span></div>
+        </div>
+
         <div class="stat-row">
-            <div class="stat-card" style="border-color: var(--accent);">
-                <b id="countTotal">0</b>
-                <span>PUPILS</span>
-            </div>
-            <div class="stat-card" style="border-color: var(--success);">
-                <b id="countPaid" style="color: var(--success);">0</b>
-                <span>CLEARED</span>
-            </div>
-            <div class="stat-card" style="border-color: var(--danger);">
-                <b id="countBal" style="color: var(--danger);">0</b>
-                <span>UNPAID</span>
-            </div>
+            <div class="stat-card" style="border-color:var(--accent);"><b id="countT">0</b><span>TOTAL</span></div>
+            <div class="stat-card" style="border-color:var(--success);"><b id="countP" style="color:var(--success);">0</b><span>PAID</span></div>
+            <div class="stat-card" style="border-color:var(--danger);"><b id="countB" style="color:var(--danger);">0</b><span>OWING</span></div>
         </div>
 
         <div class="container">
-            <div class="search-box">
-                <span style="font-size: 1.2rem; margin-right: 10px;">🔍</span>
-                <input type="text" placeholder="SEARCH STUDENT RECORDS...">
-            </div>
-
             <div class="table-wrap">
-                <div class="scroll-area">
+                <div class="scroll">
                     <table>
                         <thead>
                             <tr>
                                 <th>LIN</th>
-                                <th>STUDENT NAME</th>
+                                <th>PHOTO</th>
+                                <th>NAME</th>
                                 <th>CLASS</th>
                                 <th>AGE</th>
                                 <th>HEALTH</th>
-                                <th>TOTAL FEES</th>
+                                <th>TOTAL</th>
                                 <th>PAID</th>
                                 <th>BALANCE</th>
                             </tr>
@@ -118,7 +113,6 @@
         const supabaseClient = supabase.createClient(_URL, _KEY);
         let activeID = "";
 
-        // CLOCK SYSTEM
         setInterval(() => {
             const now = new Date();
             document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-GB');
@@ -129,45 +123,42 @@
             const id = document.getElementById('loginID').value.trim().toUpperCase();
             const key = document.getElementById('loginKey').value.trim();
             const { data } = await supabaseClient.from('schools').select('*').eq('id', id).eq('access_key', key).maybeSingle();
-
             if (data) {
                 activeID = id;
-                document.getElementById('login-ui').style.display = 'none';
-                document.getElementById('dashboard-ui').style.display = 'block';
+                document.getElementById('login-screen').style.display='none';
+                document.getElementById('main-ui').style.display='block';
                 document.getElementById('dispSchool').innerText = data.school_name;
                 fetchRecords();
-            } else { alert("INVALID ACCESS KEY OR ID"); }
+            } else { alert("ACCESS DENIED"); }
         }
 
         async function fetchRecords() {
-            const { count, data } = await supabaseClient.from('students')
-                .select('*', {count:'exact'}).eq('school_id', activeID).order('name', {ascending:true});
-            
-            document.getElementById('countTotal').innerText = count || 0;
-            
+            const { count, data } = await supabaseClient.from('students').select('*', {count:'exact'}).eq('school_id', activeID).order('name', {ascending:true});
+            document.getElementById('countT').innerText = count || 0;
             if(data) {
-                let cleared = 0, pending = 0;
+                let paidC = 0, balC = 0;
                 document.getElementById('stuBody').innerHTML = data.map((s, i) => {
                     const total = s.total_fees || 0;
                     const paid = s.paid_fees || 0;
                     const bal = total - paid;
-                    if(bal <= 0) cleared++; else pending++;
+                    if(bal <= 0) paidC++; else balC++;
                     
                     return `
                         <tr>
-                            <td class="lin-cell">#${(i+1).toString().padStart(3,'0')}</td>
-                            <td class="name-cell">${s.name}</td>
+                            <td class="lin-no">#${(i+1).toString().padStart(3,'0')}</td>
+                            <td><div class="student-pic"></div></td>
+                            <td style="color:var(--primary)">${s.name}</td>
                             <td><span class="badge bg-blue">${s.class || 'N/A'}</span></td>
                             <td>${s.age || '--'}</td>
-                            <td><span class="badge bg-green">${s.health_status || 'GOOD'}</span></td>
+                            <td>${s.health_status || 'NORMAL'}</td>
                             <td>${total.toLocaleString()}</td>
                             <td style="color:var(--success)">${paid.toLocaleString()}</td>
-                            <td style="color:${bal > 0 ? 'var(--danger)' : 'var(--success)'}">${bal.toLocaleString()}</td>
+                            <td style="color:var(--danger)">${bal.toLocaleString()}</td>
                         </tr>
                     `;
                 }).join('');
-                document.getElementById('countPaid').innerText = cleared;
-                document.getElementById('countBal').innerText = pending;
+                document.getElementById('countP').innerText = paidC;
+                document.getElementById('countB').innerText = balC;
             }
         }
     </script>
