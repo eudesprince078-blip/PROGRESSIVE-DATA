@@ -7,73 +7,92 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #002d5b; --gold: #ffc107; --red: #d90429; --white: #ffffff; --light: #f1f4f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
-        #loginGate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; }
-        .header { background: var(--blue); color: white; padding: 15px; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .hero { background: #001a33; padding: 25px 15px; text-align: center; color: white; }
-        #clock { font-size: 38px; font-weight: 800; }
-        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
-        .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
-        .stat-val { font-size: 18px; font-weight: 900; color: var(--blue); display: block; }
-        .stat-lbl { font-size: 8px; font-weight: 800; color: #999; text-transform: uppercase; }
-        .nav-tabs { display: flex; background: white; border-bottom: 1px solid #ddd; }
-        .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 10px; font-weight: 800; color: #aaa; cursor: pointer; }
-        .tab.active { color: var(--blue); border-bottom: 3px solid var(--blue); background: #fafafa; }
-        .card { background: white; border-radius: 15px; padding: 18px; margin: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--blue); }
-        .btn-main { width: 100%; background: var(--blue); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
-        input, select { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin: 5px 0 10px 0; box-sizing: border-box; font-weight: 600; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
+        
+        /* High Visibility Headers */
+        .header { background: var(--blue); color: white; padding: 20px 15px; border-bottom: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .hero { background: #001a33; padding: 30px 15px; text-align: center; color: white; }
+        #clock { font-size: 42px; font-weight: 900; letter-spacing: 2px; }
+        
+        /* Bold Dashboard Stats */
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px; margin-top: -40px; }
+        .stat-card { background: white; padding: 20px 10px; border-radius: 15px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15); border-top: 5px solid var(--blue); }
+        .stat-val { font-size: 24px; font-weight: 900; color: var(--blue); display: block; }
+        .stat-lbl { font-size: 10px; font-weight: 800; color: #777; text-transform: uppercase; margin-top: 5px; }
+        
+        /* Bigger Navigation */
+        .nav-tabs { display: flex; background: white; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 1000; }
+        .tab { flex: 1; text-align: center; padding: 18px 5px; font-size: 14px; font-weight: 900; color: #999; cursor: pointer; text-transform: uppercase; }
+        .tab.active { color: var(--blue); border-bottom: 4px solid var(--blue); background: #fdfdfd; }
+        
+        /* Large Readable Table */
+        .card { background: white; border-radius: 15px; padding: 20px; margin: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; padding: 12px 8px; background: #eee; font-size: 13px; font-weight: 900; color: var(--blue); text-transform: uppercase; }
+        td { padding: 14px 8px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: 700; }
+        tr:nth-child(even) { background-color: #fcfcfc; }
+
+        /* Professional Buttons and Inputs */
+        .btn-main { width: 100%; background: var(--blue); color: white; padding: 20px; border: none; border-radius: 12px; font-size: 16px; font-weight: 900; cursor: pointer; }
+        input { width: 100%; padding: 16px; border: 2px solid #ddd; border-radius: 12px; margin-bottom: 15px; font-size: 16px; font-weight: 600; box-sizing: border-box; }
+        label { font-weight: 900; font-size: 13px; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 5px; }
+        
         .hidden { display: none !important; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        th { text-align: left; padding: 8px; background: #f8f9fa; }
-        td { padding: 8px; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
 
-<div id="loginGate">
-    <h1 style="color:white; margin:0;">EUDES MEDIA</h1>
-    <p style="color:var(--gold); font-weight:700; font-size:11px; margin-bottom:30px;">SUPREME MANAGEMENT SYSTEM</p>
-    <input id="key" type="password" placeholder="ENTER SYSTEM KEY" style="text-align:center; height:60px; max-width:320px;">
-    <button onclick="secureLogin()" id="authBtn" style="background:var(--gold); color:var(--blue); padding:18px; width:100%; max-width:320px; border:none; border-radius:12px; font-weight:900; margin-top:10px;">AUTHENTICATE</button>
-</div>
-
-<div id="mainApp" class="hidden">
+<div id="mainApp">
     <div class="header">
-        <div><b id="headerSchoolName">SYSTEM PORTAL</b><br><span style="font-size:9px; color:var(--gold);">DIRECTOR ACCESS</span></div>
-        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:10px;">LOGOUT</button>
+        <div><b id="headerSchoolName" style="font-size: 18px;">SYSTEM PORTAL</b><br><span style="font-size:11px; color:var(--gold); font-weight: 800;">ADMINISTRATION ACCESS</span></div>
+        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:10px 15px; border-radius:8px; font-weight:900;">LOGOUT</button>
     </div>
+    
     <div class="hero"><div id="clock">00:00:00</div></div>
     
     <div class="dashboard">
         <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span class="stat-lbl">Pupils</span></div>
-        <div class="stat-card"><span class="stat-val" style="color:#2b9348">LIVE</span><span class="stat-lbl">Status</span></div>
-        <div class="stat-card"><span class="stat-val" style="color:var(--gold)">1</span><span class="stat-lbl">School</span></div>
+        <div class="stat-card"><span class="stat-val" style="color:#2b9348">LIVE</span><span class="stat-lbl">Server</span></div>
+        <div class="stat-card"><span class="stat-val" style="color:var(--gold)">1</span><span class="stat-lbl">Entity</span></div>
     </div>
 
     <div class="nav-tabs">
-        <div class="tab active" id="t-adm" onclick="tab('adm')">Registration</div>
-        <div class="tab" id="t-rec" onclick="tab('rec')">Records</div>
+        <div class="tab active" id="t-rec" onclick="tab('rec')">Master Records</div>
+        <div class="tab" id="t-adm" onclick="tab('adm')">New Entry</div>
     </div>
 
-    <div id="v-adm" class="p-view">
-        <div class="card">
-            <h3 style="color:var(--blue); margin-top:0;">REGISTER NEW PUPIL</h3>
-            <label>Full Name</label><input id="name" placeholder="Full Student Name">
-            <label>Age</label><input id="age" type="number" placeholder="Years">
-            <label>Physical Location</label><input id="loc" placeholder="Home Village/Address">
-            <label>Parent Contact</label><input id="contact" placeholder="07... / +256...">
-            <button onclick="submitData()" class="btn-main" id="saveBtn">SAVE TO DATABASE</button>
-        </div>
-    </div>
-
-    <div id="v-rec" class="hidden p-view">
+    <div id="v-rec" class="p-view">
         <div class="card" style="padding:10px; overflow-x:auto;">
-            <h3 style="color:var(--blue);">STUDENT MASTER LIST</h3>
+            <h2 style="color:var(--blue); text-align:center; margin-bottom:20px;">STUDENT MASTER LEDGER</h2>
             <table>
-                <thead><tr><th>#</th><th>Name</th><th>Age</th><th>Location</th><th>Contact</th></tr></thead>
-                <tbody id="tableBody"></tbody>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Student Name</th>
+                        <th>Age</th>
+                        <th>Location</th>
+                        <th>Contact</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    </tbody>
             </table>
         </div>
+    </div>
+
+    <div id="v-adm" class="hidden p-view">
+        <div class="card">
+            <h2 style="color:var(--blue); margin-top:0;">PUPIL REGISTRATION</h2>
+            <label>Full Name</label><input id="name" placeholder="Full Name">
+            <label>Age</label><input id="age" type="number" placeholder="Enter Age">
+            <label>Physical Location</label><input id="loc" placeholder="Current Residence">
+            <label>Guardian Contact</label><input id="contact" placeholder="+256...">
+            <button onclick="submitData()" class="btn-main" id="saveBtn">SUBMIT TO SYSTEM</button>
+        </div>
+    </div>
+
+    <div style="text-align:center; padding:30px; color:#999; font-size:12px; font-weight:900;">
+        EUDES MEDIA SOFTWARE | +256762992440
     </div>
 </div>
 
@@ -83,38 +102,17 @@
     const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
     let cachedData = [];
 
-    async function secureLogin() {
-        const btn = document.getElementById('authBtn');
-        const typedKey = document.getElementById('key').value.trim().toUpperCase();
-        if(!typedKey) return alert("ENTER KEY");
-        btn.innerText = "AUTHENTICATING...";
+    // Auto-Login for Director (Your Credentials)
+    window.currentSchool = {id: 1, school_name: "Progressive Mothers", brand_color: "#002d5b"};
 
-        // EMERGENCY OVERRIDE: If you type JESUS CARES, it will open even if DB fails.
-        if (typedKey === "JESUS CARES") {
-            window.currentSchool = {id: 1, school_name: "Progressive Mothers", brand_color: "#002d5b"};
-            launchApp();
-            return;
-        }
-
-        try {
-            const { data: schools } = await _client.from('schools').select('*');
-            const match = schools ? schools.find(s => s.access_key.trim().toUpperCase() === typedKey) : null;
-            if (match) { window.currentSchool = match; launchApp(); } 
-            else { alert("INVALID KEY"); btn.innerText = "AUTHENTICATE"; }
-        } catch (e) { alert("CONNECTION ERROR"); btn.innerText = "AUTHENTICATE"; }
-    }
-
-    function launchApp() {
+    async function init() {
         document.getElementById('headerSchoolName').innerText = window.currentSchool.school_name.toUpperCase();
-        document.documentElement.style.setProperty('--blue', window.currentSchool.brand_color);
-        loadData();
-        document.getElementById('loginGate').classList.add('hidden');
-        document.getElementById('mainApp').classList.remove('hidden');
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
+        await loadData();
     }
 
     async function loadData() {
-        const { data } = await _client.from('students').select('*').eq('school_id', window.currentSchool.id);
+        const { data } = await _client.from('students').select('*').eq('school_id', window.currentSchool.id).order('name', { ascending: true });
         if(data) { cachedData = data; renderUI(); }
     }
 
@@ -122,12 +120,20 @@
         const body = document.getElementById('tableBody');
         body.innerHTML = "";
         cachedData.forEach((s, index) => {
-            body.innerHTML += `<tr><td>${index+1}</td><td>${s.name}</td><td>${s.age || ''}</td><td>${s.location || ''}</td><td>${s.contact}</td></tr>`;
+            body.innerHTML += `
+                <tr>
+                    <td style="color:var(--blue)">${index+1}</td>
+                    <td><b style="text-transform:uppercase;">${s.name}</b></td>
+                    <td>${s.age || '-'}</td>
+                    <td style="font-size:12px;">${s.location || '-'}</td>
+                    <td style="color:#555;">${s.contact || '-'}</td>
+                </tr>`;
         });
         document.getElementById('c-tot').innerText = cachedData.length;
     }
 
     async function submitData() {
+        const btn = document.getElementById('saveBtn');
         const payload = {
             school_id: window.currentSchool.id,
             name: document.getElementById('name').value,
@@ -135,8 +141,17 @@
             location: document.getElementById('loc').value,
             contact: document.getElementById('contact').value
         };
+        if(!payload.name) return alert("Please enter a name");
+        
+        btn.innerText = "SAVING...";
         const { error } = await _client.from('students').insert([payload]);
-        if(!error) { alert("RECORD SAVED"); loadData(); tab('rec'); }
+        if(!error) {
+            alert("SUCCESSFULLY REGISTERED");
+            document.querySelectorAll('input').forEach(i => i.value = "");
+            await loadData();
+            tab('rec');
+        }
+        btn.innerText = "SUBMIT TO SYSTEM";
     }
 
     function tab(t) { 
@@ -145,6 +160,8 @@
         document.querySelectorAll('.tab').forEach(tb => tb.classList.remove('active'));
         document.getElementById('t-'+t).classList.add('active');
     }
+
+    init();
 </script>
 </body>
 </html>
