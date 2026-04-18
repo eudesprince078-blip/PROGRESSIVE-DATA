@@ -3,97 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESMS Pro | Eudes Media</title>
+    <title>ESMS Premium | Eudes Media</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --sidebar: #0f172a; --bg: #f1f5f9; --white: #ffffff; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --primary: #0047AB; --sidebar: #0f172a; --bg: #f8fafc; --white: #ffffff; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; text-transform: uppercase; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; color: #1e293b; overflow-x: hidden; }
 
-        /* Navigation */
-        .mobile-nav { display: none; background: var(--white); padding: 12px 20px; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 1001; }
-        .sidebar { width: 280px; background: var(--sidebar); color: white; padding: 40px 20px; display: flex; flex-direction: column; height: 100vh; position: fixed; left: 0; top: 0; transition: 0.3s ease; z-index: 1000; }
-        .brand { font-weight: 800; font-size: 1.4rem; margin-bottom: 40px; border-left: 4px solid var(--primary); padding-left: 15px; }
-        
-        /* Layout */
-        .main { margin-left: 280px; padding: 40px 30px; transition: 0.3s; min-height: 100vh; }
-        .login-card { max-width: 420px; margin: 40px auto; background: var(--white); padding: 35px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-        .panel { display: none; background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .visible { display: block; }
+        /* HEADER & CLOCK */
+        .header-bar { background: var(--white); padding: 20px; border-bottom: 2px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1001; }
+        .clock-section { text-align: right; }
+        #live-clock { font-size: 1.5rem; font-weight: 800; color: var(--primary); margin: 0; }
+        #live-date { font-size: 0.7rem; font-weight: 600; color: #64748b; margin: 0; }
 
-        /* UI Elements */
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 10px; font-size: 0.9rem; font-family: inherit; }
-        .btn-primary { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        
-        /* Table Styles */
-        .table-wrap { overflow-x: auto; background: white; border-radius: 15px; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; font-size: 0.7rem; text-transform: uppercase; border-bottom: 2px solid #edf2f7; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
-        
-        /* Badges */
-        .badge { padding: 4px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; }
-        .bg-health { background: #dcfce7; color: #166534; }
-        .bg-money { background: #fef9c3; color: #854d0e; }
+        /* DASHBOARD ELEMENTS */
+        .main { padding: 25px; max-width: 1200px; margin: 0 auto; }
+        .stat-banner { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--white); padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .stat-card b { font-size: 1.8rem; display: block; color: var(--sidebar); }
+        .stat-card span { font-size: 0.65rem; color: #94a3b8; font-weight: 800; }
 
-        @media (max-width: 1024px) {
-            .mobile-nav { display: flex; }
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-            .main { margin-left: 0; padding: 15px; }
+        /* ENROLLMENT FORM */
+        .registration-box { background: var(--white); padding: 25px; border-radius: 20px; border: 1px solid #e2e8f0; margin-bottom: 25px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        input { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 600; font-family: inherit; font-size: 0.85rem; background: #fcfcfc; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 10px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 15px; }
+
+        /* TABLE DESIGN */
+        .table-container { background: white; border-radius: 20px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .scroll-area { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: #f1f5f9; padding: 18px 15px; text-align: left; font-size: 0.7rem; color: #475569; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 18px 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; font-weight: 600; }
+        
+        .lin-cell { font-weight: 800; color: #94a3b8; width: 50px; }
+        .name-cell { color: var(--primary); font-weight: 800; }
+        .badge { padding: 5px 10px; border-radius: 8px; font-size: 0.65rem; }
+        .bg-green { background: #dcfce7; color: #15803d; }
+        .bg-blue { background: #e0f2fe; color: #0369a1; }
+
+        @media (max-width: 600px) {
+            .main { padding: 15px; }
+            .header-bar { padding: 15px; }
+            #live-clock { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
 
-    <header class="mobile-nav">
-        <div style="font-weight: 800; color: var(--primary);">EUDES MEDIA</div>
-        <button onclick="toggleSidebar()" style="background:none; border:none; font-size:1.5rem;">☰</button>
-    </header>
-
-    <aside class="sidebar" id="sidebar">
-        <div class="brand">EUDES MEDIA</div>
-        <div class="nav-item active" onclick="switchSection('dashboard-panel')">School Registry</div>
-        <button onclick="location.reload()" style="margin-top:auto; padding:12px; background:#ef4444; border:none; color:white; border-radius:10px; font-weight:700;">Logout</button>
-    </aside>
+    <div class="header-bar">
+        <div style="font-weight: 800; color: var(--sidebar); font-size: 1.1rem; border-left: 4px solid var(--primary); padding-left: 10px;">
+            EUDES MEDIA <br> <small style="color:var(--primary); font-size:0.6rem;">AUTHORITY HUB</small>
+        </div>
+        <div class="clock-section">
+            <p id="live-clock">00:00:00</p>
+            <p id="live-date">LOADING DATE...</p>
+        </div>
+    </div>
 
     <main class="main">
-        <div id="login-section" class="login-card">
-            <h2 style="text-align: center; margin-top: 0;">System Login</h2>
-            <input type="text" id="loginID" placeholder="SCHOOL ID (e.g. PM001)" style="text-transform: uppercase;">
+        <div id="login-section" class="registration-box" style="max-width:400px; margin: 50px auto; text-align:center;">
+            <h2 style="margin-top:0">SYSTEM ACCESS</h2>
+            <input type="text" id="loginID" placeholder="SCHOOL ID" style="margin-bottom:10px;">
             <input type="password" id="loginKey" placeholder="ACCESS KEY">
-            <button class="btn-primary" onclick="doLogin()">Sign In</button>
-            <p id="debug-msg" style="color:red; font-size:0.7rem; margin-top:10px; text-align:center;"></p>
+            <button class="btn-add" onclick="doLogin()">AUTHORIZE LOGIN</button>
         </div>
 
-        <div id="dashboard-section" style="display:none;">
-            <div style="margin-bottom: 20px;">
-                <h1 id="schoolDisplay" style="margin:0; font-size: 1.8rem; color: var(--primary);">---</h1>
-                <p id="pupilCountLabel" style="margin:0; color:#64748b; font-weight:600;">Total Pupils: <span id="pupilCount">0</span></p>
+        <div id="dashboard-content" style="display:none;">
+            <div class="stat-banner">
+                <div class="stat-card"><span id="schoolName">---</span><b>SCHOOL</b></div>
+                <div class="stat-card"><span id="pupilCount">0</span><b>PUPILS</b></div>
+                <div class="stat-card"><span>STATUS</span><b>ACTIVE</b></div>
             </div>
 
-            <div class="panel visible" id="dashboard-panel">
-                <h3 style="margin-top:0">Quick Enrollment</h3>
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
-                    <input type="text" id="stuName" placeholder="Student Name">
-                    <input type="number" id="stuAge" placeholder="Age">
-                    <input type="text" id="stuHealth" placeholder="Health Status (e.g. Normal)">
-                    <input type="number" id="stuTotal" placeholder="Total Fees to Pay">
+            <div class="registration-box">
+                <h3 style="margin-top:0; color:var(--primary); font-size:0.9rem;">NEW ENROLLMENT</h3>
+                <div class="form-grid">
+                    <input type="text" id="stuName" placeholder="FULL NAME">
+                    <input type="text" id="stuClass" placeholder="CLASS (e.g. P.7)">
+                    <input type="number" id="stuAge" placeholder="AGE">
+                    <input type="text" id="stuHealth" placeholder="HEALTH STATUS">
+                    <input type="number" id="stuTotal" placeholder="TOTAL FEES">
                 </div>
-                <button class="btn-primary" onclick="saveStudent()" style="margin-top:10px;">Register Student</button>
+                <button class="btn-add" onclick="saveStudent()">REGISTER STUDENT TO SYSTEM</button>
+            </div>
 
-                <div class="table-wrap">
-                    <table id="mainTable">
+            <div class="table-container">
+                <div class="scroll-area">
+                    <table>
                         <thead>
                             <tr>
                                 <th>LIN</th>
-                                <th>Full Name</th>
-                                <th>Age</th>
-                                <th>Health</th>
-                                <th>Total Due</th>
-                                <th>Paid</th>
-                                <th>Balance</th>
+                                <th>STUDENT NAME</th>
+                                <th>CLASS</th>
+                                <th>AGE</th>
+                                <th>HEALTH</th>
+                                <th>FEES TOTAL</th>
+                                <th>PAID</th>
+                                <th>BALANCE</th>
                             </tr>
                         </thead>
                         <tbody id="stuTable"></tbody>
@@ -107,25 +115,27 @@
         const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const supabaseClient = supabase.createClient(_URL, _KEY);
-
         let activeSchoolID = "";
 
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        // CLOCK LOGIC
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-GB');
+            document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+        }, 1000);
 
         async function doLogin() {
             const id = document.getElementById('loginID').value.trim().toUpperCase();
             const key = document.getElementById('loginKey').value.trim();
-            const { data, error } = await supabaseClient.from('schools').select('*').eq('id', id).eq('access_key', key).maybeSingle();
+            const { data } = await supabaseClient.from('schools').select('*').eq('id', id).eq('access_key', key).maybeSingle();
 
             if (data) {
                 activeSchoolID = id;
                 document.getElementById('login-section').style.display = 'none';
-                document.getElementById('dashboard-section').style.display = 'block';
-                document.getElementById('schoolDisplay').innerText = data.school_name;
+                document.getElementById('dashboard-content').style.display = 'block';
+                document.getElementById('schoolName').innerText = data.school_name;
                 loadPupils();
-            } else {
-                alert("Invalid Credentials");
-            }
+            } else { alert("ACCESS DENIED"); }
         }
 
         async function loadPupils() {
@@ -141,13 +151,14 @@
                     const balance = total - paid;
                     return `
                         <tr>
-                            <td><b>${index + 1}</b></td>
-                            <td style="font-weight:700;">${s.name}</td>
+                            <td class="lin-cell">${index + 1}</td>
+                            <td class="name-cell">${s.name}</td>
+                            <td><span class="badge bg-blue">${s.class || 'N/A'}</span></td>
                             <td>${s.age || '--'}</td>
-                            <td><span class="badge bg-health">${s.health_status || 'Normal'}</span></td>
-                            <td>UGX ${total.toLocaleString()}</td>
-                            <td style="color:green;">UGX ${paid.toLocaleString()}</td>
-                            <td style="color:red; font-weight:700;">UGX ${balance.toLocaleString()}</td>
+                            <td><span class="badge bg-green">${s.health_status || 'GOOD'}</span></td>
+                            <td>${total.toLocaleString()}</td>
+                            <td style="color:green;">${paid.toLocaleString()}</td>
+                            <td style="color:red;">${balance.toLocaleString()}</td>
                         </tr>
                     `;
                 }).join('');
@@ -156,14 +167,16 @@
 
         async function saveStudent() {
             const name = document.getElementById('stuName').value;
+            const stuClass = document.getElementById('stuClass').value;
             const age = document.getElementById('stuAge').value;
             const health = document.getElementById('stuHealth').value;
             const total = document.getElementById('stuTotal').value;
 
-            if(!name) return alert("Enter Student Name");
+            if(!name) return alert("NAME REQUIRED");
 
             const { error } = await supabaseClient.from('students').insert([{
                 name: name,
+                class: stuClass,
                 age: age,
                 health_status: health,
                 total_fees: total,
@@ -172,11 +185,7 @@
             }]);
 
             if(!error) {
-                // Clear inputs
-                document.getElementById('stuName').value = '';
-                document.getElementById('stuAge').value = '';
-                document.getElementById('stuHealth').value = '';
-                document.getElementById('stuTotal').value = '';
+                document.querySelectorAll('.form-grid input').forEach(i => i.value = '');
                 loadPupils();
             }
         }
