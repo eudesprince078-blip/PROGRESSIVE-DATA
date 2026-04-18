@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; --accent: #f59e0b; }
+        :root { --primary: #0047AB; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; }
         * { box-sizing: border-box; text-transform: uppercase; transition: 0.2s; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
 
@@ -17,14 +17,14 @@
         .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.65rem; font-weight: 800; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #f8fafc; }
 
-        /* DASHBOARD STATS */
+        /* DASHBOARD HERO */
         .hero { background: var(--dark); color: white; padding: 30px 20px; text-align: center; }
         #live-clock { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -25px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-bottom: 4px solid #cbd5e1; }
         .stat-card b { display: block; font-size: 1.4rem; }
 
-        /* ADMISSION FORM */
+        /* FORMS */
         .container { padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px; }
@@ -65,7 +65,7 @@
             <div class="stat-card"><b id="countB" style="color:var(--danger);">0</b><span>OWING</span></div>
         </div>
         <div class="container">
-            <div class="card"><input type="text" id="searchBox" placeholder="SEARCH BY NAME OR LIN..." onkeyup="doSearch()"></div>
+            <div class="card"><input type="text" id="searchBox" placeholder="SEARCH..." onkeyup="doSearch()"></div>
             <div class="table-wrap card">
                 <table>
                     <thead>
@@ -83,22 +83,21 @@
             <div class="form-grid">
                 <div><label>FULL NAME</label><input type="text" id="inName"></div>
                 <div><label>CLASS</label><input type="text" id="inClass"></div>
-                <div><label>CONTACT NUMBER</label><input type="text" id="inContact"></div>
+                <div><label>CONTACT (SAVE AS CONTACT)</label><input type="text" id="inContact"></div>
                 <div><label>FEES EXPECTED</label><input type="number" id="inExp"></div>
                 <div><label>FEES PAID</label><input type="number" id="inPaid"></div>
                 <div>
-                    <label>FEES STATUS</label>
+                    <label>STATUS</label>
                     <select id="inStatus">
                         <option value="OWING">OWING</option>
                         <option value="CLEARED">CLEARED</option>
                         <option value="PARTIAL">PARTIAL</option>
                     </select>
                 </div>
-                <div><label>HEALTH STATUS</label><input type="text" id="inHealth" placeholder="GOOD"></div>
-                <div><label>AGE</label><input type="number" id="inAge"></div>
+                <div><label>HEALTH STATUS</label><input type="text" id="inHealth" placeholder="NORMAL"></div>
             </div>
-            <button class="btn btn-save" id="saveBtn" onclick="saveToSupabase()">SAVE STUDENT DATA</button>
-            <button class="btn btn-cancel" id="cancelBtn" onclick="resetForm()">CANCEL EDIT</button>
+            <button class="btn btn-save" id="saveBtn" onclick="saveData()">SAVE STUDENT RECORD</button>
+            <button class="btn btn-cancel" id="cancelBtn" onclick="resetAdmission()">CANCEL EDIT</button>
         </div>
     </div>
 
@@ -108,7 +107,7 @@
         const client = supabase.createClient(_URL, _KEY);
         
         let allStudents = [];
-        let editingStudentId = null;
+        let editID = null;
 
         setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
@@ -117,6 +116,9 @@
             document.querySelectorAll('.tab').forEach(c => c.classList.remove('active'));
             document.getElementById(t).style.display='block';
             if(t === 'dash') fetchAll();
+            // Highlight correct tab manually
+            const activeTab = Array.from(document.querySelectorAll('.tab')).find(tab => tab.innerText.toLowerCase() === t.toLowerCase());
+            if(activeTab) activeTab.classList.add('active');
         }
 
         async function fetchAll() {
@@ -126,96 +128,89 @@
         }
 
         function renderDash() {
-            let clearedCount = 0, owingCount = 0;
+            let cleared = 0, owing = 0;
             document.getElementById('dashBody').innerHTML = allStudents.map(s => {
                 const status = s.fees_status || 'OWING';
-                if(status === 'CLEARED') clearedCount++; else owingCount++;
+                if(status === 'CLEARED') cleared++; else owing++;
                 return `<tr>
                     <td>${s.lin || '---'}</td>
                     <td style="color:var(--primary)">${s.name}</td>
                     <td>${s.class}</td>
-                    <td>${s.contact_number || '--'}</td>
+                    <td>${s.contact || '--'}</td>
                     <td>${(s.fees_expected || 0).toLocaleString()}</td>
                     <td>${(s.fees_paid || 0).toLocaleString()}</td>
                     <td style="color:${status === 'CLEARED' ? 'green' : 'red'}">${status}</td>
                     <td>
-                        <button class="btn btn-edit" onclick="setupEdit('${s.id}')">EDIT</button>
-                        <button class="btn btn-del" onclick="setupDelete('${s.id}')">DEL</button>
+                        <button class="btn btn-edit" onclick="startEdit('${s.id}')">EDIT</button>
+                        <button class="btn btn-del" onclick="startDelete('${s.id}')">DEL</button>
                     </td>
                 </tr>`;
             }).join('');
             document.getElementById('countT').innerText = allStudents.length;
-            document.getElementById('countP').innerText = clearedCount;
-            document.getElementById('countB').innerText = owingCount;
+            document.getElementById('countP').innerText = cleared;
+            document.getElementById('countB').innerText = owing;
         }
 
-        async function saveToSupabase() {
+        async function saveData() {
             const btn = document.getElementById('saveBtn');
-            btn.innerText = "PROCESSING..."; btn.disabled = true;
+            btn.innerText = "WAIT..."; btn.disabled = true;
 
             const payload = {
                 name: document.getElementById('inName').value,
                 class: document.getElementById('inClass').value,
-                contact_number: document.getElementById('inContact').value,
+                contact: document.getElementById('inContact').value, // Corrected to 'contact'
                 fees_expected: document.getElementById('inExp').value,
                 fees_paid: document.getElementById('inPaid').value,
                 fees_status: document.getElementById('inStatus').value,
-                health_status: document.getElementById('inHealth').value,
-                age: document.getElementById('inAge').value
+                health_status: document.getElementById('inHealth').value
             };
 
-            let response;
-            if(editingStudentId) {
-                response = await client.from('students').update(payload).eq('id', editingStudentId);
+            let res;
+            if(editID) {
+                res = await client.from('students').update(payload).eq('id', editID);
             } else {
-                response = await client.from('students').insert([payload]);
+                res = await client.from('students').insert([payload]);
             }
 
-            if(!response.error) {
-                alert("SUCCESSFULLY SAVED");
-                resetForm();
+            if(!res.error) {
+                alert("DONE");
+                resetAdmission();
                 showTab('dash');
             } else {
-                alert("DATABASE ERROR: " + response.error.message);
+                alert("ERROR: " + res.error.message);
             }
-            btn.innerText = "SAVE STUDENT DATA"; btn.disabled = false;
+            btn.innerText = "SAVE STUDENT RECORD"; btn.disabled = false;
         }
 
-        function setupEdit(id) {
+        function startEdit(id) {
             const s = allStudents.find(x => x.id === id);
-            editingStudentId = id;
+            editID = id;
             document.getElementById('inName').value = s.name || "";
             document.getElementById('inClass').value = s.class || "";
-            document.getElementById('inContact').value = s.contact_number || "";
+            document.getElementById('inContact').value = s.contact || ""; // Mapped to s.contact
             document.getElementById('inExp').value = s.fees_expected || "";
             document.getElementById('inPaid').value = s.fees_paid || "";
             document.getElementById('inStatus').value = s.fees_status || "OWING";
             document.getElementById('inHealth').value = s.health_status || "";
-            document.getElementById('inAge').value = s.age || "";
             
-            document.getElementById('formTitle').innerText = "EDIT: " + s.name;
-            document.getElementById('saveBtn').innerText = "UPDATE RECORD";
+            document.getElementById('formTitle').innerText = "EDITING RECORD";
+            document.getElementById('saveBtn').innerText = "UPDATE NOW";
             document.getElementById('cancelBtn').style.display = "block";
-            
-            // Highlight the tab manually for the Edit switch
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector('[onclick="showTab(\'admission\')"]').classList.add('active');
             showTab('admission');
         }
 
-        async function setupDelete(id) {
-            if(confirm("DELETE PERMANENTLY?")) {
+        async function startDelete(id) {
+            if(confirm("DELETE?")) {
                 await client.from('students').delete().eq('id', id);
                 fetchAll();
             }
         }
 
-        function resetForm() {
-            editingStudentId = null;
+        function resetAdmission() {
+            editID = null;
             document.querySelectorAll('#admission input').forEach(i => i.value = "");
-            document.getElementById('inStatus').value = "OWING";
             document.getElementById('formTitle').innerText = "STUDENT ENROLLMENT";
-            document.getElementById('saveBtn').innerText = "SAVE STUDENT DATA";
+            document.getElementById('saveBtn').innerText = "SAVE STUDENT RECORD";
             document.getElementById('cancelBtn').style.display = "none";
         }
 
