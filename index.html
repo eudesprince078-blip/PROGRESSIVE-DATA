@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESMS Pro Hub | Eudes Media</title>
+    <title>ESMS Pro | Eudes Media</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -11,36 +11,38 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; color: #1e293b; overflow-x: hidden; }
 
+        /* Navigation */
         .mobile-nav { display: none; background: var(--white); padding: 12px 20px; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 1001; }
         .sidebar { width: 280px; background: var(--sidebar); color: white; padding: 40px 20px; display: flex; flex-direction: column; height: 100vh; position: fixed; left: 0; top: 0; transition: 0.3s ease; z-index: 1000; }
         .brand { font-weight: 800; font-size: 1.4rem; margin-bottom: 40px; border-left: 4px solid var(--primary); padding-left: 15px; }
-        .nav-group { margin-bottom: 25px; display: none; } 
-        .nav-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
-        .nav-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; color: #94a3b8; margin-bottom: 5px; font-weight: 600; }
-        .nav-item.active { background: var(--primary); color: white; }
-
+        
+        /* Layout */
         .main { margin-left: 280px; padding: 40px 30px; transition: 0.3s; min-height: 100vh; }
         .login-card { max-width: 420px; margin: 40px auto; background: var(--white); padding: 35px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .panel { display: none; background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .visible { display: block; }
 
-        input, select { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px; font-size: 1rem; font-family: inherit; }
-        .btn-primary { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        /* UI Elements */
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 10px; font-size: 0.9rem; font-family: inherit; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        
+        /* Table Styles */
+        .table-wrap { overflow-x: auto; background: white; border-radius: 15px; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; font-size: 0.7rem; text-transform: uppercase; border-bottom: 2px solid #edf2f7; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+        
+        /* Badges */
+        .badge { padding: 4px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; }
+        .bg-health { background: #dcfce7; color: #166534; }
+        .bg-money { background: #fef9c3; color: #854d0e; }
 
         @media (max-width: 1024px) {
             .mobile-nav { display: flex; }
-            .sidebar { transform: translateX(-100%); width: 260px; }
+            .sidebar { transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); }
-            .main { margin-left: 0; padding: 20px; }
+            .main { margin-left: 0; padding: 15px; }
         }
-
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: var(--white); padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: center; }
-        .stat-card b { font-size: 1.6rem; display: block; color: var(--sidebar); }
-        .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        th { text-align: left; padding: 12px; border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 0.75rem; text-transform: uppercase; }
-        td { padding: 15px 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -52,134 +54,131 @@
 
     <aside class="sidebar" id="sidebar">
         <div class="brand">EUDES MEDIA</div>
-        <div id="admin-menu" class="nav-group">
-            <span class="nav-label">Management</span>
-            <div class="nav-item active" onclick="switchSection('admin-panel')">Dashboard</div>
-        </div>
-        <div id="teacher-menu" class="nav-group">
-            <span class="nav-label">Academics</span>
-            <div class="nav-item active" onclick="switchSection('teacher-panel')">Mark Sheet</div>
-        </div>
-        <div id="finance-menu" class="nav-group">
-            <span class="nav-label">Finance</span>
-            <div class="nav-item active" onclick="switchSection('finance-panel')">Bursar Desk</div>
-        </div>
-        <button onclick="location.reload()" style="margin-top:auto; padding:12px; background:#ef4444; border:none; color:white; border-radius:10px; font-weight:700; cursor:pointer;">Logout</button>
+        <div class="nav-item active" onclick="switchSection('dashboard-panel')">School Registry</div>
+        <button onclick="location.reload()" style="margin-top:auto; padding:12px; background:#ef4444; border:none; color:white; border-radius:10px; font-weight:700;">Logout</button>
     </aside>
 
     <main class="main">
         <div id="login-section" class="login-card">
-            <h2 style="text-align: center; margin-top: 0; color: var(--sidebar);">System Access</h2>
-            <label style="font-weight:700; font-size:0.75rem; color:#64748b;">SCHOOL ID</label>
-            <input type="text" id="loginID" placeholder="e.g. PM001" style="text-transform: uppercase;">
-            <label style="font-weight:700; font-size:0.75rem; color:#64748b;">ACCESS KEY</label>
-            <input type="password" id="loginKey" placeholder="Enter PM2026">
-            <label style="font-weight:700; font-size:0.75rem; color:#64748b;">LOGIN ROLE</label>
-            <select id="loginRole">
-                <option value="Admin">Administrator</option>
-                <option value="Teacher">Teacher</option>
-                <option value="Finance">Bursar</option>
-            </select>
-            <button class="btn-primary" onclick="doLogin()">Authorize & Login</button>
-            <p id="debug-msg" style="color:red; font-size:0.75rem; margin-top:15px; text-align:center; font-weight:600;"></p>
+            <h2 style="text-align: center; margin-top: 0;">System Login</h2>
+            <input type="text" id="loginID" placeholder="SCHOOL ID (e.g. PM001)" style="text-transform: uppercase;">
+            <input type="password" id="loginKey" placeholder="ACCESS KEY">
+            <button class="btn-primary" onclick="doLogin()">Sign In</button>
+            <p id="debug-msg" style="color:red; font-size:0.7rem; margin-top:10px; text-align:center;"></p>
         </div>
 
         <div id="dashboard-section" style="display:none;">
-            <div style="margin-bottom: 25px;">
-                <h1 id="clock" style="margin:0; font-size: 2.2rem; letter-spacing: -1.5px; color: var(--sidebar);">00:00</h1>
-                <p id="date" style="margin:0; color:#64748b; font-weight:600; font-size: 0.9rem;"></p>
-                <div id="role-pill" style="display:inline-block; padding:5px 14px; border-radius:20px; background:var(--primary); color:white; font-size:0.65rem; font-weight:800; margin-top:10px; text-transform:uppercase;">---</div>
+            <div style="margin-bottom: 20px;">
+                <h1 id="schoolDisplay" style="margin:0; font-size: 1.8rem; color: var(--primary);">---</h1>
+                <p id="pupilCountLabel" style="margin:0; color:#64748b; font-weight:600;">Total Pupils: <span id="pupilCount">0</span></p>
             </div>
-            <div class="stat-grid">
-                <div class="stat-card"><small>PUPILS</small><b id="pupilCount">0</b></div>
-                <div class="stat-card"><small>SCHOOL</small><b id="schoolDisplay" style="font-size:1.1rem;">---</b></div>
+
+            <div class="panel visible" id="dashboard-panel">
+                <h3 style="margin-top:0">Quick Enrollment</h3>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+                    <input type="text" id="stuName" placeholder="Student Name">
+                    <input type="number" id="stuAge" placeholder="Age">
+                    <input type="text" id="stuHealth" placeholder="Health Status (e.g. Normal)">
+                    <input type="number" id="stuTotal" placeholder="Total Fees to Pay">
+                </div>
+                <button class="btn-primary" onclick="saveStudent()" style="margin-top:10px;">Register Student</button>
+
+                <div class="table-wrap">
+                    <table id="mainTable">
+                        <thead>
+                            <tr>
+                                <th>LIN</th>
+                                <th>Full Name</th>
+                                <th>Age</th>
+                                <th>Health</th>
+                                <th>Total Due</th>
+                                <th>Paid</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stuTable"></tbody>
+                    </table>
+                </div>
             </div>
-            <div id="admin-panel" class="panel"><h3 style="margin-top:0">New Registration</h3><input type="text" id="stuName" placeholder="Enter student full name"><button class="btn-primary" onclick="saveStudent()">Add Student</button></div>
-            <div id="teacher-panel" class="panel"><h3 style="margin-top:0">Mark Sheet</h3><div class="table-wrap"><table><thead><tr><th>Name</th><th>ENG</th><th>MAT</th><th>SST</th><th>SCI</th></tr></thead><tbody id="stuTable"></tbody></table></div></div>
-            <div id="finance-panel" class="panel"><h3 style="margin-top:0">Bursar Desk</h3><p>Manage student fee payments here.</p></div>
         </div>
     </main>
 
     <script>
-        // Updated with your specific credentials
         const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        
         const supabaseClient = supabase.createClient(_URL, _KEY);
+
         let activeSchoolID = "";
-        let activeRole = "";
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-            document.getElementById('date').innerText = now.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
-        }, 1000);
 
         async function doLogin() {
-            const idInput = document.getElementById('loginID').value.trim().toUpperCase();
-            const keyInput = document.getElementById('loginKey').value.trim();
-            activeRole = document.getElementById('loginRole').value;
-            const debug = document.getElementById('debug-msg');
+            const id = document.getElementById('loginID').value.trim().toUpperCase();
+            const key = document.getElementById('loginKey').value.trim();
+            const { data, error } = await supabaseClient.from('schools').select('*').eq('id', id).eq('access_key', key).maybeSingle();
 
-            try {
-                debug.style.color = "orange";
-                debug.innerText = "Connecting to Eudes Media Servers...";
-
-                const { data, error } = await supabaseClient.from('schools')
-                    .select('*').eq('id', idInput).eq('access_key', keyInput).maybeSingle();
-
-                if (error) throw error;
-
-                if (data) {
-                    activeSchoolID = idInput;
-                    document.getElementById('login-section').style.display = 'none';
-                    document.getElementById('dashboard-section').style.display = 'block';
-                    document.getElementById('schoolDisplay').innerText = data.school_name;
-                    document.getElementById('role-pill').innerText = activeRole;
-                    document.querySelectorAll('.nav-group').forEach(g => g.style.display = 'none');
-                    document.getElementById(activeRole.toLowerCase() + '-menu').style.display = 'block';
-                    switchSection(activeRole.toLowerCase() + '-panel');
-                    loadPupils();
-                } else {
-                    debug.style.color = "red";
-                    debug.innerText = "Invalid ID or Key. Please check your credentials.";
-                }
-            } catch (err) {
-                debug.style.color = "red";
-                debug.innerText = "Connection Error. Check internet or Supabase status.";
-                console.error(err);
+            if (data) {
+                activeSchoolID = id;
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('dashboard-section').style.display = 'block';
+                document.getElementById('schoolDisplay').innerText = data.school_name;
+                loadPupils();
+            } else {
+                alert("Invalid Credentials");
             }
-        }
-
-        function switchSection(id) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('visible'));
-            document.getElementById(id).classList.add('visible');
-            if(window.innerWidth <= 1024) document.getElementById('sidebar').classList.remove('open');
         }
 
         async function loadPupils() {
             const { count, data } = await supabaseClient.from('students')
-                .select('*', {count:'exact'}).eq('school_id', activeSchoolID);
+                .select('*', {count:'exact'}).eq('school_id', activeSchoolID).order('name', {ascending:true});
+            
             document.getElementById('pupilCount').innerText = count || 0;
+            
             if(data) {
-                document.getElementById('stuTable').innerHTML = data.map(s => `
-                    <tr>
-                        <td style="font-weight:600;">${s.name}</td>
-                        <td><input type="number" style="width:50px; padding:5px; border-radius:5px; border:1px solid #ddd;"></td>
-                        <td><input type="number" style="width:50px; padding:5px; border-radius:5px; border:1px solid #ddd;"></td>
-                        <td><input type="number" style="width:50px; padding:5px; border-radius:5px; border:1px solid #ddd;"></td>
-                        <td><input type="number" style="width:50px; padding:5px; border-radius:5px; border:1px solid #ddd;"></td>
-                    </tr>
-                `).join('');
+                document.getElementById('stuTable').innerHTML = data.map((s, index) => {
+                    const total = s.total_fees || 0;
+                    const paid = s.paid_fees || 0;
+                    const balance = total - paid;
+                    return `
+                        <tr>
+                            <td><b>${index + 1}</b></td>
+                            <td style="font-weight:700;">${s.name}</td>
+                            <td>${s.age || '--'}</td>
+                            <td><span class="badge bg-health">${s.health_status || 'Normal'}</span></td>
+                            <td>UGX ${total.toLocaleString()}</td>
+                            <td style="color:green;">UGX ${paid.toLocaleString()}</td>
+                            <td style="color:red; font-weight:700;">UGX ${balance.toLocaleString()}</td>
+                        </tr>
+                    `;
+                }).join('');
             }
         }
 
         async function saveStudent() {
-            const name = document.getElementById('stuName').value.trim();
-            if(!name) return;
-            const { error } = await supabaseClient.from('students').insert([{ name, school_id: activeSchoolID }]);
-            if(!error) { document.getElementById('stuName').value = ''; loadPupils(); }
+            const name = document.getElementById('stuName').value;
+            const age = document.getElementById('stuAge').value;
+            const health = document.getElementById('stuHealth').value;
+            const total = document.getElementById('stuTotal').value;
+
+            if(!name) return alert("Enter Student Name");
+
+            const { error } = await supabaseClient.from('students').insert([{
+                name: name,
+                age: age,
+                health_status: health,
+                total_fees: total,
+                paid_fees: 0,
+                school_id: activeSchoolID
+            }]);
+
+            if(!error) {
+                // Clear inputs
+                document.getElementById('stuName').value = '';
+                document.getElementById('stuAge').value = '';
+                document.getElementById('stuHealth').value = '';
+                document.getElementById('stuTotal').value = '';
+                loadPupils();
+            }
         }
     </script>
 </body>
