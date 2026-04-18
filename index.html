@@ -19,11 +19,13 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
         label { display: block; font-size: 0.6rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
         input, select { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; font-family: inherit; }
-        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; width: 100%; display: block; }
-        .btn-edit { background: var(--primary); font-size: 0.6rem; width: auto; padding: 6px 10px; display: inline-block; }
-        .stu-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; border: 1px solid #ddd; }
+        .btn { padding: 10px 15px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; color: white; }
+        .btn-save { background: var(--primary); width: 100%; font-size: 1rem; margin-top: 20px; }
+        .btn-edit { background: var(--primary); font-size: 0.6rem; }
+        .btn-del { background: var(--danger); font-size: 0.6rem; }
+        .stu-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; }
         .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { text-align: left; font-size: 0.6rem; color: #94a3b8; padding: 10px; border-bottom: 2px solid #f1f5f9; }
         td { padding: 12px 10px; font-size: 0.8rem; font-weight: 700; border-bottom: 1px solid #f1f5f9; }
     </style>
@@ -47,6 +49,7 @@
                     <thead>
                         <tr>
                             <th>PHOTO</th>
+                            <th>LIN</th>
                             <th>NAME</th>
                             <th>CLASS</th>
                             <th>CONTACT</th>
@@ -65,6 +68,7 @@
         <div class="card">
             <h3 id="formTitle" style="margin-top:0; color:var(--primary);">STUDENT REGISTRATION</h3>
             <div class="form-grid">
+                <div><label>LIN NUMBER</label><input type="text" id="inLin"></div>
                 <div><label>FULL NAME</label><input type="text" id="inName"></div>
                 <div><label>CLASS</label><input type="text" id="inClass"></div>
                 <div><label>CONTACT (PARENT)</label><input type="text" id="inContact"></div>
@@ -83,8 +87,8 @@
                     <input type="file" id="inPhoto" accept="image/*" style="border:none; padding:0;">
                 </div>
             </div>
-            <button class="btn" style="background:var(--primary); margin-top:20px;" id="saveBtn" onclick="processSave()">SAVE TO DATABASE</button>
-            <button class="btn" style="background:#64748b; margin-top:10px; display:none;" id="cancelBtn" onclick="resetForm()">CANCEL EDIT</button>
+            <button class="btn btn-save" id="saveBtn" onclick="processSave()">SAVE TO DATABASE</button>
+            <button class="btn" style="background:#64748b; width:100%; margin-top:10px; display:none;" id="cancelBtn" onclick="resetForm()">CANCEL EDIT</button>
         </div>
     </div>
 
@@ -107,12 +111,16 @@
             body.innerHTML = allStudents.map(s => `
                 <tr>
                     <td><img src="${s.photo_url || ''}" class="stu-img" onerror="this.src='https://via.placeholder.com/50'"></td>
+                    <td>${s.lin || '---'}</td>
                     <td style="color:var(--primary)">${s.name}</td>
                     <td>${s.class}</td>
                     <td>${s.contact || '--'}</td>
                     <td>${(s.fees_expected || 0).toLocaleString()}</td>
                     <td style="color:${s.fees_status === 'CLEARED' ? 'green' : 'red'}">${s.fees_status || 'OWING'}</td>
-                    <td><button class="btn btn-edit" onclick="openEditMode('${s.id}')">EDIT</button></td>
+                    <td>
+                        <button class="btn btn-edit" onclick="openEditMode('${s.id}')">EDIT</button>
+                        <button class="btn btn-del" onclick="processDelete('${s.id}')">DEL</button>
+                    </td>
                 </tr>
             `).join('');
         }
@@ -129,6 +137,7 @@
             const s = allStudents.find(x => String(x.id) === String(id));
             if(!s) return;
             editTargetId = id;
+            document.getElementById('inLin').value = s.lin || "";
             document.getElementById('inName').value = s.name || "";
             document.getElementById('inClass').value = s.class || "";
             document.getElementById('inContact').value = s.contact || "";
@@ -151,11 +160,12 @@
 
             if (photoFile) {
                 const path = `photos/${Date.now()}_${photoFile.name}`;
-                const { data, error } = await client.storage.from('student-photos').upload(path, photoFile);
+                const { data } = await client.storage.from('student-photos').upload(path, photoFile);
                 if (data) pUrl = client.storage.from('student-photos').getPublicUrl(path).data.publicUrl;
             }
 
             const dataObj = {
+                lin: document.getElementById('inLin').value,
                 name: document.getElementById('inName').value,
                 class: document.getElementById('inClass').value,
                 contact: document.getElementById('inContact').value,
@@ -180,6 +190,13 @@
                 alert("ERROR: " + res.error.message);
             }
             btn.innerText = "SAVE TO DATABASE"; btn.disabled = false;
+        }
+
+        async function processDelete(id) {
+            if(confirm("ARE YOU SURE YOU WANT TO DELETE THIS RECORD?")) {
+                const { error } = await client.from('students').delete().eq('id', id);
+                if(!error) fetchStudents(); else alert("DELETE ERROR: " + error.message);
+            }
         }
 
         function resetForm() {
