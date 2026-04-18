@@ -15,21 +15,23 @@
         .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.65rem; font-weight: 800; color: #64748b; cursor: pointer; }
         .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: #f8fafc; }
         .container { padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
         label { display: block; font-size: 0.6rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
-        input, select { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; }
-        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; width: 100%; }
-        .btn-edit { background: var(--primary); font-size: 0.6rem; width: auto; padding: 6px 10px; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        td, th { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; }
+        input, select { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 700; width: 100%; font-family: inherit; }
+        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; width: 100%; display: block; }
+        .btn-edit { background: var(--primary); font-size: 0.6rem; width: auto; padding: 6px 10px; display: inline-block; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { text-align: left; font-size: 0.6rem; color: #94a3b8; padding: 10px; border-bottom: 2px solid #f1f5f9; }
+        td { padding: 12px 10px; font-size: 0.8rem; font-weight: 700; border-bottom: 1px solid #f1f5f9; }
     </style>
 </head>
 <body>
 
     <div class="top-nav">
         <div>ESMS AUTHORITY HUB</div>
-        <div style="font-size:0.6rem;">EUDES MEDIA | +256762992440</div>
+        <div style="font-size:0.6rem; opacity:0.8;">EUDES MEDIA | +256762992440</div>
     </div>
 
     <div class="tab-bar">
@@ -39,12 +41,21 @@
 
     <div id="dash" class="tab-content container">
         <div class="card">
-            <div style="overflow-x:auto;">
+            <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>EXPECTED</th><th>STATUS</th><th>ACTION</th></tr>
+                        <tr>
+                            <th>STUDENT NAME</th>
+                            <th>CLASS</th>
+                            <th>CONTACT</th>
+                            <th>FEES EXPECTED</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                        </tr>
                     </thead>
-                    <tbody id="dashBody"></tbody>
+                    <tbody id="dashBody">
+                        <tr><td colspan="6" style="text-align:center; color:#94a3b8;">LOADING DATA...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -52,11 +63,11 @@
 
     <div id="admission" class="tab-content container" style="display:none;">
         <div class="card">
-            <h3 id="formTitle">NEW ENROLLMENT</h3>
+            <h3 id="formTitle" style="margin-top:0; color:var(--primary);">NEW REGISTRATION</h3>
             <div class="form-grid">
                 <div><label>FULL NAME</label><input type="text" id="inName"></div>
                 <div><label>CLASS</label><input type="text" id="inClass"></div>
-                <div><label>CONTACT</label><input type="text" id="inContact"></div>
+                <div><label>CONTACT (PARENT)</label><input type="text" id="inContact"></div>
                 <div><label>FEES EXPECTED</label><input type="number" id="inExp"></div>
                 <div><label>FEES PAID</label><input type="number" id="inPaid"></div>
                 <div>
@@ -64,10 +75,12 @@
                     <select id="inStatus">
                         <option value="OWING">OWING</option>
                         <option value="CLEARED">CLEARED</option>
+                        <option value="PARTIAL">PARTIAL</option>
                     </select>
                 </div>
             </div>
-            <button class="btn" style="background:var(--primary); margin-top:15px;" id="saveBtn" onclick="processSave()">SAVE RECORD</button>
+            <button class="btn" style="background:var(--primary); margin-top:20px;" id="saveBtn" onclick="runSave()">SAVE TO DATABASE</button>
+            <button class="btn" style="background:#64748b; margin-top:10px; display:none;" id="cancelBtn" onclick="resetForm()">CANCEL EDIT</button>
         </div>
     </div>
 
@@ -77,54 +90,69 @@
         const client = supabase.createClient(_URL, _KEY);
         
         let allStudents = [];
-        let currentEditId = null;
+        let editTargetId = null;
+
+        async function fetchStudents() {
+            try {
+                const { data, error } = await client.from('students').select('*').order('name');
+                if (error) throw error;
+                allStudents = data || [];
+                renderTable();
+            } catch (err) {
+                document.getElementById('dashBody').innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">ERROR: ${err.message}</td></tr>`;
+            }
+        }
+
+        function renderTable() {
+            const body = document.getElementById('dashBody');
+            if (allStudents.length === 0) {
+                body.innerHTML = `<tr><td colspan="6" style="text-align:center;">NO RECORDS FOUND</td></tr>`;
+                return;
+            }
+            body.innerHTML = allStudents.map(s => `
+                <tr>
+                    <td style="color:var(--primary)">${s.name || 'N/A'}</td>
+                    <td>${s.class || 'N/A'}</td>
+                    <td>${s.contact || s.contact_number || '--'}</td>
+                    <td>${(s.fees_expected || 0).toLocaleString()}</td>
+                    <td style="color:${s.fees_status === 'CLEARED' ? 'green' : 'red'}">${s.fees_status || 'OWING'}</td>
+                    <td><button class="btn btn-edit" onclick="openEditMode('${s.id}')">EDIT</button></td>
+                </tr>
+            `).join('');
+        }
 
         function showTab(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.style.display='none');
             document.querySelectorAll('.tab').forEach(c => c.classList.remove('active'));
             document.getElementById(t).style.display='block';
             document.getElementById(t === 'dash' ? 'tab-dash' : 'tab-adm').classList.add('active');
-            if(t === 'dash') fetch();
+            if(t === 'dash') fetchStudents();
         }
 
-        async function fetch() {
-            const { data } = await client.from('students').select('*').order('name');
-            allStudents = data || [];
-            const body = document.getElementById('dashBody');
-            body.innerHTML = allStudents.map(s => `
-                <tr>
-                    <td>${s.name}</td>
-                    <td>${s.class}</td>
-                    <td>${s.contact || '--'}</td>
-                    <td>${s.fees_expected || 0}</td>
-                    <td>${s.fees_status || 'OWING'}</td>
-                    <td><button class="btn btn-edit" onclick="editMode('${s.id}')">EDIT</button></td>
-                </tr>
-            `).join('');
-        }
+        function openEditMode(id) {
+            const s = allStudents.find(x => String(x.id) === String(id));
+            if(!s) return alert("Error: Student ID not found in current list.");
 
-        function editMode(id) {
-            const s = allStudents.find(x => x.id == id);
-            if(!s) return alert("CANNOT FIND STUDENT ID: " + id);
-
-            currentEditId = id;
+            editTargetId = id;
             document.getElementById('inName').value = s.name || "";
             document.getElementById('inClass').value = s.class || "";
-            document.getElementById('inContact').value = s.contact || "";
+            document.getElementById('inContact').value = s.contact || s.contact_number || "";
             document.getElementById('inExp').value = s.fees_expected || "";
             document.getElementById('inPaid').value = s.fees_paid || "";
             document.getElementById('inStatus').value = s.fees_status || "OWING";
             
-            document.getElementById('formTitle').innerText = "EDITING: " + s.name;
-            document.getElementById('saveBtn').innerText = "UPDATE NOW";
+            document.getElementById('formTitle').innerText = "EDITING: " + (s.name || "STUDENT");
+            document.getElementById('saveBtn').innerText = "UPDATE RECORD NOW";
+            document.getElementById('cancelBtn').style.display = "block";
+            
             showTab('admission');
         }
 
-        async function processSave() {
+        async function runSave() {
             const btn = document.getElementById('saveBtn');
-            btn.innerText = "WAIT...";
-            
-            const row = {
+            btn.innerText = "WAIT..."; btn.disabled = true;
+
+            const dataObj = {
                 name: document.getElementById('inName').value,
                 class: document.getElementById('inClass').value,
                 contact: document.getElementById('inContact').value,
@@ -133,25 +161,33 @@
                 fees_status: document.getElementById('inStatus').value
             };
 
-            let res;
-            if(currentEditId) {
-                res = await client.from('students').update(row).eq('id', currentEditId);
+            let result;
+            if(editTargetId) {
+                result = await client.from('students').update(dataObj).eq('id', editTargetId);
             } else {
-                res = await client.from('students').insert([row]);
+                result = await client.from('students').insert([dataObj]);
             }
 
-            if(!res.error) {
-                alert("SUCCESS");
-                currentEditId = null;
-                document.getElementById('formTitle').innerText = "NEW ENROLLMENT";
-                document.getElementById('saveBtn').innerText = "SAVE RECORD";
+            if(!result.error) {
+                alert("SUCCESSFUL");
+                resetForm();
                 showTab('dash');
             } else {
-                alert("ERROR: " + res.error.message);
+                alert("DATABASE ERROR: " + result.error.message);
             }
+            btn.innerText = "SAVE TO DATABASE"; btn.disabled = false;
         }
 
-        fetch();
+        function resetForm() {
+            editTargetId = null;
+            document.querySelectorAll('#admission input').forEach(i => i.value = "");
+            document.getElementById('formTitle').innerText = "NEW REGISTRATION";
+            document.getElementById('saveBtn').innerText = "SAVE TO DATABASE";
+            document.getElementById('cancelBtn').style.display = "none";
+        }
+
+        // Initial Load
+        fetchStudents();
     </script>
 </body>
 </html>
