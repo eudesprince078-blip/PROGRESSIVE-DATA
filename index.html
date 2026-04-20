@@ -10,114 +10,55 @@
         :root { --primary: #0047AB; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; }
         * { box-sizing: border-box; text-transform: uppercase; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: #f1f5f9; margin: 0; color: #1e293b; }
-        
-        /* LOGIN SYSTEM */
         #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .login-card { background: white; padding: 35px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; }
-        input, select { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; font-size: 0.85rem; }
-
-        /* BRANDED HEADER */
-        .school-header { background: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; }
-        .school-logo { width: 55px; height: 55px; border-radius: 12px; object-fit: contain; background: #f8fafc; border: 1px solid #eee; }
-        .school-info h2 { margin: 0; font-size: 1.1rem; color: var(--primary); font-weight: 800; }
-
-        .top-nav { background: var(--primary); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.65rem; font-weight: 800; }
-        .tab-bar { background: white; display: flex; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 1000; }
-        .tab { flex: 1; padding: 16px; text-align: center; font-size: 0.6rem; font-weight: 800; color: #64748b; cursor: pointer; transition: 0.3s; }
-        .tab.active { color: var(--primary); border-bottom: 4px solid var(--primary); background: #f8fafc; }
-
-        /* PIPELINE STATS */
-        .pipeline-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
-        .pipe-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-bottom: 4px solid #cbd5e1; }
-        .pipe-card.active-pipe { border-color: var(--primary); }
-        .pipe-card b { display: block; font-size: 1.4rem; color: var(--dark); }
-        .pipe-card span { font-size: 0.5rem; color: #64748b; font-weight: 800; }
-
-        /* DATA TABLE */
-        .container { padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th { text-align: left; font-size: 0.55rem; color: #94a3b8; padding: 12px; background: #f8fafc; }
-        td { padding: 14px 12px; font-size: 0.75rem; font-weight: 700; border-bottom: 1px solid #f1f5f9; }
-        
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.6rem; color: white; }
-        .bg-applied { background: #6366f1; }
-        .bg-interview { background: #f59e0b; }
-        .bg-enrolled { background: #10b981; }
-
-        .btn { padding: 12px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); text-transform: uppercase; }
-        .btn:disabled { opacity: 0.6; }
+        input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; }
+        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; }
+        #main-app { display: none; }
+        .header { background: white; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #ddd; }
+        .logo { width: 50px; height: 50px; border-radius: 8px; object-fit: contain; }
+        .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
+        .step { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .step b { display: block; font-size: 1.2rem; }
+        .step span { font-size: 0.5rem; color: #64748b; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-card">
-            <h1 style="color:var(--primary); margin:0; font-size: 1.6rem;">ESMS AUTHORITY</h1>
-            <p style="font-size: 0.5rem; color: #64748b; font-weight: 800; margin-bottom: 25px;">BY EUDES MEDIA | +256762992440</p>
+            <h2 style="color:var(--primary)">ESMS AUTHORITY</h2>
             <input type="text" id="schIdInput" placeholder="SCHOOL ID">
             <input type="password" id="passInput" placeholder="ACCESS KEY">
-            <button class="btn" id="loginBtn" style="width:100%" onclick="authenticate()">LOG IN</button>
-            <p id="login-err" style="color:var(--danger); font-size:0.7rem; margin-top:15px; display:none; font-weight: 800;"></p>
+            <button class="btn" id="loginBtn" onclick="authenticate()">LOG IN</button>
+            <p id="err" style="color:red; font-size:0.7rem; margin-top:10px; display:none;"></p>
         </div>
     </div>
 
-    <div id="main-app" style="display:none;">
-        <div class="school-header">
-            <img src="" id="displayLogo" class="school-logo" onerror="this.src='https://via.placeholder.com/60?text=LOGO'">
-            <div class="school-info">
-                <h2 id="displayName">---</h2>
-                <div style="font-size:0.5rem; color:#64748b; font-weight:800;">ADMISSIONS & PIPELINE MANAGER</div>
+    <div id="main-app">
+        <div class="header">
+            <img src="" id="schLogo" class="logo">
+            <div>
+                <h3 id="schName" style="margin:0">SCHOOL NAME</h3>
+                <small id="roleDisplay" style="color:var(--primary); font-weight:800;"></small>
             </div>
         </div>
 
-        <div class="top-nav">
-            <div id="displayRole">ACCESS: ---</div>
-            <div id="schoolIdDisplay">ID: ---</div>
+        <div class="pipeline">
+            <div class="step"><b id="c1">0</b><span>APPLIED</span></div>
+            <div class="step"><b id="c2">0</b><span>INTERVIEW</span></div>
+            <div class="step"><b id="c3">0</b><span>PAYMENT</span></div>
+            <div class="step"><b id="c4">0</b><span>ENROLLED</span></div>
         </div>
 
-        <div class="tab-bar">
-            <div class="tab active" id="btn-dash" onclick="showTab('dash')">PIPELINE</div>
-            <div class="tab" id="btn-adm" onclick="showTab('admission')">NEW STUDENT</div>
-            <div class="tab" onclick="location.reload()" style="color:var(--danger)">LOGOUT</div>
-        </div>
-
-        <div id="dash" class="tab-content">
-            <div class="pipeline-grid">
-                <div class="pipe-card"><b>0</b><span id="p-applied">APPLIED</span></div>
-                <div class="pipe-card"><b>0</b><span id="p-interview">INTERVIEW</span></div>
-                <div class="pipe-card"><b>0</b><span id="p-payment">PAYMENT</span></div>
-                <div class="pipe-card" style="border-color:var(--success)"><b>0</b><span id="p-enrolled">ENROLLED</span></div>
-            </div>
-
-            <div class="container">
-                <div class="card">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>NAME</th><th>AGE</th><th>LOCATION</th><th>HEALTH</th><th>STATUS</th><th>CHANGE STATUS</th><th class="admin-only">ACTION</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dashBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="admission" class="tab-content container" style="display:none;">
-            <div class="card">
-                <h3 style="color:var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">STUDENT ENROLLMENT</h3>
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 20px;">
-                    <div><label style="font-size:0.5rem; font-weight:800; color:var(--primary);">FULL NAME</label><input type="text" id="inName"></div>
-                    <div><label style="font-size:0.5rem; font-weight:800; color:var(--primary);">AGE</label><input type="number" id="inAge"></div>
-                    <div><label style="font-size:0.5rem; font-weight:800; color:var(--primary);">DATE OF BIRTH</label><input type="date" id="inDob"></div>
-                    <div><label style="font-size:0.5rem; font-weight:800; color:var(--primary);">LOCATION</label><input type="text" id="inLoc"></div>
-                    <div><label style="font-size:0.5rem; font-weight:800; color:var(--primary);">HEALTH STATUS</label><input type="text" id="inHealth" value="NORMAL"></div>
-                    <div><label style="font-size:0.5rem; font-weight:800; color:var(--primary);">PARENT CONTACT</label><input type="text" id="inContact"></div>
-                    <div><label style="font-size:0.5rem; font-weight:800; color:var(--primary);">FEES EXPECTED</label><input type="number" id="inExp"></div>
-                    <div><label style="font-size:0.5rem; font-weight:800; color:var(--primary);">FEES PAID</label><input type="number" id="inPaid"></div>
-                </div>
-                <button class="btn" style="width:100%; margin-top:25px; padding:18px;" id="saveBtn" onclick="saveStudent()">SUBMIT APPLICATION</button>
+        <div style="padding:20px;">
+            <div style="background:white; border-radius:15px; padding:15px; overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; min-width:600px;">
+                    <thead style="text-align:left; font-size:0.6rem; color:#999;">
+                        <tr><th>NAME</th><th>LOCATION</th><th>STATUS</th></tr>
+                    </thead>
+                    <tbody id="stuBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -127,119 +68,73 @@
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const client = supabase.createClient(_URL, _KEY);
 
-        let activeSchoolId = "";
-        let userRole = "";
+        let activeSID = "";
 
-        // LOGIN (Using "Schools" with capital S)
         async function authenticate() {
-            const sid = document.getElementById('schIdInput').value.trim();
+            const id = document.getElementById('schIdInput').value.trim();
             const key = document.getElementById('passInput').value.trim();
-            const err = document.getElementById('login-err');
+            const errBox = document.getElementById('err');
             const btn = document.getElementById('loginBtn');
 
-            btn.innerText = "AUTHENTICATING..."; btn.disabled = true;
+            btn.innerText = "OPENING...";
+            errBox.style.display = 'none';
 
             try {
-                // FIXED: Changed 'schools' to 'Schools' to match your setup
-                const { data: school, error } = await client.from('Schools').select('*').eq('school_id', sid).maybeSingle();
+                // IMPORTANT: Using 'Schools' with Capital S to match your screenshot
+                const { data: school, error } = await client
+                    .from('Schools') 
+                    .select('*')
+                    .eq('school_id', id)
+                    .maybeSingle();
 
-                if (error) throw new Error("DB ERROR: " + error.message);
+                if (error) throw new Error("DATABASE ERROR");
                 if (!school) throw new Error("ID NOT FOUND");
 
-                if (key === school.admin_key) userRole = "ADMIN";
-                else if (key === school.teacher_key) userRole = "TEACHER";
-                else if (key === school.finance_key) userRole = "FINANCE";
-                else throw new Error("INVALID KEY");
+                let role = "";
+                if (key === school.admin_key) role = "ADMIN";
+                else if (key === school.teacher_key) role = "TEACHER";
+                else if (key === school.finance_key) role = "FINANCE";
+                else throw new Error("WRONG ACCESS KEY");
 
-                activeSchoolId = sid;
+                // Login Success
+                activeSID = id;
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
-                document.getElementById('displayName').innerText = school.school_name;
-                document.getElementById('displayLogo').src = school.logo_url;
-                document.getElementById('displayRole').innerText = "ACCESS: " + userRole;
-                document.getElementById('schoolIdDisplay').innerText = "ID: " + activeSchoolId;
+                document.getElementById('schName').innerText = school.school_name;
+                document.getElementById('schLogo').src = school.logo_url;
+                document.getElementById('roleDisplay').innerText = "ACCESS: " + role;
 
-                loadData();
+                loadStudents();
+
             } catch (e) {
-                err.innerText = e.message;
-                err.style.display = 'block';
-                btn.innerText = "LOG IN"; btn.disabled = false;
+                btn.innerText = "LOG IN";
+                errBox.innerText = e.message;
+                errBox.style.display = 'block';
             }
         }
 
-        async function loadData() {
-            const { data, error } = await client.from('students').select('*').eq('scho_id', activeSchoolId);
+        async function loadStudents() {
+            const { data } = await client.from('students').select('*').eq('scho_id', activeSID);
             const list = data || [];
-            let counts = { APPLIED: 0, INTERVIEW: 0, PAYMENT: 0, ENROLLED: 0 };
+            let a=0, i=0, p=0, e=0;
 
-            document.getElementById('dashBody').innerHTML = list.map(s => {
-                const status = s.status || 'APPLIED';
-                if(counts[status] !== undefined) counts[status]++;
-                
+            document.getElementById('stuBody').innerHTML = list.map(s => {
+                if(s.status === 'APPLIED') a++;
+                if(s.status === 'INTERVIEW') i++;
+                if(s.status === 'PAYMENT') p++;
+                if(s.status === 'ENROLLED') e++;
+
                 return `<tr>
-                    <td>${s.name}</td>
-                    <td>${s.age || '--'}</td>
+                    <td style="padding:10px; font-weight:800;">${s.name}</td>
                     <td>${s.location || '--'}</td>
-                    <td>${s.health_status || '--'}</td>
-                    <td><span class="badge bg-${status.toLowerCase()}">${status}</span></td>
-                    <td>
-                        <select onchange="updateStat('${s.id}', this.value)" style="margin:0; padding:5px; font-size:0.6rem;">
-                            <option value="">CHANGE...</option>
-                            <option value="APPLIED">APPLIED</option>
-                            <option value="INTERVIEW">INTERVIEW</option>
-                            <option value="PAYMENT">PAYMENT</option>
-                            <option value="ENROLLED">ENROLLED</option>
-                        </select>
-                    </td>
-                    <td class="admin-only">${userRole === 'ADMIN' ? `<button onclick="del('${s.id}')" style="color:red; background:none; border:none; cursor:pointer;">DEL</button>` : '--'}</td>
+                    <td><span style="font-size:0.6rem; background:#eee; padding:3px 8px; border-radius:5px;">${s.status || 'NEW'}</span></td>
                 </tr>`;
             }).join('');
 
-            // Update Pipeline Counts
-            document.querySelector('.pipe-card:nth-child(1) b').innerText = counts.APPLIED;
-            document.querySelector('.pipe-card:nth-child(2) b').innerText = counts.INTERVIEW;
-            document.querySelector('.pipe-card:nth-child(3) b').innerText = counts.PAYMENT;
-            document.querySelector('.pipe-card:nth-child(4) b').innerText = counts.ENROLLED;
-        }
-
-        async function updateStat(id, val) {
-            if(!val) return;
-            await client.from('students').update({ status: val }).eq('id', id);
-            loadData();
-        }
-
-        async function saveStudent() {
-            const btn = document.getElementById('saveBtn');
-            btn.innerText = "SAVING..."; btn.disabled = true;
-
-            const payload = {
-                scho_id: activeSchoolId,
-                name: document.getElementById('inName').value,
-                age: document.getElementById('inAge').value,
-                dob: document.getElementById('inDob').value,
-                location: document.getElementById('inLoc').value,
-                health_status: document.getElementById('inHealth').value,
-                contact: document.getElementById('inContact').value,
-                fees_expected: document.getElementById('inExp').value,
-                fees_paid: document.getElementById('inPaid').value,
-                status: 'APPLIED'
-            };
-
-            const { error } = await client.from('students').insert([payload]);
-            if(!error) { alert("SUCCESS"); showTab('dash'); } else { alert(error.message); }
-            btn.innerText = "SUBMIT APPLICATION"; btn.disabled = false;
-        }
-
-        async function del(id) {
-            if(confirm("DELETE?")) { await client.from('students').delete().eq('id', id); loadData(); }
-        }
-
-        function showTab(t) {
-            document.querySelectorAll('.tab-content').forEach(c => c.style.display='none');
-            document.querySelectorAll('.tab').forEach(c => c.classList.remove('active'));
-            document.getElementById(t).style.display = 'block';
-            document.getElementById('btn-' + t).classList.add('active');
-            if(t === 'dash') loadData();
+            document.getElementById('c1').innerText = a;
+            document.getElementById('c2').innerText = i;
+            document.getElementById('c3').innerText = p;
+            document.getElementById('c4').innerText = e;
         }
     </script>
 </body>
