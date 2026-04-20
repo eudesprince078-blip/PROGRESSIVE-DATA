@@ -11,14 +11,16 @@
         * { box-sizing: border-box; text-transform: uppercase; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); margin: 0; color: #1e293b; }
         
-        /* UI Components */
+        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .login-card { background: white; padding: 35px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; outline: none; }
-        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; }
+        input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; outline: none; text-align: center; }
+        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
 
+        /* MAIN APP UI */
         .header { background: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; }
-        .logo { width: 55px; height: 55px; border-radius: 12px; object-fit: contain; }
+        .logo { width: 55px; height: 55px; border-radius: 12px; object-fit: contain; background: #f8fafc; border: 1px solid #eee; }
         
         .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
         .step { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-bottom: 4px solid #cbd5e1; }
@@ -31,8 +33,9 @@
 
         .container { padding: 20px; }
         .card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; overflow-x: auto; padding: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        td, th { padding: 12px; text-align: left; font-size: 0.75rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        td, th { padding: 12px; text-align: left; font-size: 0.7rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; }
+        select { padding: 5px; font-size: 0.6rem; text-transform: uppercase; font-weight: 800; }
     </style>
 </head>
 <body>
@@ -41,19 +44,19 @@
         <div class="login-card">
             <h1 style="color:var(--primary); margin:0;">ESMS AUTHORITY</h1>
             <p style="font-size:0.5rem; color:#64748b; font-weight:800; margin-bottom:20px;">EUDES MEDIA SOLUTIONS</p>
-            <input type="text" id="schIdInput" placeholder="SCHOOL ID (e.g. SCH-001)">
-            <input type="password" id="passInput" placeholder="ACCESS KEY">
-            <button class="btn" onclick="authenticate()">OPEN SYSTEM</button>
+            <input type="text" id="schIdInput" placeholder="SCHOOL ID (PM001)">
+            <input type="password" id="passInput" placeholder="ACCESS KEY (PM2026)">
+            <button class="btn" id="loginBtn" onclick="authenticate()">OPEN SYSTEM</button>
             <p id="err" style="color:red; font-size:0.7rem; margin-top:10px; display:none;"></p>
         </div>
     </div>
 
     <div id="main-app" style="display:none;">
         <div class="header">
-            <img src="" id="schLogo" class="logo" onerror="this.src='https://via.placeholder.com/60'">
+            <img src="" id="schLogo" class="logo" onerror="this.src='https://via.placeholder.com/60?text=LOGO'">
             <div>
-                <h2 id="schName" style="margin:0; font-size: 1.1rem; color: var(--primary);">SCHOOL NAME</h2>
-                <div id="roleDisplay" style="font-size:0.55rem; color:#64748b; font-weight:800;">---</div>
+                <h2 id="schName" style="margin:0; font-size: 1.1rem; color: var(--primary);">---</h2>
+                <div id="roleDisplay" style="font-size:0.55rem; color:#64748b; font-weight:800;">ACCESS: ---</div>
             </div>
         </div>
 
@@ -73,9 +76,7 @@
             <div class="container">
                 <div class="card">
                     <table>
-                        <thead>
-                            <tr><th>NAME</th><th>LOCATION</th><th>HEALTH</th><th>STATUS</th><th>PIPELINE</th></tr>
-                        </thead>
+                        <thead><tr><th>NAME</th><th>LOCATION</th><th>HEALTH</th><th>STATUS</th><th>ACTION</th></tr></thead>
                         <tbody id="stuBody"></tbody>
                     </table>
                 </div>
@@ -84,11 +85,11 @@
 
         <div id="adm" class="tab-content container" style="display:none;">
             <div class="card">
-                <h3 style="color:var(--primary)">NEW STUDENT REGISTRATION</h3>
-                <input type="text" id="nName" placeholder="STUDENT FULL NAME">
-                <input type="text" id="nLoc" placeholder="PHYSICAL LOCATION">
+                <h3 style="color:var(--primary)">NEW ADMISSION</h3>
+                <input type="text" id="nName" placeholder="STUDENT NAME">
+                <input type="text" id="nLoc" placeholder="LOCATION">
                 <input type="text" id="nHealth" placeholder="HEALTH STATUS" value="NORMAL">
-                <button class="btn" onclick="saveStudent()">SUBMIT TO PIPELINE</button>
+                <button class="btn" onclick="saveStudent()">REGISTER STUDENT</button>
             </div>
         </div>
     </div>
@@ -97,30 +98,52 @@
         const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const client = supabase.createClient(_URL, _KEY);
-        let currentSchID = "";
+        let activeID = "";
 
         async function authenticate() {
             const id = document.getElementById('schIdInput').value.trim();
             const key = document.getElementById('passInput').value.trim();
-            
-            // Using your updated 'sch_id' column
-            const { data: school, error } = await client.from('Schools').select('*').eq('sch_id', id).maybeSingle();
+            const btn = document.getElementById('loginBtn');
 
-            if (school && (key === school.admin_key || key === school.teacher_key || key === school.finance_key)) {
-                currentSchID = id;
+            btn.innerText = "VERIFYING...";
+
+            try {
+                // Fetching from 'Schools' table using 'sch_id'
+                const { data: school, error } = await client.from('Schools').select('*').eq('sch_id', id).maybeSingle();
+
+                if (error) throw new Error("DB ERROR: Check Schools Table");
+                if (!school) throw new Error("SCHOOL ID NOT FOUND");
+
+                let role = "";
+                if (key === school.admin_key) role = "ADMIN";
+                else if (key === school.teacher_key) role = "TEACHER";
+                else if (key === school.finance_key) role = "FINANCE";
+                else throw new Error("WRONG ACCESS KEY");
+
+                activeID = id;
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
                 document.getElementById('schName').innerText = school.school_name;
                 document.getElementById('schLogo').src = school.logo_url;
+                document.getElementById('roleDisplay').innerText = "ACCESS: " + role;
+
                 loadData();
-            } else {
-                alert("ACCESS DENIED: CHECK ID OR KEY");
+            } catch (e) {
+                btn.innerText = "OPEN SYSTEM";
+                document.getElementById('err').innerText = e.message;
+                document.getElementById('err').style.display = 'block';
             }
         }
 
         async function loadData() {
-            // Looking for students linked to this sch_id
-            const { data } = await client.from('students').select('*').eq('sch_id', currentSchID);
+            // Load students linked to sch_id
+            const { data, error } = await client.from('students').select('*').eq('sch_id', activeID);
+            
+            if (error) {
+                console.error(error);
+                return;
+            }
+
             const list = data || [];
             let counts = { APPLIED: 0, INTERVIEW: 0, PAYMENT: 0, ENROLLED: 0 };
 
@@ -133,7 +156,7 @@
                     <td>${s.health_status || 'NORMAL'}</td>
                     <td><span style="background:#eef2ff; color:#0047AB; padding:4px 8px; border-radius:5px; font-size:0.6rem;">${st}</span></td>
                     <td>
-                        <select onchange="updateStat('${s.id}', this.value)" style="padding:5px; font-size:0.6rem;">
+                        <select onchange="updateStat('${s.id}', this.value)">
                             <option value="">MOVE...</option>
                             <option value="APPLIED">APPLIED</option>
                             <option value="INTERVIEW">INTERVIEW</option>
@@ -151,24 +174,16 @@
         }
 
         async function saveStudent() {
-            const name = document.getElementById('nName').value;
-            if(!name) return alert("NAME REQUIRED");
-
             const student = {
-                sch_id: currentSchID, // Saving with the new sch_id column name
-                name: name,
+                sch_id: activeID, // Link to school
+                name: document.getElementById('nName').value,
                 location: document.getElementById('nLoc').value,
                 health_status: document.getElementById('nHealth').value,
                 status: 'APPLIED'
             };
-
             const { error } = await client.from('students').insert([student]);
-            if(!error) {
-                alert("SUCCESSFULLY ENROLLED");
-                showTab('dash');
-            } else {
-                alert("ERROR: " + error.message);
-            }
+            if(error) alert("RENAME 'students' COLUMN TO 'sch_id': " + error.message);
+            else showTab('dash');
         }
 
         async function updateStat(id, val) {
