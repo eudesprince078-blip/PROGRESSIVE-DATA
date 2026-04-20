@@ -9,78 +9,98 @@
     <style>
         :root { --primary: #0047AB; --danger: #ef4444; --success: #22c55e; --dark: #0f172a; }
         * { box-sizing: border-box; text-transform: uppercase; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
         
         /* LOGIN SHIELD */
         #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 2px solid #e2e8f0; font-weight: 700; }
+        .login-card { background: white; padding: 35px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+        input, select { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; font-family: inherit; font-size: 0.9rem; }
 
-        /* HEADER & TABS */
-        .school-header { background: white; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; }
-        .school-logo { width: 45px; height: 45px; border-radius: 8px; object-fit: contain; }
+        /* BRANDED HEADER */
+        .school-header { background: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; }
+        .school-logo { width: 55px; height: 55px; border-radius: 12px; object-fit: contain; background: #f8fafc; }
+        .school-info h2 { margin: 0; font-size: 1.1rem; color: var(--primary); font-weight: 800; }
+
+        .top-nav { background: var(--primary); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.65rem; font-weight: 800; }
         .tab-bar { background: white; display: flex; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 1000; }
-        .tab { flex: 1; padding: 15px; text-align: center; font-size: 0.6rem; font-weight: 800; color: #64748b; cursor: pointer; }
-        .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+        .tab { flex: 1; padding: 16px; text-align: center; font-size: 0.65rem; font-weight: 800; color: #64748b; cursor: pointer; transition: 0.3s; }
+        .tab.active { color: var(--primary); border-bottom: 4px solid var(--primary); background: #f8fafc; }
 
-        /* DASHBOARD STATS */
-        .hero { background: var(--dark); color: white; padding: 20px; text-align: center; }
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-top: -15px; }
-        .stat-card { background: white; padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .stat-card b { display: block; font-size: 1.2rem; }
+        /* DASHBOARD HERO */
+        .hero { background: var(--dark); color: white; padding: 30px; text-align: center; border-bottom: 5px solid var(--primary); }
+        #live-clock { font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 20px; margin-top: -20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-bottom: 4px solid #cbd5e1; }
+        .stat-card b { display: block; font-size: 1.4rem; color: var(--dark); }
+        .stat-card span { font-size: 0.55rem; color: #64748b; font-weight: 800; }
 
+        /* DATA TABLE */
         .container { padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; overflow-x: auto; }
+        .card { background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { text-align: left; font-size: 0.6rem; color: #94a3b8; padding: 12px; border-bottom: 2px solid #f1f5f9; }
+        td { padding: 14px 12px; font-size: 0.8rem; font-weight: 700; border-bottom: 1px solid #f1f5f9; }
         
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { text-align: left; font-size: 0.55rem; color: #94a3b8; padding: 10px; }
-        td { padding: 10px; font-size: 0.75rem; font-weight: 700; border-bottom: 1px solid #f1f5f9; }
-        
-        .btn { padding: 10px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); }
+        /* BUTTONS */
+        .btn { padding: 12px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
+        .btn-p { background: var(--success); padding: 6px 12px; font-size: 0.6rem; }
+        .btn-a { background: var(--danger); padding: 6px 12px; font-size: 0.6rem; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-card">
-            <h2 style="color:var(--primary)">SYSTEM ACCESS</h2>
-            <input type="text" id="schIdInput" placeholder="SCHOOL ID (e.g., SCH-101)">
+            <div style="margin-bottom: 20px;">
+                <h1 style="color:var(--primary); margin:0; font-size: 1.8rem;">ESMS HUB</h1>
+                <p style="font-size: 0.6rem; color: #64748b; font-weight: 800; letter-spacing: 1px;">EUDES MEDIA INNOVATION</p>
+            </div>
+            
+            <input type="text" id="schIdInput" placeholder="SCHOOL ID (e.g. SCH-001)">
             <input type="password" id="passInput" placeholder="ACCESS KEY">
-            <button class="btn" style="width:100%" onclick="authenticate()">LOGIN</button>
-            <p id="login-err" style="color:var(--danger); font-size:0.6rem; display:none; margin-top:10px;"></p>
+            
+            <button class="btn" style="width:100%; padding: 16px; font-size: 1rem;" onclick="authenticate()">LOG IN</button>
+            <p id="login-err" style="color:var(--danger); font-size:0.7rem; margin-top:15px; display:none; font-weight: 800;"></p>
         </div>
     </div>
 
     <div id="main-app" style="display:none;">
         <div class="school-header">
-            <img src="" id="displayLogo" class="school-logo" onerror="this.src='https://via.placeholder.com/50'">
-            <div>
-                <h2 id="displayName" style="margin:0; font-size:1rem;">SCHOOL NAME</h2>
-                <div id="displayRole" style="font-size:0.5rem; color:var(--primary); font-weight:800;">ROLE: ---</div>
+            <img src="" id="displayLogo" class="school-logo" onerror="this.src='https://via.placeholder.com/60?text=LOGO'">
+            <div class="school-info">
+                <h2 id="displayName">LOADING...</h2>
+                <div style="font-size:0.55rem; color:#64748b; font-weight:800;">INTEGRATED STUDENT MANAGEMENT</div>
             </div>
         </div>
 
+        <div class="top-nav">
+            <div id="displayRole">ACCESS: ---</div>
+            <div id="schoolIdDisplay">ID: ---</div>
+        </div>
+
         <div class="tab-bar">
-            <div class="tab active" onclick="showTab('dash')">DASHBOARD</div>
-            <div class="tab" id="tab-adm" onclick="showTab('admission')">ADMISSION</div>
+            <div class="tab active" id="btn-dash" onclick="showTab('dash')">DASHBOARD</div>
+            <div class="tab" id="btn-adm" onclick="showTab('admission')">REGISTRATION</div>
             <div class="tab" onclick="location.reload()" style="color:var(--danger)">LOGOUT</div>
         </div>
 
         <div id="dash" class="tab-content">
-            <div class="hero"><h1 id="live-clock" style="margin:0">00:00:00</h1></div>
+            <div class="hero"><h1 id="live-clock">00:00:00</h1></div>
             <div class="stat-grid">
-                <div class="stat-card"><b id="countT">0</b><span>PUPILS</span></div>
+                <div class="stat-card"><b id="countT">0</b><span>STUDENTS</span></div>
                 <div class="stat-card"><b id="countC" style="color:var(--success);">0</b><span>CLEARED</span></div>
                 <div class="stat-card"><b id="countO" style="color:var(--danger);">0</b><span>OWING</span></div>
             </div>
+
             <div class="container">
                 <div class="card">
                     <table>
                         <thead>
                             <tr>
-                                <th>PHOTO</th><th>NAME</th><th>CLASS</th>
-                                <th class="money">EXPECTED</th><th class="money">PAID</th>
-                                <th>STATUS</th><th>ROLLCALL</th><th class="admin-only">ACTION</th>
+                                <th>PHOTO</th><th>NAME</th><th>AGE</th><th>LOCATION</th>
+                                <th class="money-col">EXPECTED</th><th class="money-col">PAID</th>
+                                <th>FEES STATUS</th><th>ROLLCALL</th><th class="admin-only">ACTION</th>
                             </tr>
                         </thead>
                         <tbody id="dashBody"></tbody>
@@ -91,17 +111,18 @@
 
         <div id="admission" class="tab-content container" style="display:none;">
             <div class="card">
-                <h3>NEW ENROLLMENT</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <input type="text" id="inLin" placeholder="LIN">
-                    <input type="text" id="inName" placeholder="FULL NAME">
-                    <input type="text" id="inClass" placeholder="CLASS">
-                    <input type="text" id="inContact" placeholder="CONTACT">
-                    <input type="number" id="inExp" placeholder="TOTAL FEES">
-                    <input type="number" id="inPaid" placeholder="PAID">
-                    <select id="inStatus"><option value="OWING">OWING</option><option value="CLEARED">CLEARED</option></select>
+                <h3 style="margin-top:0; color:var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">STUDENT ENROLLMENT</h3>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <div><label style="font-size:0.6rem; font-weight:800; color:var(--primary);">FULL NAME</label><input type="text" id="inName"></div>
+                    <div><label style="font-size:0.6rem; font-weight:800; color:var(--primary);">AGE</label><input type="number" id="inAge"></div>
+                    <div><label style="font-size:0.6rem; font-weight:800; color:var(--primary);">DATE OF BIRTH</label><input type="date" id="inDob"></div>
+                    <div><label style="font-size:0.6rem; font-weight:800; color:var(--primary);">RESIDENTIAL LOCATION</label><input type="text" id="inLoc"></div>
+                    <div><label style="font-size:0.6rem; font-weight:800; color:var(--primary);">PARENT CONTACT</label><input type="text" id="inContact"></div>
+                    <div><label style="font-size:0.6rem; font-weight:800; color:var(--primary);">HEALTH STATUS</label><input type="text" id="inHealth" placeholder="Normal/Allergy/None"></div>
+                    <div><label style="font-size:0.6rem; font-weight:800; color:var(--primary);">FEES EXPECTED</label><input type="number" id="inExp"></div>
+                    <div><label style="font-size:0.6rem; font-weight:800; color:var(--primary);">FEES PAID</label><input type="number" id="inPaid"></div>
                 </div>
-                <button class="btn" style="width:100%; margin-top:15px;" id="saveBtn" onclick="saveStudent()">SAVE DATA</button>
+                <button class="btn" style="width:100%; margin-top:25px; padding:18px; font-size: 1rem;" id="saveBtn" onclick="saveStudent()">REGISTER STUDENT</button>
             </div>
         </div>
     </div>
@@ -113,80 +134,118 @@
 
         let activeSchoolId = "";
         let userRole = "";
-        let students = [];
+        let studentsList = [];
 
+        // 1. AUTHENTICATION (FIXED TO MATCH YOUR school_id COLUMN)
         async function authenticate() {
-            const schId = document.getElementById('schIdInput').value;
-            const inputKey = document.getElementById('passInput').value;
+            const sid = document.getElementById('schIdInput').value;
+            const key = document.getElementById('passInput').value;
             const err = document.getElementById('login-err');
 
-            const { data: school, error } = await client.from('schools').select('*').eq('school_id', schId).single();
+            const { data: school, error } = await client.from('schools').select('*').eq('school_id', sid).single();
 
             if (error || !school) {
-                err.innerText = "SCHOOL ID NOT FOUND"; err.style.display = 'block'; return;
+                err.innerText = "ERROR: SCHOOL ID NOT FOUND"; err.style.display = 'block'; return;
             }
 
-            if (inputKey === school.admin_key) userRole = "ADMIN";
-            else if (inputKey === school.finance_key) userRole = "FINANCE";
-            else if (inputKey === school.teacher_key) userRole = "TEACHER";
-            else { err.innerText = "INVALID KEY"; err.style.display = 'block'; return; }
+            if (key === school.admin_key) userRole = "ADMIN";
+            else if (key === school.finance_key) userRole = "FINANCE";
+            else if (key === school.teacher_key) userRole = "TEACHER";
+            else { err.innerText = "ERROR: INVALID KEY"; err.style.display = 'block'; return; }
 
-            activeSchoolId = schId;
+            activeSchoolId = sid;
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
             document.getElementById('displayName').innerText = school.school_name;
             document.getElementById('displayLogo').src = school.logo_url;
-            document.getElementById('displayRole').innerText = "ROLE: " + userRole;
+            document.getElementById('displayRole').innerText = "ACCESS: " + userRole;
+            document.getElementById('schoolIdDisplay').innerText = "ID: " + activeSchoolId;
 
             if(userRole === "TEACHER") {
-                document.querySelectorAll('.money').forEach(e => e.style.display = 'none');
-                document.getElementById('tab-adm').style.display = 'none';
+                document.querySelectorAll('.money-col').forEach(e => e.style.display = 'none');
+                document.getElementById('btn-adm').style.display = 'none';
             }
             loadData();
         }
 
+        // 2. LOAD FILTERED DATA
         async function loadData() {
             const { data } = await client.from('students').select('*').eq('scho_id', activeSchoolId).order('name');
-            students = data || [];
+            studentsList = data || [];
             let t=0, c=0, o=0;
-            document.getElementById('dashBody').innerHTML = students.map(s => {
-                t++; s.fees_status === 'CLEARED' ? c++ : o++;
+
+            document.getElementById('dashBody').innerHTML = studentsList.map(s => {
+                t++; 
+                const isCleared = (Number(s.fees_paid) >= Number(s.fees_expected));
+                isCleared ? c++ : o++;
+                
                 return `<tr>
-                    <td><img src="${s.photo_url || ''}" style="width:35px;height:35px;border-radius:4px;" onerror="this.src='https://via.placeholder.com/35'"></td>
-                    <td>${s.name}</td><td>${s.class}</td>
-                    ${userRole !== 'TEACHER' ? `<td>${s.fees_expected}</td><td>${s.fees_paid}</td>` : ''}
-                    <td style="color:${s.fees_status === 'CLEARED' ? 'green' : 'red'}">${s.fees_status}</td>
-                    <td><button onclick="mark('${s.id}','P')">P</button> <button onclick="mark('${s.id}','A')">A</button></td>
-                    <td class="admin-only">${userRole==='ADMIN' ? `<button onclick="del('${s.id}')">DEL</button>` : '--'}</td>
+                    <td><img src="${s.photo_url || ''}" class="stu-img" onerror="this.src='https://via.placeholder.com/40'"></td>
+                    <td>${s.name}</td>
+                    <td>${s.age || '--'}</td>
+                    <td>${s.location || '--'}</td>
+                    ${userRole !== 'TEACHER' ? `<td>${(s.fees_expected || 0).toLocaleString()}</td><td>${(s.fees_paid || 0).toLocaleString()}</td>` : ''}
+                    <td style="color:${isCleared ? 'green' : 'red'}">${isCleared ? 'CLEARED' : 'OWING'}</td>
+                    <td>
+                        <button class="btn btn-p" onclick="markAttendance('${s.id}','PRESENT')">P</button>
+                        <button class="btn btn-a" onclick="markAttendance('${s.id}','ABSENT')">A</button>
+                    </td>
+                    <td class="admin-only">${userRole === 'ADMIN' ? `<button onclick="deleteRecord('${s.id}')" style="background:none;border:none;color:red;cursor:pointer;">DEL</button>` : '--'}</td>
                 </tr>`;
             }).join('');
+
             document.getElementById('countT').innerText = t;
             document.getElementById('countC').innerText = c;
             document.getElementById('countO').innerText = o;
         }
 
+        // 3. SAVE STUDENT (WITH ALL FIELDS)
         async function saveStudent() {
             const btn = document.getElementById('saveBtn');
-            btn.innerText = "SAVING..."; btn.disabled = true;
-            const obj = {
+            btn.innerText = "PROCESSING..."; btn.disabled = true;
+
+            const payload = {
                 scho_id: activeSchoolId,
-                lin: document.getElementById('inLin').value,
                 name: document.getElementById('inName').value,
-                class: document.getElementById('inClass').value,
+                age: document.getElementById('inAge').value,
+                dob: document.getElementById('inDob').value,
+                location: document.getElementById('inLoc').value,
                 contact: document.getElementById('inContact').value,
+                health_status: document.getElementById('inHealth').value,
                 fees_expected: document.getElementById('inExp').value,
-                fees_paid: document.getElementById('inPaid').value,
-                fees_status: document.getElementById('inStatus').value
+                fees_paid: document.getElementById('inPaid').value
             };
-            const { error } = await client.from('students').insert([obj]);
-            if(!error) { alert("SUCCESS"); showTab('dash'); } else { alert("ERROR: " + error.message); }
-            btn.innerText = "SAVE DATA"; btn.disabled = false;
+
+            const { error } = await client.from('students').insert([payload]);
+            if(!error) {
+                alert("SUCCESS: STUDENT REGISTERED");
+                showTab('dash');
+                // Clear fields
+                document.querySelectorAll('#admission input').forEach(i => i.value = "");
+            } else {
+                alert("ERROR: " + error.message);
+            }
+            btn.innerText = "REGISTER STUDENT"; btn.disabled = false;
+        }
+
+        async function markAttendance(id, status) {
+            await client.from('students').update({ attendance: status }).eq('id', id);
+            loadData();
+        }
+
+        async function deleteRecord(id) {
+            if(confirm("DELETE PERMANENTLY?")) {
+                await client.from('students').delete().eq('id', id);
+                loadData();
+            }
         }
 
         function showTab(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.style.display='none');
-            document.getElementById(t).style.display='block';
-            if(t==='dash') loadData();
+            document.querySelectorAll('.tab').forEach(c => c.classList.remove('active'));
+            document.getElementById(t).style.display = 'block';
+            document.getElementById('btn-' + t).classList.add('active');
+            if(t === 'dash') loadData();
         }
 
         setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString(); }, 1000);
