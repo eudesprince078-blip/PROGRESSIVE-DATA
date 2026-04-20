@@ -1,98 +1,190 @@
-<script>
-    const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
-    const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-    const client = supabase.createClient(_URL, _KEY);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ESMS AUTHORITY | EUDES MEDIA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #0047AB; --bg: #f8fafc; --dark: #0f172a; }
+        * { box-sizing: border-box; text-transform: uppercase; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); margin: 0; color: #1e293b; }
+        
+        /* UI Components */
+        #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { background: white; padding: 35px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; outline: none; }
+        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; }
 
-    let activeSID = "";
+        .header { background: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; }
+        .logo { width: 55px; height: 55px; border-radius: 12px; object-fit: contain; }
+        
+        .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
+        .step { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-bottom: 4px solid #cbd5e1; }
+        .step b { display: block; font-size: 1.4rem; color: var(--dark); }
+        .step span { font-size: 0.5rem; color: #64748b; font-weight: 800; }
 
-    async function authenticate() {
-        const inputID = document.getElementById('schIdInput').value.trim();
-        const inputKey = document.getElementById('passInput').value.trim();
-        const btn = document.getElementById('loginBtn');
-        const errBox = document.getElementById('err');
+        .tab-bar { background: white; display: flex; border-bottom: 2px solid #e2e8f0; }
+        .tab { flex: 1; padding: 16px; text-align: center; font-size: 0.6rem; font-weight: 800; color: #64748b; cursor: pointer; }
+        .tab.active { color: var(--primary); border-bottom: 4px solid var(--primary); }
 
-        btn.innerText = "CONNECTING...";
-        errBox.style.display = 'none';
+        .container { padding: 20px; }
+        .card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; overflow-x: auto; padding: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        td, th { padding: 12px; text-align: left; font-size: 0.75rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; }
+    </style>
+</head>
+<body>
 
-        try {
-            // STEP 1: Fetch all rows from the Schools table
-            const { data: allSchools, error } = await client.from('Schools').select('*');
+    <div id="login-screen">
+        <div class="login-card">
+            <h1 style="color:var(--primary); margin:0;">ESMS AUTHORITY</h1>
+            <p style="font-size:0.5rem; color:#64748b; font-weight:800; margin-bottom:20px;">EUDES MEDIA SOLUTIONS</p>
+            <input type="text" id="schIdInput" placeholder="SCHOOL ID (e.g. SCH-001)">
+            <input type="password" id="passInput" placeholder="ACCESS KEY">
+            <button class="btn" onclick="authenticate()">OPEN SYSTEM</button>
+            <p id="err" style="color:red; font-size:0.7rem; margin-top:10px; display:none;"></p>
+        </div>
+    </div>
 
-            if (error) {
-                console.error("Supabase Error:", error);
-                throw new Error("DATABASE REJECTED CONNECTION");
-            }
+    <div id="main-app" style="display:none;">
+        <div class="header">
+            <img src="" id="schLogo" class="logo" onerror="this.src='https://via.placeholder.com/60'">
+            <div>
+                <h2 id="schName" style="margin:0; font-size: 1.1rem; color: var(--primary);">SCHOOL NAME</h2>
+                <div id="roleDisplay" style="font-size:0.55rem; color:#64748b; font-weight:800;">---</div>
+            </div>
+        </div>
 
-            if (!allSchools || allSchools.length === 0) {
-                throw new Error("NO SCHOOLS FOUND IN DATABASE");
-            }
+        <div class="tab-bar">
+            <div class="tab active" id="t1" onclick="showTab('dash')">PIPELINE</div>
+            <div class="tab" id="t2" onclick="showTab('adm')">ENROLLMENT</div>
+            <div class="tab" onclick="location.reload()" style="color:red">LOGOUT</div>
+        </div>
 
-            // STEP 2: Manually find the school by checking every possible column name
-            // This bypasses the "Column sch_id does not exist" error
-            const school = allSchools.find(s => 
-                s.sch_id === inputID || 
-                s.school_id === inputID || 
-                s.Sch_ID === inputID
-            );
+        <div id="dash" class="tab-content">
+            <div class="pipeline">
+                <div class="step"><b id="c1">0</b><span>APPLIED</span></div>
+                <div class="step"><b id="c2">0</b><span>INTERVIEW</span></div>
+                <div class="step"><b id="c3">0</b><span>PAYMENT</span></div>
+                <div class="step" style="border-color:var(--primary)"><b id="c4">0</b><span>ENROLLED</span></div>
+            </div>
+            <div class="container">
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr><th>NAME</th><th>LOCATION</th><th>HEALTH</th><th>STATUS</th><th>PIPELINE</th></tr>
+                        </thead>
+                        <tbody id="stuBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-            if (!school) {
-                throw new Error("INVALID SCHOOL ID");
-            }
+        <div id="adm" class="tab-content container" style="display:none;">
+            <div class="card">
+                <h3 style="color:var(--primary)">NEW STUDENT REGISTRATION</h3>
+                <input type="text" id="nName" placeholder="STUDENT FULL NAME">
+                <input type="text" id="nLoc" placeholder="PHYSICAL LOCATION">
+                <input type="text" id="nHealth" placeholder="HEALTH STATUS" value="NORMAL">
+                <button class="btn" onclick="saveStudent()">SUBMIT TO PIPELINE</button>
+            </div>
+        </div>
+    </div>
 
-            // STEP 3: Verify the Access Key
-            let userRole = "";
-            if (inputKey === school.admin_key) userRole = "ADMIN";
-            else if (inputKey === school.teacher_key) userRole = "TEACHER";
-            else if (inputKey === school.finance_key) userRole = "FINANCE";
-            else throw new Error("WRONG ACCESS KEY");
+    <script>
+        const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
+        const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
+        const client = supabase.createClient(_URL, _KEY);
+        let currentSchID = "";
 
-            // SUCCESS: Launch the App
-            activeSID = inputID;
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
+        async function authenticate() {
+            const id = document.getElementById('schIdInput').value.trim();
+            const key = document.getElementById('passInput').value.trim();
             
-            document.getElementById('schName').innerText = school.school_name || "SCHOOL DASHBOARD";
-            document.getElementById('schLogo').src = school.logo_url || "";
-            document.getElementById('roleDisplay').innerText = "ACCESS: " + userRole;
+            // Using your updated 'sch_id' column
+            const { data: school, error } = await client.from('Schools').select('*').eq('sch_id', id).maybeSingle();
 
-            loadData();
-
-        } catch (e) {
-            btn.innerText = "OPEN SYSTEM";
-            errBox.innerText = e.message;
-            errBox.style.display = 'block';
-            console.log("Login Failed:", e.message);
+            if (school && (key === school.admin_key || key === school.teacher_key || key === school.finance_key)) {
+                currentSchID = id;
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('schName').innerText = school.school_name;
+                document.getElementById('schLogo').src = school.logo_url;
+                loadData();
+            } else {
+                alert("ACCESS DENIED: CHECK ID OR KEY");
+            }
         }
-    }
 
-    async function loadData() {
-        try {
-            const { data, error } = await client
-                .from('students')
-                .select('*')
-                .eq('scho_id', activeSID);
-
-            if (error) throw error;
-
+        async function loadData() {
+            // Looking for students linked to this sch_id
+            const { data } = await client.from('students').select('*').eq('sch_id', currentSchID);
             const list = data || [];
-            let c = { APPLIED: 0, INTERVIEW: 0, PAYMENT: 0, ENROLLED: 0 };
+            let counts = { APPLIED: 0, INTERVIEW: 0, PAYMENT: 0, ENROLLED: 0 };
 
             document.getElementById('stuBody').innerHTML = list.map(s => {
-                const stat = s.status || 'APPLIED';
-                if(c[stat] !== undefined) c[stat]++;
+                const st = s.status || 'APPLIED';
+                if(counts[st] !== undefined) counts[st]++;
                 return `<tr>
-                    <td style="padding:15px; font-weight:800; border-bottom:1px solid #eee;">${s.name}</td>
-                    <td style="border-bottom:1px solid #eee;"><span style="background:#eef2ff; color:#0047AB; padding:4px 8px; border-radius:5px; font-size:0.6rem;">${stat}</span></td>
+                    <td>${s.name}</td>
+                    <td>${s.location || '--'}</td>
+                    <td>${s.health_status || 'NORMAL'}</td>
+                    <td><span style="background:#eef2ff; color:#0047AB; padding:4px 8px; border-radius:5px; font-size:0.6rem;">${st}</span></td>
+                    <td>
+                        <select onchange="updateStat('${s.id}', this.value)" style="padding:5px; font-size:0.6rem;">
+                            <option value="">MOVE...</option>
+                            <option value="APPLIED">APPLIED</option>
+                            <option value="INTERVIEW">INTERVIEW</option>
+                            <option value="PAYMENT">PAYMENT</option>
+                            <option value="ENROLLED">ENROLLED</option>
+                        </select>
+                    </td>
                 </tr>`;
             }).join('');
 
-            document.getElementById('c1').innerText = c.APPLIED;
-            document.getElementById('c2').innerText = c.INTERVIEW;
-            document.getElementById('c3').innerText = c.PAYMENT;
-            document.getElementById('c4').innerText = c.ENROLLED;
-
-        } catch (err) {
-            console.log("Data Load Error:", err.message);
+            document.getElementById('c1').innerText = counts.APPLIED;
+            document.getElementById('c2').innerText = counts.INTERVIEW;
+            document.getElementById('c3').innerText = counts.PAYMENT;
+            document.getElementById('c4').innerText = counts.ENROLLED;
         }
-    }
-</script>
+
+        async function saveStudent() {
+            const name = document.getElementById('nName').value;
+            if(!name) return alert("NAME REQUIRED");
+
+            const student = {
+                sch_id: currentSchID, // Saving with the new sch_id column name
+                name: name,
+                location: document.getElementById('nLoc').value,
+                health_status: document.getElementById('nHealth').value,
+                status: 'APPLIED'
+            };
+
+            const { error } = await client.from('students').insert([student]);
+            if(!error) {
+                alert("SUCCESSFULLY ENROLLED");
+                showTab('dash');
+            } else {
+                alert("ERROR: " + error.message);
+            }
+        }
+
+        async function updateStat(id, val) {
+            if(val) {
+                await client.from('students').update({ status: val }).eq('id', id);
+                loadData();
+            }
+        }
+
+        function showTab(t) {
+            document.getElementById('dash').style.display = t === 'dash' ? 'block' : 'none';
+            document.getElementById('adm').style.display = t === 'adm' ? 'block' : 'none';
+            document.getElementById('t1').classList.toggle('active', t === 'dash');
+            document.getElementById('t2').classList.toggle('active', t === 'adm');
+            if(t === 'dash') loadData();
+        }
+    </script>
+</body>
+</html>
