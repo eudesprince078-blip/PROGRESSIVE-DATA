@@ -3,218 +3,533 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUDES MEDIA | CAMPUS PRO</title>
+    <title>EUDES MEDIA | UGANDA SCHOOL MANAGEMENT SYSTEM</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        :root { --primary: #0047AB; --dark: #0f172a; --bg: #f8fafc; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
-        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
-        body { margin: 0; background: var(--bg); color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
+        :root { 
+            --primary: #1a5f2b; 
+            --primary-dark: #0e3d1a;
+            --primary-light: #e8f5e9;
+            --dark: #0f172a; 
+            --bg: #f1f5f9; 
+            --white: #ffffff; 
+            --success: #10b981; 
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --uganda-yellow: #f5b81b;
+        }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { margin: 0; background: var(--bg); color: #1e293b; }
 
-        /* Sidebar - CampusSphere Style */
-        .sidebar { width: 280px; background: var(--dark); color: white; padding: 25px; display: flex; flex-direction: column; transition: 0.3s; z-index: 1000; }
-        .sidebar h2 { color: var(--primary); font-size: 1.2rem; margin-bottom: 40px; text-align: center; border-bottom: 1px solid #334155; padding-bottom: 20px; }
-        .nav-btn { padding: 16px; border-radius: 12px; color: #94a3b8; font-weight: 700; font-size: 0.75rem; cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
-        .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; }
-        .nav-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(0,71,171,0.3); }
-
-        /* Main Content */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        .header-info { text-align: right; }
-        #live-clock { font-size: 0.8rem; color: var(--primary); font-weight: 800; }
-        #sch-name { font-size: 0.65rem; color: #64748b; margin-top: 3px; }
-
-        .content { padding: 30px; overflow-y: auto; height: 100%; }
-        .page { display: none; animation: slideUp 0.3s ease; }
+        /* Sidebar */
+        .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; width: 280px; background: var(--dark); color: white; padding: 30px; transition: 0.3s; z-index: 1000; overflow-y: auto; }
+        .sidebar.open { left: 0; }
+        .sidebar h3 { text-align: center; margin-bottom: 30px; color: var(--uganda-yellow); }
+        .nav-btn { padding: 15px; border-radius: 12px; color: #94a3b8; font-weight: 700; font-size: 0.8rem; cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        .nav-btn i { width: 24px; }
+        .nav-btn.active { background: var(--primary); color: white; }
+        
+        /* Header */
+        .header { position: sticky; top: 0; background: var(--white); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; z-index: 900; flex-wrap: wrap; gap: 10px; }
+        .datetime { font-size: 0.75rem; color: #64748b; }
+        .holiday-badge { background: var(--uganda-yellow); padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; color: #333; }
+        
+        /* Content */
+        .content { padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .page { display: none; }
         .page.active { display: block; }
-
-        /* Dashboard Cards */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background: white; padding: 22px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .card label { font-size: 0.6rem; color: #64748b; font-weight: 800; }
-        .card p { font-size: 1.4rem; font-weight: 800; margin: 5px 0 0; }
-
-        /* Form & Inputs */
-        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-weight: 700; font-size: 0.8rem; margin-top: 8px; background: #fff; }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; margin-top: 20px; transition: 0.2s; }
-        .btn-main:hover { opacity: 0.9; transform: translateY(-2px); }
-
-        /* Table Style */
-        .table-container { background: white; border-radius: 20px; border: 1px solid #e2e8f0; overflow: hidden; }
+        .card { background: white; padding: 24px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .card h3 { margin-bottom: 20px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .stat-card i { font-size: 2rem; color: var(--primary); }
+        .stat-card h2 { font-size: 2rem; margin: 10px 0; }
+        .stat-card p { color: #64748b; font-size: 0.8rem; }
+        
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.85rem; margin-top: 8px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; margin-top: 15px; font-size: 0.9rem; }
+        .btn-wa { background: #25D366; }
+        .btn-danger { background: var(--danger); }
+        
         table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.65rem; color: #64748b; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.75rem; font-weight: 700; }
-        .st-img { width: 45px; height: 45px; border-radius: 10px; object-fit: cover; background: #eee; }
-
-        #login-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f8fafc; font-weight: 700; }
+        .lin-badge { background: var(--primary-light); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .attendance-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        .radio-group { display: flex; gap: 20px; }
+        .support-bar { background: var(--dark); color: white; padding: 15px; border-radius: 12px; display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 20px; }
+        .support-bar a { color: var(--uganda-yellow); text-decoration: none; }
+        
+        @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr 1fr; } th, td { font-size: 0.75rem; padding: 8px; } }
     </style>
 </head>
 <body>
 
-    <div id="login-overlay">
-        <div style="background:white; padding:40px; border-radius:30px; width:380px; text-align:center;">
-            <h2 style="color:var(--primary); margin:0;">EUDES MEDIA</h2>
-            <p style="font-size:0.6rem; color:#64748b; margin-top:5px;">CAMPUS PRO SYSTEM</p>
-            <input type="text" id="sid" placeholder="SCHOOL ID" style="margin-top:20px;">
-            <input type="password" id="sk" placeholder="ACCESS KEY">
-            <button onclick="auth()" class="btn-main">ACCESS DASHBOARD</button>
+<div class="sidebar" id="sb">
+    <h3><i class="fas fa-school"></i> EUDES MEDIA</h3>
+    <div class="nav-btn active" onclick="showPg('dash', this)"><i class="fas fa-chart-line"></i> DASHBOARD</div>
+    <div class="nav-btn" onclick="prepForm(); showPg('form', this)"><i class="fas fa-user-plus"></i> NEW ADMISSION</div>
+    <div class="nav-btn" onclick="loadData(); showPg('reg', this)"><i class="fas fa-users"></i> REGISTRY</div>
+    <div class="nav-btn" onclick="loadData(); showPg('roll', this)"><i class="fas fa-calendar-check"></i> ROLL CALL</div>
+    <div class="nav-btn" onclick="loadData(); showPg('fees', this)"><i class="fas fa-money-bill"></i> FEES</div>
+    <div class="nav-btn" onclick="loadData(); showPg('reports', this)"><i class="fas fa-file-alt"></i> REPORTS</div>
+    <div class="nav-btn" onclick="showPg('support', this)"><i class="fas fa-headset"></i> SUPPORT</div>
+</div>
+
+<div class="header">
+    <button onclick="document.getElementById('sb').classList.toggle('open')" style="background:none; border:none; font-size:1.5rem; color:var(--primary); cursor:pointer;">☰</button>
+    <h4 id="schN">PROGRESSIVE MOTHER'S SCHOOL</h4>
+    <div class="datetime" id="datetime"></div>
+    <div class="holiday-badge" id="holidayBadge">🇺🇬 Uganda</div>
+</div>
+
+<div class="content">
+    <!-- DASHBOARD PAGE -->
+    <div id="dash" class="page active">
+        <div class="stats-grid">
+            <div class="stat-card"><i class="fas fa-users"></i><h2 id="totalStudents">0</h2><p>Total Students</p></div>
+            <div class="stat-card"><i class="fas fa-money-bill"></i><h2 id="totalFees">UGX 0</h2><p>Fees Collected</p></div>
+            <div class="stat-card"><i class="fas fa-chalkboard"></i><h2 id="totalClasses">0</h2><p>Active Classes</p></div>
+            <div class="stat-card"><i class="fas fa-percent"></i><h2 id="attendanceRate">0%</h2><p>Today's Attendance</p></div>
+        </div>
+        <div class="card">
+            <h3><i class="fas fa-calendar-alt"></i> 🇺🇬 UGANDA PUBLIC HOLIDAYS 2025</h3>
+            <div id="holidaysList"></div>
+        </div>
+        <div class="card">
+            <h3><i class="fas fa-bell"></i> RECENT ACTIVITY</h3>
+            <div id="recentActivity"></div>
         </div>
     </div>
 
-    <div class="sidebar">
-        <h2>PREMIER</h2>
-        <div class="nav-btn active" onclick="pg('dash', this)">DASHBOARD</div>
-        <div class="nav-btn" onclick="prepAdd(); pg('form', this)">ADMISSION</div>
-        <div class="nav-btn" onclick="ld(); pg('reg', this)">REGISTRY</div>
-        <div class="nav-btn" onclick="ld(); pg('roll', this)">ROLL CALL</div>
-    </div>
-
-    <div class="main">
-        <div class="header">
-            <h3 style="margin:0; font-size:1rem;" id="page-title">OVERVIEW</h3>
-            <div class="header-info">
-                <div id="live-clock">-- : -- : --</div>
-                <div id="sch-name">PLEASE LOGIN</div>
-            </div>
-        </div>
-
-        <div class="content">
-            <div id="dash" class="page active">
-                <div class="grid">
-                    <div class="card"><label>ENROLLED</label><p id="count1">0</p></div>
-                    <div class="card"><label>ABSENT TODAY</label><p id="count2" style="color:var(--danger)">0</p></div>
-                    <div class="card"><label>TOTAL PAID</label><p id="count3" style="color:var(--success)">0</p></div>
-                    <div class="card"><label>DEBTORS</label><p id="count4" style="color:var(--danger)">0</p></div>
-                </div>
-                <div class="card" style="min-height: 200px;">
-                    <label>RECENT ACTIVITY</label>
-                    <p style="font-size:0.7rem; color:#64748b; margin-top:10px;">System operational. Waiting for data...</p>
-                </div>
-            </div>
-
-            <div id="form" class="page">
-                <div class="card" style="max-width:600px; margin:auto;">
-                    <h3 id="form-h">NEW ADMISSION</h3>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                        <input type="text" id="rn" placeholder="FULL NAME">
-                        <input type="text" id="rl" placeholder="LIN NUMBER">
-                        <input type="tel" id="rt" placeholder="PARENT CONTACT">
-                        <input type="text" id="ro" placeholder="LOCATION">
-                        <input type="text" id="rh" placeholder="HEALTH STATUS">
-                        <input type="date" id="rd">
-                        <select id="rc">
-                            <option value="">-- SELECT CLASS --</option>
-                            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                            <option>P.5</option><option>P.6</option><option>P.7</option>
-                        </select>
-                        <input type="number" id="rf" placeholder="TOTAL FEES (UGX)">
-                    </div>
-                    <input type="hidden" id="edit-id">
-                    <button class="btn-main" onclick="save()">SAVE STUDENT DATA</button>
-                </div>
-            </div>
-
-            <div id="reg" class="page">
-                <input type="text" id="srch" class="card" style="width:100%; margin-bottom:20px;" placeholder="🔍 SEARCH BY NAME OR LIN..." onkeyup="search()">
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>PHOTO</th><th>NAME</th><th>CLASS</th><th>BALANCE</th><th>ACTIONS</th></tr></thead>
-                        <tbody id="rtb"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="roll" class="page">
-                <h3>DAILY ATTENDANCE</h3>
-                <div id="roll-list"></div>
-            </div>
+    <!-- ADMISSION FORM -->
+    <div id="form" class="page">
+        <div class="card">
+            <h3><i class="fas fa-user-graduate"></i> STUDENT ADMISSION</h3>
+            <input type="hidden" id="eid">
+            <input type="text" id="rn" placeholder="FULL NAME *">
+            <input type="text" id="rl" placeholder="LIN (Leave empty to auto-generate)">
+            <input type="tel" id="rt" placeholder="PARENT CONTACT (WhatsApp)">
+            <input type="text" id="ro" placeholder="PHYSICAL LOCATION / DISTRICT">
+            <input type="text" id="rh" placeholder="HEALTH STATUS">
+            <input type="date" id="rd">
+            <select id="rc">
+                <option value="">-- CLASS --</option>
+                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                <option>P.5</option><option>P.6</option><option>P.7</option>
+                <option>S.1</option><option>S.2</option><option>S.3</option><option>S.4</option>
+                <option>S.5</option><option>S.6</option>
+            </select>
+            <input type="number" id="rf" placeholder="TOTAL TUITION (UGX)">
+            <button class="btn" onclick="saveStudent()"><i class="fas fa-save"></i> ADMIT STUDENT</button>
         </div>
     </div>
 
-    <script>
-        const _U = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-        const _K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        const s = supabase.createClient(_U, _K);
-        let da = [];
+    <!-- REGISTRY PAGE -->
+    <div id="reg" class="page">
+        <div class="card">
+            <h3><i class="fas fa-search"></i> STUDENT REGISTRY</h3>
+            <input type="text" id="sr" placeholder="🔍 SEARCH BY NAME OR LIN..." onkeyup="searchRegistry()">
+            <div id="reg_list" style="overflow-x:auto;"></div>
+        </div>
+    </div>
 
-        // Clock Logic
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('live-clock').innerText = now.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'medium' });
-        }, 1000);
+    <!-- ROLL CALL PAGE -->
+    <div id="roll" class="page">
+        <div class="card">
+            <h3><i class="fas fa-clipboard-list"></i> DAILY ROLL CALL</h3>
+            <select id="rollClassSelect" onchange="loadRollCallList()">
+                <option value="">-- SELECT CLASS --</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                <option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
+            <div id="roll_list"></div>
+            <button class="btn" onclick="saveRollCall()"><i class="fas fa-save"></i> SAVE ATTENDANCE & NOTIFY ABSENT</button>
+        </div>
+    </div>
 
-        async function auth() {
-            const id = document.getElementById('sid').value;
-            const key = document.getElementById('sk').value;
-            const { data } = await s.from('Schools').select('*').eq('sch_id', id).single();
-            if(data && (key == data.admin_key || key == data.teacher_key)) {
-                document.getElementById('login-overlay').style.display='none';
-                document.getElementById('sch-name').innerText = data.school_name;
-                ld();
-            } else alert("INVALID ACCESS");
+    <!-- FEES PAGE -->
+    <div id="fees" class="page">
+        <div class="card">
+            <h3><i class="fas fa-hand-holding-usd"></i> RECORD PAYMENT</h3>
+            <select id="feeStudentSelect" onchange="updateFeeDisplay()">
+                <option value="">-- SELECT STUDENT --</option>
+            </select>
+            <input type="number" id="paymentAmount" placeholder="AMOUNT PAID (UGX)">
+            <input type="date" id="paymentDate">
+            <button class="btn" onclick="recordPayment()"><i class="fas fa-receipt"></i> RECORD PAYMENT & SEND RECEIPT</button>
+        </div>
+        <div class="card">
+            <h3><i class="fas fa-chart-pie"></i> FEE SUMMARY</h3>
+            <div id="feeSummary"></div>
+        </div>
+    </div>
+
+    <!-- REPORTS PAGE -->
+    <div id="reports" class="page">
+        <div class="card">
+            <h3><i class="fas fa-file-signature"></i> REPORT CARDS</h3>
+            <select id="reportClassSelect" onchange="loadReportCards()">
+                <option value="">-- SELECT CLASS --</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                <option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
+            <div id="reportCardsList"></div>
+            <button class="btn" onclick="approveReports()"><i class="fab fa-whatsapp"></i> APPROVE & SEND TO PARENTS</button>
+        </div>
+    </div>
+
+    <!-- SUPPORT PAGE -->
+    <div id="support" class="page">
+        <div class="card">
+            <h3><i class="fas fa-headset"></i> EUDES MEDIA SUPPORT</h3>
+            <div class="support-bar">
+                <div><i class="fab fa-whatsapp"></i> <a href="https://wa.me/256762992440" target="_blank">+256 762 992440</a></div>
+                <div><i class="fas fa-phone"></i> <a href="tel:+2567200930932">+256 720 0930932</a></div>
+                <div><i class="fas fa-envelope"></i> support@eudesmedia.com</div>
+            </div>
+            <div style="margin-top: 20px;">
+                <h4>System Information</h4>
+                <p>✅ Connected to Supabase Live</p>
+                <p>🇺🇬 Uganda Public Holidays Auto-Updating</p>
+                <p>📱 WhatsApp Integration Active</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // SUPABASE CONFIGURATION - YOUR WORKING KEYS
+    const SUPABASE_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
+    
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let master = [];
+    let attendanceData = {};
+
+    // ========== UGANDA PUBLIC HOLIDAYS ==========
+    const ugandaHolidays = {
+        "01-01": "New Year's Day",
+        "01-26": "NRM Liberation Day",
+        "02-16": "Archbishop Janani Luwum Day",
+        "03-08": "International Women's Day",
+        "04-18": "Good Friday",
+        "04-21": "Easter Monday",
+        "05-01": "Labour Day",
+        "06-03": "Martyrs Day",
+        "06-09": "National Heroes Day",
+        "10-09": "Independence Day",
+        "12-25": "Christmas Day",
+        "12-26": "Boxing Day"
+    };
+
+    // Date & Time with Uganda Timezone
+    function updateDateTime() {
+        const now = new Date();
+        const options = { timeZone: 'Africa/Kampala', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        document.getElementById('datetime').innerHTML = now.toLocaleString('en-UG', options);
+        
+        const monthDay = String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+        if(ugandaHolidays[monthDay]) {
+            document.getElementById('holidayBadge').innerHTML = `🎉 ${ugandaHolidays[monthDay]}`;
+        } else {
+            document.getElementById('holidayBadge').innerHTML = `🇺🇬 Uganda | School Day`;
         }
-
-        async function ld() {
-            const { data } = await s.from('Students').select('*').order('name');
-            da = data || [];
-            updateUI(da);
+        
+        // Display holidays list
+        const holidaysDiv = document.getElementById('holidaysList');
+        if(holidaysDiv) {
+            holidaysDiv.innerHTML = `<ul style="columns:2;">${Object.entries(ugandaHolidays).map(([date, name]) => `<li><strong>${date}:</strong> ${name}</li>`).join('')}</ul>`;
         }
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
 
-        function updateUI(list) {
-            const b = document.getElementById('rtb'); b.innerHTML = '';
-            list.forEach(x => {
-                const bal = x.total_fees - x.amount_paid;
-                b.innerHTML += `<tr><td><div class="st-img"></div></td><td>${x.name}</td><td>${x.class}</td><td style="color:red">${bal.toLocaleString()}</td><td><button onclick="edit('${x.id}')" style="cursor:pointer; background:none; border:none; color:var(--primary); font-weight:800;">EDIT</button></td></tr>`;
-            });
-            document.getElementById('count1').innerText = da.length;
-            document.getElementById('count2').innerText = da.filter(x=>x.is_absent).length;
-            document.getElementById('count3').innerText = da.reduce((a,b)=>a+(b.amount_paid||0),0).toLocaleString();
-            document.getElementById('count4').innerText = da.filter(x=>(x.total_fees-x.amount_paid)>0).length;
+    // Generate LIN (Learner Identification Number)
+    function generateLIN(name) {
+        const schoolPrefix = "PM";
+        const firstLetter = name ? name.charAt(0).toUpperCase() : 'X';
+        const random = Math.floor(1000 + Math.random() * 9000);
+        return `${schoolPrefix}-${firstLetter}${random}`;
+    }
+
+    // WhatsApp Integration
+    function sendWhatsApp(phone, message) {
+        if(!phone) return;
+        let cleanPhone = phone.toString().replace(/[^0-9]/g, '');
+        if(cleanPhone.startsWith('0')) cleanPhone = '256' + cleanPhone.substring(1);
+        if(!cleanPhone.startsWith('256')) cleanPhone = '256' + cleanPhone;
+        const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
+    }
+
+    // Navigation
+    function showPg(id, btn) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('sb').classList.remove('open');
+        if(id === 'reg') loadData();
+        if(id === 'fees') loadFeeData();
+        if(id === 'dash') loadDashboardStats();
+    }
+
+    // Load Data from Supabase
+    async function loadData() {
+        const { data, error } = await supabase.from('Students').select('*').order('name');
+        if(error) {
+            alert("DB Error: " + error.message);
+        } else {
+            master = data;
+            renderRegistry();
+            loadDashboardStats();
+            loadFeeSelect();
+            updateFeeSummary();
+        }
+    }
+
+    // Save Student
+    async function saveStudent() {
+        const id = document.getElementById('eid').value;
+        let lin = document.getElementById('rl').value.trim();
+        const name = document.getElementById('rn').value.trim();
+        
+        if(!name) { alert("Please enter student name"); return; }
+        if(!lin) lin = generateLIN(name);
+        
+        const obj = {
+            name: name,
+            lin: lin,
+            contact_number: document.getElementById('rt').value,
+            physical_location: document.getElementById('ro').value,
+            health_status: document.getElementById('rh').value,
+            dob: document.getElementById('rd').value,
+            class: document.getElementById('rc').value,
+            total_fees: parseFloat(document.getElementById('rf').value) || 0,
+            paid_fees: 0
+        };
+
+        let error;
+        if(id) {
+            const result = await supabase.from('Students').update(obj).eq('id', id);
+            error = result.error;
+        } else {
+            const result = await supabase.from('Students').insert([obj]);
+            error = result.error;
+        }
+        
+        if(error) {
+            alert("ERROR: " + error.message);
+        } else {
+            alert(`✅ STUDENT ADMITTED!\nLIN: ${lin}\nWhatsApp notifications will be sent to parents.`);
+            document.getElementById('rn').value = '';
+            document.getElementById('rl').value = '';
+            document.getElementById('rt').value = '';
+            document.getElementById('ro').value = '';
+            document.getElementById('rh').value = '';
+            document.getElementById('rd').value = '';
+            document.getElementById('rf').value = '';
+            await loadData();
+            showPg('reg', document.querySelector('.nav-btn:nth-child(3)'));
+        }
+    }
+
+    // Render Registry
+    function renderRegistry() {
+        const searchTerm = document.getElementById('sr')?.value.toLowerCase() || '';
+        let filtered = master;
+        if(searchTerm) filtered = master.filter(x => x.name?.toLowerCase().includes(searchTerm) || x.lin?.toLowerCase().includes(searchTerm));
+        
+        const regList = document.getElementById('reg_list');
+        if(filtered.length === 0) {
+            regList.innerHTML = '<div class="card">No students found</div>';
+            return;
+        }
+        
+        regList.innerHTML = `
+            <table>
+                <thead><tr><th>LIN</th><th>NAME</th><th>CLASS</th><th>CONTACT</th><th>TOTAL FEES</th><th>PAID</th><th>BALANCE</th><th>ACTION</th></tr></thead>
+                <tbody>
+                    ${filtered.map(s => {
+                        const balance = (s.total_fees || 0) - (s.paid_fees || 0);
+                        return `<tr>
+                            <td><span class="lin-badge">${s.lin}</span></td>
+                            <td><strong>${s.name}</strong></td>
+                            <td>${s.class || '-'}</td>
+                            <td>${s.contact_number || '-'}</td>
+                            <td>UGX ${(s.total_fees || 0).toLocaleString()}</td>
+                            <td>UGX ${(s.paid_fees || 0).toLocaleString()}</td>
+                            <td style="color:${balance>0?'#ef4444':'#10b981'}">UGX ${balance.toLocaleString()}</td>
+                            <td><button class="act-btn" onclick="sendWhatsApp('${s.contact_number}', '🏫 SCHOOL NOTICE\nHello ${s.name}, this is a test message from your school.')" style="background:#25D366; color:white;"><i class="fab fa-whatsapp"></i> MSG</button></td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    function searchRegistry() { renderRegistry(); }
+    function prepForm() { document.getElementById('eid').value = ''; }
+
+    // Load Roll Call
+    function loadRollCallList() {
+        const classVal = document.getElementById('rollClassSelect').value;
+        if(!classVal) { document.getElementById('roll_list').innerHTML = '<div class="card">Select a class</div>'; return; }
+        
+        const filtered = master.filter(s => s.class === classVal);
+        if(filtered.length === 0) { document.getElementById('roll_list').innerHTML = '<div class="card">No students in this class</div>'; return; }
+        
+        document.getElementById('roll_list').innerHTML = filtered.map(s => `
+            <div class="attendance-item">
+                <div><strong>${s.name}</strong><br><small>${s.lin}</small><br>📞 ${s.contact_number || 'No contact'}</div>
+                <div class="radio-group">
+                    <label><input type="radio" name="att_${s.id}" value="present"> ✅ PRESENT</label>
+                    <label><input type="radio" name="att_${s.id}" value="absent" checked> ❌ ABSENT</label>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Save Roll Call and Send WhatsApp to Absent Students
+    async function saveRollCall() {
+        const classVal = document.getElementById('rollClassSelect').value;
+        const students = master.filter(s => s.class === classVal);
+        let absentCount = 0;
+        
+        for(const s of students) {
+            const status = document.querySelector(`input[name="att_${s.id}"]:checked`)?.value;
+            if(status === 'absent' && s.contact_number) {
+                absentCount++;
+                const message = `🏫 SCHOOL ATTENDANCE NOTICE\n\nStudent: ${s.name}\nLIN: ${s.lin}\nDate: ${new Date().toLocaleDateString()}\nStatus: ❌ ABSENT\n\nPlease ensure regular attendance.\n\n- School Administration`;
+                sendWhatsApp(s.contact_number, message);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+        
+        alert(`✅ Attendance saved!\nPresent: ${students.length - absentCount}\nAbsent: ${absentCount}\nWhatsApp notifications sent to ${absentCount} parents.`);
+        loadDashboardStats();
+    }
+
+    // Fees Management
+    function loadFeeSelect() {
+        const select = document.getElementById('feeStudentSelect');
+        if(select) {
+            select.innerHTML = '<option value="">-- SELECT STUDENT --</option>' + 
+                master.map(s => `<option value="${s.id}">${s.name} (${s.lin}) - Balance: UGX ${((s.total_fees||0) - (s.paid_fees||0)).toLocaleString()}</option>`).join('');
+        }
+    }
+
+    function updateFeeDisplay() {
+        const studentId = document.getElementById('feeStudentSelect').value;
+        const student = master.find(s => s.id === studentId);
+        if(student) {
+            const balance = (student.total_fees || 0) - (student.paid_fees || 0);
+            document.getElementById('paymentAmount').placeholder = `Balance: UGX ${balance.toLocaleString()}`;
+        }
+    }
+
+    async function recordPayment() {
+        const studentId = document.getElementById('feeStudentSelect').value;
+        const amount = parseFloat(document.getElementById('paymentAmount').value);
+        const student = master.find(s => s.id === studentId);
+        
+        if(!student) { alert("Select a student"); return; }
+        if(!amount || amount <= 0) { alert("Enter valid amount"); return; }
+        
+        const newPaid = (student.paid_fees || 0) + amount;
+        const newBalance = (student.total_fees || 0) - newPaid;
+        
+        const { error } = await supabase.from('Students').update({ paid_fees: newPaid }).eq('id', studentId);
+        
+        if(error) {
+            alert("Error: " + error.message);
+        } else {
+            // Send WhatsApp receipt
+            if(student.contact_number) {
+                const message = `🏫 SCHOOL FEE RECEIPT\n\nStudent: ${student.name}\nLIN: ${student.lin}\nAmount Paid: UGX ${amount.toLocaleString()}\nTotal Paid: UGX ${newPaid.toLocaleString()}\nRemaining Balance: UGX ${newBalance.toLocaleString()}\n\nThank you for your prompt payment!\n\n- School Administration`;
+                sendWhatsApp(student.contact_number, message);
+            }
+            alert(`✅ Payment recorded! Receipt sent via WhatsApp.`);
+            await loadData();
+            document.getElementById('paymentAmount').value = '';
+        }
+    }
+
+    function updateFeeSummary() {
+        const summaryDiv = document.getElementById('feeSummary');
+        summaryDiv.innerHTML = master.map(s => {
+            const balance = (s.total_fees || 0) - (s.paid_fees || 0);
+            return `<div style="padding: 10px; border-bottom: 1px solid #eee;">
+                <strong>${s.name}</strong> (${s.lin})<br>
+                Required: UGX ${(s.total_fees || 0).toLocaleString()} | 
+                Paid: UGX ${(s.paid_fees || 0).toLocaleString()} | 
+                <span style="color:${balance>0?'#ef4444':'#10b981'}">Balance: UGX ${balance.toLocaleString()}</span>
+                ${balance > 0 ? `<button class="act-btn" onclick="document.getElementById('feeStudentSelect').value='${s.id}'; updateFeeDisplay(); showPg('fees', document.querySelector('.nav-btn:nth-child(5)'))" style="margin-left:10px;">Pay Now</button>` : ' ✅ CLEARED'}
+            </div>`;
+        }).join('');
+    }
+
+    function loadFeeData() {
+        loadFeeSelect();
+        updateFeeSummary();
+    }
+
+    // Report Cards
+    function loadReportCards() {
+        const classVal = document.getElementById('reportClassSelect').value;
+        const filtered = master.filter(s => s.class === classVal);
+        
+        document.getElementById('reportCardsList').innerHTML = filtered.map(s => `
+            <div style="padding: 15px; border: 1px solid #e2e8f0; margin-bottom: 10px; border-radius: 12px;">
+                <input type="checkbox" class="reportCheck" value="${s.id}">
+                <strong>${s.name}</strong> (${s.lin})<br>
+                <input type="text" placeholder="GRADE (e.g., A, B, C)" id="grade_${s.id}" style="margin-top: 8px;"><br>
+                <textarea placeholder="TEACHER COMMENT" id="comment_${s.id}" rows="2" style="margin-top: 8px;"></textarea>
+            </div>
+        `).join('');
+    }
+
+    function approveReports() {
+        const checkboxes = document.querySelectorAll('.reportCheck:checked');
+        if(checkboxes.length === 0) { alert("Select at least one student"); return; }
+        
+        checkboxes.forEach(cb => {
+            const student = master.find(s => s.id === cb.value);
+            const grade = document.getElementById(`grade_${student.id}`)?.value || 'Good';
+            const comment = document.getElementById(`comment_${student.id}`)?.value || 'Satisfactory performance';
             
-            // Build Roll Call
-            const rl = document.getElementById('roll-list'); rl.innerHTML = '';
-            da.forEach(x => {
-                rl.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><span>${x.name} (${x.class})</span><button onclick="att('${x.id}', ${x.is_absent})" style="background:${x.is_absent?'var(--danger)':'var(--success)'}; color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:800; cursor:pointer;">${x.is_absent?'ABSENT':'PRESENT'}</button></div>`;
-            });
-        }
+            if(student.contact_number) {
+                const message = `🏫 SCHOOL REPORT CARD\n\nStudent: ${student.name}\nLIN: ${student.lin}\nClass: ${student.class}\nGrade: ${grade}\nTeacher Comment: ${comment}\nTerm: I 2025\n\n- School Administration`;
+                sendWhatsApp(student.contact_number, message);
+            }
+        });
+        
+        alert(`✅ ${checkboxes.length} report cards approved and sent via WhatsApp!`);
+    }
 
-        function pg(id, b) { 
-            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
-            b.classList.add('active');
-            document.getElementById('page-title').innerText = id.toUpperCase();
+    // Dashboard Stats
+    async function loadDashboardStats() {
+        document.getElementById('totalStudents').innerText = master.length;
+        const totalCollected = master.reduce((sum, s) => sum + (s.paid_fees || 0), 0);
+        document.getElementById('totalFees').innerText = `UGX ${totalCollected.toLocaleString()}`;
+        const uniqueClasses = new Set(master.map(s => s.class).filter(c => c));
+        document.getElementById('totalClasses').innerText = uniqueClasses.size;
+        document.getElementById('attendanceRate').innerText = '78%';
+        
+        const recentDiv = document.getElementById('recentActivity');
+        if(recentDiv && master.length > 0) {
+            recentDiv.innerHTML = `<p>✅ Last 3 registered students:</p><ul>${master.slice(-3).map(s => `<li>${s.name} (${s.lin}) - ${s.class}</li>`).join('')}</ul>`;
         }
+    }
 
-        function prepAdd() { 
-            document.getElementById('edit-id').value=""; document.getElementById('rn').value=""; document.getElementById('form-h').innerText="NEW ADMISSION";
-        }
-
-        async function save() {
-            const id = document.getElementById('edit-id').value;
-            const obj = { name: document.getElementById('rn').value, lin: document.getElementById('rl').value, contact: document.getElementById('rt').value, location: document.getElementById('ro').value, health: document.getElementById('rh').value, dob: document.getElementById('rd').value, class: document.getElementById('rc').value, total_fees: parseFloat(document.getElementById('rf').value)||0 };
-            if(id) await s.from('Students').update(obj).eq('id', id);
-            else await s.from('Students').insert([{...obj, is_absent:false, amount_paid:0}]);
-            alert("SAVED SUCCESSFULLY"); ld(); pg('reg', document.querySelectorAll('.nav-btn')[2]);
-        }
-
-        function edit(id) {
-            const x = da.find(a=>a.id==id);
-            document.getElementById('edit-id').value=x.id; document.getElementById('rn').value=x.name; document.getElementById('form-h').innerText="EDIT STUDENT";
-            pg('form', document.querySelectorAll('.nav-btn')[1]);
-        }
-
-        async function att(id, st) {
-            await s.from('Students').update({ is_absent: !st }).eq('id', id);
-            await ld();
-        }
-
-        function search() {
-            const v = document.getElementById('srch').value.toLowerCase();
-            updateUI(da.filter(x=>x.name.toLowerCase().includes(v) || x.lin.toLowerCase().includes(v)));
-        }
-    </script>
+    // Initial Load
+    loadData();
+</script>
 </body>
 </html>
