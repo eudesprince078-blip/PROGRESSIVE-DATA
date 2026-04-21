@@ -13,25 +13,33 @@
 
         /* SIDEBAR */
         .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 20px; }
-        .nav-item { padding: 12px 15px; border-radius: 10px; color: #64748b; font-weight: 700; font-size: 0.75rem; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .nav-item { padding: 12px 15px; border-radius: 10px; color: #64748b; font-weight: 700; font-size: 0.75rem; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
         .nav-item.active { background: #eff6ff; color: var(--primary); }
-        .nav-item:hover:not(.active) { background: #f1f5f9; }
 
         /* MAIN CONTENT */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .header { padding: 15px 40px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* PAGES (Hidden by default) */
-        .page { display: none; padding: 40px; height: 100%; overflow-y: auto; animation: fadeIn 0.3s ease; }
+        .page { display: none; padding: 30px; height: 100%; overflow-y: auto; }
         .page.active { display: block; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* LOGIN OVERLAY */
+        /* FORM STYLE (From Video) */
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-size: 0.6rem; font-weight: 800; color: #64748b; margin-bottom: 8px; }
+        .form-input { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #e2e8f0; outline: none; font-weight: 600; }
+        
+        /* PIPELINE TRACKER */
+        .pipeline { display: flex; justify-content: space-between; margin-bottom: 30px; }
+        .step { text-align: center; flex: 1; }
+        .step-circle { width: 25px; height: 25px; border-radius: 50%; border: 2px solid #e2e8f0; margin: 0 auto 5px; font-size: 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+        .step.active .step-circle { border-color: var(--primary); color: var(--primary); }
+        .step-label { font-size: 0.45rem; color: #94a3b8; font-weight: 800; }
+
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; }
+        th { background: #f1f5f9; padding: 15px; text-align: left; font-size: 0.6rem; }
+        td { padding: 15px; font-size: 0.65rem; border-bottom: 1px solid #f1f5f9; }
+
         #login-screen { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-card { background: white; padding: 40px; border-radius: 30px; width: 380px; text-align: center; }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; text-align: center; }
-        .btn { padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; }
     </style>
 </head>
 <body>
@@ -39,50 +47,57 @@
     <div id="login-screen">
         <div class="login-card">
             <h1 style="color:var(--primary); margin:0;">ESMS AUTHORITY</h1>
-            <p style="font-size:0.6rem; color:#64748b; margin-bottom:30px;">EUDES MEDIA SYSTEMS</p>
-            <input type="text" id="schId" placeholder="SCHOOL ID (PM001)">
-            <input type="password" id="schKey" placeholder="ACCESS KEY">
-            <button class="btn" onclick="authenticate()">VERIFY SYSTEM</button>
-            <div id="err" style="color:red; font-size:0.7rem; margin-top:15px; display:none;"></div>
+            <p style="font-size:0.6rem; color:#64748b; margin-bottom:30px;">EUDES MEDIA SOLUTIONS</p>
+            <input type="text" id="schId" placeholder="SCHOOL ID" style="width:100%; padding:15px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd; text-align:center;">
+            <input type="password" id="schKey" placeholder="ACCESS KEY" style="width:100%; padding:15px; margin-bottom:20px; border-radius:10px; border:1px solid #ddd; text-align:center;">
+            <button onclick="authenticate()" style="width:100%; padding:16px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer;">OPEN SYSTEM</button>
         </div>
     </div>
 
     <div class="sidebar">
         <h2 style="font-size: 0.8rem; color: var(--primary); margin-bottom: 30px;">CAMPUSSPHERE</h2>
         <div class="nav-item active" onclick="showPage('dash-page', this)">📊 Dashboard</div>
-        <div class="nav-item" onclick="showPage('students-page', this)">👤 Students</div>
-        <div class="nav-item" onclick="showPage('billing-page', this)">💰 Billing</div>
+        <div class="nav-item" onclick="showPage('reg-page', this)">📝 New Admission</div>
+        <div class="nav-item" onclick="fetchStudents(); showPage('list-page', this)">👤 Student List</div>
         <div style="margin-top: auto;"><button onclick="location.reload()" style="background:none; border:none; color:#e11d48; font-weight:800; cursor:pointer; font-size:0.7rem;">LOGOUT</button></div>
     </div>
 
     <div class="main">
         <div class="header">
-            <div>
-                <h2 id="dispName" style="margin:0; font-size: 0.9rem; color: #1e293b;"></h2>
-                <p id="dispId" style="margin:0; font-size: 0.55rem; color: #64748b; font-weight: 800;"></p>
+            <h2 id="dispName" style="margin:0; font-size: 0.9rem;"></h2>
+            <img id="dispLogo" src="" style="height:35px; border-radius:5px;">
+        </div>
+
+        <div id="reg-page" class="page">
+            <div class="pipeline">
+                <div class="step active"><div class="step-circle">1</div><div class="step-label">Applied</div></div>
+                <div class="step"><div class="step-circle">2</div><div class="step-label">Review</div></div>
+                <div class="step"><div class="step-circle">3</div><div class="step-label">Interview</div></div>
+                <div class="step"><div class="step-circle">4</div><div class="step-label">Accepted</div></div>
             </div>
-            <img id="dispLogo" src="" style="height:40px; border-radius:8px;">
+
+            <div style="background:white; padding:30px; border-radius:20px; border:1px solid #e2e8f0; max-width:600px;">
+                <h3 style="margin-top:0; color:var(--primary);">Student Registration</h3>
+                <div class="form-group"><label>Full Name</label><input type="text" id="stName" class="form-input"></div>
+                <div style="display:flex; gap:20px;">
+                    <div class="form-group" style="flex:1;"><label>Age</label><input type="number" id="stAge" class="form-input"></div>
+                    <div class="form-group" style="flex:1;"><label>Contact Number</label><input type="text" id="stContact" class="form-input"></div>
+                </div>
+                <div class="form-group"><label>Physical Location</label><input type="text" id="stLoc" class="form-input"></div>
+                <button onclick="saveStudent()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:10px; font-weight:800; cursor:pointer;">SUBMIT APPLICATION</button>
+            </div>
+        </div>
+
+        <div id="list-page" class="page">
+            <h3>Registered Students</h3>
+            <table>
+                <thead><tr><th>LIN</th><th>NAME</th><th>AGE</th><th>CONTACT</th><th>LOCATION</th></tr></thead>
+                <tbody id="stTable"></tbody>
+            </table>
         </div>
 
         <div id="dash-page" class="page active">
-            <h3 style="margin-top:0;">School Overview</h3>
-            <div style="background:white; padding:30px; border-radius:20px; border:1px solid #e2e8f0;">
-                <p style="color:#64748b; font-size:0.8rem;">Welcome to the Management Dashboard. Use the sidebar to navigate.</p>
-            </div>
-        </div>
-
-        <div id="students-page" class="page">
-            <h3 style="margin-top:0;">Student Records</h3>
-            <div style="background:white; padding:30px; border-radius:20px; border:1px solid #e2e8f0;">
-                <p style="color:#64748b; font-size:0.8rem;">No Student data found yet. This is where your registration list will appear.</p>
-            </div>
-        </div>
-
-        <div id="billing-page" class="page">
-            <h3 style="margin-top:0;">Financial Tracking</h3>
-            <div style="background:white; padding:30px; border-radius:20px; border:1px solid #e2e8f0;">
-                <p style="color:#64748b; font-size:0.8rem;">Payment records for the current term will be listed here.</p>
-            </div>
+            <h3>System Status: Online</h3>
         </div>
     </div>
 
@@ -91,43 +106,47 @@
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const client = supabase.createClient(_URL, _KEY);
 
-        // FUNCTION TO SWITCH PAGES
-        function showPage(pageId, element) {
-            // Hide all pages
+        function showPage(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // Show selected page
-            document.getElementById(pageId).classList.add('active');
-            // Update Sidebar UI
+            document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            element.classList.add('active');
+            el.classList.add('active');
         }
 
         async function authenticate() {
-            const idInput = document.getElementById('schId').value.trim();
-            const keyInput = document.getElementById('schKey').value.trim();
-            const errBox = document.getElementById('err');
-            
-            try {
-                const { data: school, error } = await client
-                    .from('Schools')
-                    .select('*')
-                    .eq('sch_id', idInput)
-                    .single();
-
-                if (error || !school) throw new Error("ID NOT RECOGNIZED");
-
-                if (keyInput === school.admin_key || keyInput === school.teacher_key) {
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('dispName').innerText = school.school_name;
-                    document.getElementById('dispId').innerText = "ID: " + school.sch_id;
-                    if(school.logo_url) document.getElementById('dispLogo').src = school.logo_url;
-                } else {
-                    throw new Error("ACCESS DENIED");
-                }
-            } catch (e) {
-                errBox.style.display = "block";
-                errBox.innerText = "❌ " + e.message;
+            const id = document.getElementById('schId').value.trim();
+            const key = document.getElementById('schKey').value.trim();
+            const { data: school } = await client.from('Schools').select('*').eq('sch_id', id).single();
+            if (school && (key === school.admin_key || key === school.teacher_key)) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dispName').innerText = school.school_name;
+                document.getElementById('dispLogo').src = school.logo_url;
             }
+        }
+
+        async function saveStudent() {
+            const name = document.getElementById('stName').value;
+            const age = document.getElementById('stAge').value;
+            const contact = document.getElementById('stContact').value;
+            const loc = document.getElementById('stLoc').value;
+
+            const { error } = await client.from('Students').insert([
+                { name: name, age: age, contact_number: contact, physical_location: loc, lin_number: 'GEN-' + Math.floor(Math.random()*1000) }
+            ]);
+
+            if (!error) {
+                alert("STUDENT REGISTERED SUCCESSFULY!");
+                location.reload();
+            }
+        }
+
+        async function fetchStudents() {
+            const { data } = await client.from('Students').select('*');
+            const tbody = document.getElementById('stTable');
+            tbody.innerHTML = '';
+            data.forEach(st => {
+                tbody.innerHTML += `<tr><td>${st.lin_number}</td><td>${st.name}</td><td>${st.age}</td><td>${st.contact_number}</td><td>${st.physical_location}</td></tr>`;
+            });
         }
     </script>
 </body>
