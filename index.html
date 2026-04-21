@@ -60,14 +60,14 @@
             <table>
                 <thead><tr><th>LIN</th><th>NAME</th><th>AGE</th><th>CONTACT</th><th>LOCATION</th></tr></thead>
                 <tbody id="stTable">
-                    <tr><td colspan="5" style="text-align:center; padding:40px;">No students found yet.</td></tr>
+                    <tr><td colspan="5" style="text-align:center; padding:40px;">Waiting for connection...</td></tr>
                 </tbody>
             </table>
+            <div id="debugLog" style="font-size: 0.5rem; color: red; margin-top: 10px;"></div>
         </div>
     </div>
 
     <script>
-        // DOUBLE CHECK THESE TWO VALUES IN YOUR SUPABASE SETTINGS
         const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const client = supabase.createClient(_URL, _KEY);
@@ -83,43 +83,47 @@
             const id = document.getElementById('schId').value.trim();
             const key = document.getElementById('schKey').value.trim();
             
-            // Testing connection to Schools table
             const { data: school, error } = await client.from('Schools').select('*').eq('sch_id', id).single();
             
             if (school && (key === school.admin_key || key === school.teacher_key)) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dispName').innerText = school.school_name;
                 document.getElementById('dispLogo').src = school.logo_url;
-                document.getElementById('connStatus').innerText = "Connected to " + school.school_name;
+                document.getElementById('connStatus').innerText = "Connected: " + school.school_name;
                 fetchStudents();
             } else {
-                alert("Login failed. Check your ID and Key.");
+                alert("Login failed.");
             }
         }
 
         async function fetchStudents() {
             const tbody = document.getElementById('stTable');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">Searching Database...</td></tr>';
+            const debug = document.getElementById('debugLog');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">Scanning Database...</td></tr>';
 
-            // IMPORTANT: If your table is named "students" (lowercase), change 'Students' below to 'students'
-            const { data, error } = await client.from('Students').select('*');
+            // ATTEMPT 1: Try Capitalized 'Students'
+            let response = await client.from('Students').select('*');
 
-            if (error) {
-                console.error(error);
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:40px;">
-                    <strong>ERROR:</strong> ${error.message}<br>
-                    <small>Try enabling RLS and adding a policy set to 'true'.</small>
-                </td></tr>`;
+            // ATTEMPT 2: If failed, try lowercase 'students'
+            if (response.error && response.error.code === "PGRST116" || response.error?.message.includes("not found")) {
+                debug.innerText = "Retrying with lowercase 'students' table name...";
+                response = await client.from('students').select('*');
+            }
+
+            if (response.error) {
+                debug.innerText = "FINAL ERROR: " + response.error.message;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:40px;">TABLE NOT FOUND. PLEASE CHECK SUPABASE TABLE NAME.</td></tr>`;
                 return;
             }
 
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">DATABASE IS EMPTY. NO STUDENTS FOUND.</td></tr>';
+            if (!response.data || response.data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">DATABASE CONNECTED BUT TABLE IS EMPTY.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = '';
-            data.forEach(st => {
+            debug.innerText = ""; // Clear errors if successful
+            response.data.forEach(st => {
                 tbody.innerHTML += `<tr>
                     <td style="color:var(--primary)">${st.lin_number || '---'}</td>
                     <td>${st.name || '---'}</td>
