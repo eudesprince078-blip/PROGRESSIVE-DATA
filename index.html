@@ -3,160 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUDES MEDIA | SCHOOL ENGINE</title>
+    <title>EUDES MEDIA | PREMIER SCHOOL ENGINE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --success: #10b981; --danger: #e11d48; --bg: #f1f5f9; }
-        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
-        body { margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
-        
-        .sidebar { width: 280px; background: #0f172a; display: flex; flex-direction: column; padding: 25px; color: white; }
-        .nav-item { padding: 14px 18px; border-radius: 12px; color: #94a3b8; font-weight: 700; font-size: 0.7rem; cursor: pointer; margin-bottom: 8px; }
-        .nav-item.active { background: var(--primary); color: white; }
-        
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .header { padding: 15px 40px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-        .page { display: none; padding: 30px; height: 100%; overflow-y: auto; }
-        .page.active { display: block; }
-
-        /* PHOTO UPLOAD STYLING */
-        .photo-picker {
-            border: 2px dashed #cbd5e1;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
-            background: #f8fafc;
-            transition: 0.3s;
+        :root { 
+            --primary: #0047AB; 
+            --secondary: #002D62;
+            --success: #10b981; 
+            --danger: #ef4444; 
+            --bg: #f8fafc; 
+            --white: #ffffff;
         }
-        .photo-picker:hover { border-color: var(--primary); background: #eff6ff; }
-        #imgPreview { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; display: none; margin: 10px auto; border: 2px solid var(--primary); }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: white; padding: 30px; border-radius: 20px; }
-        .field { display: flex; flex-direction: column; gap: 5px; }
-        label { font-size: 0.6rem; font-weight: 800; color: #64748b; }
-        input, select { padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; font-weight: 700; }
-
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.6rem; color: #64748b; }
-        td { padding: 12px 15px; font-size: 0.65rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; }
-        .st-img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
         
-        .btn-main { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; }
-        #login-screen { position:fixed; inset:0; background:#0f172a; z-index:9999; display:flex; align-items:center; justify-content:center; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
+        body { margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; color: #1e293b; }
+        
+        /* SIDEBAR DESIGN */
+        .sidebar { width: 300px; background: #0f172a; display: flex; flex-direction: column; padding: 30px; color: white; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .nav-item { padding: 18px 22px; border-radius: 16px; color: #94a3b8; font-weight: 800; font-size: 0.75rem; cursor: pointer; margin-bottom: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 12px; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; transform: translateX(5px); }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 10px 20px -5px rgba(0, 71, 171, 0.5); }
+        
+        /* MAIN INTERFACE */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .header { padding: 20px 45px; background: var(--white); border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .page { display: none; padding: 40px; height: 100%; overflow-y: auto; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* DASHBOARD CARDS */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .stat-card { background: var(--white); padding: 35px; border-radius: 28px; border: 1px solid #eef2f6; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02); transition: 0.3s; position: relative; overflow: hidden; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 30px -10px rgba(0,0,0,0.08); }
+        .stat-card::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 8px; background: var(--primary); }
+        .stat-card.paid::after { background: var(--success); }
+        .stat-card.arrears::after { background: var(--danger); }
+        .stat-card label { font-size: 0.7rem; font-weight: 800; color: #64748b; letter-spacing: 1px; }
+        .stat-card p { margin: 12px 0 0; font-size: 2rem; font-weight: 800; color: #0f172a; }
+
+        /* LARGE READABLE TABLE */
+        .table-container { background: var(--white); border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid #eef2f6; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #fcfdfe; padding: 22px; text-align: left; font-size: 0.75rem; color: #64748b; border-bottom: 2px solid #f1f5f9; letter-spacing: 0.5px; }
+        td { padding: 22px; font-size: 0.95rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: #1e293b; }
+        .st-name { font-size: 1.1rem; color: #0f172a; font-weight: 800; }
+        .st-img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; border: 3px solid #f1f5f9; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        /* FORM DESIGN */
+        .form-card { background: var(--white); padding: 45px; border-radius: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.03); max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .field { display: flex; flex-direction: column; gap: 8px; }
+        label { font-size: 0.7rem; font-weight: 800; color: #475569; }
+        input, select { padding: 16px; border-radius: 14px; border: 2px solid #e2e8f0; font-weight: 700; font-size: 0.9rem; transition: 0.3s; background: #fcfdfe; }
+        input:focus { border-color: var(--primary); outline: none; background: white; }
+
+        /* UPLOAD ZONE */
+        .upload-zone { grid-column: span 2; border: 3px dashed #e2e8f0; border-radius: 24px; padding: 40px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .upload-zone:hover { border-color: var(--primary); background: #f0f7ff; }
+        #imgPrev { width: 120px; height: 120px; border-radius: 20px; object-fit: cover; display: none; margin: 0 auto 15px; border: 4px solid var(--white); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        .btn-confirm { background: var(--primary); color: white; border: none; padding: 20px; border-radius: 18px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px -5px rgba(0, 71, 171, 0.4); grid-column: span 2; }
+        .btn-confirm:hover { background: var(--secondary); transform: translateY(-2px); }
+
+        #login-overlay { position:fixed; inset:0; background:#0f172a; z-index:9999; display:flex; align-items:center; justify-content:center; }
     </style>
 </head>
 <body onload="startTime()">
 
-    <div id="login-screen">
-        <div style="background:white; padding:50px; border-radius:40px; width:400px; text-align:center;">
-            <h2 style="color:var(--primary); margin:0;">EUDES MEDIA</h2>
-            <p style="font-size:0.6rem; color:#64748b; margin-bottom:30px;">SCHOOL ACCESS PORTAL</p>
-            <input type="text" id="schId" placeholder="SCHOOL ID" style="width:100%; margin-bottom:10px; padding:12px; border-radius:10px; border:1px solid #ddd;">
-            <input type="password" id="schKey" placeholder="ACCESS KEY" style="width:100%; margin-bottom:20px; padding:12px; border-radius:10px; border:1px solid #ddd;">
-            <button onclick="authenticate()" class="btn-main" style="width:100%;">LOGIN SYSTEM</button>
+    <div id="login-overlay">
+        <div style="background:white; padding:60px; border-radius:45px; width:450px; text-align:center;">
+            <h1 style="color:var(--primary); margin:0; font-size: 1.8rem;">EUDES MEDIA</h1>
+            <p style="font-size:0.75rem; color:#64748b; margin-bottom:40px; font-weight: 800; letter-spacing: 2px;">AUTHENTICATION REQUIRED</p>
+            <input type="text" id="schId" placeholder="SCHOOL ID" style="width:100%; margin-bottom:15px;">
+            <input type="password" id="schKey" placeholder="ACCESS KEY" style="width:100%; margin-bottom:30px;">
+            <button onclick="authenticate()" class="btn-confirm" style="width:100%;">ACCESS SYSTEMS</button>
         </div>
     </div>
 
     <div class="sidebar">
-        <h2 style="font-size: 0.9rem; margin-bottom: 40px;">EUDES MEDIA</h2>
+        <div style="margin-bottom: 50px; text-align: center;">
+            <h2 style="font-size: 1.2rem; margin:0; letter-spacing: 1px;">PREMIER ENGINE</h2>
+            <div style="width:40px; height:4px; background:var(--primary); margin: 10px auto; border-radius:10px;"></div>
+        </div>
         <div class="nav-item active" onclick="showPage('dash-page', this)">📊 DASHBOARD</div>
-        <div class="nav-item" onclick="showPage('reg-page', this)">📝 ADMISSION</div>
-        <div class="nav-item" onclick="fetchStudents(); showPage('list-page', this)">👥 REGISTRY</div>
+        <div class="nav-item" onclick="showPage('reg-page', this)">📝 NEW ADMISSION</div>
+        <div class="nav-item" onclick="fetchStudents(); showPage('list-page', this)">👥 STUDENT REGISTRY</div>
+        <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <p style="font-size: 0.55rem; color: #64748b; text-align: center;">POWERED BY EUDES MEDIA</p>
+        </div>
     </div>
 
     <div class="main">
         <div class="header">
-            <div style="display:flex; align-items:center; gap:15px;">
-                <img id="dispLogo" src="" style="height:40px; border-radius:8px;">
-                <h3 id="dispName" style="margin:0; font-size: 0.8rem; color: var(--primary);"></h3>
+            <div style="display:flex; align-items:center; gap:20px;">
+                <img id="dispLogo" src="" style="height:55px; border-radius:16px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                <h3 id="dispName" style="margin:0; font-size: 1.1rem; color: var(--primary); font-weight: 800;"></h3>
             </div>
             <div style="text-align:right;">
-                <h5 id="txtClock" style="margin:0;">00:00:00</h5>
-                <p id="txtDate" style="margin:0; font-size: 0.5rem; color:#94a3b8;"></p>
+                <h5 id="txtClock" style="margin:0; font-size: 1.2rem; color: #0f172a;">00:00:00</h5>
+                <p id="txtDate" style="margin:0; font-size: 0.65rem; color:#94a3b8; font-weight: 800;"></p>
             </div>
         </div>
 
         <div id="dash-page" class="page active">
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px;">
-                <div style="background:white; padding:25px; border-radius:20px; border-left: 5px solid var(--primary);">
-                    <label>TOTAL STUDENTS</label><p id="statTotal" style="font-size:1.5rem; margin:5px 0;">0</p>
+            <h2 style="margin-bottom: 30px;">Institutional Statistics</h2>
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <label>TOTAL ENROLLMENT</label>
+                    <p id="stCount">0</p>
                 </div>
-                <div style="background:white; padding:25px; border-radius:20px; border-left: 5px solid var(--success);">
-                    <label>TOTAL PAID</label><p id="statPaid" style="font-size:1.5rem; margin:5px 0;">0</p>
+                <div class="stat-card paid">
+                    <label>TOTAL TUITION PAID</label>
+                    <p id="stPaid">0</p>
                 </div>
-                <div style="background:white; padding:25px; border-radius:20px; border-left: 5px solid var(--danger);">
-                    <label>TOTAL ARREARS (DEBT)</label><p id="statDebt" style="font-size:1.5rem; margin:5px 0;">0</p>
+                <div class="stat-card arrears">
+                    <label>TOTAL ARREARS (DEBT)</label>
+                    <p id="stDebt">0</p>
                 </div>
             </div>
         </div>
 
         <div id="reg-page" class="page">
-            <div class="form-grid">
-                <div class="field" style="grid-column: span 2;">
-                    <label>STUDENT PHOTO</label>
-                    <div class="photo-picker" onclick="document.getElementById('fileInput').click()">
-                        <img id="imgPreview" src="">
-                        <p id="photoLabel" style="font-size:0.6rem; color:#64748b;">CLICK TO SELECT STUDENT PHOTO</p>
-                        <input type="file" id="fileInput" hidden accept="image/*" onchange="handleImage(this)">
-                    </div>
+            <div class="form-card">
+                <div class="upload-zone" onclick="document.getElementById('fInp').click()">
+                    <img id="imgPrev" src="">
+                    <h4 id="upLabel" style="margin:0; color:var(--primary);">+ CLICK TO UPLOAD STUDENT PHOTO</h4>
+                    <p style="font-size: 0.6rem; color: #94a3b8; margin-top: 5px;">SUPPORTED: JPG, PNG, WEBP</p>
+                    <input type="file" id="fInp" hidden accept="image/*" onchange="previewImg(this)">
                 </div>
                 <div class="field"><label>LIN NUMBER</label><input type="text" id="rLin"></div>
                 <div class="field"><label>FULL NAME</label><input type="text" id="rName"></div>
-                <div class="field"><label>CLASS</label>
+                <div class="field"><label>ASSIGN CLASS</label>
                     <select id="rClass">
                         <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
                         <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                         <option>P.5</option><option>P.6</option><option>P.7</option>
                     </select>
                 </div>
-                <div class="field"><label>DATE OF BIRTH</label><input type="date" id="rDob" onchange="calcAge(this.value)"></div>
+                <div class="field"><label>DATE OF BIRTH</label><input type="date" id="rDob" onchange="getAge(this.value)"></div>
                 <div class="field"><label>AGE</label><input type="text" id="rAge" readonly></div>
-                <div class="field"><label>TOTAL TUITION</label><input type="number" id="rFees"></div>
-                <button class="btn-main" onclick="submitAdmission()" style="grid-column: span 2;">SAVE STUDENT</button>
+                <div class="field"><label>TUITION FEES (UGX)</label><input type="number" id="rFees"></div>
+                <button class="btn-confirm" onclick="saveStudent()">FINALIZE ADMISSION</button>
             </div>
         </div>
 
         <div id="list-page" class="page">
-            <table>
-                <thead>
-                    <tr><th>PHOTO</th><th>LIN</th><th>NAME</th><th>CLASS</th><th>PAID</th><th>ARREARS</th></tr>
-                </thead>
-                <tbody id="stTable"></tbody>
-            </table>
+            <h2 style="margin-bottom: 30px;">Student Master Registry</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>STUDENT PHOTO</th>
+                            <th>LIN</th>
+                            <th>FULL NAME</th>
+                            <th>CLASS</th>
+                            <th>PAID (UGX)</th>
+                            <th>ARREARS (UGX)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stTable"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
-        const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
-        const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        const client = supabase.createClient(_URL, _KEY);
-        let currentPhotoBase64 = "";
+        const _U = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+        const _K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
+        const client = supabase.createClient(_U, _K);
+        let photoData = "";
 
         function startTime() {
-            const now = new Date();
-            document.getElementById('txtClock').innerText = now.toLocaleTimeString();
-            document.getElementById('txtDate').innerText = now.toDateString();
+            const n = new Date();
+            document.getElementById('txtClock').innerText = n.toLocaleTimeString();
+            document.getElementById('txtDate').innerText = n.toDateString();
             setTimeout(startTime, 1000);
         }
 
-        function handleImage(input) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onloadend = function() {
-                currentPhotoBase64 = reader.result;
-                document.getElementById('imgPreview').src = reader.result;
-                document.getElementById('imgPreview').style.display = 'block';
-                document.getElementById('photoLabel').style.display = 'none';
+        function previewImg(input) {
+            const f = input.files[0];
+            const r = new FileReader();
+            r.onloadend = () => {
+                photoData = r.result;
+                document.getElementById('imgPrev').src = r.result;
+                document.getElementById('imgPrev').style.display = 'block';
+                document.getElementById('upLabel').style.display = 'none';
             }
-            if (file) reader.readAsDataURL(file);
+            if (f) r.readAsDataURL(f);
         }
 
-        function calcAge(dob) {
-            const yr = new Date(dob).getFullYear();
-            const cur = new Date().getFullYear();
-            document.getElementById('rAge').value = (cur - yr) + " YEARS";
+        function getAge(dob) {
+            const y = new Date(dob).getFullYear();
+            const c = new Date().getFullYear();
+            document.getElementById('rAge').value = (c - y) + " YEARS OLD";
         }
 
         function showPage(id, el) {
@@ -169,63 +208,59 @@
         async function authenticate() {
             const id = document.getElementById('schId').value.trim();
             const key = document.getElementById('schKey').value.trim();
-            const { data: school } = await client.from('Schools').select('*').eq('sch_id', id).single();
-            if (school && (key === school.admin_key || key === school.teacher_key)) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('dispName').innerText = school.school_name;
-                document.getElementById('dispLogo').src = school.logo_url;
+            const { data: sch } = await client.from('Schools').select('*').eq('sch_id', id).single();
+            if (sch && (key === sch.admin_key || key === sch.teacher_key)) {
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('dispName').innerText = sch.school_name;
+                document.getElementById('dispLogo').src = sch.logo_url;
                 fetchStudents();
-            } else { alert("WRONG ACCESS DETAILS"); }
+            } else { alert("ACCESS DENIED"); }
         }
 
-        async function submitAdmission() {
-            const student = {
+        async function saveStudent() {
+            const st = {
                 lin: document.getElementById('rLin').value,
                 name: document.getElementById('rName').value,
                 class: document.getElementById('rClass').value,
                 dob: document.getElementById('rDob').value,
                 age: document.getElementById('rAge').value,
-                photo_url: currentPhotoBase64, // The actual image data
+                photo_url: photoData,
                 total_fees: parseFloat(document.getElementById('rFees').value) || 0,
                 amount_paid: 0,
                 is_absent: false,
                 payment_history: []
             };
-            const { error } = await client.from('Students').insert([student]);
-            if (!error) { 
-                alert("STUDENT SAVED SUCCESSFULLY"); 
-                location.reload(); 
-            } else {
-                alert("ERROR: Check if your Supabase columns match exactly.");
-            }
+            const { error } = await client.from('Students').insert([st]);
+            if (!error) { alert("SUCCESSFULLY ADMITTED"); location.reload(); }
+            else { alert("ERROR: CHECK DATABASE COLUMNS"); }
         }
 
         async function fetchStudents() {
             const { data, error } = await client.from('Students').select('*').order('name', { ascending: true });
             if (error) return;
 
-            const tbody = document.getElementById('stTable');
-            tbody.innerHTML = '';
+            const tb = document.getElementById('stTable');
+            tb.innerHTML = '';
             let tPaid = 0, tDebt = 0;
 
-            data.forEach(st => {
-                const debt = (st.total_fees || 0) - (st.amount_paid || 0);
-                tPaid += (st.amount_paid || 0);
-                tDebt += debt;
+            data.forEach(s => {
+                const d = (s.total_fees || 0) - (s.amount_paid || 0);
+                tPaid += (s.amount_paid || 0);
+                tDebt += d;
 
-                tbody.innerHTML += `<tr>
-                    <td><img src="${st.photo_url || 'https://via.placeholder.com/50'}" class="st-img"></td>
-                    <td>${st.lin}</td>
-                    <td>${st.name}</td>
-                    <td>${st.class}</td>
-                    <td style="color:var(--success)">${(st.amount_paid || 0).toLocaleString()}</td>
-                    <td style="color:var(--danger)">${debt.toLocaleString()}</td>
+                tb.innerHTML += `<tr>
+                    <td><img src="${s.photo_url || 'https://via.placeholder.com/100'}" class="st-img"></td>
+                    <td style="color:var(--primary)">#${s.lin}</td>
+                    <td class="st-name">${s.name}</td>
+                    <td><span style="background:#f1f5f9; padding:8px 15px; border-radius:10px;">${s.class}</span></td>
+                    <td style="color:var(--success)">${(s.amount_paid || 0).toLocaleString()}</td>
+                    <td style="color:var(--danger)">${d.toLocaleString()}</td>
                 </tr>`;
             });
 
-            document.getElementById('statTotal').innerText = data.length;
-            document.getElementById('statPaid').innerText = "UGX " + tPaid.toLocaleString();
-            document.getElementById('statDebt').innerText = "UGX " + tDebt.toLocaleString();
+            document.getElementById('stCount').innerText = data.length;
+            document.getElementById('stPaid').innerText = "UGX " + tPaid.toLocaleString();
+            document.getElementById('stDebt').innerText = "UGX " + tDebt.toLocaleString();
         }
     </script>
 </body>
