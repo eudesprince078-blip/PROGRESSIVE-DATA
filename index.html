@@ -3,293 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUDES MEDIA | PREMIER ENGINE PRO</title>
+    <title>EUDES MEDIA | CAMPUS PRO</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --dark: #0f172a; --bg: #f1f5f9; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
+        :root { --primary: #0047AB; --dark: #0f172a; --bg: #f8fafc; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
-        body { margin: 0; background: var(--bg); color: #1e293b; overflow-x: hidden; }
+        body { margin: 0; background: var(--bg); color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
 
-        .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; width: 280px; background: var(--dark); color: white; padding: 30px; transition: 0.3s; z-index: 1000; }
-        .sidebar.open { left: 0; }
-        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
-        .overlay.active { display: block; }
-        .nav-btn { padding: 15px; border-radius: 12px; color: #94a3b8; font-weight: 800; font-size: 0.7rem; cursor: pointer; margin-bottom: 5px; }
-        .nav-btn.active { background: var(--primary); color: white; }
+        /* Sidebar - CampusSphere Style */
+        .sidebar { width: 280px; background: var(--dark); color: white; padding: 25px; display: flex; flex-direction: column; transition: 0.3s; z-index: 1000; }
+        .sidebar h2 { color: var(--primary); font-size: 1.2rem; margin-bottom: 40px; text-align: center; border-bottom: 1px solid #334155; padding-bottom: 20px; }
+        .nav-btn { padding: 16px; border-radius: 12px; color: #94a3b8; font-weight: 700; font-size: 0.75rem; cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(0,71,171,0.3); }
 
-        .header { position: sticky; top: 0; background: var(--white); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; z-index: 900; }
-        .content { padding: 15px; max-width: 1200px; margin: auto; }
-        .page { display: none; animation: fadeIn 0.2s ease-in; }
+        /* Main Content */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+        .header-info { text-align: right; }
+        #live-clock { font-size: 0.8rem; color: var(--primary); font-weight: 800; }
+        #sch-name { font-size: 0.65rem; color: #64748b; margin-top: 3px; }
+
+        .content { padding: 30px; overflow-y: auto; height: 100%; }
+        .page { display: none; animation: slideUp 0.3s ease; }
         .page.active { display: block; }
 
-        .card { background: white; padding: 18px; border-radius: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; border: 1px solid #e2e8f0; }
-        .card label { font-size: 0.6rem; font-weight: 800; color: #64748b; display: block; margin-bottom: 5px; }
-        .card p { font-size: 1.2rem; font-weight: 800; margin: 0; }
+        /* Dashboard Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: white; padding: 22px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .card label { font-size: 0.6rem; color: #64748b; font-weight: 800; }
+        .card p { font-size: 1.4rem; font-weight: 800; margin: 5px 0 0; }
 
-        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-weight: 700; font-size: 0.8rem; margin-top: 5px; background: white; }
-        
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 12px; text-align: left; font-size: 0.7rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; }
-        .st-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; }
+        /* Form & Inputs */
+        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-weight: 700; font-size: 0.8rem; margin-top: 8px; background: #fff; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; margin-top: 20px; transition: 0.2s; }
+        .btn-main:hover { opacity: 0.9; transform: translateY(-2px); }
 
-        .btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; margin-top: 10px; }
-        .act-btn { padding: 10px 15px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; font-size: 0.65rem; }
-        
-        #login-screen { position:fixed; inset:0; background:var(--dark); z-index:2000; display:flex; align-items:center; justify-content:center; padding: 20px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        /* Table Style */
+        .table-container { background: white; border-radius: 20px; border: 1px solid #e2e8f0; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.65rem; color: #64748b; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.75rem; font-weight: 700; }
+        .st-img { width: 45px; height: 45px; border-radius: 10px; object-fit: cover; background: #eee; }
+
+        #login-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div style="background:white; padding:35px; border-radius:25px; width:100%; max-width:380px; text-align:center;">
+    <div id="login-overlay">
+        <div style="background:white; padding:40px; border-radius:30px; width:380px; text-align:center;">
             <h2 style="color:var(--primary); margin:0;">EUDES MEDIA</h2>
-            <p id="clock" style="font-size:0.6rem; font-weight:800; margin:10px 0; color:#64748b;"></p>
-            <input type="text" id="sid" placeholder="SCHOOL ID">
+            <p style="font-size:0.6rem; color:#64748b; margin-top:5px;">CAMPUS PRO SYSTEM</p>
+            <input type="text" id="sid" placeholder="SCHOOL ID" style="margin-top:20px;">
             <input type="password" id="sk" placeholder="ACCESS KEY">
-            <button onclick="auth()" class="btn">SECURE LOGIN</button>
+            <button onclick="auth()" class="btn-main">ACCESS DASHBOARD</button>
         </div>
     </div>
 
-    <div class="overlay" id="ov" onclick="tgl()"></div>
-    <div class="sidebar" id="sb">
-        <h3 style="text-align:center; margin-bottom:30px; letter-spacing: 2px;">PREMIER PRO</h3>
-        <div class="nav-btn active" onclick="pg('dash', this)">📊 DASHBOARD</div>
-        <div class="nav-btn" onclick="prepAdd(); pg('form', this)">📝 ADMISSION</div>
-        <div class="nav-btn" onclick="ld(); pg('reg', this)">👥 REGISTRY</div>
-        <div class="nav-btn" onclick="ld(); pg('roll', this)">✅ ROLL CALL</div>
-        <div class="nav-btn" onclick="ld(); pg('fin', this)">💰 FINANCE</div>
+    <div class="sidebar">
+        <h2>PREMIER</h2>
+        <div class="nav-btn active" onclick="pg('dash', this)">DASHBOARD</div>
+        <div class="nav-btn" onclick="prepAdd(); pg('form', this)">ADMISSION</div>
+        <div class="nav-btn" onclick="ld(); pg('reg', this)">REGISTRY</div>
+        <div class="nav-btn" onclick="ld(); pg('roll', this)">ROLL CALL</div>
     </div>
 
-    <div class="header">
-        <button onclick="tgl()" style="background:none; border:none; font-size:1.5rem; color:var(--primary); cursor:pointer;">☰</button>
-        <div style="text-align:right">
-            <h4 id="schN" style="margin:0; font-size:0.7rem;">SYSTEM LOCKED</h4>
-            <p id="topT" style="margin:0; font-size:0.55rem; font-weight:800; color:#94a3b8;"></p>
-        </div>
-    </div>
-
-    <div class="content">
-        <div id="dash" class="page active">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
-                <div class="card"><label>TOTAL ENROLLED</label><p id="d1">0</p></div>
-                <div class="card"><label>ABSENT TODAY</label><p id="d2" style="color:var(--danger)">0</p></div>
+    <div class="main">
+        <div class="header">
+            <h3 style="margin:0; font-size:1rem;" id="page-title">OVERVIEW</h3>
+            <div class="header-info">
+                <div id="live-clock">-- : -- : --</div>
+                <div id="sch-name">PLEASE LOGIN</div>
             </div>
-            <div class="card" style="border-left:5px solid var(--primary)"><label>EXPECTED REVENUE</label><p id="d3">0</p></div>
-            <div class="card" style="border-left:5px solid var(--success)"><label>TOTAL PAID</label><p id="d4">0</p></div>
-            <div class="card" style="border-left:5px solid var(--danger)"><label>OUTSTANDING DEBT</label><p id="d5" style="color:var(--danger)">0</p></div>
         </div>
 
-        <div id="form" class="page">
-            <h3 id="ft">STUDENT ADMISSION</h3>
-            <div class="card">
-                <div onclick="document.getElementById('fi').click()" style="border:2px dashed var(--primary); padding:20px; text-align:center; border-radius:15px; background:#f8fafc; cursor:pointer; margin-bottom:15px;">
-                    <img id="pi" style="width:120px; height:120px; border-radius:15px; display:none; margin:0 auto 10px; object-fit:cover; border:3px solid white; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
-                    <span id="it" style="font-weight:800; color:var(--primary);">+ TAP TO UPLOAD PHOTO</span>
-                    <input type="file" id="fi" hidden accept="image/*" onchange="handleImg(this)">
+        <div class="content">
+            <div id="dash" class="page active">
+                <div class="grid">
+                    <div class="card"><label>ENROLLED</label><p id="count1">0</p></div>
+                    <div class="card"><label>ABSENT TODAY</label><p id="count2" style="color:var(--danger)">0</p></div>
+                    <div class="card"><label>TOTAL PAID</label><p id="count3" style="color:var(--success)">0</p></div>
+                    <div class="card"><label>DEBTORS</label><p id="count4" style="color:var(--danger)">0</p></div>
                 </div>
-                <input type="hidden" id="eid">
-                <input type="text" id="rn" placeholder="NAME">
-                <input type="text" id="rl" placeholder="LIN NUMBER">
-                <input type="tel" id="rt" placeholder="CONTACT">
-                <input type="text" id="ro" placeholder="LOCATION">
-                <input type="date" id="rd">
-                <select id="rc">
-                    <option value="">-- SELECT CLASS --</option>
-                    <option>Baby</option><option>Middle</option><option>Top</option>
-                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                    <option>P.5</option><option>P.6</option><option>P.7</option>
-                </select>
-                <input type="number" id="rf" placeholder="FEES (UGX)">
-                <button class="btn" onclick="saveData()">SAVE STUDENT</button>
+                <div class="card" style="min-height: 200px;">
+                    <label>RECENT ACTIVITY</label>
+                    <p style="font-size:0.7rem; color:#64748b; margin-top:10px;">System operational. Waiting for data...</p>
+                </div>
             </div>
-        </div>
 
-        <div id="reg" class="page">
-            <input type="text" id="sr" class="card" style="width:100%; border:2px solid var(--primary)" placeholder="🔍 SEARCH BY NAME OR LIN..." onkeyup="filterReg()">
-            <div style="overflow-x:auto; background:white; border-radius:15px; padding:10px;">
-                <table>
-                    <thead><tr><th>PHOTO</th><th>NAME</th><th>CLASS</th><th>DEBT</th><th>ACTION</th></tr></thead>
-                    <tbody id="rtb"></tbody>
-                </table>
+            <div id="form" class="page">
+                <div class="card" style="max-width:600px; margin:auto;">
+                    <h3 id="form-h">NEW ADMISSION</h3>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <input type="text" id="rn" placeholder="FULL NAME">
+                        <input type="text" id="rl" placeholder="LIN NUMBER">
+                        <input type="tel" id="rt" placeholder="PARENT CONTACT">
+                        <input type="text" id="ro" placeholder="LOCATION">
+                        <input type="text" id="rh" placeholder="HEALTH STATUS">
+                        <input type="date" id="rd">
+                        <select id="rc">
+                            <option value="">-- SELECT CLASS --</option>
+                            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                            <option>P.5</option><option>P.6</option><option>P.7</option>
+                        </select>
+                        <input type="number" id="rf" placeholder="TOTAL FEES (UGX)">
+                    </div>
+                    <input type="hidden" id="edit-id">
+                    <button class="btn-main" onclick="save()">SAVE STUDENT DATA</button>
+                </div>
             </div>
-        </div>
 
-        <div id="fin" class="page">
-            <select id="fc" onchange="filterFin()" style="border:2px solid var(--primary); margin-bottom:15px;">
-                <option value="">-- CHOOSE CLASS --</option>
-                <option>Baby</option><option>Middle</option><option>Top</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                <option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-            <div id="fl"></div>
-        </div>
+            <div id="reg" class="page">
+                <input type="text" id="srch" class="card" style="width:100%; margin-bottom:20px;" placeholder="🔍 SEARCH BY NAME OR LIN..." onkeyup="search()">
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>PHOTO</th><th>NAME</th><th>CLASS</th><th>BALANCE</th><th>ACTIONS</th></tr></thead>
+                        <tbody id="rtb"></tbody>
+                    </table>
+                </div>
+            </div>
 
-        <div id="roll" class="page">
-            <select id="ac" onchange="filterRoll()" style="border:2px solid var(--primary); margin-bottom:15px;">
-                <option value="">-- CHOOSE CLASS --</option>
-                <option>Baby</option><option>Middle</option><option>Top</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                <option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-            <div id="rbody"></div>
+            <div id="roll" class="page">
+                <h3>DAILY ATTENDANCE</h3>
+                <div id="roll-list"></div>
+            </div>
         </div>
     </div>
 
     <script>
         const _U = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const _K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        const supabaseClient = supabase.createClient(_U, _K);
-        let masterData = [], photoBuffer = "";
+        const s = supabase.createClient(_U, _K);
+        let da = [];
 
-        setInterval(() => { const n = new Date().toLocaleString(); document.getElementById('clock').innerText = n; document.getElementById('topT').innerText = n; }, 1000);
-        function tgl() { document.getElementById('sb').classList.toggle('open'); document.getElementById('ov').classList.toggle('active'); }
-        function pg(id, b) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(b) { document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active')); b.classList.add('active'); } if(window.innerWidth<1000) tgl(); }
-
-        function handleImg(i) {
-            const f = i.files[0]; const r = new FileReader(); r.readAsDataURL(f);
-            r.onload = (e) => {
-                const g = new Image(); g.src = e.target.result;
-                g.onload = () => {
-                    const c = document.createElement('canvas'); c.width = 300; c.height = (g.height/g.width)*300;
-                    c.getContext('2d').drawImage(g,0,0,300,c.height);
-                    photoBuffer = c.toDataURL('image/jpeg', 0.5);
-                    document.getElementById('pi').src = photoBuffer; document.getElementById('pi').style.display = 'block'; document.getElementById('it').style.display = 'none';
-                };
-            };
-        }
+        // Clock Logic
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('live-clock').innerText = now.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'medium' });
+        }, 1000);
 
         async function auth() {
-            try {
-                const i = document.getElementById('sid').value; const k = document.getElementById('sk').value;
-                const { data: d, error } = await supabaseClient.from('Schools').select('*').eq('sch_id', i).single();
-                if(error) throw error;
-                if(d && (k==d.admin_key || k==d.teacher_key)) { 
-                    document.getElementById('login-screen').style.display='none'; 
-                    document.getElementById('schN').innerText=d.school_name; 
-                    ld(); 
-                } else alert("INVALID CREDENTIALS");
-            } catch(e) { alert("LOGIN ERROR: " + e.message); }
+            const id = document.getElementById('sid').value;
+            const key = document.getElementById('sk').value;
+            const { data } = await s.from('Schools').select('*').eq('sch_id', id).single();
+            if(data && (key == data.admin_key || key == data.teacher_key)) {
+                document.getElementById('login-overlay').style.display='none';
+                document.getElementById('sch-name').innerText = data.school_name;
+                ld();
+            } else alert("INVALID ACCESS");
         }
 
         async function ld() {
-            const { data, error } = await supabaseClient.from('Students').select('*').order('name');
-            if(!error) { masterData = data; renderReg(masterData); updateDash(); }
+            const { data } = await s.from('Students').select('*').order('name');
+            da = data || [];
+            updateUI(da);
         }
 
-        function renderReg(list) {
+        function updateUI(list) {
             const b = document.getElementById('rtb'); b.innerHTML = '';
             list.forEach(x => {
-                const debt = (x.total_fees || 0) - (x.amount_paid || 0);
-                b.innerHTML += `<tr>
-                    <td><img src="${x.photo_url || ''}" class="st-img"></td>
-                    <td>${x.name}</td><td>${x.class}</td>
-                    <td style="color:red">${debt.toLocaleString()}</td>
-                    <td>
-                        <button class="act-btn" style="background:#e0f2fe; color:#0369a1;" onclick="prepEdit('${x.id}')">EDIT</button>
-                        <button class="act-btn" style="background:#fee2e2; color:#b91c1c;" onclick="delSt('${x.id}')">DEL</button>
-                    </td>
-                </tr>`;
+                const bal = x.total_fees - x.amount_paid;
+                b.innerHTML += `<tr><td><div class="st-img"></div></td><td>${x.name}</td><td>${x.class}</td><td style="color:red">${bal.toLocaleString()}</td><td><button onclick="edit('${x.id}')" style="cursor:pointer; background:none; border:none; color:var(--primary); font-weight:800;">EDIT</button></td></tr>`;
+            });
+            document.getElementById('count1').innerText = da.length;
+            document.getElementById('count2').innerText = da.filter(x=>x.is_absent).length;
+            document.getElementById('count3').innerText = da.reduce((a,b)=>a+(b.amount_paid||0),0).toLocaleString();
+            document.getElementById('count4').innerText = da.filter(x=>(x.total_fees-x.amount_paid)>0).length;
+            
+            // Build Roll Call
+            const rl = document.getElementById('roll-list'); rl.innerHTML = '';
+            da.forEach(x => {
+                rl.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><span>${x.name} (${x.class})</span><button onclick="att('${x.id}', ${x.is_absent})" style="background:${x.is_absent?'var(--danger)':'var(--success)'}; color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:800; cursor:pointer;">${x.is_absent?'ABSENT':'PRESENT'}</button></div>`;
             });
         }
 
-        function updateDash() {
-            const exp = masterData.reduce((a,b)=>a+(b.total_fees||0),0);
-            const pd = masterData.reduce((a,b)=>a+(b.amount_paid||0),0);
-            document.getElementById('d1').innerText = masterData.length;
-            document.getElementById('d2').innerText = masterData.filter(x=>x.is_absent).length;
-            document.getElementById('d3').innerText = exp.toLocaleString();
-            document.getElementById('d4').innerText = pd.toLocaleString();
-            document.getElementById('d5').innerText = (exp-pd).toLocaleString();
+        function pg(id, b) { 
+            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
+            b.classList.add('active');
+            document.getElementById('page-title').innerText = id.toUpperCase();
         }
 
-        function filterReg() {
-            const v = document.getElementById('sr').value.toLowerCase();
-            renderReg(masterData.filter(x => x.name.toLowerCase().includes(v) || x.lin.toLowerCase().includes(v)));
+        function prepAdd() { 
+            document.getElementById('edit-id').value=""; document.getElementById('rn').value=""; document.getElementById('form-h').innerText="NEW ADMISSION";
         }
 
-        function prepAdd() {
-            document.getElementById('eid').value=""; document.getElementById('rn').value=""; document.getElementById('rl').value=""; document.getElementById('rt').value=""; document.getElementById('ro').value=""; document.getElementById('rd').value=""; document.getElementById('rc').value=""; document.getElementById('rf').value=""; 
-            document.getElementById('pi').style.display='none'; document.getElementById('it').style.display='block'; photoBuffer=""; document.getElementById('ft').innerText="NEW ADMISSION";
+        async function save() {
+            const id = document.getElementById('edit-id').value;
+            const obj = { name: document.getElementById('rn').value, lin: document.getElementById('rl').value, contact: document.getElementById('rt').value, location: document.getElementById('ro').value, health: document.getElementById('rh').value, dob: document.getElementById('rd').value, class: document.getElementById('rc').value, total_fees: parseFloat(document.getElementById('rf').value)||0 };
+            if(id) await s.from('Students').update(obj).eq('id', id);
+            else await s.from('Students').insert([{...obj, is_absent:false, amount_paid:0}]);
+            alert("SAVED SUCCESSFULLY"); ld(); pg('reg', document.querySelectorAll('.nav-btn')[2]);
         }
 
-        async function saveData() {
-            try {
-                const id = document.getElementById('eid').value;
-                const obj = { 
-                    name: document.getElementById('rn').value, 
-                    lin: document.getElementById('rl').value, 
-                    contact: document.getElementById('rt').value, 
-                    location: document.getElementById('ro').value, 
-                    dob: document.getElementById('rd').value, 
-                    class: document.getElementById('rc').value, 
-                    photo_url: photoBuffer, 
-                    total_fees: parseFloat(document.getElementById('rf').value)||0 
-                };
-                if(!obj.name || !obj.class) return alert("NAME AND CLASS REQUIRED");
-
-                let res;
-                if(id) res = await supabaseClient.from('Students').update(obj).eq('id', id);
-                else res = await supabaseClient.from('Students').insert([{...obj, is_absent:false, amount_paid:0}]);
-                
-                if(res.error) throw res.error;
-                alert("SUCCESSFULLY SAVED");
-                await ld();
-                pg('reg');
-            } catch(e) { alert("SAVE ERROR: " + e.message); }
+        function edit(id) {
+            const x = da.find(a=>a.id==id);
+            document.getElementById('edit-id').value=x.id; document.getElementById('rn').value=x.name; document.getElementById('form-h').innerText="EDIT STUDENT";
+            pg('form', document.querySelectorAll('.nav-btn')[1]);
         }
 
-        function prepEdit(id) {
-            const x = masterData.find(a=>a.id===id);
-            document.getElementById('eid').value=x.id; document.getElementById('rn').value=x.name; document.getElementById('rl').value=x.lin; document.getElementById('rt').value=x.contact; document.getElementById('ro').value=x.location; document.getElementById('rd').value=x.dob; document.getElementById('rc').value=x.class; document.getElementById('rf').value=x.total_fees;
-            photoBuffer=x.photo_url; document.getElementById('pi').src=photoBuffer; document.getElementById('pi').style.display='block'; document.getElementById('it').style.display='none';
-            document.getElementById('ft').innerText="EDIT STUDENT"; pg('form');
+        async function att(id, st) {
+            await s.from('Students').update({ is_absent: !st }).eq('id', id);
+            await ld();
         }
 
-        async function delSt(id) { if(confirm("PERMANENTLY DELETE?")) { await supabaseClient.from('Students').delete().eq('id', id); ld(); } }
-
-        function filterFin() {
-            const c = document.getElementById('fc').value;
-            const b = document.getElementById('fl'); b.innerHTML = '';
-            masterData.filter(x=>x.class===c).forEach(x => {
-                b.innerHTML += `<div class="card">
-                    <p style="font-weight:800">${x.name}</p>
-                    <p style="color:red; font-size:0.7rem">DUE: ${(x.total_fees-x.amount_paid).toLocaleString()}</p>
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <input type="number" id="p${x.id}" placeholder="AMOUNT">
-                        <button class="act-btn" style="background:var(--success); color:white" onclick="makePay('${x.id}', ${x.amount_paid})">PAY</button>
-                    </div>
-                </div>`;
-            });
-        }
-
-        async function makePay(id, cur) {
-            const a = parseFloat(document.getElementById('p'+id).value)||0;
-            await supabaseClient.from('Students').update({ amount_paid: cur + a }).eq('id', id);
-            alert("PAYMENT SAVED"); await ld(); filterFin();
-        }
-
-        function filterRoll() {
-            const c = document.getElementById('ac').value;
-            const b = document.getElementById('rbody'); b.innerHTML = '';
-            masterData.filter(x=>x.class===c).forEach(x => {
-                b.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-weight:800">${x.name}</span>
-                    <button class="act-btn" style="background:${x.is_absent?'var(--danger)':'var(--success)'}; color:white; width:120px;" onclick="markAtt('${x.id}', ${x.is_absent})">
-                        ${x.is_absent?'ABSENT':'PRESENT'}
-                    </button>
-                </div>`;
-            });
-        }
-
-        async function markAtt(id, status) {
-            try {
-                const { error } = await supabaseClient.from('Students').update({ is_absent: !status }).eq('id', id);
-                if(error) throw error;
-                await ld();
-                filterRoll();
-            } catch(e) { alert("ATTENDANCE ERROR: " + e.message); }
+        function search() {
+            const v = document.getElementById('srch').value.toLowerCase();
+            updateUI(da.filter(x=>x.name.toLowerCase().includes(v) || x.lin.toLowerCase().includes(v)));
         }
     </script>
 </body>
