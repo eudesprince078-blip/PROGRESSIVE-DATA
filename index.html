@@ -7,41 +7,39 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --dark: #0f172a; --bg: #f8fafc; --white: #ffffff; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; }
+        :root { --primary: #0047AB; --dark: #0f172a; --bg: #f1f5f9; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
-        body { margin: 0; background: var(--bg); color: #1e293b; overflow-x: hidden; }
+        body { margin: 0; background: var(--bg); color: #1e293b; }
 
         .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; width: 280px; background: var(--dark); color: white; padding: 30px; transition: 0.3s; z-index: 1000; }
         .sidebar.open { left: 0; }
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
         .overlay.active { display: block; }
-        .nav-btn { padding: 15px; border-radius: 12px; color: #94a3b8; font-weight: 800; font-size: 0.7rem; cursor: pointer; margin-bottom: 5px; border: 1px solid transparent; }
-        .nav-btn.active { background: var(--primary); color: white; border-color: rgba(255,255,255,0.1); }
+        .nav-btn { padding: 15px; border-radius: 12px; color: #94a3b8; font-weight: 800; font-size: 0.7rem; cursor: pointer; margin-bottom: 5px; }
+        .nav-btn.active { background: var(--primary); color: white; }
 
         .header { position: sticky; top: 0; background: var(--white); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; z-index: 900; }
         .content { padding: 15px; }
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
 
-        .card { background: white; padding: 18px; border-radius: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 15px; }
-        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-weight: 700; font-size: 0.8rem; margin-top: 5px; outline-color: var(--primary); }
+        .card { background: white; padding: 18px; border-radius: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; border: 1px solid #e2e8f0; }
+        .card label { font-size: 0.6rem; font-weight: 800; color: #64748b; display: block; margin-bottom: 5px; }
+        .card p { font-size: 1.2rem; font-weight: 800; margin: 0; }
+
+        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-weight: 700; font-size: 0.8rem; margin-top: 5px; }
         
-        .search-bar { background: white; border: 2px solid var(--primary); padding: 15px; margin-bottom: 15px; border-radius: 12px; font-weight: 800; }
-        
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        table { width: 100%; border-collapse: collapse; min-width: 850px; }
         th, td { padding: 12px; text-align: left; font-size: 0.7rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; }
         .st-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; }
 
-        .btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); }
-
-        .action-btn { padding: 8px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; font-size: 0.6rem; margin-right: 5px; }
-        .edit { background: #e0e7ff; color: var(--primary); }
+        .btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; margin-top: 10px; }
+        .act-btn { padding: 8px 12px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; font-size: 0.65rem; }
+        .edit { background: #dbeafe; color: var(--primary); margin-right: 5px; }
         .del { background: #fee2e2; color: var(--danger); }
-        .pay { background: #dcfce7; color: var(--success); }
 
         #login-screen { position:fixed; inset:0; background:var(--dark); z-index:2000; display:flex; align-items:center; justify-content:center; padding: 20px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -49,289 +47,199 @@
     <div id="login-screen">
         <div style="background:white; padding:35px; border-radius:25px; width:100%; max-width:380px; text-align:center;">
             <h2 style="color:var(--primary); margin:0;">EUDES MEDIA</h2>
-            <p id="liveClock" style="font-size:0.65rem; font-weight:800; margin:10px 0; color: #64748b;"></p>
-            <input type="text" id="schoolId" placeholder="SCHOOL ID">
-            <input type="password" id="schoolKey" placeholder="ACCESS KEY">
-            <button onclick="handleLogin()" class="btn" style="margin-top: 15px;">LOGIN SYSTEM</button>
+            <p id="clock" style="font-size:0.6rem; font-weight:800; margin:10px 0; color:#64748b;"></p>
+            <input type="text" id="sid" placeholder="SCHOOL ID">
+            <input type="password" id="sk" placeholder="ACCESS KEY">
+            <button onclick="auth()" class="btn">LOGIN</button>
         </div>
     </div>
 
-    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-    <div class="sidebar" id="sidebar">
-        <h3 style="text-align:center; margin-bottom:30px; letter-spacing: 1px;">PREMIER ENGINE</h3>
-        <div class="nav-btn active" onclick="navTo('dash-p', this)">📊 DASHBOARD</div>
-        <div class="nav-btn" onclick="navTo('reg-p', this)">📝 NEW ADMISSION</div>
-        <div class="nav-btn" onclick="refreshData(); navTo('list-p', this)">👥 STUDENT REGISTRY</div>
-        <div class="nav-btn" onclick="refreshData(); navTo('roll-p', this)">✅ ROLL CALL</div>
-        <div class="nav-btn" onclick="refreshData(); navTo('fin-p', this)">💰 FINANCE CENTER</div>
-        <button onclick="location.reload()" style="margin-top:50px; background:none; border:none; color:var(--danger); font-weight:800; width:100%; cursor:pointer;">LOGOUT</button>
+    <div class="overlay" id="ov" onclick="tgl_menu()"></div>
+    <div class="sidebar" id="sb">
+        <h3 style="text-align:center; margin-bottom:30px;">PREMIER ENGINE</h3>
+        <div class="nav-btn active" onclick="pg('dash', this)">📊 DASHBOARD</div>
+        <div class="nav-btn" onclick="pg('form', this)">📝 ADMISSION</div>
+        <div class="nav-btn" onclick="ld_data(); pg('reg', this)">👥 REGISTRY</div>
+        <div class="nav-btn" onclick="ld_data(); pg('roll', this)">✅ ROLL CALL</div>
+        <div class="nav-btn" onclick="ld_data(); pg('fin', this)">💰 FINANCE</div>
     </div>
 
     <div class="header">
-        <button onclick="toggleSidebar()" style="background:none; border:none; font-size:1.5rem; color:var(--primary); cursor:pointer;">☰</button>
+        <button onclick="tgl_menu()" style="background:none; border:none; font-size:1.5rem; color:var(--primary);">☰</button>
         <div style="text-align:right">
-            <h4 id="topSchName" style="margin:0; font-size:0.7rem; color:var(--primary);"></h4>
-            <p id="topDate" style="margin:0; font-size:0.55rem; font-weight:800; color: #94a3b8;"></p>
+            <h4 id="schN" style="margin:0; font-size:0.7rem;"></h4>
+            <p id="topT" style="margin:0; font-size:0.55rem; font-weight:800; color:#94a3b8;"></p>
         </div>
     </div>
 
     <div class="content">
-        <div id="dash-p" class="page active">
-            <h3 style="margin-bottom:15px;">OVERVIEW</h3>
+        <div id="dash" class="page active">
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
-                <div class="card"><label style="font-size:0.6rem;">STUDENTS</label><p id="dashTotal" style="font-size:1.5rem;">0</p></div>
-                <div class="card"><label style="font-size:0.6rem;">ABSENT</label><p id="dashAbsent" style="font-size:1.5rem; color:var(--danger)">0</p></div>
+                <div class="card"><label>TOTAL STUDENTS</label><p id="dash_total">0</p></div>
+                <div class="card"><label>ABSENT TODAY</label><p id="dash_absent" style="color:var(--danger)">0</p></div>
             </div>
-            <div class="card" style="border-left: 5px solid var(--success);">
-                <label style="font-size:0.6rem;">FINANCE (TOTAL PAID UGX)</label>
-                <p id="dashFinance" style="font-size:1.5rem; color:var(--success)">0</p>
-            </div>
+            <div class="card" style="border-left:5px solid var(--primary)"><label>EXPECTED REVENUE (UGX)</label><p id="dash_exp">0</p></div>
+            <div class="card" style="border-left:5px solid var(--success)"><label>TOTAL COLLECTED (UGX)</label><p id="dash_pd">0</p></div>
+            <div class="card" style="border-left:5px solid var(--danger)"><label>TOTAL DEBT (UGX)</label><p id="dash_debt" style="color:var(--danger)">0</p></div>
         </div>
 
-        <div id="reg-p" class="page">
-            <h3 id="formTitle">STUDENT ADMISSION</h3>
+        <div id="form" class="page">
+            <h3 id="form_title">NEW ADMISSION</h3>
             <div class="card">
-                <div onclick="document.getElementById('fileInp').click()" style="border:2px dashed var(--primary); padding:20px; text-align:center; border-radius:15px; background:#f0f7ff; cursor:pointer;">
-                    <img id="imgPrev" style="width:100px; height:100px; border-radius:12px; display:none; margin:0 auto 10px; object-fit:cover;">
-                    <span id="imgTxt">+ UPLOAD STUDENT PHOTO</span>
-                    <input type="file" id="fileInp" hidden accept="image/*" onchange="handleImg(this)">
+                <div onclick="document.getElementById('fi').click()" style="border:2px dashed var(--primary); padding:20px; text-align:center; border-radius:15px; background:#f8fafc; cursor:pointer;">
+                    <img id="pi" style="width:100px; height:100px; border-radius:12px; display:none; margin:0 auto 10px; object-fit:cover;">
+                    <span id="it">+ STUDENT PHOTO</span>
+                    <input type="file" id="fi" hidden accept="image/*" onchange="compress_img(this)">
                 </div>
-                <input type="hidden" id="editStudentId">
-                <input type="text" id="fName" placeholder="FULL NAME">
-                <input type="text" id="fLin" placeholder="LIN (ID NUMBER)">
-                <input type="tel" id="fTel" placeholder="CONTACT NUMBER">
-                <input type="text" id="fLoc" placeholder="PHYSICAL LOCATION">
-                <input type="date" id="fDob" title="DATE OF BIRTH">
-                <select id="fClass">
+                <input type="hidden" id="edit_id">
+                <input type="text" id="r_name" placeholder="FULL NAME">
+                <input type="text" id="r_lin" placeholder="LIN">
+                <input type="tel" id="r_tel" placeholder="CONTACT">
+                <input type="text" id="r_loc" placeholder="LOCATION">
+                <input type="date" id="r_dob">
+                <select id="r_class">
                     <option value="">-- SELECT CLASS --</option>
                     <option>Baby</option><option>Middle</option><option>Top</option>
                     <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                     <option>P.5</option><option>P.6</option><option>P.7</option>
                 </select>
-                <input type="number" id="fFees" placeholder="TOTAL TUITION (UGX)">
-                <button class="btn" id="saveActionBtn" onclick="saveToSupabase()" style="margin-top:15px;">SAVE STUDENT DATA</button>
+                <input type="number" id="r_fees" placeholder="TOTAL FEES">
+                <button class="btn" onclick="save_student()">SAVE STUDENT DATA</button>
             </div>
         </div>
 
-        <div id="list-p" class="page">
-            <h3>REGISTRY</h3>
-            <input type="text" class="search-bar" id="mainSearch" placeholder="🔍 SEARCH NAME OR LIN..." onkeyup="runSearch()">
-            <div style="overflow-x:auto; background:white; border-radius:18px;">
+        <div id="reg" class="page">
+            <input type="text" id="search_box" class="card" style="width:100%; border:2px solid var(--primary)" placeholder="🔍 SEARCH NAME OR LIN..." onkeyup="run_search()">
+            <div style="overflow-x:auto; background:white; border-radius:15px;">
                 <table>
                     <thead><tr><th>PHOTO</th><th>NAME</th><th>CLASS</th><th>DEBT</th><th>ACTIONS</th></tr></thead>
-                    <tbody id="regTableBody"></tbody>
+                    <tbody id="reg_table"></tbody>
                 </table>
             </div>
         </div>
 
-        <div id="roll-p" class="page">
-            <h3>ATTENDANCE</h3>
-            <select id="rollClassFilter" onchange="renderRollCall()" style="border:2px solid var(--primary); margin-bottom:15px;">
-                <option value="">-- CHOOSE CLASS --</option>
+        <div id="fin" class="page">
+            <h3>FINANCE CENTER</h3>
+            <select id="fin_class" onchange="filter_fin()" style="border:2px solid var(--primary); margin-bottom:15px;">
+                <option value="">-- SELECT CLASS --</option>
                 <option>Baby</option><option>Middle</option><option>Top</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <div id="rollContainer"></div>
+            <div id="fin_list"></div>
         </div>
 
-        <div id="fin-p" class="page">
-            <h3>FINANCE CENTER</h3>
-            <div id="financeList"></div>
+        <div id="roll" class="page">
+            <h3>ROLL CALL</h3>
+            <select id="roll_class" onchange="filter_roll()" style="border:2px solid var(--primary); margin-bottom:15px;">
+                <option value="">-- SELECT CLASS --</option>
+                <option>Baby</option><option>Middle</option><option>Top</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                <option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
+            <div id="roll_list"></div>
         </div>
     </div>
 
     <script>
         const _U = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const _K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        const supabaseClient = supabase.createClient(_U, _K);
-        let studentData = [], currentBase64 = "";
+        const sb = supabase.createClient(_U, _K);
+        let masterList = [], photoBase64 = "";
 
-        // CLOCK
-        setInterval(() => { 
-            const n = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }); 
-            document.getElementById('liveClock').innerText = n; 
-            document.getElementById('topDate').innerText = n; 
-        }, 1000);
+        setInterval(() => { const n = new Date().toLocaleString(); document.getElementById('clock').innerText = n; document.getElementById('topT').innerText = n; }, 1000);
+        function tgl_menu() { document.getElementById('sb').classList.toggle('open'); document.getElementById('ov').classList.toggle('active'); }
+        function pg(id, b) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(b) { document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active')); b.classList.add('active'); } if(window.innerWidth<1000) tgl_menu(); }
 
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('active'); }
-        
-        function navTo(pageId, btn) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
-            if(btn) btn.classList.add('active');
-            if(window.innerWidth < 1000) toggleSidebar();
-        }
-
-        function handleImg(input) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 450;
-                    const scaleSize = MAX_WIDTH / img.width;
-                    canvas.width = MAX_WIDTH;
-                    canvas.height = img.height * scaleSize;
-                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                    currentBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                    document.getElementById('imgPrev').src = currentBase64;
-                    document.getElementById('imgPrev').style.display = 'block';
-                    document.getElementById('imgTxt').style.display = 'none';
+        function compress_img(i) {
+            const f = i.files[0]; const r = new FileReader(); r.readAsDataURL(f);
+            r.onload = (e) => {
+                const g = new Image(); g.src = e.target.result;
+                g.onload = () => {
+                    const c = document.createElement('canvas'); c.width = 400; c.height = (g.height/g.width)*400;
+                    c.getContext('2d').drawImage(g,0,0,400,c.height);
+                    photoBase64 = c.toDataURL('image/jpeg', 0.6);
+                    document.getElementById('pi').src = photoBase64; document.getElementById('pi').style.display = 'block'; document.getElementById('it').style.display = 'none';
                 };
             };
         }
 
-        async function handleLogin() {
-            const id = document.getElementById('schoolId').value;
-            const key = document.getElementById('schoolKey').value;
-            const { data: school } = await supabaseClient.from('Schools').select('*').eq('sch_id', id).single();
-            if(school && (key === school.admin_key || key === school.teacher_key)) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('topSchName').innerText = school.school_name;
-                refreshData();
-            } else { alert("ACCESS DENIED: CHECK YOUR KEY"); }
+        async function auth() {
+            const i = document.getElementById('sid').value; const k = document.getElementById('sk').value;
+            const { data: d } = await sb.from('Schools').select('*').eq('sch_id', i).single();
+            if(d && (k==d.admin_key || k==d.teacher_key)) { document.getElementById('login-screen').style.display='none'; document.getElementById('schN').innerText=d.school_name; ld_data(); }
+            else alert("WRONG KEY");
         }
 
-        async function saveToSupabase() {
-            const editId = document.getElementById('editStudentId').value;
-            const payload = {
-                name: document.getElementById('fName').value,
-                lin: document.getElementById('fLin').value,
-                contact: document.getElementById('fTel').value,
-                location: document.getElementById('fLoc').value,
-                dob: document.getElementById('fDob').value,
-                class: document.getElementById('fClass').value,
-                photo_url: currentBase64,
-                total_fees: parseFloat(document.getElementById('fFees').value) || 0
-            };
-
-            let response;
-            if(editId) {
-                response = await supabaseClient.from('Students').update(payload).eq('id', editId);
-            } else {
-                response = await supabaseClient.from('Students').insert([{...payload, is_absent: false, amount_paid: 0}]);
-            }
-
-            if(!response.error) { alert("DATA SYNCED SUCCESSFULLY"); location.reload(); }
-            else { alert("ERROR: CHECK DATABASE COLUMNS"); console.error(response.error); }
+        async function ld_data() {
+            const { data } = await sb.from('Students').select('*').order('name');
+            masterList = data || [];
+            update_ui(masterList);
         }
 
-        async function refreshData() {
-            const { data } = await supabaseClient.from('Students').select('*').order('name');
-            studentData = data || [];
-            renderRegistry(studentData);
-            updateDashboard(studentData);
-            renderFinance(studentData);
+        function update_ui(list) {
+            const b = document.getElementById('reg_table'); b.innerHTML = '';
+            list.forEach(x => {
+                const debt = (x.total_fees || 0) - (x.amount_paid || 0);
+                b.innerHTML += `<tr><td><img src="${x.photo_url}" class="st-img"></td><td>${x.name}</td><td>${x.class}</td><td style="color:red">${debt.toLocaleString()}</td><td><button class="act-btn edit" onclick="prep_edit('${x.id}')">EDIT</button><button class="act-btn del" onclick="delete_st('${x.id}')">DEL</button></td></tr>`;
+            });
+            const exp = masterList.reduce((a,b)=>a+(b.total_fees||0),0);
+            const pd = masterList.reduce((a,b)=>a+(b.amount_paid||0),0);
+            document.getElementById('dash_total').innerText = masterList.length;
+            document.getElementById('dash_absent').innerText = masterList.filter(x=>x.is_absent).length;
+            document.getElementById('dash_exp').innerText = exp.toLocaleString();
+            document.getElementById('dash_pd').innerText = pd.toLocaleString();
+            document.getElementById('dash_debt').innerText = (exp-pd).toLocaleString();
         }
 
-        function renderRegistry(list) {
-            const body = document.getElementById('regTableBody');
-            body.innerHTML = '';
-            list.forEach(s => {
-                const debt = (s.total_fees || 0) - (s.amount_paid || 0);
-                body.innerHTML += `<tr>
-                    <td><img src="${s.photo_url || ''}" class="st-img"></td>
-                    <td>${s.name}</td>
-                    <td>${s.class}</td>
-                    <td style="color:${debt > 0 ? 'red' : 'green'}">${debt.toLocaleString()}</td>
-                    <td>
-                        <button class="action-btn edit" onclick="prepEdit('${s.id}')">EDIT</button>
-                        <button class="action-btn del" onclick="handleDelete('${s.id}')">DEL</button>
-                    </td>
-                </tr>`;
+        function run_search() {
+            const v = document.getElementById('search_box').value.toLowerCase();
+            const filtered = masterList.filter(x => x.name.toLowerCase().includes(v) || x.lin.toLowerCase().includes(v));
+            update_ui(filtered);
+        }
+
+        async function save_student() {
+            const eid = document.getElementById('edit_id').value;
+            const obj = { name: document.getElementById('r_name').value, lin: document.getElementById('r_lin').value, contact: document.getElementById('r_tel').value, location: document.getElementById('r_loc').value, dob: document.getElementById('r_dob').value, class: document.getElementById('r_class').value, photo_url: photoBase64, total_fees: parseFloat(document.getElementById('r_fees').value)||0 };
+            if(eid) await sb.from('Students').update(obj).eq('id', eid);
+            else await sb.from('Students').insert([{...obj, is_absent:false, amount_paid:0}]);
+            location.reload();
+        }
+
+        function prep_edit(id) {
+            const x = masterList.find(a => a.id === id);
+            document.getElementById('edit_id').value = x.id; document.getElementById('r_name').value = x.name; document.getElementById('r_lin').value = x.lin; document.getElementById('r_tel').value = x.contact; document.getElementById('r_loc').value = x.location; document.getElementById('r_dob').value = x.dob; document.getElementById('r_class').value = x.class; document.getElementById('r_fees').value = x.total_fees;
+            photoBase64 = x.photo_url; document.getElementById('pi').src = photoBase64; document.getElementById('pi').style.display = 'block'; document.getElementById('it').style.display = 'none';
+            document.getElementById('form_title').innerText = "EDIT STUDENT"; pg('form');
+        }
+
+        async function delete_st(id) { if(confirm("DELETE?")) { await sb.from('Students').delete().eq('id', id); ld_data(); } }
+
+        function filter_fin() {
+            const c = document.getElementById('fin_class').value;
+            const l = masterList.filter(x => x.class === c);
+            const b = document.getElementById('fin_list'); b.innerHTML = '';
+            l.forEach(x => {
+                b.innerHTML += `<div class="card"><p style="font-weight:800">${x.name}</p><p style="color:red; font-size:0.7rem">DEBT: ${(x.total_fees-x.amount_paid).toLocaleString()}</p><div style="display:flex; gap:10px; margin-top:10px;"><input type="number" id="pay${x.id}" placeholder="AMOUNT"><button class="act-btn" style="background:green; color:white" onclick="make_pay('${x.id}', ${x.amount_paid})">PAY</button></div></div>`;
             });
         }
 
-        function runSearch() {
-            const term = document.getElementById('mainSearch').value.toLowerCase();
-            const filtered = studentData.filter(s => s.name.toLowerCase().includes(term) || s.lin.toLowerCase().includes(term));
-            renderRegistry(filtered);
+        async function make_pay(id, cur) {
+            const a = parseFloat(document.getElementById('pay'+id).value)||0;
+            await sb.from('Students').update({ amount_paid: cur + a }).eq('id', id);
+            alert("PAID"); ld_data(); setTimeout(filter_fin, 500);
         }
 
-        function renderRollCall() {
-            const cls = document.getElementById('rollClassFilter').value;
-            const list = studentData.filter(s => s.class === cls);
-            const container = document.getElementById('rollContainer');
-            container.innerHTML = '';
-            list.forEach(s => {
-                container.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-weight:800; font-size:0.75rem;">${s.name}</span>
-                    <button class="action-btn" style="width:100px; background:${s.is_absent ? 'var(--danger)' : 'var(--success)'}; color:white;" 
-                    onclick="updateAttendance('${s.id}', ${s.is_absent})">
-                        ${s.is_absent ? 'ABSENT' : 'PRESENT'}
-                    </button>
-                </div>`;
+        function filter_roll() {
+            const c = document.getElementById('roll_class').value;
+            const l = masterList.filter(x => x.class === c);
+            const b = document.getElementById('roll_list'); b.innerHTML = '';
+            l.forEach(x => {
+                b.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><span>${x.name}</span><button class="act-btn" style="background:${x.is_absent?'red':'green'}; color:white" onclick="toggle_att('${x.id}', ${x.is_absent})">${x.is_absent?'ABSENT':'PRESENT'}</button></div>`;
             });
         }
 
-        async function updateAttendance(id, current) {
-            await supabaseClient.from('Students').update({ is_absent: !current }).eq('id', id);
-            await refreshData();
-            renderRollCall();
-        }
-
-        function renderFinance(list) {
-            const container = document.getElementById('financeList');
-            container.innerHTML = '';
-            list.forEach(s => {
-                container.innerHTML += `<div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:800;">${s.name}</span>
-                        <span style="color:var(--danger); font-size:0.7rem;">DEBT: ${(s.total_fees - s.amount_paid).toLocaleString()}</span>
-                    </div>
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <input type="number" id="pay_${s.id}" placeholder="ENTER AMOUNT" style="flex:1;">
-                        <button class="action-btn pay" style="padding:10px 20px;" onclick="addPayment('${s.id}', ${s.amount_paid})">PAY</button>
-                    </div>
-                </div>`;
-            });
-        }
-
-        async function addPayment(id, currentPaid) {
-            const amount = parseFloat(document.getElementById(`pay_${id}`).value) || 0;
-            if(amount <= 0) return;
-            await supabaseClient.from('Students').update({ amount_paid: currentPaid + amount }).eq('id', id);
-            alert("PAYMENT RECEIVED");
-            refreshData();
-        }
-
-        async function handleDelete(id) {
-            if(confirm("PERMANENTLY DELETE STUDENT?")) {
-                await supabaseClient.from('Students').delete().eq('id', id);
-                refreshData();
-            }
-        }
-
-        function prepEdit(id) {
-            const s = studentData.find(x => x.id === id);
-            document.getElementById('editStudentId').value = s.id;
-            document.getElementById('fName').value = s.name;
-            document.getElementById('fLin').value = s.lin;
-            document.getElementById('fTel').value = s.contact;
-            document.getElementById('fLoc').value = s.location;
-            document.getElementById('fDob').value = s.dob;
-            document.getElementById('fClass').value = s.class;
-            document.getElementById('fFees').value = s.total_fees;
-            currentBase64 = s.photo_url;
-            document.getElementById('imgPrev').src = s.photo_url;
-            document.getElementById('imgPrev').style.display = 'block';
-            document.getElementById('imgTxt').style.display = 'none';
-            document.getElementById('formTitle').innerText = "EDIT STUDENT INFO";
-            document.getElementById('saveActionBtn').innerText = "UPDATE STUDENT RECORD";
-            navTo('reg-p', document.querySelectorAll('.nav-btn')[1]);
-        }
-
-        function updateDashboard(list) {
-            document.getElementById('dashTotal').innerText = list.length;
-            document.getElementById('dashAbsent').innerText = list.filter(x => x.is_absent).length;
-            const totalCash = list.reduce((sum, s) => sum + (s.amount_paid || 0), 0);
-            document.getElementById('dashFinance').innerText = totalCash.toLocaleString();
-        }
+        async function toggle_att(id, t) { await sb.from('Students').update({ is_absent: !t }).eq('id', id); await ld_data(); filter_roll(); }
     </script>
 </body>
 </html>
