@@ -5,48 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ESMS AUTHORITY | EUDES MEDIA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --bg: #f8fafc; --dark: #0f172a; --white: #ffffff; }
+        :root { --primary: #0047AB; --bg: #0f172a; --white: #ffffff; }
         * { box-sizing: border-box; text-transform: uppercase; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); margin: 0; color: #1e293b; }
+        body { background: var(--bg); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
         
-        #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: var(--white); padding: 40px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; }
+        .login-card { background: var(--white); padding: 40px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
         input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; text-align: center; outline: none; }
-        .btn { padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; }
-        #err { color: #e11d48; font-size: 0.7rem; margin-top: 15px; font-weight: 800; display: none; }
-
-        .header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; }
-        .logo { width: 55px; height: 55px; border-radius: 12px; object-fit: contain; }
+        .btn { padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; transition: 0.3s; }
+        .btn:active { transform: scale(0.98); }
+        
+        #err { color: #e11d48; font-size: 0.7rem; margin-top: 15px; font-weight: 800; display: none; background: #fff1f2; padding: 10px; border-radius: 10px; }
+        
+        /* DASHBOARD VIEW */
+        #main-app { position: fixed; inset: 0; background: #f8fafc; display: none; flex-direction: column; }
+        .header { background: white; padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px; }
+        .logo { width: 50px; height: 50px; border-radius: 10px; background: #eee; object-fit: contain; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-card">
-            <h1 style="color:var(--primary); margin:0;">ESMS AUTHORITY</h1>
-            <p style="font-size:0.55rem; color:#64748b; font-weight:800; margin-bottom:25px;">EUDES MEDIA SOLUTIONS</p>
+            <h1 style="color:var(--primary); margin:0; font-size: 1.6rem;">ESMS AUTHORITY</h1>
+            <p style="font-size:0.55rem; color:#64748b; font-weight:800; margin-bottom:25px; letter-spacing: 1px;">EUDES MEDIA SOLUTIONS</p>
+            
             <input type="text" id="schId" placeholder="SCHOOL ID (PM001)">
-            <input type="password" id="schKey" placeholder="ACCESS KEY">
-            <button class="btn" onclick="authenticate()">OPEN SYSTEM</button>
-            <p id="err"></p>
+            <input type="password" id="schKey" placeholder="ACCESS KEY (PM2026)">
+            <button class="btn" id="loginBtn" onclick="authenticate()">OPEN SYSTEM</button>
+            
+            <div id="err"></div>
         </div>
     </div>
 
-    <div id="main-app" style="display:none;">
+    <div id="main-app">
         <div class="header">
-            <img src="" id="schLogo" class="logo" onerror="this.src='https://via.placeholder.com/60'">
+            <img src="" id="schLogo" class="logo" onerror="this.src='https://via.placeholder.com/50'">
             <div>
                 <h2 id="schName" style="margin:0; font-size: 1.1rem; color: var(--primary);">---</h2>
-                <div style="font-size:0.55rem; color:#64748b; font-weight:800;">DASHBOARD ACTIVE</div>
+                <p style="margin:0; font-size: 0.6rem; font-weight: 800; color: #64748b;">DASHBOARD ACTIVE</p>
             </div>
         </div>
-        <div style="padding:20px; text-align:center;">
-            <div style="background:white; padding:30px; border-radius:20px; border:1px solid #e2e8f0;">
-                <h2 style="color:var(--primary)">AUTHENTICATED</h2>
-                <p>YOU ARE NOW CONNECTED TO THE DATABASE.</p>
-                <button class="btn" onclick="location.reload()" style="background:#64748b; width:150px;">LOGOUT</button>
+        <div style="padding:40px; text-align: center;">
+            <div style="background:white; padding:40px; border-radius:25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h2 style="color:var(--primary)">WELCOME BACK</h2>
+                <p style="font-weight: 700;">SYSTEM IS CONNECTED TO SUPABASE</p>
+                <button class="btn" onclick="location.reload()" style="background:#64748b; width:150px; margin-top:20px;">LOGOUT</button>
             </div>
         </div>
     </div>
@@ -60,32 +65,39 @@
             const idInput = document.getElementById('schId').value.trim().toUpperCase();
             const keyInput = document.getElementById('schKey').value.trim();
             const errBox = document.getElementById('err');
-            
+            const btn = document.getElementById('loginBtn');
+
+            btn.innerText = "CONNECTING...";
             errBox.style.display = "none";
 
             try {
-                // FIXED: Changed 'sch_id' to 'scho_id' to match your Supabase table
-                const { data, error } = await client
-                    .from('Schools')
-                    .select('*')
-                    .eq('scho_id', idInput)
-                    .single();
+                // 1. Get ALL rows from Schools table
+                const { data: schools, error } = await client.from('Schools').select('*');
 
-                if (error || !data) {
-                    throw new Error("SCHOOL ID NOT FOUND IN DATABASE");
+                if (error) throw new Error("Check Internet Connection");
+
+                // 2. Search for the ID in ANY column (scho_id or sch_id)
+                const school = schools.find(s => {
+                    const checkID = (s.scho_id || s.sch_id || "").toString().toUpperCase();
+                    return checkID === idInput;
+                });
+
+                if (!school) {
+                    throw new Error(`ID "${idInput}" NOT FOUND. CHECK SUPABASE TABLE.`);
                 }
 
-                // Check key (PM2026)
-                if (keyInput === data.admin_key || keyInput === data.teacher_key) {
+                // 3. Match the Access Key
+                if (keyInput === school.admin_key || keyInput === school.teacher_key) {
                     document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('main-app').style.display = 'block';
-                    document.getElementById('schName').innerText = data.school_name;
-                    document.getElementById('schLogo').src = data.logo_url || "";
+                    document.getElementById('main-app').style.display = 'flex';
+                    document.getElementById('schName').innerText = school.school_name;
+                    document.getElementById('schLogo').src = school.logo_url || "";
                 } else {
-                    throw new Error("INVALID ACCESS KEY");
+                    throw new Error("WRONG ACCESS KEY. PLEASE TRY AGAIN.");
                 }
 
             } catch (e) {
+                btn.innerText = "OPEN SYSTEM";
                 errBox.style.display = "block";
                 errBox.innerText = "⚠️ " + e.message;
             }
