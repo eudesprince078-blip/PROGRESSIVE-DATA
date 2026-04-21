@@ -58,7 +58,7 @@
     <div class="sidebar" id="sb">
         <h3 style="text-align:center; margin-bottom:30px;">PREMIER ENGINE</h3>
         <div class="nav-btn active" onclick="pg('dash', this)">📊 DASHBOARD</div>
-        <div class="nav-btn" onclick="pg('form', this)">📝 NEW ADMISSION</div>
+        <div class="nav-btn" onclick="clear_form(); pg('form', this)">📝 NEW ADMISSION</div>
         <div class="nav-btn" onclick="ld(); pg('reg', this)">👥 REGISTRY</div>
         <div class="nav-btn" onclick="ld(); pg('roll', this)">✅ ROLL CALL</div>
         <div class="nav-btn" onclick="ld(); pg('fin', this)">💰 FINANCE</div>
@@ -84,34 +84,35 @@
         </div>
 
         <div id="form" class="page">
-            <h3 id="ft">NEW ADMISSION</h3>
+            <h3 id="ft">NEW STUDENT ENTRY</h3>
             <div class="card">
                 <div onclick="document.getElementById('fi').click()" style="border:2px dashed var(--primary); padding:20px; text-align:center; border-radius:15px; background:#f8fafc; cursor:pointer;">
                     <img id="pi" style="width:100px; height:100px; border-radius:12px; display:none; margin:0 auto 10px; object-fit:cover;">
-                    <span id="it">+ PHOTO</span>
+                    <span id="it">+ UPLOAD PHOTO</span>
                     <input type="file" id="fi" hidden accept="image/*" onchange="cp(this)">
                 </div>
                 <input type="hidden" id="eid">
-                <input type="text" id="rn" placeholder="FULL NAME">
-                <input type="text" id="rl" placeholder="LIN">
-                <input type="tel" id="rt" placeholder="CONTACT">
-                <input type="text" id="ro" placeholder="LOCATION">
+                <input type="text" id="rn" placeholder="STUDENT FULL NAME">
+                <input type="text" id="rl" placeholder="LIN / STUDENT ID">
+                <input type="tel" id="rt" placeholder="PARENT CONTACT">
+                <input type="text" id="ro" placeholder="PHYSICAL LOCATION">
                 <input type="date" id="rd">
                 <select id="rc">
-                    <option value="">-- CLASS --</option>
+                    <option value="">-- SELECT CLASS --</option>
                     <option>Baby</option><option>Middle</option><option>Top</option>
                     <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                     <option>P.5</option><option>P.6</option><option>P.7</option>
                 </select>
-                <input type="number" id="rf" placeholder="TOTAL FEES">
-                <button class="btn" onclick="sv()">SAVE DATA</button>
+                <input type="number" id="rf" placeholder="TOTAL SCHOOL FEES (UGX)">
+                <button class="btn" onclick="sv()">CONFIRM AND SAVE</button>
             </div>
         </div>
 
         <div id="reg" class="page">
+            <h3>STUDENT REGISTRY</h3>
             <input type="text" id="sr" class="card" style="width:100%; border:2px solid var(--primary)" placeholder="🔍 SEARCH NAME OR LIN..." onkeyup="sh()">
             <div style="overflow-x:auto; background:white; border-radius:15px;">
-                <table>
+                <table id="st_table">
                     <thead><tr><th>PHOTO</th><th>NAME</th><th>CLASS</th><th>DEBT</th><th>ACTION</th></tr></thead>
                     <tbody id="rtb"></tbody>
                 </table>
@@ -119,8 +120,9 @@
         </div>
 
         <div id="fin" class="page">
+            <h3>FINANCE CENTER</h3>
             <select id="fc" onchange="rf()" style="border:2px solid var(--primary); margin-bottom:15px;">
-                <option value="">-- SELECT CLASS FOR FINANCE --</option>
+                <option value="">-- SELECT CLASS --</option>
                 <option>Baby</option><option>Middle</option><option>Top</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
@@ -129,8 +131,9 @@
         </div>
 
         <div id="roll" class="page">
+            <h3>DAILY ATTENDANCE</h3>
             <select id="ac" onchange="ra()" style="border:2px solid var(--primary); margin-bottom:15px;">
-                <option value="">-- SELECT CLASS FOR ROLL CALL --</option>
+                <option value="">-- SELECT CLASS --</option>
                 <option>Baby</option><option>Middle</option><option>Top</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
@@ -148,6 +151,10 @@
         setInterval(() => { const n = new Date().toLocaleString(); document.getElementById('clock').innerText = n; document.getElementById('topT').innerText = n; }, 1000);
         function tgl() { document.getElementById('sb').classList.toggle('open'); document.getElementById('ov').classList.toggle('active'); }
         function pg(id, b) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(b) { document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active')); b.classList.add('active'); } if(window.innerWidth<1000) tgl(); }
+
+        function clear_form() {
+            document.getElementById('eid').value=""; document.getElementById('rn').value=""; document.getElementById('rl').value=""; document.getElementById('rt').value=""; document.getElementById('ro').value=""; document.getElementById('rd').value=""; document.getElementById('rc').value=""; document.getElementById('rf').value=""; document.getElementById('pi').style.display='none'; document.getElementById('it').style.display='block'; pB=""; document.getElementById('ft').innerText="NEW STUDENT ENTRY";
+        }
 
         function cp(i) {
             const f = i.files[0]; const r = new FileReader(); r.readAsDataURL(f);
@@ -178,7 +185,7 @@
         function upd(l) {
             const b = document.getElementById('rtb'); b.innerHTML = '';
             l.forEach(x => {
-                const d = x.total_fees - x.amount_paid;
+                const d = (x.total_fees || 0) - (x.amount_paid || 0);
                 b.innerHTML += `<tr><td><img src="${x.photo_url}" class="st-img"></td><td>${x.name}</td><td>${x.class}</td><td style="color:red">${d.toLocaleString()}</td><td><button class="act-btn edit" onclick="et('${x.id}')">EDIT</button><button class="act-btn del" onclick="dl('${x.id}')">DEL</button></td></tr>`;
             });
             const ex = da.reduce((a,b)=>a+(b.total_fees||0),0);
@@ -195,12 +202,17 @@
         async function sv() {
             const id = document.getElementById('eid').value;
             const obj = { name: document.getElementById('rn').value, lin: document.getElementById('rl').value, contact: document.getElementById('rt').value, location: document.getElementById('ro').value, dob: document.getElementById('rd').value, class: document.getElementById('rc').value, photo_url: pB, total_fees: parseFloat(document.getElementById('rf').value)||0 };
-            if(id) await s.from('Students').update(obj).eq('id', id);
-            else await s.from('Students').insert([{...obj, is_absent:false, amount_paid:0}]);
             
-            alert("SAVED SUCCESSFULLY");
-            document.getElementById('eid').value=""; document.getElementById('rn').value=""; document.getElementById('rl').value=""; document.getElementById('rt').value=""; document.getElementById('ro').value=""; document.getElementById('rd').value=""; document.getElementById('rc').value=""; document.getElementById('rf').value=""; document.getElementById('pi').style.display='none'; document.getElementById('it').style.display='block';
-            ld();
+            let res;
+            if(id) res = await s.from('Students').update(obj).eq('id', id);
+            else res = await s.from('Students').insert([{...obj, is_absent:false, amount_paid:0}]);
+            
+            if(!res.error) {
+                alert("STUDENT DATA SAVED");
+                clear_form();
+                await ld();
+                pg('reg');
+            } else alert("ERROR SAVING TO DATABASE");
         }
 
         function et(id) {
@@ -210,7 +222,7 @@
             document.getElementById('ft').innerText="EDIT STUDENT"; pg('form');
         }
 
-        async function dl(id) { if(confirm("DELETE?")) { await s.from('Students').delete().eq('id', id); ld(); } }
+        async function dl(id) { if(confirm("DELETE PERMANENTLY?")) { await s.from('Students').delete().eq('id', id); ld(); } }
 
         function rf() {
             const c = document.getElementById('fc').value;
@@ -224,7 +236,7 @@
         async function py(id, c) {
             const a = parseFloat(document.getElementById('p'+id).value)||0;
             await s.from('Students').update({ amount_paid: c+a }).eq('id', id);
-            alert("PAYMENT SAVED"); ld(); setTimeout(rf, 500);
+            alert("PAYMENT RECEIVED"); await ld(); rf();
         }
 
         function ra() {
@@ -236,7 +248,11 @@
             });
         }
 
-        async function at(id, t) { await s.from('Students').update({ is_absent:!t }).eq('id', id); await ld(); ra(); }
+        async function at(id, t) { 
+            await s.from('Students').update({ is_absent:!t }).eq('id', id); 
+            await ld(); 
+            ra(); 
+        }
     </script>
 </body>
 </html>
