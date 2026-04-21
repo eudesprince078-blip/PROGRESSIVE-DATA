@@ -3,30 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUDES MEDIA | MOBILE ENGINE</title>
+    <title>EUDES MEDIA | COMPLETE SCHOOL ENGINE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --dark: #0f172a; --bg: #f8fafc; --white: #ffffff; }
+        :root { --primary: #0047AB; --dark: #0f172a; --bg: #f8fafc; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
         body { margin: 0; background: var(--bg); color: #1e293b; overflow-x: hidden; }
 
-        /* MOBILE RESPONSIVE SIDEBAR */
+        /* MOBILE SIDEBAR */
         .sidebar { 
             position: fixed; left: -100%; top: 0; bottom: 0; width: 280px; 
             background: var(--dark); color: white; padding: 30px; 
-            transition: 0.3s; z-index: 1000; box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+            transition: 0.3s; z-index: 1000; 
         }
         .sidebar.open { left: 0; }
-        .sidebar-overlay { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; 
-        }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
         .sidebar-overlay.active { display: block; }
-
         .nav-item { padding: 15px; border-radius: 12px; color: #94a3b8; font-weight: 800; font-size: 0.75rem; cursor: pointer; margin-bottom: 10px; }
         .nav-item.active { background: var(--primary); color: white; }
 
-        /* MAIN LAYOUT */
+        /* HEADER */
         .header { 
             position: sticky; top: 0; background: var(--white); padding: 15px 20px; 
             display: flex; justify-content: space-between; align-items: center; 
@@ -34,87 +31,98 @@
         }
         .menu-btn { font-size: 1.5rem; cursor: pointer; background: none; border: none; color: var(--primary); }
 
-        .content { padding: 20px; max-width: 1200px; margin: auto; }
+        .content { padding: 20px; max-width: 1400px; margin: auto; }
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
 
         /* DASHBOARD CARDS */
         .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
-        .card { background: white; padding: 25px; border-radius: 20px; border-left: 5px solid var(--primary); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .card { background: white; padding: 25px; border-radius: 20px; border-left: 5px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .card label { font-size: 0.65rem; color: #64748b; font-weight: 800; }
         .card p { margin: 10px 0 0; font-size: 1.6rem; font-weight: 800; color: var(--dark); }
 
-        /* FORM & INPUTS */
-        .form-box { background: white; padding: 20px; border-radius: 20px; display: grid; gap: 15px; }
+        /* REGISTRATION FORM */
+        .form-box { background: white; padding: 25px; border-radius: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .field { display: flex; flex-direction: column; gap: 5px; }
+        .full-width { grid-column: span 2; }
         label { font-size: 0.65rem; font-weight: 800; color: #64748b; }
-        input, select { padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-weight: 700; font-size: 0.85rem; width: 100%; }
+        input, select { padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-weight: 700; font-size: 0.85rem; width: 100%; background: #fcfdfe; }
 
-        /* COMPRESSION PREVIEW */
-        .upload-area { border: 2px dashed #e2e8f0; padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; }
+        /* PHOTO SECTION */
+        .upload-area { border: 2px dashed #e2e8f0; padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; background: #f8fafc; }
         #imgPrev { width: 100px; height: 100px; border-radius: 15px; object-fit: cover; display: none; margin: 10px auto; border: 3px solid var(--primary); }
 
-        /* TABLE - SCROLLABLE ON MOBILE */
-        .table-wrap { background: white; border-radius: 15px; overflow-x: auto; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        th { padding: 15px; text-align: left; font-size: 0.6rem; color: #64748b; background: #fcfdfe; }
-        td { padding: 15px; font-size: 0.8rem; font-weight: 700; border-top: 1px solid #f1f5f9; }
-        .st-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
+        /* DATA TABLE - HIGH VISIBILITY */
+        .table-wrap { background: white; border-radius: 20px; overflow-x: auto; margin-top: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.02); }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { padding: 20px; text-align: left; font-size: 0.65rem; color: #64748b; background: #fcfdfe; border-bottom: 2px solid #f1f5f9; }
+        td { padding: 18px 20px; font-size: 0.85rem; font-weight: 700; border-bottom: 1px solid #f1f5f9; }
+        .st-img { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; }
 
-        .btn { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; }
+        .btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 800; width: 100%; cursor: pointer; font-size: 0.9rem; }
         #login-overlay { position:fixed; inset:0; background:var(--dark); z-index:2000; display:flex; align-items:center; justify-content:center; padding: 20px; }
+
+        /* RESPONSIVE FORM FIX */
+        @media (max-width: 768px) { .form-box { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="login-overlay">
-        <div style="background:white; padding:40px; border-radius:30px; width:100%; max-width:400px; text-align:center;">
+        <div style="background:white; padding:40px; border-radius:35px; width:100%; max-width:400px; text-align:center;">
             <h2 style="color:var(--primary); margin:0;">EUDES MEDIA</h2>
-            <p style="font-size:0.7rem; color:#94a3b8; margin-bottom:25px;">SECURE MOBILE PORTAL</p>
+            <p style="font-size:0.7rem; color:#94a3b8; margin-bottom:25px; letter-spacing:1px;">AUTHENTICATED ACCESS</p>
             <input type="text" id="schId" placeholder="SCHOOL ID" style="margin-bottom:10px;">
             <input type="password" id="schKey" placeholder="ACCESS KEY" style="margin-bottom:20px;">
-            <button onclick="authenticate()" class="btn">INITIALIZE</button>
+            <button onclick="authenticate()" class="btn">INITIALIZE SYSTEM</button>
         </div>
     </div>
 
     <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
     
     <div class="sidebar" id="sidebar">
-        <h3 style="margin-bottom:40px; text-align:center;">PREMIER ENGINE</h3>
+        <div style="text-align:center; margin-bottom:40px;">
+            <h3 style="margin:0;">CAMPUSSPHERE</h3>
+            <p style="font-size:0.5rem; color:var(--primary);">BY EUDES MEDIA</p>
+        </div>
         <div class="nav-item active" onclick="showPage('dash-page', this)">📊 DASHBOARD</div>
         <div class="nav-item" onclick="showPage('reg-page', this)">📝 NEW ADMISSION</div>
-        <div class="nav-item" onclick="fetchStudents(); showPage('list-page', this)">👥 REGISTRY</div>
-        <button onclick="location.reload()" style="background:none; border:none; color:#ef4444; font-weight:800; cursor:pointer; font-size:0.6rem; margin-top:50px; width:100%;">EXIT SYSTEM</button>
+        <div class="nav-item" onclick="fetchStudents(); showPage('list-page', this)">👥 STUDENT REGISTRY</div>
+        <button onclick="location.reload()" style="background:none; border:none; color:var(--danger); font-weight:800; cursor:pointer; font-size:0.6rem; margin-top:50px; width:100%;">SHUTDOWN</button>
     </div>
 
     <div class="header">
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        <img id="dispLogo" src="" style="height:35px; border-radius:8px;">
-        <h4 id="dispName" style="margin:0; font-size: 0.7rem; color: var(--primary);"></h4>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img id="dispLogo" src="" style="height:40px; border-radius:8px;">
+            <h4 id="dispName" style="margin:0; font-size: 0.75rem; color: var(--primary);"></h4>
+        </div>
     </div>
 
     <div class="content">
         <div id="dash-page" class="page active">
-            <h3 style="margin-bottom:20px;">INSTITUTION STATISTICS</h3>
+            <h3 style="margin-bottom:20px;">STATISTICS OVERVIEW</h3>
             <div class="stat-grid">
                 <div class="card"><label>TOTAL ENROLLMENT</label><p id="stCount">0</p></div>
-                <div class="card" style="border-color: #10b981;"><label>TOTAL PAID</label><p id="stPaid">0</p></div>
-                <div class="card" style="border-color: #ef4444;"><label>ARREARS</label><p id="stDebt">0</p></div>
+                <div class="card" style="border-color: var(--success);"><label>TOTAL PAID (UGX)</label><p id="stPaid">0</p></div>
+                <div class="card" style="border-color: var(--danger);"><label>TOTAL ARREARS (DEBT)</label><p id="stDebt">0</p></div>
             </div>
         </div>
 
         <div id="reg-page" class="page">
             <div class="form-box">
-                <div class="upload-area" onclick="document.getElementById('fileInp').click()">
+                <div class="upload-area full-width" onclick="document.getElementById('fileInp').click()">
                     <img id="imgPrev" src="">
-                    <p id="upLabel" style="font-size:0.65rem; color:var(--primary); font-weight:800;">+ CLICK FOR PHOTO</p>
+                    <p id="upLabel" style="font-size:0.7rem; color:var(--primary); font-weight:800;">+ CLICK TO CAPTURE/UPLOAD STUDENT PHOTO</p>
                     <input type="file" id="fileInp" hidden accept="image/*" onchange="compressImage(this)">
                 </div>
-                <div class="field"><label>LIN NUMBER</label><input type="text" id="rLin"></div>
+                <div class="field"><label>LIN NUMBER (ID)</label><input type="text" id="rLin"></div>
                 <div class="field"><label>FULL NAME</label><input type="text" id="rName"></div>
                 <div class="field"><label>PARENT CONTACT</label><input type="tel" id="rPhone" placeholder="+256..."></div>
                 <div class="field"><label>PHYSICAL LOCATION</label><input type="text" id="rLoc"></div>
+                <div class="field"><label>DATE OF BIRTH</label><input type="date" id="rDob" onchange="calcAge(this.value)"></div>
+                <div class="field"><label>AGE (AUTO)</label><input type="text" id="rAge" readonly></div>
                 <div class="field"><label>CLASS</label>
                     <select id="rClass">
                         <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
@@ -122,18 +130,18 @@
                         <option>P.5</option><option>P.6</option><option>P.7</option>
                     </select>
                 </div>
-                <div class="field"><label>HEALTH STATUS</label><input type="text" id="rHealth" placeholder="Normal"></div>
-                <div class="field"><label>TUITION (UGX)</label><input type="number" id="rFees"></div>
-                <button class="btn" onclick="saveStudent()">FINALIZE ADMISSION</button>
+                <div class="field"><label>HEALTH STATUS</label><input type="text" id="rHealth" value="Normal"></div>
+                <div class="field full-width"><label>TOTAL TUITION (UGX)</label><input type="number" id="rFees"></div>
+                <button class="btn full-width" onclick="saveStudent()">ADMIT STUDENT</button>
             </div>
         </div>
 
         <div id="list-page" class="page">
-            <h3>STUDENT REGISTRY</h3>
+            <h3>MASTER REGISTRY</h3>
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th>PHOTO</th><th>NAME</th><th>CONTACT</th><th>LOCATION</th><th>DEBT</th></tr>
+                        <tr><th>PHOTO</th><th>LIN</th><th>NAME</th><th>CLASS</th><th>AGE</th><th>LOCATION</th><th>CONTACT</th><th>HEALTH</th><th>ARREARS</th></tr>
                     </thead>
                     <tbody id="stTable"></tbody>
                 </table>
@@ -145,7 +153,7 @@
         const _U = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const _K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const client = supabase.createClient(_U, _K);
-        let compressedData = "";
+        let compressedPhoto = "";
 
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('open');
@@ -157,28 +165,33 @@
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
-            if(window.innerWidth < 1000) toggleMenu();
+            if(window.innerWidth < 1000 && document.getElementById('sidebar').classList.contains('open')) toggleMenu();
         }
 
-        // PHOTO COMPRESSOR ENGINE
+        function calcAge(dob) {
+            const yr = new Date(dob).getFullYear();
+            const cur = new Date().getFullYear();
+            document.getElementById('rAge').value = (cur - yr) + " YEARS";
+        }
+
         function compressImage(input) {
             const file = input.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = (event) => {
+            reader.onload = (e) => {
                 const img = new Image();
-                img.src = event.target.result;
+                img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const MAX_WIDTH = 600;
-                    const scaleSize = MAX_WIDTH / img.width;
+                    const scale = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
-                    canvas.height = img.height * scaleSize;
+                    canvas.height = img.height * scale;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    compressedData = canvas.toDataURL('image/jpeg', 0.7); // 70% quality
-                    document.getElementById('imgPrev').src = compressedData;
+                    compressedPhoto = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('imgPrev').src = compressedPhoto;
                     document.getElementById('imgPrev').style.display = 'block';
                     document.getElementById('upLabel').style.display = 'none';
                 };
@@ -194,7 +207,7 @@
                 document.getElementById('dispName').innerText = sch.school_name;
                 document.getElementById('dispLogo').src = sch.logo_url;
                 fetchStudents();
-            } else { alert("WRONG DETAILS"); }
+            } else { alert("INVALID LOGIN"); }
         }
 
         async function saveStudent() {
@@ -203,16 +216,18 @@
                 name: document.getElementById('rName').value,
                 contact_number: document.getElementById('rPhone').value,
                 physical_location: document.getElementById('rLoc').value,
+                dob: document.getElementById('rDob').value,
+                age: document.getElementById('rAge').value,
                 class: document.getElementById('rClass').value,
                 health_status: document.getElementById('rHealth').value,
-                photo_url: compressedData,
+                photo_url: compressedPhoto,
                 total_fees: parseFloat(document.getElementById('rFees').value) || 0,
                 amount_paid: 0,
                 is_absent: false
             };
             const { error } = await client.from('Students').insert([st]);
-            if (!error) { alert("ADMITTED"); location.reload(); }
-            else { alert("ERROR: CHECK TABLE FIELDS"); }
+            if (!error) { alert("ADMISSION SUCCESSFUL"); location.reload(); }
+            else { alert("ERROR: Mismatch in Supabase columns. Ensure 'physical_location' and 'contact_number' exist."); }
         }
 
         async function fetchStudents() {
@@ -226,15 +241,19 @@
                 tPaid += (s.amount_paid || 0); tDebt += d;
                 tb.innerHTML += `<tr>
                     <td><img src="${s.photo_url || ''}" class="st-img"></td>
+                    <td style="color:var(--primary)">#${s.lin}</td>
                     <td>${s.name}</td>
-                    <td>${s.contact_number || 'N/A'}</td>
+                    <td>${s.class}</td>
+                    <td>${s.age || 'N/A'}</td>
                     <td>${s.physical_location || 'N/A'}</td>
-                    <td style="color:#ef4444">${d.toLocaleString()}</td>
+                    <td>${s.contact_number || 'N/A'}</td>
+                    <td>${s.health_status || 'N/A'}</td>
+                    <td style="color:var(--danger)">${d.toLocaleString()}</td>
                 </tr>`;
             });
             document.getElementById('stCount').innerText = data.length;
-            document.getElementById('stPaid').innerText = "UGX " + tPaid.toLocaleString();
-            document.getElementById('stDebt').innerText = "UGX " + tDebt.toLocaleString();
+            document.getElementById('stPaid').innerText = tPaid.toLocaleString();
+            document.getElementById('stDebt').innerText = tDebt.toLocaleString();
         }
     </script>
 </body>
