@@ -18,8 +18,8 @@
         .page { display: none; padding: 30px; height: 100%; overflow-y: auto; }
         .page.active { display: block; }
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; }
-        th { background: #f1f5f9; padding: 15px; text-align: left; font-size: 0.65rem; color: #64748b; }
-        td { padding: 15px; font-size: 0.7rem; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #1e293b; }
+        th { background: #f1f5f9; padding: 15px; text-align: left; font-size: 0.6rem; color: #64748b; }
+        td { padding: 15px; font-size: 0.65rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: #1e293b; }
         #login-screen { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
@@ -28,10 +28,10 @@
     <div id="login-screen">
         <div style="background:white; padding:40px; border-radius:30px; width:380px; text-align:center;">
             <h1 style="color:var(--primary); margin:0;">ESMS AUTHORITY</h1>
-            <p style="font-size:0.6rem; color:#64748b; margin-bottom:20px;">SYSTEM ACCESS</p>
-            <input type="text" id="schId" placeholder="SCHOOL ID" style="width:100%; padding:15px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd; text-align:center;">
-            <input type="password" id="schKey" placeholder="ACCESS KEY" style="width:100%; padding:15px; margin-bottom:20px; border-radius:10px; border:1px solid #ddd; text-align:center;">
-            <button onclick="authenticate()" style="width:100%; padding:16px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer;">ENTER SYSTEM</button>
+            <p style="font-size:0.55rem; color:#64748b; margin-bottom:20px;">EUDES MEDIA SOLUTIONS</p>
+            <input type="text" id="schId" placeholder="SCHOOL ID" style="width:100%; padding:15px; margin-bottom:10px; border-radius:10px; border:1px solid #e2e8f0; text-align:center;">
+            <input type="password" id="schKey" placeholder="ACCESS KEY" style="width:100%; padding:15px; margin-bottom:20px; border-radius:10px; border:1px solid #e2e8f0; text-align:center;">
+            <button onclick="authenticate()" style="width:100%; padding:16px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer;">VERIFY SYSTEM</button>
         </div>
     </div>
 
@@ -49,26 +49,25 @@
         </div>
 
         <div id="dash-page" class="page active">
-            <h3>Overview</h3>
-            <p style="font-size: 0.7rem; color: #64748b;">Welcome to the Eudes Media Student Management System.</p>
+            <div style="background:white; padding:30px; border-radius:20px; border:1px solid #e2e8f0;">
+                <h3 style="margin:0; color:var(--primary);">System Status: Ready</h3>
+                <p id="connStatus" style="font-size: 0.7rem; color:#64748b;">Checking Database Connection...</p>
+            </div>
         </div>
 
         <div id="list-page" class="page">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3 style="margin:0;">Registered Students</h3>
-                <button onclick="fetchStudents()" style="background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:8px; font-size:0.6rem; font-weight:800; cursor:pointer;">RE-SCAN DB</button>
-            </div>
+            <h3 style="margin-bottom:20px;">Registered Students</h3>
             <table>
                 <thead><tr><th>LIN</th><th>NAME</th><th>AGE</th><th>CONTACT</th><th>LOCATION</th></tr></thead>
                 <tbody id="stTable">
-                    <tr><td colspan="5" style="text-align:center; padding:30px;">Waiting for scan...</td></tr>
+                    <tr><td colspan="5" style="text-align:center; padding:40px;">No students found yet.</td></tr>
                 </tbody>
             </table>
-            <div id="log" style="margin-top:20px; font-size:0.5rem; color:#94a3b8;"></div>
         </div>
     </div>
 
     <script>
+        // DOUBLE CHECK THESE TWO VALUES IN YOUR SUPABASE SETTINGS
         const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const client = supabase.createClient(_URL, _KEY);
@@ -83,50 +82,52 @@
         async function authenticate() {
             const id = document.getElementById('schId').value.trim();
             const key = document.getElementById('schKey').value.trim();
-            const { data: school } = await client.from('Schools').select('*').eq('sch_id', id).single();
+            
+            // Testing connection to Schools table
+            const { data: school, error } = await client.from('Schools').select('*').eq('sch_id', id).single();
+            
             if (school && (key === school.admin_key || key === school.teacher_key)) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dispName').innerText = school.school_name;
                 document.getElementById('dispLogo').src = school.logo_url;
+                document.getElementById('connStatus').innerText = "Connected to " + school.school_name;
+                fetchStudents();
+            } else {
+                alert("Login failed. Check your ID and Key.");
             }
         }
 
         async function fetchStudents() {
             const tbody = document.getElementById('stTable');
-            const logBox = document.getElementById('log');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">SCANNING TABLE...</td></tr>';
-            logBox.innerText = "Attempting to reach Students table...";
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">Searching Database...</td></tr>';
 
-            try {
-                // We use .select('*') to ensure all columns are fetched
-                const { data, error, status } = await client.from('Students').select('*');
+            // IMPORTANT: If your table is named "students" (lowercase), change 'Students' below to 'students'
+            const { data, error } = await client.from('Students').select('*');
 
-                if (error) {
-                    logBox.innerText = `DATABASE REJECTED: ${error.message} (Status: ${status})`;
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">ACCESS BLOCKED BY SUPABASE.</td></tr>`;
-                    return;
-                }
-
-                if (!data || data.length === 0) {
-                    logBox.innerText = "Connection Successful, but table is empty.";
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">NO DATA FOUND IN TABLE</td></tr>';
-                    return;
-                }
-
-                logBox.innerText = `Success! Found ${data.length} records.`;
-                tbody.innerHTML = '';
-                data.forEach(st => {
-                    tbody.innerHTML += `<tr>
-                        <td style="color:var(--primary)">${st.lin_number || '---'}</td>
-                        <td>${st.name || '---'}</td>
-                        <td>${st.age || '---'}</td>
-                        <td>${st.contact_number || '---'}</td>
-                        <td>${st.physical_location || '---'}</td>
-                    </tr>`;
-                });
-            } catch (err) {
-                logBox.innerText = "CRITICAL ERROR: " + err.message;
+            if (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:40px;">
+                    <strong>ERROR:</strong> ${error.message}<br>
+                    <small>Try enabling RLS and adding a policy set to 'true'.</small>
+                </td></tr>`;
+                return;
             }
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">DATABASE IS EMPTY. NO STUDENTS FOUND.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach(st => {
+                tbody.innerHTML += `<tr>
+                    <td style="color:var(--primary)">${st.lin_number || '---'}</td>
+                    <td>${st.name || '---'}</td>
+                    <td>${st.age || '---'}</td>
+                    <td>${st.contact_number || '---'}</td>
+                    <td>${st.physical_location || '---'}</td>
+                </tr>`;
+            });
         }
     </script>
 </body>
