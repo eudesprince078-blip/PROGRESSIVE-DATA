@@ -10,14 +10,10 @@
         :root { --primary: #0047AB; --bg: #0f172a; --white: #ffffff; }
         * { box-sizing: border-box; text-transform: uppercase; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        
         .login-card { background: var(--white); padding: 40px; border-radius: 30px; width: 95%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
         input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; text-align: center; outline: none; }
-        .btn { padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; transition: 0.3s; }
-        .btn:active { transform: scale(0.98); }
-        
+        .btn { padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; }
         #err { color: #e11d48; font-size: 0.7rem; margin-top: 15px; font-weight: 800; display: none; background: #fff1f2; padding: 10px; border-radius: 10px; border: 1px solid #fda4af; }
-        
         #dash { display: none; width: 100%; height: 100vh; background: #f8fafc; flex-direction: column; }
         .nav { background: white; padding: 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; }
         .sch-logo { width: 50px; height: 50px; border-radius: 10px; object-fit: contain; }
@@ -30,15 +26,15 @@
             <h1 style="color:var(--primary); margin:0; font-size: 1.6rem;">ESMS AUTHORITY</h1>
             <p style="font-size:0.55rem; color:#64748b; font-weight:800; margin-bottom:25px;">PRINCIPLED MANAGEMENT</p>
             
-            <input type="text" id="schId" placeholder="SCHOOL ID (PM0001)">
+            <input type="text" id="schId" placeholder="ENTER SCHOOL ID">
             <input type="password" id="schKey" placeholder="ACCESS KEY">
-            <button class="btn" id="loginBtn" onclick="authenticate()">VERIFY IDENTITY</button>
+            <button class="btn" id="loginBtn" onclick="authenticate()">VERIFY & OPEN</button>
             
             <div id="err"></div>
         </div>
     </div>
 
-    <div id="dash">
+    <div id="dash" style="color: #000;">
         <div class="nav">
             <div style="display:flex; align-items:center; gap:15px;">
                 <img src="" id="dispLogo" class="sch-logo" onerror="this.src='https://via.placeholder.com/50?text=LOGO'">
@@ -47,12 +43,12 @@
                     <p id="dispId" style="margin:0; font-size: 0.6rem; font-weight: 800; color: #64748b;"></p>
                 </div>
             </div>
-            <button onclick="location.reload()" style="background:none; border:1px solid #cbd5e1; padding:8px 15px; border-radius:8px; font-weight:800; cursor:pointer;">EXIT SYSTEM</button>
+            <button onclick="location.reload()" style="background:none; border:1px solid #cbd5e1; padding:8px 15px; border-radius:8px; font-weight:800; cursor:pointer;">LOGOUT</button>
         </div>
         <div style="padding:40px; text-align:center;">
             <div style="background:white; padding:50px; border-radius:30px; border:1px solid #e2e8f0; display:inline-block;">
                 <h2 style="color:green; margin-top:0;">✅ AUTHENTICATED</h2>
-                <p>YOU HAVE SUCCESSFULLY LOGGED INTO THE **SCHOOLS** DATABASE.</p>
+                <p>DATABASE CONNECTION STABLE.</p>
             </div>
         </div>
     </div>
@@ -69,17 +65,17 @@
             const btn = document.getElementById('loginBtn');
 
             errBox.style.display = "none";
-            btn.innerText = "AUTHENTICATING...";
+            btn.innerText = "CHECKING...";
 
             try {
-                // We strictly query the 'Schools' table by 'sch_id'
+                // Strict check on 'Schools' table and 'sch_id' column
                 const { data: school, error } = await client
                     .from('Schools')
                     .select('*')
                     .eq('sch_id', idInput)
                     .single();
 
-                if (error || !school) throw new Error("SCHOOL ID NOT RECOGNIZED");
+                if (error || !school) throw new Error("ID NOT FOUND");
 
                 if (keyInput === school.admin_key || keyInput === school.teacher_key) {
                     document.getElementById('login-screen').style.display = 'none';
@@ -88,12 +84,12 @@
                     document.getElementById('dispId').innerText = "ID: " + school.sch_id;
                     document.getElementById('dispLogo').src = school.logo_url || "";
                 } else {
-                    throw new Error("SECURITY KEY REJECTED");
+                    throw new Error("INVALID ACCESS KEY");
                 }
             } catch (e) {
                 errBox.style.display = "block";
                 errBox.innerText = "❌ " + e.message;
-                btn.innerText = "VERIFY IDENTITY";
+                btn.innerText = "VERIFY & OPEN";
             }
         }
     </script>
