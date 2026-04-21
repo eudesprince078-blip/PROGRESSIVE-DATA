@@ -5,89 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ESMS AUTHORITY | EUDES MEDIA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #0047AB; --bg: #f8fafc; --dark: #0f172a; --white: #ffffff; }
         * { box-sizing: border-box; text-transform: uppercase; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); margin: 0; color: #1e293b; }
         
-        /* LOGIN SCREEN */
         #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: var(--white); padding: 40px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .login-card { background: var(--white); padding: 40px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; }
         input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; text-align: center; outline: none; }
         .btn { padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; }
+        #err { color: #e11d48; font-size: 0.7rem; margin-top: 15px; font-weight: 800; display: none; }
 
-        /* DASHBOARD UI */
         .header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; }
-        .logo { width: 55px; height: 55px; border-radius: 12px; object-fit: contain; background: #f1f5f9; }
-        
-        .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
-        .step { background: var(--white); padding: 15px; border-radius: 18px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border-bottom: 4px solid #cbd5e1; }
-        .step b { display: block; font-size: 1.4rem; color: var(--dark); }
-        .step span { font-size: 0.5rem; color: #64748b; font-weight: 800; }
-
-        .tab-bar { background: var(--white); display: flex; border-bottom: 2px solid #e2e8f0; }
-        .tab { flex: 1; padding: 18px; text-align: center; font-size: 0.65rem; font-weight: 800; color: #64748b; cursor: pointer; }
-        .tab.active { color: var(--primary); border-bottom: 4px solid var(--primary); }
-
-        .container { padding: 20px; }
-        .card { background: var(--white); border-radius: 24px; border: 1px solid #e2e8f0; padding: 20px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        td, th { padding: 12px; text-align: left; font-size: 0.7rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; }
+        .logo { width: 55px; height: 55px; border-radius: 12px; object-fit: contain; }
+        .container { padding: 20px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-card">
-            <h1 style="color:var(--primary); margin:0; font-size: 1.6rem;">ESMS AUTHORITY</h1>
+            <h1 style="color:var(--primary); margin:0; font-size: 1.5rem;">ESMS AUTHORITY</h1>
             <p style="font-size:0.55rem; color:#64748b; font-weight:800; margin-bottom:25px;">EUDES MEDIA SOLUTIONS</p>
-            <input type="text" id="schIdInput" placeholder="SCHOOL ID (PM001)">
-            <input type="password" id="passInput" placeholder="ACCESS KEY">
-            <button class="btn" id="loginBtn" onclick="authenticate()">OPEN SYSTEM</button>
-            <p id="err" style="color:red; font-size:0.65rem; margin-top:15px; display:none; font-weight:800;"></p>
+            <input type="text" id="schId" placeholder="SCHOOL ID (PM001)">
+            <input type="password" id="schKey" placeholder="ACCESS KEY">
+            <button class="btn" onclick="authenticate()">OPEN SYSTEM</button>
+            <p id="err"></p>
         </div>
     </div>
 
     <div id="main-app" style="display:none;">
         <div class="header">
-            <img src="" id="schLogo" class="logo" onerror="this.src='https://via.placeholder.com/60'">
+            <img src="https://via.placeholder.com/60" id="schLogo" class="logo">
             <div>
                 <h2 id="schName" style="margin:0; font-size: 1.1rem; color: var(--primary);">---</h2>
-                <div id="roleDisplay" style="font-size:0.55rem; color:#64748b; font-weight:800;">---</div>
+                <div style="font-size:0.55rem; color:#64748b; font-weight:800;">SYSTEM ACTIVE</div>
             </div>
         </div>
-
-        <div class="tab-bar">
-            <div class="tab active" id="t1" onclick="showTab('dash')">PIPELINE</div>
-            <div class="tab" id="t2" onclick="showTab('adm')">ENROLLMENT</div>
-            <div class="tab" onclick="location.reload()" style="color:red">LOGOUT</div>
-        </div>
-
-        <div id="dash" class="tab-content">
-            <div class="pipeline">
-                <div class="step"><b id="c1">0</b><span>APPLIED</span></div>
-                <div class="step"><b id="c2">0</b><span>INTERVIEW</span></div>
-                <div class="step"><b id="c3">0</b><span>PAYMENT</span></div>
-                <div class="step" style="border-color:var(--primary)"><b id="c4">0</b><span>ENROLLED</span></div>
-            </div>
-            <div class="container">
-                <div class="card">
-                    <table>
-                        <thead><tr><th>NAME</th><th>LOCATION</th><th>HEALTH</th><th>STATUS</th><th>MOVE</th></tr></thead>
-                        <tbody id="stuBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="adm" class="tab-content container" style="display:none;">
-            <div class="card" style="max-width:500px; margin:auto;">
-                <h3 style="color:var(--primary)">NEW STUDENT</h3>
-                <input type="text" id="nName" placeholder="STUDENT NAME">
-                <input type="text" id="nLoc" placeholder="RESIDENCE">
-                <input type="text" id="nHealth" placeholder="HEALTH" value="NORMAL">
-                <button class="btn" onclick="saveStudent()">SAVE STUDENT</button>
+        <div class="container">
+            <div style="background:white; padding:30px; border-radius:20px; border:1px solid #e2e8f0;">
+                <h3 style="color:var(--primary)">WELCOME TO THE CONTROL CENTER</h3>
+                <p>CONNECTION TO SUPABASE IS SUCCESSFUL.</p>
+                <button class="btn" onclick="location.reload()" style="background:#64748b; max-width:200px;">LOGOUT</button>
             </div>
         </div>
     </div>
@@ -96,86 +56,41 @@
         const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const client = supabase.createClient(_URL, _KEY);
-        let activeSID = "";
 
         async function authenticate() {
-            const idInput = document.getElementById('schIdInput').value.trim().toUpperCase();
-            const keyInput = document.getElementById('passInput').value.trim();
+            const idInput = document.getElementById('schId').value.trim().toUpperCase();
+            const keyInput = document.getElementById('schKey').value.trim();
             const errBox = document.getElementById('err');
             
+            errBox.style.display = "none";
+
             try {
-                const { data: schools, error } = await client.from('Schools').select('*');
-                if (error) throw new Error("DB ERROR");
+                // We search for the row where scho_id is PM001
+                const { data, error } = await client
+                    .from('Schools')
+                    .select('*')
+                    .eq('scho_id', idInput)
+                    .single();
 
-                // Checks all possible column names (scho_id, sch_id, etc)
-                const school = schools?.find(s => {
-                    return Object.values(s).some(v => v && v.toString().toUpperCase() === idInput);
-                });
+                if (error || !data) {
+                    throw new Error("SCHOOL ID NOT FOUND");
+                }
 
-                if (school && (keyInput === school.admin_key || keyInput === school.teacher_key)) {
-                    activeSID = idInput;
+                // Check key (case-insensitive for ease of use)
+                if (keyInput.toUpperCase() === data.admin_key.toUpperCase() || 
+                    keyInput.toUpperCase() === data.teacher_key.toUpperCase()) {
+                    
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('main-app').style.display = 'block';
-                    document.getElementById('schName').innerText = school.school_name;
-                    document.getElementById('schLogo').src = school.logo_url || "";
-                    document.getElementById('roleDisplay').innerText = "ACCESS: AUTHORIZED";
-                    loadData();
+                    document.getElementById('schName').innerText = data.school_name;
                 } else {
-                    throw new Error("INVALID ID OR KEY");
+                    throw new Error("INVALID ACCESS KEY");
                 }
+
             } catch (e) {
                 errBox.style.display = "block";
-                errBox.innerText = e.message;
+                errBox.innerText = "⚠️ " + e.message;
             }
-        }
-
-        async function loadData() {
-            const { data } = await client.from('students').select('*');
-            const list = data?.filter(s => 
-                Object.values(s).some(v => v && v.toString().toUpperCase() === activeSID)
-            ) || [];
-
-            let counts = { APPLIED: 0, INTERVIEW: 0, PAYMENT: 0, ENROLLED: 0 };
-            document.getElementById('stuBody').innerHTML = list.map(s => {
-                const st = s.status || 'APPLIED';
-                if(counts[st] !== undefined) counts[st]++;
-                return `<tr>
-                    <td>${s.name}</td>
-                    <td>${s.location || '--'}</td>
-                    <td>${s.health_status || 'NORMAL'}</td>
-                    <td>${st}</td>
-                    <td><select onchange="updateStat('${s.id}', this.value)"><option value="">MOVE...</option><option value="APPLIED">APPLIED</option><option value="INTERVIEW">INTERVIEW</option><option value="PAYMENT">PAYMENT</option><option value="ENROLLED">ENROLLED</option></select></td>
-                </tr>`;
-            }).join('');
-
-            document.getElementById('c1').innerText = counts.APPLIED;
-            document.getElementById('c2').innerText = counts.INTERVIEW;
-            document.getElementById('c3').innerText = counts.PAYMENT;
-            document.getElementById('c4').innerText = counts.ENROLLED;
-        }
-
-        async function saveStudent() {
-            const { error } = await client.from('students').insert([{
-                sch_id: activeSID,
-                name: document.getElementById('nName').value,
-                location: document.getElementById('nLoc').value,
-                health_status: document.getElementById('nHealth').value,
-                status: 'APPLIED'
-            }]);
-            if(error) alert(error.message);
-            else { alert("STUDENT SAVED"); showTab('dash'); }
-        }
-
-        async function updateStat(id, val) {
-            if(val) { await client.from('students').update({ status: val }).eq('id', id); loadData(); }
-        }
-
-        function showTab(t) {
-            document.getElementById('dash').style.display = t === 'dash' ? 'block' : 'none';
-            document.getElementById('adm').style.display = t === 'adm' ? 'block' : 'none';
-            document.getElementById('t1').classList.toggle('active', t === 'dash');
-            document.getElementById('t2').classList.toggle('active', t === 'adm');
-            if(t === 'dash') loadData();
         }
     </script>
 </body>
