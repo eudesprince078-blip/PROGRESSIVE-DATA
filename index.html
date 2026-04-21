@@ -5,59 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESMS | EUDES MEDIA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --bg: #f8fafc; --sidebar: #ffffff; }
+        :root { --primary: #0047AB; --bg: #f8fafc; }
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
         body { margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
-
-        /* SIDEBAR */
-        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 20px; }
-        .nav-item { padding: 12px 15px; border-radius: 10px; color: #64748b; font-weight: 700; font-size: 0.75rem; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+        .sidebar { width: 260px; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 20px; }
+        .nav-item { padding: 12px 15px; border-radius: 10px; color: #64748b; font-weight: 700; font-size: 0.75rem; cursor: pointer; margin-bottom: 5px; }
         .nav-item.active { background: #eff6ff; color: var(--primary); }
-
-        /* MAIN CONTENT */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .main { flex: 1; display: flex; flex-direction: column; }
         .header { padding: 15px 40px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
         .page { display: none; padding: 30px; height: 100%; overflow-y: auto; }
         .page.active { display: block; }
-
-        /* FORM STYLE (From Video) */
-        .form-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; font-size: 0.6rem; font-weight: 800; color: #64748b; margin-bottom: 8px; }
-        .form-input { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #e2e8f0; outline: none; font-weight: 600; }
-        
-        /* PIPELINE TRACKER */
-        .pipeline { display: flex; justify-content: space-between; margin-bottom: 30px; }
-        .step { text-align: center; flex: 1; }
-        .step-circle { width: 25px; height: 25px; border-radius: 50%; border: 2px solid #e2e8f0; margin: 0 auto 5px; font-size: 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 800; }
-        .step.active .step-circle { border-color: var(--primary); color: var(--primary); }
-        .step-label { font-size: 0.45rem; color: #94a3b8; font-weight: 800; }
-
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; }
-        th { background: #f1f5f9; padding: 15px; text-align: left; font-size: 0.6rem; }
-        td { padding: 15px; font-size: 0.65rem; border-bottom: 1px solid #f1f5f9; }
-
+        th { background: #f1f5f9; padding: 15px; text-align: left; font-size: 0.65rem; color: #64748b; }
+        td { padding: 15px; font-size: 0.7rem; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #1e293b; }
         #login-screen { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: white; padding: 40px; border-radius: 30px; width: 380px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div class="login-card">
+        <div style="background:white; padding:40px; border-radius:30px; width:380px; text-align:center;">
             <h1 style="color:var(--primary); margin:0;">ESMS AUTHORITY</h1>
-            <p style="font-size:0.6rem; color:#64748b; margin-bottom:30px;">EUDES MEDIA SOLUTIONS</p>
+            <p style="font-size:0.6rem; color:#64748b; margin-bottom:20px;">SYSTEM ACCESS</p>
             <input type="text" id="schId" placeholder="SCHOOL ID" style="width:100%; padding:15px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd; text-align:center;">
             <input type="password" id="schKey" placeholder="ACCESS KEY" style="width:100%; padding:15px; margin-bottom:20px; border-radius:10px; border:1px solid #ddd; text-align:center;">
-            <button onclick="authenticate()" style="width:100%; padding:16px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer;">OPEN SYSTEM</button>
+            <button onclick="authenticate()" style="width:100%; padding:16px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer;">ENTER SYSTEM</button>
         </div>
     </div>
 
     <div class="sidebar">
         <h2 style="font-size: 0.8rem; color: var(--primary); margin-bottom: 30px;">CAMPUSSPHERE</h2>
         <div class="nav-item active" onclick="showPage('dash-page', this)">📊 Dashboard</div>
-        <div class="nav-item" onclick="showPage('reg-page', this)">📝 New Admission</div>
         <div class="nav-item" onclick="fetchStudents(); showPage('list-page', this)">👤 Student List</div>
         <div style="margin-top: auto;"><button onclick="location.reload()" style="background:none; border:none; color:#e11d48; font-weight:800; cursor:pointer; font-size:0.7rem;">LOGOUT</button></div>
     </div>
@@ -68,36 +48,23 @@
             <img id="dispLogo" src="" style="height:35px; border-radius:5px;">
         </div>
 
-        <div id="reg-page" class="page">
-            <div class="pipeline">
-                <div class="step active"><div class="step-circle">1</div><div class="step-label">Applied</div></div>
-                <div class="step"><div class="step-circle">2</div><div class="step-label">Review</div></div>
-                <div class="step"><div class="step-circle">3</div><div class="step-label">Interview</div></div>
-                <div class="step"><div class="step-circle">4</div><div class="step-label">Accepted</div></div>
-            </div>
-
-            <div style="background:white; padding:30px; border-radius:20px; border:1px solid #e2e8f0; max-width:600px;">
-                <h3 style="margin-top:0; color:var(--primary);">Student Registration</h3>
-                <div class="form-group"><label>Full Name</label><input type="text" id="stName" class="form-input"></div>
-                <div style="display:flex; gap:20px;">
-                    <div class="form-group" style="flex:1;"><label>Age</label><input type="number" id="stAge" class="form-input"></div>
-                    <div class="form-group" style="flex:1;"><label>Contact Number</label><input type="text" id="stContact" class="form-input"></div>
-                </div>
-                <div class="form-group"><label>Physical Location</label><input type="text" id="stLoc" class="form-input"></div>
-                <button onclick="saveStudent()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:10px; font-weight:800; cursor:pointer;">SUBMIT APPLICATION</button>
-            </div>
+        <div id="dash-page" class="page active">
+            <h3>Overview</h3>
+            <p style="font-size: 0.7rem; color: #64748b;">Welcome to the Eudes Media Student Management System.</p>
         </div>
 
         <div id="list-page" class="page">
-            <h3>Registered Students</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="margin:0;">Registered Students</h3>
+                <button onclick="fetchStudents()" style="background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:8px; font-size:0.6rem; font-weight:800; cursor:pointer;">RE-SCAN DB</button>
+            </div>
             <table>
                 <thead><tr><th>LIN</th><th>NAME</th><th>AGE</th><th>CONTACT</th><th>LOCATION</th></tr></thead>
-                <tbody id="stTable"></tbody>
+                <tbody id="stTable">
+                    <tr><td colspan="5" style="text-align:center; padding:30px;">Waiting for scan...</td></tr>
+                </tbody>
             </table>
-        </div>
-
-        <div id="dash-page" class="page active">
-            <h3>System Status: Online</h3>
+            <div id="log" style="margin-top:20px; font-size:0.5rem; color:#94a3b8;"></div>
         </div>
     </div>
 
@@ -124,29 +91,42 @@
             }
         }
 
-        async function saveStudent() {
-            const name = document.getElementById('stName').value;
-            const age = document.getElementById('stAge').value;
-            const contact = document.getElementById('stContact').value;
-            const loc = document.getElementById('stLoc').value;
-
-            const { error } = await client.from('Students').insert([
-                { name: name, age: age, contact_number: contact, physical_location: loc, lin_number: 'GEN-' + Math.floor(Math.random()*1000) }
-            ]);
-
-            if (!error) {
-                alert("STUDENT REGISTERED SUCCESSFULY!");
-                location.reload();
-            }
-        }
-
         async function fetchStudents() {
-            const { data } = await client.from('Students').select('*');
             const tbody = document.getElementById('stTable');
-            tbody.innerHTML = '';
-            data.forEach(st => {
-                tbody.innerHTML += `<tr><td>${st.lin_number}</td><td>${st.name}</td><td>${st.age}</td><td>${st.contact_number}</td><td>${st.physical_location}</td></tr>`;
-            });
+            const logBox = document.getElementById('log');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">SCANNING TABLE...</td></tr>';
+            logBox.innerText = "Attempting to reach Students table...";
+
+            try {
+                // We use .select('*') to ensure all columns are fetched
+                const { data, error, status } = await client.from('Students').select('*');
+
+                if (error) {
+                    logBox.innerText = `DATABASE REJECTED: ${error.message} (Status: ${status})`;
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">ACCESS BLOCKED BY SUPABASE.</td></tr>`;
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    logBox.innerText = "Connection Successful, but table is empty.";
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">NO DATA FOUND IN TABLE</td></tr>';
+                    return;
+                }
+
+                logBox.innerText = `Success! Found ${data.length} records.`;
+                tbody.innerHTML = '';
+                data.forEach(st => {
+                    tbody.innerHTML += `<tr>
+                        <td style="color:var(--primary)">${st.lin_number || '---'}</td>
+                        <td>${st.name || '---'}</td>
+                        <td>${st.age || '---'}</td>
+                        <td>${st.contact_number || '---'}</td>
+                        <td>${st.physical_location || '---'}</td>
+                    </tr>`;
+                });
+            } catch (err) {
+                logBox.innerText = "CRITICAL ERROR: " + err.message;
+            }
         }
     </script>
 </body>
