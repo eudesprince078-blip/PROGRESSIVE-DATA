@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUDES MEDIA | ULTIMATE ENGINE</title>
+    <title>EUDES MEDIA | ULTIMATE MOBILE ENGINE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -33,22 +33,26 @@
         label { font-size: 0.65rem; font-weight: 800; color: #64748b; }
         input, select { padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-weight: 700; font-size: 0.85rem; width: 100%; }
 
-        /* TABLE & LISTS */
-        .table-wrap { background: white; border-radius: 15px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { padding: 15px; text-align: left; font-size: 0.6rem; color: #64748b; background: #fcfdfe; }
-        td { padding: 15px; font-size: 0.8rem; font-weight: 700; border-top: 1px solid #f1f5f9; }
-        .st-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
+        /* PHOTO UPLOAD BOX */
+        .photo-box { border: 2px dashed var(--primary); padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; background: #f0f7ff; margin-bottom: 15px; }
+        #imgPrev { width: 120px; height: 120px; border-radius: 15px; object-fit: cover; display: none; margin: 10px auto; border: 3px solid var(--primary); }
 
-        /* ATTENDANCE TOGGLE */
-        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; }
+        
+        /* ROLL CALL */
+        .switch { position: relative; display: inline-block; width: 45px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
         input:checked + .slider { background-color: var(--success); }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider:before { transform: translateX(26px); }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider:before { transform: translateX(23px); }
 
-        .btn { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; }
+        /* TABLE */
+        .table-wrap { background: white; border-radius: 15px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        td, th { padding: 15px; font-size: 0.8rem; font-weight: 700; text-align: left; border-bottom: 1px solid #f1f5f9; }
+        .st-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+
         #login-screen { position:fixed; inset:0; background:var(--dark); z-index:2000; display:flex; align-items:center; justify-content:center; padding: 20px; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -58,10 +62,10 @@
     <div id="login-screen">
         <div style="background:white; padding:40px; border-radius:30px; width:100%; max-width:400px; text-align:center;">
             <h2 style="color:var(--primary); margin:0;">EUDES MEDIA</h2>
-            <p style="font-size:0.7rem; color:#94a3b8; margin-bottom:25px;">SECURE ACCESS</p>
-            <input type="text" id="schId" placeholder="SCHOOL ID" style="margin-bottom:10px;">
-            <input type="password" id="schKey" placeholder="ACCESS KEY" style="margin-bottom:20px;">
-            <button onclick="authenticate()" class="btn">LOGIN</button>
+            <p style="font-size:0.7rem; color:#94a3b8; margin-bottom:25px;">SECURE PORTAL</p>
+            <input type="text" id="schId" placeholder="SCHOOL ID">
+            <input type="password" id="schKey" placeholder="ACCESS KEY" style="margin-top:10px; margin-bottom:20px;">
+            <button onclick="authenticate()" class="btn">INITIALIZE</button>
         </div>
     </div>
 
@@ -71,51 +75,53 @@
         <h3 style="text-align:center; margin-bottom:40px;">PREMIER ENGINE</h3>
         <div class="nav-btn active" onclick="showPage('dash-p', this)">📊 DASHBOARD</div>
         <div class="nav-btn" onclick="showPage('reg-p', this)">📝 NEW ADMISSION</div>
-        <div class="nav-btn" onclick="fetchStudents(); showPage('list-p', this)">👥 REGISTRY & PAYMENTS</div>
+        <div class="nav-btn" onclick="fetchStudents(); showPage('list-p', this)">👥 REGISTRY</div>
         <div class="nav-btn" onclick="fetchStudents(); showPage('roll-p', this)">✅ ROLL CALL</div>
     </div>
 
     <div class="header">
         <button class="menu-icon" onclick="toggleMenu()">☰</button>
-        <img id="dispLogo" src="" style="height:35px; border-radius:8px;">
-        <h4 id="dispName" style="margin:0; font-size: 0.7rem; color: var(--primary);"></h4>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img id="dispLogo" src="" style="height:35px; border-radius:5px;">
+            <h4 id="dispName" style="margin:0; font-size:0.7rem; color:var(--primary);"></h4>
+        </div>
     </div>
 
     <div class="content">
         <div id="dash-p" class="page active">
-            <div style="display:grid; gap:10px;">
-                <div class="card"><label>TOTAL STUDENTS</label><p id="stCount">0</p></div>
-                <div class="card" style="border-left-color:var(--success)"><label>TOTAL PAID</label><p id="stPaid">0</p></div>
-            </div>
+            <div class="card"><label>ENROLLED STUDENTS</label><p id="stCount" style="font-size:2rem; font-weight:800; margin:0;">0</p></div>
         </div>
 
         <div id="reg-p" class="page">
             <div class="card">
+                <div class="photo-box" onclick="document.getElementById('photoInp').click()">
+                    <img id="imgPrev" src="">
+                    <p id="upText" style="font-size:0.7rem; color:var(--primary); font-weight:800;">+ CLICK TO CAPTURE/UPLOAD PHOTO</p>
+                    <input type="file" id="photoInp" hidden accept="image/*" onchange="compressPhoto(this)">
+                </div>
                 <div class="field"><label>LIN (ID)</label><input type="text" id="rLin"></div>
                 <div class="field"><label>FULL NAME</label><input type="text" id="rName"></div>
                 <div class="field"><label>CONTACT</label><input type="tel" id="rTel"></div>
                 <div class="field"><label>LOCATION</label><input type="text" id="rLoc"></div>
-                <div class="field"><label>DATE OF BIRTH</label><input type="date" id="rDob"></div>
+                <div class="field"><label>DOB (DATE OF BIRTH)</label><input type="date" id="rDob"></div>
                 <div class="field"><label>HEALTH STATUS</label><input type="text" id="rHealth" value="NORMAL"></div>
-                <div class="field"><label>TOTAL TUITION (UGX)</label><input type="number" id="rFees"></div>
+                <div class="field"><label>TUITION (UGX)</label><input type="number" id="rFees"></div>
                 <button class="btn" onclick="saveStudent()">ADMIT STUDENT</button>
             </div>
         </div>
 
         <div id="list-p" class="page">
-            <h3>REGISTRY & HISTORY</h3>
+            <h3>STUDENT LIST</h3>
             <div class="table-wrap">
                 <table>
-                    <thead>
-                        <tr><th>PHOTO</th><th>NAME</th><th>CONTACT</th><th>LOCATION</th><th>HEALTH</th><th>DEBT</th></tr>
-                    </thead>
+                    <thead><tr><th>PHOTO</th><th>NAME</th><th>CONTACT</th><th>LOCATION</th><th>DEBT</th></tr></thead>
                     <tbody id="stTable"></tbody>
                 </table>
             </div>
         </div>
 
         <div id="roll-p" class="page">
-            <h3>DAILY ROLL CALL</h3>
+            <h3>DAILY ATTENDANCE</h3>
             <div id="rollList"></div>
         </div>
     </div>
@@ -124,6 +130,7 @@
         const _U = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const _K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const client = supabase.createClient(_U, _K);
+        let compressedData = "";
 
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('open');
@@ -135,7 +142,29 @@
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
-            if(window.innerWidth < 1000) toggleMenu();
+            if(window.innerWidth < 1000 && document.getElementById('sidebar').classList.contains('open')) toggleMenu();
+        }
+
+        function compressPhoto(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const size = 500;
+                    const scale = size / img.width;
+                    canvas.width = size;
+                    canvas.height = img.height * scale;
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    compressedData = canvas.toDataURL('image/jpeg', 0.6);
+                    document.getElementById('imgPrev').src = compressedData;
+                    document.getElementById('imgPrev').style.display = 'block';
+                    document.getElementById('upText').style.display = 'none';
+                };
+            };
         }
 
         async function authenticate() {
@@ -147,25 +176,26 @@
                 document.getElementById('dispName').innerText = sch.school_name;
                 document.getElementById('dispLogo').src = sch.logo_url;
                 fetchStudents();
-            } else { alert("WRONG KEY"); }
+            } else { alert("ACCESS DENIED"); }
         }
 
         async function saveStudent() {
             const st = {
                 lin: document.getElementById('rLin').value,
                 name: document.getElementById('rName').value,
-                contact_number: document.getElementById('rTel').value,
-                physical_location: document.getElementById('rLoc').value,
+                contact: document.getElementById('rTel').value,
+                location: document.getElementById('rLoc').value,
                 dob: document.getElementById('rDob').value,
                 health_status: document.getElementById('rHealth').value,
+                photo_url: compressedData,
                 total_fees: parseFloat(document.getElementById('rFees').value) || 0,
                 amount_paid: 0,
                 is_absent: false,
                 payment_history: []
             };
             const { error } = await client.from('Students').insert([st]);
-            if (!error) { alert("SAVED"); location.reload(); }
-            else { alert("DB ERROR: Check columns in Supabase."); }
+            if (!error) { alert("SUCCESS"); location.reload(); }
+            else { alert("DB ERROR: Check your columns."); console.log(error); }
         }
 
         async function fetchStudents() {
@@ -175,22 +205,19 @@
             tb.innerHTML = ''; rl.innerHTML = '';
             
             data.forEach(s => {
-                // Table
                 tb.innerHTML += `<tr>
                     <td><img src="${s.photo_url || ''}" class="st-img"></td>
                     <td>${s.name}</td>
-                    <td>${s.contact_number}</td>
-                    <td>${s.physical_location}</td>
-                    <td>${s.health_status}</td>
+                    <td>${s.contact || '-'}</td>
+                    <td>${s.location || '-'}</td>
                     <td>${(s.total_fees - s.amount_paid).toLocaleString()}</td>
                 </tr>`;
 
-                // Roll Call List
                 rl.innerHTML += `
                 <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>${s.name}</span>
+                    <span style="font-weight:800;">${s.name}</span>
                     <label class="switch">
-                        <input type="checkbox" ${s.is_absent ? '' : 'checked'} onchange="markAttendance('${s.id}', this.checked)">
+                        <input type="checkbox" ${s.is_absent ? '' : 'checked'} onchange="markAtt('${s.id}', this.checked)">
                         <span class="slider"></span>
                     </label>
                 </div>`;
@@ -198,7 +225,7 @@
             document.getElementById('stCount').innerText = data.length;
         }
 
-        async function markAttendance(id, present) {
+        async function markAtt(id, present) {
             await client.from('Students').update({ is_absent: !present }).eq('id', id);
         }
     </script>
