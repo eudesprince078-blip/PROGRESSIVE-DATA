@@ -11,19 +11,16 @@
         * { box-sizing: border-box; text-transform: uppercase; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
         
-        /* LOGIN CARD */
         .login-card { background: var(--white); padding: 40px; border-radius: 30px; width: 95%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; text-align: center; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); }
-        .btn { padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; text-align: center; outline: none; }
+        .btn { padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; transition: 0.3s; }
+        .btn:active { transform: scale(0.98); }
         
         #err { color: #e11d48; font-size: 0.7rem; margin-top: 15px; font-weight: 800; display: none; background: #fff1f2; padding: 10px; border-radius: 10px; border: 1px solid #fda4af; }
         
-        /* DASHBOARD VIEW */
-        #dash { display: none; width: 100%; height: 100vh; background: #f8fafc; flex-direction: column; color: #000; }
+        #dash { display: none; width: 100%; height: 100vh; background: #f8fafc; flex-direction: column; }
         .nav { background: white; padding: 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; }
-        .logo-box { display: flex; align-items: center; gap: 15px; }
-        .sch-logo { width: 45px; height: 45px; border-radius: 8px; background: #eee; object-fit: contain; }
+        .sch-logo { width: 50px; height: 50px; border-radius: 10px; object-fit: contain; }
     </style>
 </head>
 <body>
@@ -31,11 +28,11 @@
     <div id="login-screen">
         <div class="login-card">
             <h1 style="color:var(--primary); margin:0; font-size: 1.6rem;">ESMS AUTHORITY</h1>
-            <p style="font-size:0.55rem; color:#64748b; font-weight:800; margin-bottom:25px; letter-spacing: 1px;">MANAGEMENT PORTAL</p>
+            <p style="font-size:0.55rem; color:#64748b; font-weight:800; margin-bottom:25px;">PRINCIPLED MANAGEMENT</p>
             
-            <input type="text" id="schId" placeholder="ENTER SCHOOL ID">
+            <input type="text" id="schId" placeholder="SCHOOL ID (PM0001)">
             <input type="password" id="schKey" placeholder="ACCESS KEY">
-            <button class="btn" id="loginBtn" onclick="authenticate()">VERIFY & OPEN</button>
+            <button class="btn" id="loginBtn" onclick="authenticate()">VERIFY IDENTITY</button>
             
             <div id="err"></div>
         </div>
@@ -43,20 +40,19 @@
 
     <div id="dash">
         <div class="nav">
-            <div class="logo-box">
-                <img src="" id="dispLogo" class="sch-logo" onerror="this.src='https://via.placeholder.com/45'">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <img src="" id="dispLogo" class="sch-logo" onerror="this.src='https://via.placeholder.com/50?text=LOGO'">
                 <div>
-                    <h2 id="dispName" style="margin:0; font-size: 1rem; color: var(--primary);">---</h2>
+                    <h2 id="dispName" style="margin:0; font-size: 1rem; color: var(--primary);"></h2>
                     <p id="dispId" style="margin:0; font-size: 0.6rem; font-weight: 800; color: #64748b;"></p>
                 </div>
             </div>
-            <button onclick="location.reload()" style="background:none; border:1px solid #cbd5e1; padding:8px 15px; border-radius:8px; font-weight:800; cursor:pointer;">EXIT</button>
+            <button onclick="location.reload()" style="background:none; border:1px solid #cbd5e1; padding:8px 15px; border-radius:8px; font-weight:800; cursor:pointer;">EXIT SYSTEM</button>
         </div>
-
-        <div style="padding:30px; text-align: center;">
-            <div style="background:white; padding:40px; border-radius:24px; border:1px solid #e2e8f0;">
-                <h3 style="margin-top:0;">SCHOOL SESSION ACTIVE</h3>
-                <p style="color:#64748b;">ALL DATA LOADED IS SPECIFIC TO THIS SCHOOL IDENTITY.</p>
+        <div style="padding:40px; text-align:center;">
+            <div style="background:white; padding:50px; border-radius:30px; border:1px solid #e2e8f0; display:inline-block;">
+                <h2 style="color:green; margin-top:0;">✅ AUTHENTICATED</h2>
+                <p>YOU HAVE SUCCESSFULLY LOGGED INTO THE **SCHOOLS** DATABASE.</p>
             </div>
         </div>
     </div>
@@ -72,51 +68,33 @@
             const errBox = document.getElementById('err');
             const btn = document.getElementById('loginBtn');
 
-            if(!idInput || !keyInput) {
-                showError("PLEASE FILL ALL FIELDS");
-                return;
-            }
-
-            btn.innerText = "VERIFYING...";
             errBox.style.display = "none";
+            btn.innerText = "AUTHENTICATING...";
 
             try {
-                // PRINCIPLED SEARCH: Exact match on sch_id only
+                // We strictly query the 'Schools' table by 'sch_id'
                 const { data: school, error } = await client
                     .from('Schools')
                     .select('*')
                     .eq('sch_id', idInput)
                     .single();
 
-                if (error || !school) {
-                    throw new Error("INVALID SCHOOL IDENTITY");
-                }
+                if (error || !school) throw new Error("SCHOOL ID NOT RECOGNIZED");
 
-                // VALIDATE KEY
                 if (keyInput === school.admin_key || keyInput === school.teacher_key) {
-                    launchDashboard(school);
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('dash').style.display = 'flex';
+                    document.getElementById('dispName').innerText = school.school_name;
+                    document.getElementById('dispId').innerText = "ID: " + school.sch_id;
+                    document.getElementById('dispLogo').src = school.logo_url || "";
                 } else {
-                    throw new Error("ACCESS KEY DENIED");
+                    throw new Error("SECURITY KEY REJECTED");
                 }
-
             } catch (e) {
-                showError(e.message);
-                btn.innerText = "VERIFY & OPEN";
+                errBox.style.display = "block";
+                errBox.innerText = "❌ " + e.message;
+                btn.innerText = "VERIFY IDENTITY";
             }
-        }
-
-        function launchDashboard(data) {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dash').style.display = 'flex';
-            document.getElementById('dispName').innerText = data.school_name;
-            document.getElementById('dispId').innerText = "ID: " + data.sch_id;
-            document.getElementById('dispLogo').src = data.logo_url || "";
-        }
-
-        function showError(m) {
-            const errBox = document.getElementById('err');
-            errBox.style.display = "block";
-            errBox.innerText = "⚠️ " + m;
         }
     </script>
 </body>
