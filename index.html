@@ -10,10 +10,11 @@
         :root { --primary: #0047AB; --bg: #0f172a; --white: #ffffff; }
         * { box-sizing: border-box; text-transform: uppercase; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .login-card { background: var(--white); padding: 40px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .login-card { background: var(--white); padding: 40px; border-radius: 30px; width: 95%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
         input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; text-align: center; outline: none; }
         .btn { padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; }
         #err { color: #e11d48; font-size: 0.7rem; margin-top: 15px; font-weight: 800; display: none; background: #fff1f2; padding: 10px; border-radius: 10px; }
+        #dash { display: none; color: white; text-align: center; padding: 20px; }
     </style>
 </head>
 <body>
@@ -24,8 +25,18 @@
             <p style="font-size:0.55rem; color:#64748b; font-weight:800; margin-bottom:25px;">EUDES MEDIA SOLUTIONS</p>
             <input type="text" id="schId" placeholder="SCHOOL ID (PM001)">
             <input type="password" id="schKey" placeholder="ACCESS KEY">
-            <button class="btn" id="loginBtn" onclick="authenticate()">OPEN SYSTEM</button>
+            <button class="btn" onclick="authenticate()">OPEN SYSTEM</button>
             <div id="err"></div>
+        </div>
+    </div>
+
+    <div id="dash">
+        <div style="background:white; color:#000; padding:40px; border-radius:30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <h1 id="schName" style="color:var(--primary); margin-top:0;"></h1>
+            <p style="font-weight: 800; color: #15803d;">✅ SYSTEM ONLINE</p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="font-size: 0.7rem; color: #64748b;">CONNECTED TO DATABASE: <b>SCHOOLS</b></p>
+            <button class="btn" onclick="location.reload()" style="background:#444; margin-top:20px;">LOGOUT</button>
         </div>
     </div>
 
@@ -38,40 +49,32 @@
             const idInput = document.getElementById('schId').value.trim().toUpperCase();
             const keyInput = document.getElementById('schKey').value.trim();
             const errBox = document.getElementById('err');
-            const btn = document.getElementById('loginBtn');
-
-            btn.innerText = "VERIFYING...";
             errBox.style.display = "none";
 
             try {
-                // 1. Try to fetch from 'Schools' table
-                const { data: schools, error } = await client.from('Schools').select('*');
-                
-                if (error) throw new Error("DATABASE CONNECTION ERROR");
+                // We specifically target the table with the Capital 'S'
+                const { data, error } = await client
+                    .from('Schools')
+                    .select('*')
+                    .eq('scho_id', idInput)
+                    .single();
 
-                // 2. THE DEEP SEARCH: Clean every value in the DB and compare to your input
-                const school = schools.find(s => {
-                    return Object.values(s).some(val => 
-                        val && val.toString().trim().toUpperCase() === idInput
-                    );
-                });
-
-                if (!school) {
-                    throw new Error(`ID "${idInput}" NOT FOUND IN SYSTEM`);
+                if (error || !data) {
+                    throw new Error("SCHOOL ID NOT FOUND IN 'Schools' TABLE");
                 }
 
-                // 3. Verify Key
-                if (keyInput === school.admin_key || keyInput === school.teacher_key) {
-                    alert("SUCCESS! WELCOME TO " + school.school_name);
-                    // Add your dashboard redirect here
+                // Verify the Access Key (PM2026)
+                if (keyInput === data.admin_key || keyInput === data.teacher_key) {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('dash').style.display = 'block';
+                    document.getElementById('schName').innerText = data.school_name;
                 } else {
-                    throw new Error("WRONG ACCESS KEY");
+                    throw new Error("INVALID ACCESS KEY");
                 }
 
             } catch (e) {
-                btn.innerText = "OPEN SYSTEM";
                 errBox.style.display = "block";
-                errBox.innerText = "⚠️ " + e.message;
+                errBox.innerText = "❌ " + e.message;
             }
         }
     </script>
