@@ -3,70 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BEST DATA BASE SOFTWARE| EUDES MEDIA</title>
+    <title>ESMS AUTHORITY | EUDES MEDIA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0047AB; --bg: #f8fafc; --dark: #0f172a; }
+        :root { --primary: #0047AB; --bg: #f8fafc; --dark: #0f172a; --white: #ffffff; }
         * { box-sizing: border-box; text-transform: uppercase; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); margin: 0; color: #1e293b; overflow-x: hidden; }
         
+        /* AUTHENTICATION SCREEN */
         #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: white; padding: 35px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-        input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; text-align: center; outline: none; }
-        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; }
+        .login-card { background: var(--white); padding: 40px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 700; text-align: center; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); }
+        .btn { padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; background: var(--primary); width: 100%; letter-spacing: 1px; }
+        .btn:active { transform: scale(0.98); }
+
+        /* MAIN DASHBOARD UI */
+        .header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; sticky; top: 0; z-index: 10; }
+        .logo { width: 55px; height: 55px; border-radius: 12px; object-fit: contain; background: #f1f5f9; }
         
-        .header { background: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; }
-        .logo { width: 50px; height: 50px; border-radius: 10px; object-fit: contain; }
-        .tab-bar { background: white; display: flex; border-bottom: 2px solid #e2e8f0; }
-        .tab { flex: 1; padding: 16px; text-align: center; font-size: 0.6rem; font-weight: 800; color: #64748b; cursor: pointer; }
+        .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px; }
+        .step { background: var(--white); padding: 18px 10px; border-radius: 18px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border-bottom: 4px solid #cbd5e1; }
+        .step b { display: block; font-size: 1.5rem; color: var(--dark); }
+        .step span { font-size: 0.55rem; color: #64748b; font-weight: 800; }
+
+        .tab-bar { background: var(--white); display: flex; border-bottom: 2px solid #e2e8f0; }
+        .tab { flex: 1; padding: 18px; text-align: center; font-size: 0.65rem; font-weight: 800; color: #64748b; cursor: pointer; }
         .tab.active { color: var(--primary); border-bottom: 4px solid var(--primary); }
+
         .container { padding: 20px; }
-        .card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 15px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        td, th { padding: 12px; text-align: left; font-size: 0.7rem; border-bottom: 1px solid #f1f5f9; }
+        .card { background: var(--white); border-radius: 24px; border: 1px solid #e2e8f0; padding: 20px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        td, th { padding: 14px; text-align: left; font-size: 0.75rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; }
+        th { color: #64748b; font-size: 0.65rem; }
+
+        .status-pill { background: #eff6ff; color: var(--primary); padding: 5px 10px; border-radius: 6px; font-size: 0.65rem; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-card">
-            <h1 style="color:var(--primary); margin:0;">ESMS AUTHORITY</h1>
-            <p style="font-size:0.5rem; color:#64748b; font-weight:800; margin-bottom:20px;">EUDES MEDIA SOLUTIONS</p>
-            <input type="text" id="schIdInput" placeholder="ENTER SCHOOL ID">
-            <input type="password" id="passInput" placeholder="ENTER ACCESS KEY">
+            <h1 style="color:var(--primary); margin:0; font-size: 1.6rem; font-weight: 900;">ESMS AUTHORITY</h1>
+            <p style="font-size:0.55rem; color:#64748b; font-weight:800; margin-bottom:25px; letter-spacing: 2px;">EUDES MEDIA SOLUTIONS</p>
+            <input type="text" id="schIdInput" placeholder="SCHOOL ID (E.G. PM001)">
+            <input type="password" id="passInput" placeholder="ACCESS KEY">
             <button class="btn" id="loginBtn" onclick="authenticate()">OPEN SYSTEM</button>
-            <p id="err" style="color:red; font-size:0.6rem; margin-top:15px; display:none; background: #fff1f2; padding: 10px; border-radius: 8px;"></p>
+            <p id="err" style="color:#e11d48; font-size:0.65rem; margin-top:15px; display:none; font-weight: 800; background: #fff1f2; padding: 10px; border-radius: 10px;"></p>
         </div>
     </div>
 
     <div id="main-app" style="display:none;">
         <div class="header">
-            <img src="" id="schLogo" class="logo" onerror="this.src='https://via.placeholder.com/50'">
+            <img src="" id="schLogo" class="logo" onerror="this.src='https://via.placeholder.com/60?text=LOGO'">
             <div>
-                <h2 id="schName" style="margin:0; font-size: 1rem; color: var(--primary);">---</h2>
-                <div id="roleDisplay" style="font-size:0.55rem; color:#64748b; font-weight:800;">---</div>
+                <h2 id="schName" style="margin:0; font-size: 1.1rem; color: var(--primary);">SCHOOL NAME</h2>
+                <div id="roleDisplay" style="font-size:0.55rem; color:#64748b; font-weight:800;">ACCESS: AUTHORIZED</div>
             </div>
         </div>
+
         <div class="tab-bar">
-            <div class="tab active" id="t-dash" onclick="showTab('dash')">PIPELINE</div>
-            <div class="tab" id="t-adm" onclick="showTab('adm')">ADMISSIONS</div>
-            <div class="tab" onclick="location.reload()" style="color:red">LOGOUT</div>
+            <div class="tab active" id="t1" onclick="showTab('dash')">DASHBOARD</div>
+            <div class="tab" id="t2" onclick="showTab('adm')">ENROLLMENT</div>
+            <div class="tab" onclick="location.reload()" style="color:#e11d48">EXIT SYSTEM</div>
         </div>
-        <div id="view-dash" class="tab-content container">
-            <div class="card">
-                <table>
-                    <thead><tr><th>NAME</th><th>LOCATION</th><th>STATUS</th><th>ACTION</th></tr></thead>
-                    <tbody id="stuBody"></tbody>
-                </table>
+
+        <div id="dash" class="tab-content">
+            <div class="pipeline">
+                <div class="step"><b id="c1">0</b><span>APPLIED</span></div>
+                <div class="step"><b id="c2">0</b><span>INTERVIEW</span></div>
+                <div class="step"><b id="c3">0</b><span>PAYMENT</span></div>
+                <div class="step" style="border-color:var(--primary)"><b id="c4">0</b><span>ENROLLED</span></div>
+            </div>
+            <div class="container">
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr><th>NAME</th><th>LOCATION</th><th>HEALTH</th><th>STATUS</th><th>PIPELINE ACTION</th></tr>
+                        </thead>
+                        <tbody id="stuBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <div id="view-adm" class="tab-content container" style="display:none;">
-            <div class="card">
-                <h3>NEW STUDENT</h3>
-                <input type="text" id="nName" placeholder="STUDENT NAME">
-                <input type="text" id="nLoc" placeholder="LOCATION">
-                <button class="btn" onclick="saveStudent()">SAVE STUDENT</button>
+
+        <div id="adm" class="tab-content container" style="display:none;">
+            <div class="card" style="max-width: 500px; margin: auto;">
+                <h3 style="color:var(--primary); text-align: center; margin-top: 0;">REGISTER NEW STUDENT</h3>
+                <label style="font-size: 0.6rem; font-weight: 800; color: #64748b;">FULL NAME</label>
+                <input type="text" id="nName" placeholder="E.G. JOHN DOE">
+                <label style="font-size: 0.6rem; font-weight: 800; color: #64748b;">RESIDENCE</label>
+                <input type="text" id="nLoc" placeholder="E.G. SEETA, UGANDA">
+                <label style="font-size: 0.6rem; font-weight: 800; color: #64748b;">HEALTH STATUS</label>
+                <input type="text" id="nHealth" placeholder="E.G. NORMAL" value="NORMAL">
+                <button class="btn" onclick="saveStudent()">SUBMIT TO DATABASE</button>
             </div>
         </div>
     </div>
@@ -75,72 +106,120 @@
         const _URL = 'https://kjftrwuucjdnhfwesrup.supabase.co'; 
         const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const client = supabase.createClient(_URL, _KEY);
-        let activeID = "";
+        let currentSchoolID = "";
 
         async function authenticate() {
             const idInput = document.getElementById('schIdInput').value.trim().toUpperCase();
             const keyInput = document.getElementById('passInput').value.trim();
+            const btn = document.getElementById('loginBtn');
             const errBox = document.getElementById('err');
             
-            // Fetch everything from Schools to see what's inside
-            const { data: allSchools, error } = await client.from('Schools').select('*');
+            btn.innerText = "AUTHENTICATING...";
+            errBox.style.display = "none";
 
-            if (error) {
-                errBox.style.display = "block";
-                errBox.innerText = "DATABASE ERROR: " + error.message;
-                return;
-            }
+            try {
+                const { data: schools, error } = await client.from('Schools').select('*');
+                if (error) throw new Error("CONNECTION FAILED");
 
-            // Find matching school by checking BOTH possible column names
-            const school = allSchools.find(s => 
-                (s.sch_id && s.sch_id.toUpperCase() === idInput) || 
-                (s.school_id && s.school_id.toUpperCase() === idInput)
-            );
+                // Check all possible ID column variations (scho_id, sch_id, school_id)
+                const school = schools?.find(s => {
+                    const dbID = (s.scho_id || s.sch_id || s.school_id || "").toString().trim().toUpperCase();
+                    return dbID === idInput;
+                });
 
-            if (school) {
-                if (keyInput === school.admin_key || keyInput === school.teacher_key) {
-                    activeID = school.sch_id || school.school_id;
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('main-app').style.display = 'block';
-                    document.getElementById('schName').innerText = school.school_name;
-                    document.getElementById('schLogo').src = school.logo_url;
-                    loadData();
+                if (school) {
+                    if (keyInput === school.admin_key || keyInput === school.teacher_key) {
+                        currentSchoolID = idInput;
+                        document.getElementById('login-screen').style.display = 'none';
+                        document.getElementById('main-app').style.display = 'block';
+                        document.getElementById('schName').innerText = school.school_name;
+                        document.getElementById('schLogo').src = school.logo_url || "";
+                        loadData();
+                    } else {
+                        throw new Error("INVALID ACCESS KEY");
+                    }
                 } else {
-                    errBox.style.display = "block";
-                    errBox.innerText = "WRONG ACCESS KEY";
+                    throw new Error("SCHOOL ID NOT FOUND IN SYSTEM");
                 }
-            } else {
-                // Diagnostic: Show the user what IDs actually exist in the DB
-                const existingIDs = allSchools.map(s => s.sch_id || s.school_id).join(", ");
+            } catch (e) {
+                btn.innerText = "OPEN SYSTEM";
                 errBox.style.display = "block";
-                errBox.innerText = `ID "${idInput}" NOT FOUND. EXISTING IDS IN DATABASE: ${existingIDs}`;
+                errBox.innerText = "⚠️ " + e.message;
             }
         }
 
         async function loadData() {
-            const { data } = await client.from('students').select('*').or(`sch_id.eq.${activeID},scho_id.eq.${activeID}`);
-            const list = data || [];
-            document.getElementById('stuBody').innerHTML = list.map(s => `
-                <tr>
-                    <td>${s.name}</td>
+            // Fetch students linked to this school ID
+            const { data, error } = await client.from('students').select('*');
+            if (error) return;
+
+            const list = data?.filter(s => 
+                (s.sch_id || s.scho_id || "").toString().toUpperCase() === currentSchoolID
+            ) || [];
+
+            let counts = { APPLIED: 0, INTERVIEW: 0, PAYMENT: 0, ENROLLED: 0 };
+            document.getElementById('stuBody').innerHTML = list.map(s => {
+                const st = s.status || 'APPLIED';
+                if(counts[st] !== undefined) counts[st]++;
+                return `<tr>
+                    <td style="color:var(--dark)">${s.name}</td>
                     <td>${s.location || '--'}</td>
-                    <td>${s.status || 'APPLIED'}</td>
-                    <td><button onclick="alert('Student ID: ${s.id}')">VIEW</button></td>
-                </tr>`).join('');
+                    <td>${s.health_status || 'NORMAL'}</td>
+                    <td><span class="status-pill">${st}</span></td>
+                    <td>
+                        <select onchange="updateStat('${s.id}', this.value)" style="border: 1px solid #e2e8f0; padding: 5px; border-radius: 5px; font-size: 0.65rem; font-weight: 800;">
+                            <option value="">MOVE TO...</option>
+                            <option value="APPLIED">APPLIED</option>
+                            <option value="INTERVIEW">INTERVIEW</option>
+                            <option value="PAYMENT">PAYMENT</option>
+                            <option value="ENROLLED">ENROLLED</option>
+                        </select>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            document.getElementById('c1').innerText = counts.APPLIED;
+            document.getElementById('c2').innerText = counts.INTERVIEW;
+            document.getElementById('c3').innerText = counts.PAYMENT;
+            document.getElementById('c4').innerText = counts.ENROLLED;
         }
 
         async function saveStudent() {
-            const name = document.getElementById('nName').value;
-            const { error } = await client.from('students').insert([{ sch_id: activeID, name: name, location: document.getElementById('nLoc').value, status: 'APPLIED' }]);
-            if (error) alert(error.message);
-            else { alert("SAVED!"); showTab('dash'); }
+            const name = document.getElementById('nName').value.trim();
+            if(!name) return alert("ENTER STUDENT NAME");
+
+            const student = {
+                sch_id: currentSchoolID,
+                name: name,
+                location: document.getElementById('nLoc').value,
+                health_status: document.getElementById('nHealth').value,
+                status: 'APPLIED'
+            };
+
+            const { error } = await client.from('students').insert([student]);
+            if(error) {
+                // Retry with scho_id if sch_id doesn't exist in the table
+                await client.from('students').insert([{...student, scho_id: currentSchoolID, sch_id: undefined}]);
+            }
+            
+            alert("SUCCESSFULLY REGISTERED");
+            document.getElementById('nName').value = "";
+            document.getElementById('nLoc').value = "";
+            showTab('dash');
+        }
+
+        async function updateStat(id, val) {
+            if(val) {
+                await client.from('students').update({ status: val }).eq('id', id);
+                loadData();
+            }
         }
 
         function showTab(t) {
-            document.getElementById('view-dash').style.display = t === 'dash' ? 'block' : 'none';
-            document.getElementById('view-adm').style.display = t === 'adm' ? 'block' : 'none';
-            document.getElementById('t-dash').classList.toggle('active', t === 'dash');
-            document.getElementById('t-adm').classList.toggle('active', t === 'adm');
+            document.getElementById('dash').style.display = t === 'dash' ? 'block' : 'none';
+            document.getElementById('adm').style.display = t === 'adm' ? 'block' : 'none';
+            document.getElementById('t1').classList.toggle('active', t === 'dash');
+            document.getElementById('t2').classList.toggle('active', t === 'adm');
             if(t === 'dash') loadData();
         }
     </script>
