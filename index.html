@@ -11,7 +11,6 @@
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
         body { margin: 0; background: var(--bg); color: #1e293b; }
 
-        /* NAVIGATION & SIDEBAR */
         .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; width: 280px; background: var(--dark); color: white; padding: 30px; transition: 0.3s; z-index: 1000; }
         .sidebar.open { left: 0; }
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
@@ -24,27 +23,23 @@
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
 
-        /* DASHBOARD CARDS */
         .card { background: white; padding: 18px; border-radius: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; border: 1px solid #e2e8f0; }
         .card label { font-size: 0.6rem; font-weight: 800; color: #64748b; display: block; margin-bottom: 5px; }
         .card p { font-size: 1.2rem; font-weight: 800; margin: 0; }
 
-        /* INPUTS */
         input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-weight: 700; font-size: 0.8rem; margin-top: 5px; }
         
-        /* TABLE */
         table { width: 100%; border-collapse: collapse; min-width: 850px; }
         th, td { padding: 12px; text-align: left; font-size: 0.7rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; }
         .st-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; }
 
-        /* BUTTONS */
         .btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; margin-top: 10px; }
-        .act-btn { padding: 8px 12px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; font-size: 0.65rem; }
+        .act-btn { padding: 8px 12px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; font-size: 0.6rem; }
         .edit { background: #dbeafe; color: var(--primary); margin-right: 5px; }
         .del { background: #fee2e2; color: var(--danger); }
 
         #login-screen { position:fixed; inset:0; background:var(--dark); z-index:2000; display:flex; align-items:center; justify-content:center; padding: 20px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -55,7 +50,7 @@
             <p id="clock" style="font-size:0.6rem; font-weight:800; margin:10px 0; color:#64748b;"></p>
             <input type="text" id="sid" placeholder="SCHOOL ID">
             <input type="password" id="sk" placeholder="ACCESS KEY">
-            <button onclick="auth()" class="btn">LOGIN SYSTEM</button>
+            <button onclick="auth()" class="btn">LOGIN</button>
         </div>
     </div>
 
@@ -63,7 +58,7 @@
     <div class="sidebar" id="sb">
         <h3 style="text-align:center; margin-bottom:30px;">PREMIER ENGINE</h3>
         <div class="nav-btn active" onclick="pg('dash', this)">📊 DASHBOARD</div>
-        <div class="nav-btn" onclick="pg('form', this)">📝 ADMISSION</div>
+        <div class="nav-btn" onclick="pg('form', this)">📝 NEW ADMISSION</div>
         <div class="nav-btn" onclick="ld(); pg('reg', this)">👥 REGISTRY</div>
         <div class="nav-btn" onclick="ld(); pg('roll', this)">✅ ROLL CALL</div>
         <div class="nav-btn" onclick="ld(); pg('fin', this)">💰 FINANCE</div>
@@ -72,50 +67,49 @@
     <div class="header">
         <button onclick="tgl()" style="background:none; border:none; font-size:1.5rem; color:var(--primary);">☰</button>
         <div style="text-align:right">
-            <h4 id="schN" style="margin:0; font-size:0.7rem; color:var(--primary);"></h4>
+            <h4 id="schN" style="margin:0; font-size:0.7rem;"></h4>
             <p id="topT" style="margin:0; font-size:0.55rem; font-weight:800; color:#94a3b8;"></p>
         </div>
     </div>
 
     <div class="content">
-        
         <div id="dash" class="page active">
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
                 <div class="card"><label>TOTAL STUDENTS</label><p id="d1">0</p></div>
                 <div class="card"><label>ABSENT TODAY</label><p id="d2" style="color:var(--danger)">0</p></div>
             </div>
-            <div class="card" style="border-left:5px solid var(--primary)"><label>EXPECTED REVENUE (UGX)</label><p id="d3">0</p></div>
-            <div class="card" style="border-left:5px solid var(--success)"><label>TOTAL COLLECTED (UGX)</label><p id="d4">0</p></div>
-            <div class="card" style="border-left:5px solid var(--danger)"><label>TOTAL DEBT (UGX)</label><p id="d5" style="color:var(--danger)">0</p></div>
+            <div class="card" style="border-left:5px solid var(--primary)"><label>EXPECTED REVENUE</label><p id="d3">0</p></div>
+            <div class="card" style="border-left:5px solid var(--success)"><label>TOTAL COLLECTED</label><p id="d4">0</p></div>
+            <div class="card" style="border-left:5px solid var(--danger)"><label>TOTAL DEBT</label><p id="d5" style="color:var(--danger)">0</p></div>
         </div>
 
         <div id="form" class="page">
-            <h3 id="formT">STUDENT ADMISSION</h3>
+            <h3 id="ft">NEW ADMISSION</h3>
             <div class="card">
-                <div onclick="document.getElementById('fileI').click()" style="border:2px dashed var(--primary); padding:20px; text-align:center; border-radius:15px; background:#f8fafc; cursor:pointer;">
-                    <img id="prevI" style="width:100px; height:100px; border-radius:12px; display:none; margin:0 auto 10px; object-fit:cover;">
-                    <span id="txtI">+ CLICK TO UPLOAD PHOTO</span>
-                    <input type="file" id="fileI" hidden accept="image/*" onchange="comp(this)">
+                <div onclick="document.getElementById('fi').click()" style="border:2px dashed var(--primary); padding:20px; text-align:center; border-radius:15px; background:#f8fafc; cursor:pointer;">
+                    <img id="pi" style="width:100px; height:100px; border-radius:12px; display:none; margin:0 auto 10px; object-fit:cover;">
+                    <span id="it">+ PHOTO</span>
+                    <input type="file" id="fi" hidden accept="image/*" onchange="cp(this)">
                 </div>
-                <input type="hidden" id="editID">
-                <input type="text" id="fn" placeholder="FULL NAME">
-                <input type="text" id="fl" placeholder="LIN / STUDENT ID">
-                <input type="tel" id="ft" placeholder="PARENT CONTACT">
-                <input type="text" id="fo" placeholder="RESIDENCE LOCATION">
-                <input type="date" id="fd">
-                <select id="fc">
-                    <option value="">-- SELECT CLASS --</option>
+                <input type="hidden" id="eid">
+                <input type="text" id="rn" placeholder="FULL NAME">
+                <input type="text" id="rl" placeholder="LIN">
+                <input type="tel" id="rt" placeholder="CONTACT">
+                <input type="text" id="ro" placeholder="LOCATION">
+                <input type="date" id="rd">
+                <select id="rc">
+                    <option value="">-- CLASS --</option>
                     <option>Baby</option><option>Middle</option><option>Top</option>
                     <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                     <option>P.5</option><option>P.6</option><option>P.7</option>
                 </select>
-                <input type="number" id="ff" placeholder="TOTAL TUITION FEES">
-                <button class="btn" id="saveB" onclick="sv()">SAVE RECORD</button>
+                <input type="number" id="rf" placeholder="TOTAL FEES">
+                <button class="btn" onclick="sv()">SAVE DATA</button>
             </div>
         </div>
 
         <div id="reg" class="page">
-            <input type="text" id="src" class="card" style="width:100%; border:2px solid var(--primary); padding:18px;" placeholder="🔍 SEARCH NAME OR LIN..." onkeyup="sh()">
+            <input type="text" id="sr" class="card" style="width:100%; border:2px solid var(--primary)" placeholder="🔍 SEARCH NAME OR LIN..." onkeyup="sh()">
             <div style="overflow-x:auto; background:white; border-radius:15px;">
                 <table>
                     <thead><tr><th>PHOTO</th><th>NAME</th><th>CLASS</th><th>DEBT</th><th>ACTION</th></tr></thead>
@@ -125,25 +119,23 @@
         </div>
 
         <div id="fin" class="page">
-            <h3>FINANCE CENTER</h3>
-            <select id="fcl" onchange="rf()" style="border:2px solid var(--primary); margin-bottom:15px;">
-                <option value="">-- SELECT CLASS TO PAY --</option>
+            <select id="fc" onchange="rf()" style="border:2px solid var(--primary); margin-bottom:15px;">
+                <option value="">-- SELECT CLASS FOR FINANCE --</option>
                 <option>Baby</option><option>Middle</option><option>Top</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <div id="flt"></div>
+            <div id="fl"></div>
         </div>
 
         <div id="roll" class="page">
-            <h3>DAILY ROLL CALL</h3>
-            <select id="acl" onchange="ra()" style="border:2px solid var(--primary); margin-bottom:15px;">
-                <option value="">-- SELECT CLASS --</option>
+            <select id="ac" onchange="ra()" style="border:2px solid var(--primary); margin-bottom:15px;">
+                <option value="">-- SELECT CLASS FOR ROLL CALL --</option>
                 <option>Baby</option><option>Middle</option><option>Top</option>
                 <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                 <option>P.5</option><option>P.6</option><option>P.7</option>
             </select>
-            <div id="rlt"></div>
+            <div id="rbody"></div>
         </div>
     </div>
 
@@ -153,20 +145,11 @@
         const s = supabase.createClient(_U, _K);
         let da = [], pB = "";
 
-        // CLOCK
         setInterval(() => { const n = new Date().toLocaleString(); document.getElementById('clock').innerText = n; document.getElementById('topT').innerText = n; }, 1000);
-        
         function tgl() { document.getElementById('sb').classList.toggle('open'); document.getElementById('ov').classList.toggle('active'); }
-        
-        function pg(id, b) { 
-            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); 
-            document.getElementById(id).classList.add('active'); 
-            if(b) { document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active')); b.classList.add('active'); } 
-            if(window.innerWidth<1000) tgl(); 
-        }
+        function pg(id, b) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(b) { document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active')); b.classList.add('active'); } if(window.innerWidth<1000) tgl(); }
 
-        // IMAGE COMPRESSION
-        function comp(i) {
+        function cp(i) {
             const f = i.files[0]; const r = new FileReader(); r.readAsDataURL(f);
             r.onload = (e) => {
                 const g = new Image(); g.src = e.target.result;
@@ -174,7 +157,7 @@
                     const c = document.createElement('canvas'); c.width = 400; c.height = (g.height/g.width)*400;
                     c.getContext('2d').drawImage(g,0,0,400,c.height);
                     pB = c.toDataURL('image/jpeg', 0.6);
-                    document.getElementById('prevI').src = pB; document.getElementById('prevI').style.display = 'block'; document.getElementById('txtI').style.display = 'none';
+                    document.getElementById('pi').src = pB; document.getElementById('pi').style.display = 'block'; document.getElementById('it').style.display = 'none';
                 };
             };
         }
@@ -183,7 +166,7 @@
             const i = document.getElementById('sid').value; const k = document.getElementById('sk').value;
             const { data: d } = await s.from('Schools').select('*').eq('sch_id', i).single();
             if(d && (k==d.admin_key || k==d.teacher_key)) { document.getElementById('login-screen').style.display='none'; document.getElementById('schN').innerText=d.school_name; ld(); }
-            else alert("INVALID KEY");
+            else alert("WRONG KEY");
         }
 
         async function ld() {
@@ -192,20 +175,11 @@
             upd(da);
         }
 
-        function upd(list) {
+        function upd(l) {
             const b = document.getElementById('rtb'); b.innerHTML = '';
-            list.forEach(x => {
-                const d = (x.total_fees || 0) - (x.amount_paid || 0);
-                b.innerHTML += `<tr>
-                    <td><img src="${x.photo_url}" class="st-img"></td>
-                    <td>${x.name}</td>
-                    <td>${x.class}</td>
-                    <td style="color:red">${d.toLocaleString()}</td>
-                    <td>
-                        <button class="act-btn edit" onclick="et('${x.id}')">EDIT</button>
-                        <button class="act-btn del" onclick="dl('${x.id}')">DEL</button>
-                    </td>
-                </tr>`;
+            l.forEach(x => {
+                const d = x.total_fees - x.amount_paid;
+                b.innerHTML += `<tr><td><img src="${x.photo_url}" class="st-img"></td><td>${x.name}</td><td>${x.class}</td><td style="color:red">${d.toLocaleString()}</td><td><button class="act-btn edit" onclick="et('${x.id}')">EDIT</button><button class="act-btn del" onclick="dl('${x.id}')">DEL</button></td></tr>`;
             });
             const ex = da.reduce((a,b)=>a+(b.total_fees||0),0);
             const pd = da.reduce((a,b)=>a+(b.amount_paid||0),0);
@@ -216,68 +190,34 @@
             document.getElementById('d5').innerText = (ex-pd).toLocaleString();
         }
 
-        // SEARCH FUNCTION
-        function sh() { 
-            const v = document.getElementById('src').value.toLowerCase(); 
-            const filtered = da.filter(x => x.name.toLowerCase().includes(v) || x.lin.toLowerCase().includes(v));
-            upd(filtered); 
-        }
+        function sh() { const v = document.getElementById('sr').value.toLowerCase(); upd(da.filter(x=>x.name.toLowerCase().includes(v)||x.lin.toLowerCase().includes(v))); }
 
-        // SAVE & UPDATE
         async function sv() {
-            const e = document.getElementById('editID').value;
-            const o = { name: document.getElementById('fn').value, lin: document.getElementById('fl').value, contact: document.getElementById('ft').value, location: document.getElementById('fo').value, dob: document.getElementById('fd').value, class: document.getElementById('fc').value, photo_url: pB, total_fees: parseFloat(document.getElementById('ff').value)||0 };
+            const id = document.getElementById('eid').value;
+            const obj = { name: document.getElementById('rn').value, lin: document.getElementById('rl').value, contact: document.getElementById('rt').value, location: document.getElementById('ro').value, dob: document.getElementById('rd').value, class: document.getElementById('rc').value, photo_url: pB, total_fees: parseFloat(document.getElementById('rf').value)||0 };
+            if(id) await s.from('Students').update(obj).eq('id', id);
+            else await s.from('Students').insert([{...obj, is_absent:false, amount_paid:0}]);
             
-            if(e) {
-                const { error } = await s.from('Students').update(o).eq('id', e);
-                if(!error) alert("UPDATED SUCCESSFULLY");
-            } else {
-                const { error } = await s.from('Students').insert([{...o, is_absent:false, amount_paid:0}]);
-                if(!error) alert("SAVED SUCCESSFULLY");
-            }
-            location.reload();
+            alert("SAVED SUCCESSFULLY");
+            document.getElementById('eid').value=""; document.getElementById('rn').value=""; document.getElementById('rl').value=""; document.getElementById('rt').value=""; document.getElementById('ro').value=""; document.getElementById('rd').value=""; document.getElementById('rc').value=""; document.getElementById('rf').value=""; document.getElementById('pi').style.display='none'; document.getElementById('it').style.display='block';
+            ld();
         }
 
-        // --- THE FIXED EDIT FUNCTION ---
         function et(id) {
-            const x = da.find(a => a.id == id);
-            if(!x) return;
-            
-            document.getElementById('editID').value = x.id;
-            document.getElementById('fn').value = x.name;
-            document.getElementById('fl').value = x.lin;
-            document.getElementById('ft').value = x.contact;
-            document.getElementById('fo').value = x.location;
-            document.getElementById('fd').value = x.dob;
-            document.getElementById('fc').value = x.class;
-            document.getElementById('ff').value = x.total_fees;
-            
-            pB = x.photo_url;
-            document.getElementById('prevI').src = pB;
-            document.getElementById('prevI').style.display = 'block';
-            document.getElementById('txtI').style.display = 'none';
-            
-            document.getElementById('formT').innerText = "EDITING: " + x.name;
-            document.getElementById('saveB').innerText = "UPDATE STUDENT";
-            
-            pg('form', document.querySelectorAll('.nav-btn')[1]);
+            const x = da.find(a=>a.id===id);
+            document.getElementById('eid').value=x.id; document.getElementById('rn').value=x.name; document.getElementById('rl').value=x.lin; document.getElementById('rt').value=x.contact; document.getElementById('ro').value=x.location; document.getElementById('rd').value=x.dob; document.getElementById('rc').value=x.class; document.getElementById('rf').value=x.total_fees;
+            pB=x.photo_url; document.getElementById('pi').src=pB; document.getElementById('pi').style.display='block'; document.getElementById('it').style.display='none';
+            document.getElementById('ft').innerText="EDIT STUDENT"; pg('form');
         }
 
-        async function dl(id) { if(confirm("DELETE PERMANENTLY?")) { await s.from('Students').delete().eq('id', id); ld(); } }
+        async function dl(id) { if(confirm("DELETE?")) { await s.from('Students').delete().eq('id', id); ld(); } }
 
         function rf() {
-            const c = document.getElementById('fcl').value;
+            const c = document.getElementById('fc').value;
             const l = da.filter(x=>x.class===c);
-            const b = document.getElementById('flt'); b.innerHTML = '';
+            const b = document.getElementById('fl'); b.innerHTML = '';
             l.forEach(x => {
-                b.innerHTML += `<div class="card">
-                    <p style="font-weight:800">${x.name}</p>
-                    <p style="color:red; font-size:0.7rem">DEBT: ${(x.total_fees-x.amount_paid).toLocaleString()}</p>
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <input type="number" id="p${x.id}" placeholder="AMOUNT">
-                        <button class="act-btn" style="background:green; color:white" onclick="py('${x.id}', ${x.amount_paid})">PAY</button>
-                    </div>
-                </div>`;
+                b.innerHTML += `<div class="card"><p style="font-weight:800">${x.name}</p><p style="color:red; font-size:0.7rem">DEBT: ${(x.total_fees-x.amount_paid).toLocaleString()}</p><div style="display:flex; gap:10px; margin-top:10px;"><input type="number" id="p${x.id}" placeholder="AMOUNT"><button class="act-btn" style="background:green; color:white" onclick="py('${x.id}', ${x.amount_paid})">PAY</button></div></div>`;
             });
         }
 
@@ -288,16 +228,11 @@
         }
 
         function ra() {
-            const c = document.getElementById('acl').value;
+            const c = document.getElementById('ac').value;
             const l = da.filter(x=>x.class===c);
-            const b = document.getElementById('rlt'); b.innerHTML = '';
+            const b = document.getElementById('rbody'); b.innerHTML = '';
             l.forEach(x => {
-                b.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>${x.name}</span>
-                    <button class="act-btn" style="background:${x.is_absent?'red':'green'}; color:white" onclick="at('${x.id}', ${x.is_absent})">
-                        ${x.is_absent?'ABSENT':'PRESENT'}
-                    </button>
-                </div>`;
+                b.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><span>${x.name}</span><button class="act-btn" style="background:${x.is_absent?'red':'green'}; color:white; width:100px;" onclick="at('${x.id}', ${x.is_absent})">${x.is_absent?'ABSENT':'PRESENT'}</button></div>`;
             });
         }
 
