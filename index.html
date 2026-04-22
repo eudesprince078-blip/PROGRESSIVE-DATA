@@ -1,665 +1,259 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUDES MEDIA | Progressive Mothers School - Ultimate Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: #f0f2f5; padding: 20px; }
-        .container { max-width: 1600px; margin: 0 auto; }
-        .card { background: white; border-radius: 16px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { color: #1a5f2b; margin-bottom: 10px; }
-        h3 { color: #1a5f2b; margin-bottom: 15px; border-left: 4px solid #1a5f2b; padding-left: 12px; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
-        button { background: #1a5f2b; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s; }
-        button:hover { background: #0e3d1a; transform: translateY(-2px); }
-        .btn-danger { background: #e74c3c; }
-        .btn-danger:hover { background: #c0392b; }
-        .btn-warning { background: #f39c12; }
-        .btn-warning:hover { background: #e67e22; }
-        .btn-info { background: #3498db; }
-        .btn-info:hover { background: #2980b9; }
-        .hidden { display: none; }
-        .flag { width: 100%; height: 4px; background: linear-gradient(90deg, #000, #f5b81b, #d90429); border-radius: 2px; margin-bottom: 20px; }
-        
-        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #e0e0e0; background: white; max-height: 500px; overflow-y: auto; }
-        .student-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .student-table th { background: #1a5f2b; color: white; padding: 14px 10px; text-align: left; font-weight: 600; position: sticky; top: 0; white-space: nowrap; }
-        .student-table td { padding: 12px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
-        .student-table tr:hover { background: #f8f9fa; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin: 20px 0; }
-        .stat-box { background: #f8f9fa; padding: 20px; border-radius: 12px; text-align: center; transition: transform 0.3s; }
-        .stat-box:hover { transform: translateY(-5px); }
-        .stat-box h1 { font-size: 28px; color: #1a5f2b; }
-        .stat-box p { color: #666; font-size: 12px; margin-top: 5px; }
-        
-        .role-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; margin-left: 10px; }
-        .admin-badge { background: #1a5f2b; color: white; }
-        .teacher-badge { background: #f39c12; color: white; }
-        .finance-badge { background: #3498db; color: white; }
-        
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .status { position: fixed; top: 10px; right: 10px; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; background: #27ae60; color: white; z-index: 1000; }
-        .active-badge { background: #27ae60; color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; display: inline-block; }
-        .inactive-badge { background: #e74c3c; color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; display: inline-block; }
-        .search-box { margin-bottom: 20px; }
-        .search-box input { width: 300px; padding: 10px 15px; border: 1px solid #ddd; border-radius: 25px; }
-        
-        .attendance-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #eee; }
-        .attendance-item:hover { background: #f8f9fa; }
-        .radio-group { display: flex; gap: 20px; }
-        .radio-group label { cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
-        .modal-content { background: white; border-radius: 16px; padding: 25px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
-        .preview-img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin: 15px auto; display: block; border: 3px solid #1a5f2b; }
-        
-        .id-card { background: linear-gradient(135deg, #fff, #f8f9fa); border-radius: 16px; padding: 20px; text-align: center; border: 2px solid #1a5f2b; max-width: 400px; margin: 0 auto; }
-        .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 8px; z-index: 3000; animation: slideIn 0.3s ease; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        
-        @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EUDES MEDIA PRO SYSTEM</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    margin:0;
+    font-family: Arial;
+    background:#0f172a;
+    color:white;
+}
+
+.container { padding:20px; }
+
+.card {
+    background:#1e293b;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+input, select {
+    padding:10px;
+    width:100%;
+    margin:5px 0;
+    border-radius:8px;
+    border:none;
+}
+
+button {
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    background:#22c55e;
+    color:white;
+    cursor:pointer;
+}
+
+table {
+    width:100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding:10px;
+    border-bottom:1px solid #333;
+}
+
+.stats {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+}
+
+.stat {
+    background:#1e293b;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+}
+</style>
 </head>
+
 <body>
 
-<div class="status" id="status">✅ System Ready</div>
-
 <div class="container">
-    <!-- LOGIN SCREEN -->
-    <div id="loginScreen">
-        <div class="card" style="max-width: 450px; margin: 50px auto;">
-            <div class="flag"></div>
-            <h2 style="text-align: center;">🏫 EUDES SCHOOL SYSTEM</h2>
-            <p style="text-align: center; margin-bottom: 20px;">Progressive Mothers School 🇺🇬</p>
-            
-            <input type="text" id="schoolId" placeholder="School ID" value="PM001">
-            <select id="roleSelect">
-                <option value="admin">👑 Admin - Full Access</option>
-                <option value="teacher">👨‍🏫 Teacher - Attendance Only</option>
-                <option value="finance">💰 Finance - Fees Only</option>
-            </select>
-            <input type="password" id="password" placeholder="Password" value="PM2026">
-            
-            <button onclick="login()">Login to Portal</button>
-            <div id="loginMsg" style="color: red; margin-top: 10px; text-align: center;"></div>
-        </div>
-    </div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboardScreen" class="hidden">
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                <h2>📚 Progressive Mothers School</h2>
-                <div id="roleInfo"></div>
-                <button onclick="logout()" class="btn-danger" style="width: auto; padding: 8px 20px;">Logout</button>
-            </div>
-        </div>
-
-        <div class="stats-grid" id="stats"></div>
-
-        <!-- STUDENTS TABLE -->
-        <div class="card">
-            <h3>👨‍🎓 Student Registry <span id="studentCount" style="font-size: 14px; color: #666;"></span></h3>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Search by name or LIN..." onkeyup="loadStudents()">
-                <button onclick="exportToExcel()" class="btn-info" style="margin-left: 10px;"><i class="fas fa-file-excel"></i> Export Excel</button>
-                <button onclick="importExcel()" class="btn-info" style="margin-left: 10px;"><i class="fas fa-upload"></i> Import Excel</button>
-                <button onclick="backupData()" class="btn-warning" style="margin-left: 10px;"><i class="fas fa-database"></i> Backup</button>
-            </div>
-            <div class="table-wrapper">
-                <table class="student-table">
-                    <thead>
-                        <tr><th>Photo</th><th>LIN</th><th>Name</th><th>Class</th><th>Contact</th><th>Age</th><th>DOB</th><th>Location</th><th>Health</th><th>Status</th><th>Expected</th><th>Paid</th><th>Balance</th><th>Actions</th></tr>
-                    </thead>
-                    <tbody id="studentsTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ADMIN SECTION -->
-        <div id="adminSection" class="card hidden">
-            <h3>➕ Register New Student</h3>
-            <div class="form-row">
-                <input type="text" id="studentName" placeholder="Full Name *">
-                <select id="studentClass">
-                    <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                    <option>P.5</option><option>P.6</option><option>P.7</option>
-                </select>
-                <input type="text" id="studentContact" placeholder="WhatsApp Number">
-                <input type="number" id="studentAge" placeholder="Age">
-                <input type="date" id="studentDob" placeholder="Date of Birth">
-                <input type="text" id="studentLocation" placeholder="Location">
-                <input type="text" id="studentHealth" placeholder="Health Status" value="Good">
-                <input type="number" id="studentFeesExpected" placeholder="Expected Fees (UGX)">
-                <input type="text" id="studentPhotoUrl" placeholder="Photo URL (optional)">
-            </div>
-            <button onclick="addStudent()">Register Student</button>
-            <button onclick="showBulkImport()" class="btn-info" style="margin-left: 10px;"><i class="fas fa-file-upload"></i> Bulk Import</button>
-        </div>
-
-        <!-- FINANCE SECTION -->
-        <div id="financeSection" class="card hidden">
-            <h3>💰 Record Payment</h3>
-            <div class="form-row">
-                <select id="paymentStudent"></select>
-                <input type="number" id="paymentAmount" placeholder="Amount (UGX)">
-                <select id="paymentMethod">
-                    <option>Cash</option><option>Mobile Money</option><option>Bank Transfer</option><option>Cheque</option>
-                </select>
-            </div>
-            <button onclick="recordPayment()">Record Payment & Send Receipt</button>
-            <button onclick="showPaymentHistory()" class="btn-info" style="margin-left: 10px;">View Payment History</button>
-        </div>
-
-        <!-- TEACHER SECTION -->
-        <div id="teacherSection" class="card hidden">
-            <h3>✅ Daily Roll Call</h3>
-            <select id="attendanceClass" onchange="loadAttendance()" style="width: 300px;">
-                <option value="">Select Class</option>
-                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                <option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-            <div id="attendanceList" style="margin-top: 20px;"></div>
-            <button onclick="saveAttendance()" style="margin-top: 15px;">Save Attendance & Notify Parents</button>
-        </div>
-
-        <!-- ABSENT FOLLOW-UP SECTION -->
-        <div class="card" id="absentSection">
-            <h3>⚠️ Absent Students Follow-up</h3>
-            <div id="absentList"></div>
-        </div>
-
-        <!-- PAYMENT HISTORY MODAL -->
-        <div id="paymentHistoryModal" class="modal">
-            <div class="modal-content">
-                <h3>📜 Payment History</h3>
-                <div id="paymentHistoryList"></div>
-                <button onclick="closePaymentHistory()" class="btn-danger" style="margin-top: 15px;">Close</button>
-            </div>
-        </div>
-
-        <!-- BULK IMPORT MODAL -->
-        <div id="bulkImportModal" class="modal">
-            <div class="modal-content">
-                <h3>📊 Bulk Import Students</h3>
-                <p>Upload Excel file with columns: Name, Class, Phone, Location, Fees Expected</p>
-                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv">
-                <button onclick="processExcelImport()" style="margin-top: 15px;">Import</button>
-                <button onclick="closeBulkImport()" class="btn-danger" style="margin-top: 10px;">Cancel</button>
-            </div>
-        </div>
+<!-- LOGIN -->
+<div id="login">
+    <div class="card">
+        <h2>Login</h2>
+        <input id="schoolId" placeholder="School ID">
+        <input id="username" placeholder="Username">
+        <input id="password" type="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="msg"></p>
     </div>
 </div>
 
-<!-- Photo Upload Modal -->
-<div id="photoModal" class="modal">
-    <div class="modal-content">
-        <h3>📸 Update Student Photo</h3>
-        <img id="previewImg" class="preview-img" src="" alt="Preview">
-        <input type="text" id="photoUrlInput" placeholder="Enter image URL">
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button onclick="updatePhoto()" style="flex:1;">Save Photo</button>
-            <button onclick="closeModal()" class="btn-danger" style="flex:1;">Cancel</button>
-        </div>
-    </div>
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none">
+
+<div class="card">
+    <h2>Dashboard</h2>
+</div>
+
+<div class="stats">
+    <div class="stat"><h2 id="totalStudents">0</h2><p>Students</p></div>
+    <div class="stat"><h2 id="totalPaid">0</h2><p>Fees Paid</p></div>
+    <div class="stat"><h2 id="totalBalance">0</h2><p>Balance</p></div>
+</div>
+
+<div class="card">
+    <h3>Add Student</h3>
+    <input id="name" placeholder="Name">
+    <input id="class" placeholder="Class">
+    <input id="contact" placeholder="Contact">
+    <input id="fees" placeholder="Fees Expected">
+    <button onclick="addStudent()">Save Student</button>
+</div>
+
+<div class="card">
+    <h3>Students</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Paid</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody id="table"></tbody>
+    </table>
+</div>
+
+<canvas id="chart"></canvas>
+
+</div>
 </div>
 
 <script>
-    const SUPABASE_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-    
-    let currentRole = null;
-    let allStudents = [];
-    let allPayments = [];
-    let selectedStudentId = null;
-    
-    async function fetchStudents() {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/Students?select=*&school_id=eq.PM001&order=name.asc`, {
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return await response.json();
-    }
-    
-    async function addStudentToDB(studentData) {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/Students`, {
-            method: 'POST',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify(studentData)
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return await response.json();
-    }
-    
-    async function updateStudent(id, updates) {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/Students?id=eq.${id}`, {
-            method: 'PATCH',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify(updates)
-        });
-        return response.ok;
-    }
-    
-    async function deleteStudent(id) {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/Students?id=eq.${id}`, {
-            method: 'DELETE',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-        });
-        return response.ok;
-    }
-    
-    function showToast(message) {
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-    
-    function generateIDCard(student) {
-        const cardHtml = `
-            <div class="id-card" id="idCardPrint">
-                <div style="background: #1a5f2b; color: white; padding: 10px; border-radius: 12px 12px 0 0;">
-                    <h3>Progressive Mothers School</h3>
-                    <p>Student Identification Card</p>
-                </div>
-                <div style="padding: 20px;">
-                    ${student.photo_url ? `<img src="${student.photo_url}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 15px;">` : '<div style="width: 100px; height: 100px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;"><i class="fas fa-user-graduate fa-3x" style="color: #1a5f2b;"></i></div>'}
-                    <p><strong>${student.name}</strong></p>
-                    <p><small>LIN: ${student.lin}</small></p>
-                    <p><small>Class: ${student.class}</small></p>
-                    <p><small>Parent: ${student.contact || '-'}</small></p>
-                </div>
-                <div style="background: #e8f5e9; padding: 10px; border-radius: 0 0 12px 12px; font-size: 10px;">
-                    Valid until: ${new Date().getFullYear() + 1}
-                </div>
-            </div>
-        `;
-        const win = window.open();
-        win.document.write(cardHtml);
-        win.document.close();
-        win.print();
-    }
-    
-    function exportToExcel() {
-        const exportData = allStudents.map(s => ({
-            LIN: s.lin,
-            Name: s.name,
-            Class: s.class,
-            Contact: s.contact,
-            Location: s.location,
-            Health: s.health_status,
-            'Expected Fees': s.fees_expected,
-            'Paid Fees': s.fees_paid,
-            Balance: s.fees_expected - s.fees_paid,
-            Status: s.active ? 'Active' : 'Inactive'
-        }));
-        const ws = XLSX.utils.json_to_sheet(exportData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Students');
-        XLSX.writeFile(wb, `Students_${new Date().toISOString().split('T')[0]}.xlsx`);
-        showToast('✅ Excel exported successfully!');
-    }
-    
-    function importExcel() {
-        document.getElementById('bulkImportModal').style.display = 'flex';
-    }
-    
-    function showBulkImport() { document.getElementById('bulkImportModal').style.display = 'flex'; }
-    function closeBulkImport() { document.getElementById('bulkImportModal').style.display = 'none'; }
-    
-    async function processExcelImport() {
-        const file = document.getElementById('excelFile').files[0];
-        if (!file) { alert('Select an Excel file'); return; }
-        
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(sheet);
-            
-            let imported = 0;
-            for (let row of rows) {
-                const name = row.Name || row.name || row.NAME;
-                if (name) {
-                    const random = Math.floor(1000 + Math.random() * 9000);
-                    const lin = `PM-${name.charAt(0)}${random}`;
-                    const newStudent = {
-                        name: name,
-                        lin: lin,
-                        class: row.Class || row.class || 'P.1',
-                        contact: row.Phone || row.phone || row.Contact || '',
-                        location: row.Location || row.location || 'Kampala',
-                        health_status: 'Good',
-                        fees_expected: parseInt(row.Fees) || parseInt(row.fees) || 0,
-                        fees_paid: 0,
-                        active: true,
-                        school_id: 'PM001',
-                        created_at: new Date().toISOString()
-                    };
-                    await addStudentToDB(newStudent);
-                    imported++;
-                }
-            }
-            alert(`✅ Imported ${imported} students successfully!`);
-            closeBulkImport();
-            await loadStudents();
-        };
-        reader.readAsArrayBuffer(file);
-    }
-    
-    function backupData() {
-        const backup = { students: allStudents, payments: allPayments, date: new Date().toISOString() };
-        const dataStr = JSON.stringify(backup, null, 2);
-        const blob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `eudes_backup_${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        showToast('✅ Backup created!');
-    }
-    
-    function openPhotoModal(studentId, currentPhotoUrl) {
-        selectedStudentId = studentId;
-        document.getElementById('photoUrlInput').value = currentPhotoUrl || '';
-        const previewImg = document.getElementById('previewImg');
-        previewImg.src = currentPhotoUrl || 'https://via.placeholder.com/150?text=No+Photo';
-        document.getElementById('photoModal').style.display = 'flex';
-    }
-    
-    function closeModal() {
-        document.getElementById('photoModal').style.display = 'none';
-        selectedStudentId = null;
-    }
-    
-    async function updatePhoto() {
-        const photoUrl = document.getElementById('photoUrlInput').value.trim();
-        if (!selectedStudentId) return;
-        try {
-            await updateStudent(selectedStudentId, { photo_url: photoUrl });
-            showToast('✅ Photo updated!');
-            closeModal();
-            await loadStudents();
-        } catch(e) { alert('Error: ' + e.message); }
-    }
-    
-    function login() {
-        const schoolId = document.getElementById('schoolId').value.trim();
-        const role = document.getElementById('roleSelect').value;
-        const pwd = document.getElementById('password').value;
-        
-        if(schoolId !== 'PM001') {
-            document.getElementById('loginMsg').innerHTML = '❌ Invalid School ID. Use: PM001';
-            return;
+
+const SUPABASE_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
+const SUPABASE_KEY = "YOUR_SUPABASE_KEY";
+
+let SCHOOL_ID = null;
+let students = [];
+
+// LOGIN
+async function login() {
+
+    const school = document.getElementById("schoolId").value;
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/users?school_id=eq.${school}&username=eq.${username}&password=eq.${password}`, {
+        headers:{
+            apikey:SUPABASE_KEY,
+            Authorization:`Bearer ${SUPABASE_KEY}`
         }
-        if(role === 'admin' && pwd !== 'PM2026') {
-            document.getElementById('loginMsg').innerHTML = '❌ Wrong password for Admin';
-            return;
+    });
+
+    const data = await res.json();
+
+    if(data.length === 0){
+        document.getElementById("msg").innerText = "Login failed";
+        return;
+    }
+
+    SCHOOL_ID = school;
+
+    document.getElementById("login").style.display="none";
+    document.getElementById("dashboard").style.display="block";
+
+    loadStudents();
+}
+
+// LOAD
+async function loadStudents(){
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/Students?school_id=eq.${SCHOOL_ID}`, {
+        headers:{
+            apikey:SUPABASE_KEY,
+            Authorization:`Bearer ${SUPABASE_KEY}`
         }
-        if(role === 'teacher' && pwd !== 'teacher123') {
-            document.getElementById('loginMsg').innerHTML = '❌ Wrong password for Teacher';
-            return;
+    });
+
+    students = await res.json();
+    render();
+}
+
+// ADD
+async function addStudent(){
+
+    const data = {
+        name:document.getElementById("name").value,
+        class:document.getElementById("class").value,
+        contact:document.getElementById("contact").value,
+        fees_expected:parseInt(document.getElementById("fees").value),
+        fees_paid:0,
+        school_id:SCHOOL_ID
+    };
+
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/Students`,{
+        method:"POST",
+        headers:{
+            apikey:SUPABASE_KEY,
+            Authorization:`Bearer ${SUPABASE_KEY}`,
+            "Content-Type":"application/json",
+            "Prefer":"return=representation"
+        },
+        body:JSON.stringify(data)
+    });
+
+    const txt = await res.text();
+
+    if(!res.ok){
+        alert("Error: "+txt);
+        return;
+    }
+
+    loadStudents();
+}
+
+// RENDER
+function render(){
+
+    let html="";
+    let paid=0;
+    let expected=0;
+
+    students.forEach(s=>{
+        const bal = (s.fees_expected||0)-(s.fees_paid||0);
+        paid += s.fees_paid||0;
+        expected += s.fees_expected||0;
+
+        html += `
+        <tr>
+            <td>${s.name}</td>
+            <td>${s.class}</td>
+            <td>${s.fees_paid||0}</td>
+            <td>${bal}</td>
+        </tr>`;
+    });
+
+    document.getElementById("table").innerHTML = html;
+
+    document.getElementById("totalStudents").innerText = students.length;
+    document.getElementById("totalPaid").innerText = paid;
+    document.getElementById("totalBalance").innerText = expected-paid;
+
+    drawChart(paid, expected);
+}
+
+// CHART
+function drawChart(paid, expected){
+
+    new Chart(document.getElementById("chart"), {
+        type:'bar',
+        data:{
+            labels:["Paid","Expected"],
+            datasets:[{
+                data:[paid, expected]
+            }]
         }
-        if(role === 'finance' && pwd !== 'finance123') {
-            document.getElementById('loginMsg').innerHTML = '❌ Wrong password for Finance';
-            return;
-        }
-        
-        currentRole = role;
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('dashboardScreen').classList.remove('hidden');
-        
-        let roleText = role === 'admin' ? '👑 ADMIN - Full Access' : (role === 'teacher' ? '👨‍🏫 TEACHER - Attendance Only' : '💰 FINANCE - Fees Only');
-        let roleClass = role === 'admin' ? 'admin-badge' : (role === 'teacher' ? 'teacher-badge' : 'finance-badge');
-        document.getElementById('roleInfo').innerHTML = `<span class="role-badge ${roleClass}">${roleText}</span>`;
-        
-        document.getElementById('adminSection').style.display = (role === 'admin') ? 'block' : 'none';
-        document.getElementById('financeSection').style.display = (role === 'admin' || role === 'finance') ? 'block' : 'none';
-        document.getElementById('teacherSection').style.display = (role === 'admin' || role === 'teacher') ? 'block' : 'none';
-        
-        loadStudents();
-    }
-    
-    async function loadStudents() {
-        document.getElementById('status').innerHTML = '📚 Loading students...';
-        document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="14" style="text-align:center; padding:40px;">Loading...</td></tr>';
-        
-        try {
-            const data = await fetchStudents();
-            allStudents = data || [];
-            document.getElementById('status').innerHTML = `✅ ${allStudents.length} students loaded`;
-            document.getElementById('studentCount').innerHTML = `(${allStudents.length} students)`;
-            renderStudents();
-            updateDashboard();
-            updatePaymentDropdown();
-            updateAbsentList();
-        } catch(e) {
-            document.getElementById('status').innerHTML = '❌ Error loading';
-            document.getElementById('studentsTableBody').innerHTML = `<tr><td colspan="14" style="text-align:center; padding:40px; color:red;">Error: ${e.message}</td></tr>`;
-        }
-    }
-    
-    function updateAbsentList() {
-        const absent = allStudents.filter(s => s.is_absent === true);
-        const container = document.getElementById('absentList');
-        if(absent.length === 0) {
-            container.innerHTML = '<p style="padding:20px; text-align:center;">✅ No absent students today!</p>';
-            return;
-        }
-        container.innerHTML = `<div class="table-wrapper"><table class="student-table"><thead><tr><th>LIN</th><th>Name</th><th>Class</th><th>Contact</th><th>Action</th></tr></thead><tbody>${absent.map(s => `<tr><td>${s.lin}</td><td>${s.name}</td><td>${s.class}</td><td>${s.contact || '-'}</td><td><button onclick="sendFollowUp('${s.contact}', '${s.name}')" class="btn-warning">📱 Notify</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
-    
-    function sendFollowUp(phone, name) {
-        if(phone) {
-            const msg = `🏫 Progressive Mothers School\nFollow-up: ${name} has been absent. Please ensure regular attendance.`;
-            window.open(`https://wa.me/${phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
-            showToast(`📱 Message sent to ${name}'s parent`);
-        }
-    }
-    
-    function renderStudents() {
-        const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
-        let filtered = allStudents;
-        if(searchTerm) filtered = allStudents.filter(s => s.name?.toLowerCase().includes(searchTerm) || s.lin?.toLowerCase().includes(searchTerm));
-        
-        if(filtered.length === 0) {
-            document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="14" style="text-align:center; padding:40px;">📭 No students found</td></tr>';
-            return;
-        }
-        
-        let html = '';
-        for(let s of filtered) {
-            const expected = s.fees_expected || 0;
-            const paid = s.fees_paid || 0;
-            const balance = expected - paid;
-            const statusBadge = s.active ? '<span class="active-badge">Active</span>' : '<span class="inactive-badge">Inactive</span>';
-            const age = s.age || (s.dob ? new Date().getFullYear() - new Date(s.dob).getFullYear() : '-');
-            const photoHtml = s.photo_url ? `<img src="${s.photo_url}" class="student-photo" onerror="this.src='https://via.placeholder.com/45?text=No+Photo'" style="width:45px;height:45px;border-radius:50%;object-fit:cover;">` : `<div class="photo-placeholder" style="width:45px;height:45px;background:#e8f5e9;border-radius:50%;display:flex;align-items:center;justify-content:center;">📷</div>`;
-            
-            html += `<tr>
-                <td>${photoHtml}${currentRole === 'admin' ? `<div style="margin-top:5px;"><button onclick="openPhotoModal(${s.id}, '${s.photo_url || ''}')" style="background:#3498db; padding:3px 6px; font-size:10px;">📷</button></div>` : ''}</td>
-                <td><strong>${s.lin || '-'}</strong></td>
-                <td>${s.name || '-'}</td>
-                <td>${s.class || '-'}</td>
-                <td>${s.contact || '-'}</td>
-                <td>${age}</td>
-                <td>${s.dob || '-'}</td>
-                <td>${s.location || '-'}</td>
-                <td>${s.health_status || '-'}</td>
-                <td>${statusBadge}</td>
-                <td>UGX ${expected.toLocaleString()}</td>
-                <td>UGX ${paid.toLocaleString()}</td>
-                <td style="color:${balance>0?'#e74c3c':'#27ae60'}; font-weight:bold;">UGX ${balance.toLocaleString()}</td>
-                <td>${currentRole === 'admin' ? `<button onclick="deleteStudentById(${s.id})" style="background:#e74c3c; padding:5px 10px;">Delete</button><button onclick="generateIDCard(${JSON.stringify(s).replace(/"/g, '&quot;')})" class="btn-info" style="margin-left:5px;">🪪 ID</button>` : '-'}</td>
-            </tr>`;
-        }
-        document.getElementById('studentsTableBody').innerHTML = html;
-    }
-    
-    function updateDashboard() {
-        const total = allStudents.length;
-        const activeCount = allStudents.filter(s => s.active === true).length;
-        const totalExpected = allStudents.reduce((sum, s) => sum + (s.fees_expected || 0), 0);
-        const totalPaid = allStudents.reduce((sum, s) => sum + (s.fees_paid || 0), 0);
-        const totalBalance = totalExpected - totalPaid;
-        const collectionRate = totalExpected > 0 ? Math.round((totalPaid / totalExpected) * 100) : 0;
-        const presentToday = allStudents.filter(s => s.is_absent !== true).length;
-        
-        document.getElementById('stats').innerHTML = `
-            <div class="stat-box"><h1>${total}</h1><p>Total Students</p></div>
-            <div class="stat-box"><h1>${activeCount}</h1><p>Active</p></div>
-            <div class="stat-box"><h1>UGX ${(totalPaid/1000000).toFixed(1)}M</h1><p>Collected</p></div>
-            <div class="stat-box"><h1>UGX ${(totalBalance/1000000).toFixed(1)}M</h1><p>Balance</p></div>
-            <div class="stat-box"><h1>${collectionRate}%</h1><p>Collection Rate</p></div>
-            <div class="stat-box"><h1>${presentToday}</h1><p>Present Today</p></div>
-        `;
-    }
-    
-    function updatePaymentDropdown() {
-        const select = document.getElementById('paymentStudent');
-        if(select) {
-            select.innerHTML = '<option value="">Select Student</option>' + allStudents.map(s => {
-                const balance = (s.fees_expected || 0) - (s.fees_paid || 0);
-                return `<option value="${s.id}">${s.name} (${s.lin}) - Balance: UGX ${balance.toLocaleString()}</option>`;
-            }).join('');
-        }
-    }
-    
-    async function addStudent() {
-        if(currentRole !== 'admin') { alert('Only Admin can register students!'); return; }
-        const name = document.getElementById('studentName').value.trim();
-        if(!name) { alert('Enter student name'); return; }
-        
-        const random = Math.floor(1000 + Math.random() * 9000);
-        const lin = `PM${name.charAt(0)}-${random}`;
-        
-        const newStudent = {
-            name: name, class: document.getElementById('studentClass').value, lin: lin,
-            contact: document.getElementById('studentContact').value, age: parseInt(document.getElementById('studentAge').value) || null,
-            dob: document.getElementById('studentDob').value || null, location: document.getElementById('studentLocation').value || 'Kampala',
-            health_status: document.getElementById('studentHealth').value || 'Good',
-            fees_expected: parseInt(document.getElementById('studentFeesExpected').value) || 0,
-            fees_paid: 0, active: true, school_id: 'PM001',
-            photo_url: document.getElementById('studentPhotoUrl').value || null,
-            created_at: new Date().toISOString()
-        };
-        
-        try {
-            await addStudentToDB(newStudent);
-            // Send WhatsApp welcome message
-            if(newStudent.contact) {
-                const msg = `🏫 Progressive Mothers School\nWelcome ${name}!\nLIN: ${lin}\nClass: ${newStudent.class}\nFees: UGX ${newStudent.fees_expected.toLocaleString()}\n\nWe are excited to have you! 🎉`;
-                window.open(`https://wa.me/${newStudent.contact.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
-            }
-            showToast(`✅ Student ${name} registered! LIN: ${lin}`);
-            document.getElementById('studentName').value = '';
-            document.getElementById('studentContact').value = '';
-            document.getElementById('studentAge').value = '';
-            document.getElementById('studentDob').value = '';
-            document.getElementById('studentLocation').value = '';
-            document.getElementById('studentFeesExpected').value = '';
-            document.getElementById('studentPhotoUrl').value = '';
-            await loadStudents();
-        } catch(e) { alert('Error: ' + e.message); }
-    }
-    
-    async function deleteStudentById(id) {
-        if(currentRole !== 'admin') { alert('Only Admin can delete students!'); return; }
-        if(confirm('⚠️ Delete this student permanently?')) {
-            try {
-                await deleteStudent(id);
-                showToast('✅ Student deleted!');
-                await loadStudents();
-            } catch(e) { alert('Error: ' + e.message); }
-        }
-    }
-    
-    async function recordPayment() {
-        const studentId = document.getElementById('paymentStudent').value;
-        const amount = parseInt(document.getElementById('paymentAmount').value);
-        const student = allStudents.find(s => s.id == studentId);
-        if(!studentId) { alert('Select a student'); return; }
-        if(!amount || amount <= 0) { alert('Enter valid amount'); return; }
-        
-        const newPaid = (student.fees_paid || 0) + amount;
-        const newBalance = (student.fees_expected || 0) - newPaid;
-        
-        // Record payment in history
-        allPayments.unshift({ studentId, studentName: student.name, amount, method: document.getElementById('paymentMethod').value, date: new Date().toISOString(), balance: newBalance });
-        
-        try {
-            await updateStudent(studentId, { fees_paid: newPaid });
-            // Send WhatsApp receipt
-            if(student.contact) {
-                const msg = `🏫 Progressive Mothers School\n💰 PAYMENT RECEIPT\nStudent: ${student.name}\nAmount: UGX ${amount.toLocaleString()}\nBalance: UGX ${newBalance.toLocaleString()}\nThank you!`;
-                window.open(`https://wa.me/${student.contact.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
-            }
-            showToast(`✅ Payment of UGX ${amount.toLocaleString()} recorded!`);
-            document.getElementById('paymentAmount').value = '';
-            await loadStudents();
-        } catch(e) { alert('Error: ' + e.message); }
-    }
-    
-    function showPaymentHistory() {
-        const historyHtml = allPayments.length === 0 ? '<p>No payment records</p>' : `<div class="table-wrapper"><table class="student-table"><thead><tr><th>Date</th><th>Student</th><th>Amount</th><th>Method</th><th>Balance After</th></tr></thead><tbody>${allPayments.map(p => `<td>${new Date(p.date).toLocaleString()}</td><td>${p.studentName}</td><td>UGX ${p.amount.toLocaleString()}</td><td>${p.method}</td><td>UGX ${p.balance.toLocaleString()}</td></tr>`).join('')}</tbody><td></div>`;
-        document.getElementById('paymentHistoryList').innerHTML = historyHtml;
-        document.getElementById('paymentHistoryModal').style.display = 'flex';
-    }
-    
-    function closePaymentHistory() { document.getElementById('paymentHistoryModal').style.display = 'none'; }
-    
-    function loadAttendance() {
-        const classVal = document.getElementById('attendanceClass').value;
-        if(!classVal) { document.getElementById('attendanceList').innerHTML = '<div style="padding:20px; text-align:center;">Select a class</div>'; return; }
-        const filtered = allStudents.filter(s => s.class === classVal);
-        if(filtered.length === 0) { document.getElementById('attendanceList').innerHTML = '<div style="padding:20px; text-align:center;">No students in this class</div>'; return; }
-        
-        let html = '<div style="border:1px solid #e0e0e0; border-radius:8px; overflow:hidden;">';
-        for(let s of filtered) {
-            html += `<div class="attendance-item"><div><strong>${s.name}</strong><br><small>${s.lin}</small></div>
-                <div class="radio-group"><label><input type="radio" name="att_${s.id}" value="present" ${!s.is_absent ? 'checked' : ''}> ✅ Present</label>
-                <label><input type="radio" name="att_${s.id}" value="absent" ${s.is_absent ? 'checked' : ''}> ❌ Absent</label></div></div>`;
-        }
-        html += '</div>';
-        document.getElementById('attendanceList').innerHTML = html;
-    }
-    
-    async function saveAttendance() {
-        let absentCount = 0;
-        for(let s of allStudents) {
-            const status = document.querySelector(`input[name="att_${s.id}"]:checked`)?.value;
-            const isAbsent = (status === 'absent');
-            if(isAbsent && s.contact) {
-                absentCount++;
-                const msg = `🏫 Progressive Mothers School\n${s.name} was ABSENT today (${new Date().toLocaleDateString()}). Please ensure regular attendance.`;
-                window.open(`https://wa.me/${s.contact.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
-            }
-            await updateStudent(s.id, { is_absent: isAbsent });
-        }
-        showToast(`✅ Attendance saved! ${absentCount} parents notified.`);
-        await loadStudents();
-    }
-    
-    function logout() {
-        document.getElementById('dashboardScreen').classList.add('hidden');
-        document.getElementById('loginScreen').classList.remove('hidden');
-        currentRole = null;
-    }
-    
-    window.generateIDCard = generateIDCard;
-    window.sendFollowUp = sendFollowUp;
+    });
+}
+
 </script>
+
 </body>
 </html>
+```
