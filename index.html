@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESMS ULTIMATE | POWERED BY EUDES MEDIA</title>
+    <title>ESMS ULTIMATE | EUDES MEDIA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -11,119 +11,116 @@
     <style>
         :root { --eudes-blue: #0047AB; --dark: #0f172a; --success: #10b981; --danger: #ef4444; --ug-yellow: #F5B81B; --white: #ffffff; --gray: #f1f5f9; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
-        body { background: var(--gray); color: #1e293b; height: 100vh; width: 100vw; display: flex; overflow: hidden; }
+        body { background: var(--gray); color: #1e293b; height: 100vh; width: 100vw; display: flex; overflow: hidden; position: fixed; }
 
-        /* SIDEBAR PRO */
-        .sidebar { width: 75px; background: var(--dark); color: white; display: flex; flex-direction: column; align-items: center; padding: 25px 0; z-index: 100; transition: 0.3s; flex-shrink: 0; border-right: 2px solid var(--eudes-blue); }
+        /* NAVIGATION */
+        .sidebar { width: 75px; background: var(--dark); color: white; display: flex; flex-direction: column; align-items: center; padding: 25px 0; z-index: 100; flex-shrink: 0; border-right: 2px solid var(--eudes-blue); }
         @media (min-width: 768px) { .sidebar { width: 280px; align-items: flex-start; padding: 30px; } }
         .nav-btn { width: 55px; height: 55px; border-radius: 14px; color: #94a3b8; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 12px; border: none; background: none; transition: 0.3s; }
-        .nav-btn span { display: none; font-weight: 800; font-size: 0.75rem; margin-left: 15px; letter-spacing: 0.5px; }
+        .nav-btn span { display: none; font-weight: 800; font-size: 0.75rem; margin-left: 15px; }
         @media (min-width: 768px) { .nav-btn { width: 100%; justify-content: flex-start; padding: 0 18px; } .nav-btn span { display: inline; } }
         .nav-btn.active { background: var(--eudes-blue); color: white; box-shadow: 0 8px 20px rgba(0, 71, 171, 0.3); }
 
-        /* MAIN UI */
+        /* MAIN CONTENT */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .header { background: white; padding: 15px 25px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-        .content { padding: 20px; overflow-y: auto; flex: 1; }
+        .content { padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
 
-        /* CARDS & DATA TABLES */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative; overflow: hidden; border: 1px solid #eef2f6; }
-        .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--eudes-blue); }
+        /* CARDS */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border-left: 6px solid var(--eudes-blue); }
         
         /* FORM STYLING */
-        .form-box { background: white; padding: 25px; border-radius: 20px; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; }
+        .form-box { background: white; padding: 25px; border-radius: 20px; border: 1px solid #e2e8f0; max-width: 500px; }
         .input-group { margin-bottom: 18px; }
         label { display: block; font-size: 0.65rem; font-weight: 900; color: var(--eudes-blue); margin-bottom: 6px; }
-        input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-weight: 700; font-size: 0.85rem; outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--eudes-blue); }
+        input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-weight: 700; font-size: 0.85rem; outline: none; }
 
         /* LISTS */
-        .list-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid var(--success); }
+        .item-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #eef2f6; }
+        .student-photo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #eee; margin-right: 15px; border: 2px solid var(--eudes-blue); }
 
-        /* UTILS */
         .hidden { display: none !important; }
-        .btn-full { background: var(--eudes-blue); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; font-size: 0.9rem; }
+        .btn-full { background: var(--eudes-blue); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; }
         .badge { padding: 4px 10px; border-radius: 8px; font-size: 0.6rem; font-weight: 900; }
         
         /* AUTH OVERLAY */
         #auth-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: white; padding: 40px; border-radius: 30px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }
+        .login-card { background: white; padding: 40px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="auth-overlay">
         <div class="login-card">
-            <h1 style="color:var(--eudes-blue); font-weight: 900; font-size: 1.8rem; margin-bottom: 5px;">ESMS ULTIMATE</h1>
-            <p style="font-size: 0.6rem; font-weight: 800; color: #64748b; margin-bottom: 30px;">EUDES MEDIA SOLUTIONS | UGANDA</p>
-            <input type="text" id="login-id" placeholder="SCHOOL ACCESS CODE" class="input-group">
-            <input type="password" id="login-pass" placeholder="SECRET PIN" class="input-group">
+            <h2 style="color:var(--eudes-blue); font-weight: 900; font-size: 1.5rem;">ESMS ULTIMATE</h2>
+            <p style="font-size: 0.6rem; font-weight: 800; color: #64748b; margin-bottom: 30px;">YOUR COMPLETE DIGITAL PARTNER</p>
+            <input type="text" id="login-id" placeholder="SCHOOL ID" class="input-group">
+            <input type="password" id="login-pass" placeholder="SECURITY PIN" class="input-group">
             <button onclick="handleLogin()" class="btn-full">AUTHENTICATE</button>
-            <p id="err" style="color:var(--danger); font-size: 0.65rem; margin-top: 15px; font-weight: 900;"></p>
+            <p id="err-msg" style="color:var(--danger); font-size: 0.65rem; margin-top: 15px; font-weight: 900;"></p>
         </div>
     </div>
 
     <div class="sidebar hidden" id="sidebar">
         <button class="nav-btn active" onclick="showPage('dash', this)"><i class="fas fa-home"></i><span>DASHBOARD</span></button>
-        <button class="nav-btn admin-role" onclick="showPage('reg', this)"><i class="fas fa-user-plus"></i><span>ADMISSIONS</span></button>
-        <button class="nav-btn finance-role" onclick="showPage('fees', this)"><i class="fas fa-cash-register"></i><span>FEES OFFICE</span></button>
-        <button class="nav-btn" onclick="showPage('exam', this)"><i class="fas fa-graduation-cap"></i><span>EXAM CENTER</span></button>
-        <button class="nav-btn" onclick="showPage('roll', this)"><i class="fas fa-user-check"></i><span>ATTENDANCE</span></button>
-        <div style="margin-top: auto; font-size: 0.55rem; color: #94a3b8; font-weight: 900; text-align: center;">EUDES MEDIA LTD<br>SUPPORT: +256762992440</div>
+        <button class="nav-btn admin-only" onclick="showPage('reg', this)"><i class="fas fa-user-plus"></i><span>ADMISSIONS</span></button>
+        <button class="nav-btn finance-hide" onclick="showPage('fees', this)"><i class="fas fa-wallet"></i><span>FEES OFFICE</span></button>
+        <button class="nav-btn" onclick="showPage('marks', this)"><i class="fas fa-file-invoice"></i><span>ACADEMICS</span></button>
+        <button class="nav-btn" onclick="showPage('attend', this)"><i class="fas fa-check-square"></i><span>ATTENDANCE</span></button>
+        <div style="margin-top: auto; font-size: 0.5rem; text-align: center; color: #94a3b8; font-weight: 900;">POWERED BY EUDES MEDIA<br>+256762992440</div>
     </div>
 
     <div class="main hidden" id="main">
         <div class="header">
-            <div><h2 id="sch-display" style="font-size: 0.8rem; font-weight: 900;">...</h2></div>
-            <div id="role-display" class="badge" style="background: var(--ug-yellow);">...</div>
+            <h3 id="school-title" style="font-size: 0.75rem; font-weight: 900;">...</h3>
+            <div id="role-tag" class="badge" style="background:var(--ug-yellow);">...</div>
         </div>
 
         <div class="content">
-            
             <div id="page-dash">
-                <div style="text-align:center; margin-bottom: 25px;">
-                    <h1 id="clock" style="font-size: 3rem; font-weight: 900; color: var(--dark); letter-spacing: -1px;">00:00</h1>
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <h1 id="clock" style="font-size: 3rem; font-weight: 900;">00:00</h1>
                     <p id="date-label" style="font-weight: 800; color: var(--eudes-blue);"></p>
                 </div>
                 <div class="grid">
-                    <div class="card"><h3>Total Learners</h3><h2 id="stat-students">0</h2></div>
-                    <div class="card"><h3>Term Collections</h3><h2 id="stat-cash">0</h2></div>
-                    <div class="card"><h3>System Expiry</h3><h2 id="stat-expiry" style="font-size:0.8rem; color:var(--danger)">...</h2></div>
-                </div>
-                <div class="card" style="border-left: 10px solid var(--ug-yellow);">
-                    <p style="font-weight: 900;">UGANDA NATIONAL HOLIDAYS</p>
-                    <p id="holiday-info" style="font-size: 0.7rem; margin-top: 5px;">HEROES' DAY - JUNE 9TH</p>
+                    <div class="card"><h3>LEARNERS</h3><h2 id="dash-students">0</h2></div>
+                    <div class="card"><h3>FEES PAID</h3><h2 id="dash-cash">0</h2></div>
+                    <div class="card" style="border-left-color: var(--danger);"><h3>EXPIRY</h3><h2 id="dash-expiry" style="font-size: 0.8rem;">...</h2></div>
                 </div>
             </div>
 
             <div id="page-reg" class="hidden">
                 <div class="form-box">
-                    <h2 style="margin-bottom: 20px;">Register Student Profile</h2>
-                    <div class="input-group"><label>Full Name</label><input type="text" id="r-name" placeholder="E.G. NAKATO ESTHER"></div>
-                    <div class="input-group"><label>Class Level</label>
+                    <h2 style="margin-bottom: 20px;">ADMIT NEW LEARNER</h2>
+                    <div class="input-group"><label>FULL NAME</label><input type="text" id="r-name"></div>
+                    <div class="input-group"><label>PHOTO URL</label><input type="text" id="r-photo" placeholder="https://..."></div>
+                    <div class="input-group"><label>CLASS LEVEL</label>
                         <select id="r-class">
-                            <option>BABY CLASS</option><option>TOP CLASS</option>
-                            <option>P.1</option><option>P.7</option><option>S.1</option><option>S.6</option>
+                            <option>BABY CLASS</option><option>TOP CLASS</option><option>P.1</option><option>P.7</option><option>S.1</option><option>S.6</option>
                         </select>
                     </div>
-                    <div class="input-group"><label>Physical Location (Home)</label><input type="text" id="r-loc"></div>
-                    <div class="input-group"><label>Health / Medical Notes</label><textarea id="r-health">NORMAL</textarea></div>
-                    <div class="input-group"><label>Termly Fees (UGX)</label><input type="number" id="r-total" value="450000"></div>
-                    <button onclick="submitStudent()" class="btn-full">GENERATE LIN & ADMIT</button>
+                    <div class="input-group"><label>PHYSICAL LOCATION</label><input type="text" id="r-loc"></div>
+                    <div class="input-group"><label>HEALTH STATUS</label><input type="text" id="r-health" value="NORMAL"></div>
+                    <div class="input-group"><label>TERMLY FEES (UGX)</label><input type="number" id="r-fees" value="500000"></div>
+                    <button onclick="saveLearner()" class="btn-full">GENERATE LIN & SAVE</button>
                 </div>
             </div>
 
             <div id="page-fees" class="hidden">
-                <h2 style="margin-bottom: 20px;">Fee Payments & Installments</h2>
-                <div id="fees-container"></div>
+                <h2 style="margin-bottom: 20px;">FEE BALANCES & PAYMENTS</h2>
+                <div id="fees-list"></div>
             </div>
 
-            <div id="page-exam" class="hidden">
-                <h2 style="margin-bottom: 20px;">Academic Performance & Grading</h2>
-                <div id="marks-container"></div>
+            <div id="page-marks" class="hidden">
+                <h2 style="margin-bottom: 20px;">STUDENT GRADING (UGANDA STANDARD)</h2>
+                <div id="marks-list"></div>
             </div>
 
+            <div id="page-attend" class="hidden">
+                <h2 style="margin-bottom: 20px;">DAILY ROLL CALL</h2>
+                <div id="attend-list"></div>
+            </div>
         </div>
     </div>
 
@@ -132,107 +129,99 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let activeSch = "";
-        let activeRole = "";
-        let schPrefix = "";
+        let currentSch = "";
+        let currentRole = "";
+        let prefix = "";
 
-        // LOGIN ENGINE
+        // AUTH & EXPIRY LOGIC
         async function handleLogin() {
-            const code = document.getElementById('login-id').value.toUpperCase().trim();
+            const id = document.getElementById('login-id').value.toUpperCase().trim();
             const pin = document.getElementById('login-pass').value.trim();
-            const { data: school } = await sb.from('Schools').select('*').eq('sch_id', code).single();
+            const { data: sch } = await sb.from('Schools').select('*').eq('sch_id', id).single();
 
-            if (school) {
-                // AUTO-SHUTDOWN CHECK
-                if (new Date() > new Date(school.expiry_date) || !school.is_active) {
-                    document.getElementById('err').innerHTML = "SYSTEM EXPIRED.<br>CONTACT EUDES MEDIA: +256762992440";
+            if (sch) {
+                // FIXED EXPIRY LOGIC (YYYY-MM-DD STRING COMPARISON)
+                const now = new Date();
+                const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+                
+                if (today > sch.expiry_date || !sch.is_active) {
+                    document.getElementById('err-msg').innerHTML = "SYSTEM EXPIRED.<br>CONTACT EUDES MEDIA: +256762992440";
                     return;
                 }
 
-                if (pin === school.admin_key || pin === "eudes2026") activeRole = "ADMIN";
-                else if (pin === school.teacher_key) activeRole = "TEACHER";
-                else if (pin === school.finance_key) activeRole = "FINANCE";
-                else { document.getElementById('err').innerText = "INVALID PIN"; return; }
+                if (pin === sch.admin_key || pin === "eudes2026") currentRole = "ADMIN";
+                else if (pin === sch.teacher_key) currentRole = "TEACHER";
+                else if (pin === sch.finance_key) currentRole = "FINANCE";
+                else { document.getElementById('err-msg').innerText = "WRONG PIN"; return; }
 
-                activeSch = code;
-                schPrefix = code.substring(0,2);
-                initSystem(school);
-            } else { document.getElementById('err').innerText = "SCHOOL NOT REGISTERED"; }
+                currentSch = id; prefix = id.substring(0, 2);
+                initApp(sch);
+            } else { document.getElementById('err-msg').innerText = "SCHOOL NOT FOUND"; }
         }
 
-        function initSystem(s) {
+        function initApp(sch) {
             document.getElementById('auth-overlay').classList.add('hidden');
             document.getElementById('sidebar').classList.remove('hidden');
             document.getElementById('main').classList.remove('hidden');
-            document.getElementById('sch-display').innerText = s.school_name;
-            document.getElementById('role-display').innerText = activeRole;
-            document.getElementById('stat-expiry').innerText = "RENEW ON: " + s.expiry_date;
-            
-            // Apply role permissions
-            if (activeRole === "TEACHER") document.querySelectorAll('.finance-role').forEach(e => e.remove());
-            if (activeRole !== "ADMIN") document.querySelectorAll('.admin-role').forEach(e => e.remove());
-            
-            loadDashboardData();
+            document.getElementById('school-title').innerText = sch.school_name;
+            document.getElementById('role-tag').innerText = currentRole;
+            document.getElementById('dash-expiry').innerText = sch.expiry_date;
+
+            if (currentRole === "TEACHER") document.querySelectorAll('.finance-hide').forEach(e => e.remove());
+            if (currentRole !== "ADMIN") document.querySelectorAll('.admin-only').forEach(e => e.remove());
+            loadDash();
         }
 
-        async function submitStudent() {
+        async function saveLearner() {
             const name = document.getElementById('r-name').value;
-            const lin = `${schPrefix}-${name.charAt(0).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const lin = `${prefix}-${name.charAt(0).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
             const { error } = await sb.from('Students').insert([{
-                sch_id: activeSch, name, class: document.getElementById('r-class').value,
-                location: document.getElementById('r-loc').value, health_status: document.getElementById('r-health').value,
-                total_fees_required: document.getElementById('r-total').value, lin
+                sch_id: currentSch, name, lin,
+                class: document.getElementById('r-class').value,
+                location: document.getElementById('r-loc').value,
+                health_status: document.getElementById('r-health').value,
+                total_fees_required: document.getElementById('r-fees').value,
+                photo_url: document.getElementById('r-photo').value
             }]);
-            if (!error) { alert("ADMITTED SUCCESS: " + lin); loadDashboardData(); showPage('dash', document.querySelector('.nav-btn')); }
+            if (!error) { alert("ADMISSION SUCCESSFUL: " + lin); loadDash(); showPage('dash', document.querySelector('.nav-btn')); }
         }
 
-        async function loadDashboardData() {
-            const { data: st } = await sb.from('Students').select('*').eq('sch_id', activeSch);
-            if (st) {
-                document.getElementById('stat-students').innerText = st.length;
-                let cash = st.reduce((sum, s) => sum + (Number(s.fees_paid) || 0), 0);
-                document.getElementById('stat-cash').innerText = cash.toLocaleString() + " UGX";
+        async function loadDash() {
+            const { data } = await sb.from('Students').select('*').eq('sch_id', currentSch);
+            if (data) {
+                document.getElementById('dash-students').innerText = data.length;
+                let cash = data.reduce((s, row) => s + (Number(row.fees_paid) || 0), 0);
+                document.getElementById('dash-cash').innerText = cash.toLocaleString() + " UGX";
             }
         }
 
-        // GRADING ENGINE (Ugandan Standard)
-        function getGrade(score) {
-            if (score >= 90) return "D1";
-            if (score >= 80) return "D2";
-            if (score >= 70) return "C3";
-            if (score >= 60) return "C4";
-            if (score >= 50) return "C5";
-            if (score >= 45) return "C6";
-            if (score >= 40) return "P7";
-            if (score >= 35) return "P8";
-            return "F9";
+        // GRADING LOGIC
+        function getGrade(m) {
+            if (m >= 90) return "D1"; if (m >= 80) return "D2";
+            if (m >= 70) return "C3"; if (m >= 60) return "C4";
+            if (m >= 55) return "C5"; if (m >= 50) return "C6";
+            if (m >= 45) return "P7"; if (m >= 40) return "P8"; return "F9";
         }
 
         async function loadFees() {
-            const { data } = await sb.from('Students').select('*').eq('sch_id', activeSch);
-            const container = document.getElementById('fees-container');
-            container.innerHTML = data.map(s => `
-                <div class="list-item">
-                    <div>
-                        <strong style="font-size:0.8rem;">${s.name}</strong><br>
-                        <small>BAL: ${(s.total_fees_required - s.fees_paid).toLocaleString()} UGX</small>
-                    </div>
-                    <button class="btn-full" style="width:auto; padding:8px 15px; font-size:0.6rem;" onclick="payInstallment('${s.id}', ${s.fees_paid})">COLLECT</button>
+            const { data } = await sb.from('Students').select('*').eq('sch_id', currentSch);
+            const div = document.getElementById('fees-list');
+            div.innerHTML = data.map(s => `
+                <div class="item-card">
+                    <div><strong>${s.name}</strong><br><small>BAL: ${(s.total_fees_required - s.fees_paid).toLocaleString()}</small></div>
+                    <button class="btn-full" style="width:auto; padding:8px 12px; font-size:0.6rem;" onclick="pay('${s.id}', ${s.fees_paid})">COLLECT</button>
                 </div>
             `).join('');
         }
 
-        async function payInstallment(id, current) {
-            const amt = prompt("ENTER UGX RECEIVED:");
-            if (amt) {
-                await sb.from('Students').update({ fees_paid: Number(current) + Number(amt) }).eq('id', id);
-                loadFees(); loadDashboardData();
-            }
+        async function pay(id, current) {
+            const amt = prompt("ENTER AMOUNT RECEIVED:");
+            if (amt) { await sb.from('Students').update({ fees_paid: Number(current) + Number(amt) }).eq('id', id); loadFees(); loadDash(); }
         }
 
         function showPage(p, btn) {
-            ['dash', 'reg', 'fees', 'exam'].forEach(pg => {
-                const el = document.getElementById('page-' + pg);
+            ['dash', 'reg', 'fees', 'marks', 'attend'].forEach(id => {
+                const el = document.getElementById('page-' + id);
                 if (el) el.classList.add('hidden');
             });
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -241,7 +230,6 @@
             if (p === 'fees') loadFees();
         }
 
-        // LIVE CLOCK
         setInterval(() => {
             const n = new Date();
             document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
