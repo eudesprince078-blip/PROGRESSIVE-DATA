@@ -12,70 +12,59 @@
         :root { --main: #0047AB; --bg: #f8fafc; --dark: #0f172a; --accent: #F5B81B; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
         body { background: var(--bg); height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-
-        .card { background: white; padding: 45px; border-radius: 40px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.15); border-bottom: 8px solid var(--accent); }
-        .logo-box { background: var(--main); width: 70px; height: 70px; border-radius: 22px; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; color: white; }
-        
-        input { width: 100%; padding: 18px; border-radius: 20px; border: 2px solid #f1f5f9; background: #f8fafc; font-weight: 700; margin-bottom: 15px; text-align: center; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--main); background: white; }
-        
-        .btn { background: var(--main); color: white; padding: 20px; border-radius: 20px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 1rem; letter-spacing: 1px; }
-        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
-        
-        #msg { margin-top: 25px; font-size: 0.7rem; font-weight: 900; color: #ef4444; line-height: 1.5; letter-spacing: 0.5px; }
+        .card { background: white; padding: 45px; border-radius: 40px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.1); border-bottom: 8px solid var(--accent); }
+        input { width: 100%; padding: 18px; border-radius: 20px; border: 2px solid #f1f5f9; background: #f8fafc; font-weight: 700; margin-bottom: 15px; text-align: center; outline: none; }
+        .btn { background: var(--main); color: white; padding: 20px; border-radius: 20px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 1rem; }
+        #msg { margin-top: 25px; font-size: 0.7rem; font-weight: 900; color: #ef4444; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="card" id="login-box">
-        <div class="logo-box">
-            <i class="fas fa-fingerprint" style="font-size: 2rem;"></i>
+    <div class="card" id="login-screen">
+        <div style="background: var(--main); width: 65px; height: 65px; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white;">
+            <i class="fas fa-shield-alt" style="font-size: 1.8rem;"></i>
         </div>
-        <h1 style="font-size: 1.8rem; font-weight: 900; letter-spacing: -1px;">ESMS ELITE</h1>
-        <p style="font-size: 0.6rem; color: #64748b; margin-bottom: 35px; font-weight: 800;">EUDES MEDIA | YOUR COMPLETE DIGITAL PARTNER</p>
+        <h1 style="font-size: 1.8rem; font-weight: 900;">ESMS ELITE</h1>
+        <p style="font-size: 0.6rem; color: #64748b; margin-bottom: 35px;">EUDES MEDIA | DIGITAL PARTNER</p>
 
         <input type="text" id="schId" placeholder="SCHOOL ID" value="PM001">
         <input type="password" id="pin" placeholder="SECURITY PIN">
         
-        <button onclick="handleLogin()" id="btn" class="btn">UNLOCK SYSTEM</button>
+        <button onclick="executeLogin()" id="btn" class="btn">UNLOCK SYSTEM</button>
         <div id="msg"></div>
     </div>
 
-    <div id="dash" class="hidden" style="text-align:center; background: white; padding: 60px; border-radius: 45px; box-shadow: 0 25px 60px rgba(0,0,0,0.1); width: 100%; max-width: 500px;">
-        <div style="width: 100px; height: 100px; background: #f0fdf4; color: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; font-size: 3rem;">
-            <i class="fas fa-check"></i>
-        </div>
-        <h1 style="color: #0f172a; font-weight: 900; font-size: 2rem;">ACCESS GRANTED</h1>
-        <p id="welcome" style="font-weight: 800; color: #64748b; margin-top: 15px; font-size: 1rem;"></p>
-        <button onclick="location.reload()" class="btn" style="margin-top:40px; width: auto; padding: 15px 50px;">LOGOUT</button>
+    <div id="dash" class="hidden" style="text-align:center;">
+        <h1 style="color: #16a34a; font-weight: 900;">✅ ACCESS GRANTED</h1>
+        <p id="welcome" style="margin-top: 10px; font-weight: 800;"></p>
+        <button onclick="location.reload()" class="btn" style="margin-top:30px; width: auto; padding: 10px 40px;">LOGOUT</button>
     </div>
 
     <script>
-        // INITIALIZE SUPABASE IMMEDIATELY
-        const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-        const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        
-        const client = supabase.createClient(SUPA_URL, SUPA_KEY);
+        // 1. Setup Supabase Client immediately
+        const S_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+        const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
+        const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function handleLogin() {
-            const btn = document.getElementById('btn');
+        async function executeLogin() {
             const msg = document.getElementById('msg');
-            const id = document.getElementById('schId').value.toUpperCase().trim();
-            const pass = document.getElementById('pin').value.trim();
+            const btn = document.getElementById('btn');
+            const idInput = document.getElementById('schId').value.toUpperCase().trim();
+            const pinInput = document.getElementById('pin').value.trim();
 
-            if (!id || !pass) { msg.innerText = "PLEASE ENTER BOTH ID AND PIN"; return; }
+            if(!idInput || !pinInput) { msg.innerText = "ENTER ALL DETAILS"; return; }
 
             btn.disabled = true;
             btn.innerText = "CONNECTING...";
             msg.innerText = "";
 
             try {
-                // Fetch school data
-                const { data, error } = await client
+                // Fetch the school data
+                const { data: school, error } = await supa
                     .from('Schools')
                     .select('*')
-                    .eq('sch_id', id)
+                    .eq('sch_id', idInput)
                     .maybeSingle();
 
                 if (error) {
@@ -83,37 +72,42 @@
                     return;
                 }
 
-                if (!data) {
-                    msg.innerText = "SCHOOL ID NOT REGISTERED";
+                if (!school) {
+                    msg.innerText = "SCHOOL ID NOT FOUND";
                     return;
                 }
 
-                // SECURE DATE COMPARISON
-                let expired = false;
-                if (data.expiry_date && typeof data.expiry_date === 'string') {
-                    const today = new Date();
-                    const tNum = (today.getFullYear() * 10000) + ((today.getMonth() + 1) * 100) + today.getDate();
-                    
-                    const parts = data.expiry_date.split('-');
-                    if (parts.length === 3) {
-                        const eNum = (parseInt(parts[0]) * 10000) + (parseInt(parts[1]) * 100) + parseInt(parts[2]);
-                        if (tNum > eNum) expired = true;
+                // 2. FOOLPROOF DATE LOGIC
+                // Get today as a number: 20260422
+                const now = new Date();
+                const todayNum = (now.getFullYear() * 10000) + ((now.getMonth() + 1) * 100) + now.getDate();
+                
+                let isSystemValid = true;
+
+                if (school.expiry_date) {
+                    // Turn "2027-01-01" into 20270101
+                    const d = school.expiry_date.split('-');
+                    if(d.length === 3) {
+                        const expNum = (parseInt(d[0]) * 10000) + (parseInt(d[1]) * 100) + parseInt(d[2]);
+                        if (todayNum > expNum) isSystemValid = false;
                     }
                 }
 
-                if (expired) {
+                // 3. CHECK PERMISSION
+                if (!isSystemValid) {
                     msg.innerHTML = "SYSTEM EXPIRED.<br>CONTACT EUDES MEDIA: +256762992440";
-                } else if (pass === data.admin_key || pass === data.teacher_key || pass === "eudes2026") {
-                    // SUCCESS STATE
-                    document.getElementById('login-box').classList.add('hidden');
+                } else if (pinInput === school.admin_key || pinInput === "eudes2026") {
+                    // ACCESS SUCCESS
+                    document.getElementById('login-screen').classList.add('hidden');
                     document.getElementById('dash').classList.remove('hidden');
-                    document.getElementById('welcome').innerText = (data.school_name || "SCHOOL DASHBOARD").toUpperCase();
+                    document.getElementById('welcome').innerText = "SCHOOL: " + school.school_name;
                 } else {
                     msg.innerText = "INCORRECT SECURITY PIN";
                 }
 
             } catch (err) {
-                msg.innerText = "CRITICAL ERROR: " + err.message;
+                msg.innerText = "CRITICAL ERROR. CHECK INTERNET.";
+                console.error(err);
             } finally {
                 btn.disabled = false;
                 btn.innerText = "UNLOCK SYSTEM";
