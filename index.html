@@ -3,44 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUDES MEDIA | UGANDA SCHOOL ENGINE</title>
+    <title>EUDES MEDIA | SCHOOL ENGINE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        :root { --eudes-blue: #0047AB; --dark: #0f172a; --success: #10b981; --danger: #ef4444; --uganda-yellow: #F5B81B; }
+        :root { --eudes-blue: #0047AB; --dark: #0f172a; --success: #10b981; --danger: #ef4444; --ug-yellow: #F5B81B; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
         body { background: #f1f5f9; color: #1e293b; height: 100vh; display: flex; overflow: hidden; }
 
-        /* AUTH SCREEN */
+        /* AUTHENTICATION OVERLAY */
         #auth-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: white; padding: 40px; border-radius: 30px; width: 380px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .login-card { background: white; padding: 40px; border-radius: 30px; width: 380px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 2px solid var(--eudes-blue); }
         .ug-flag { height: 6px; background: linear-gradient(90deg, #000, #F5B81B, #d90429, #000, #F5B81B, #d90429); margin-bottom: 20px; border-radius: 5px; }
 
-        /* SIDEBAR */
+        /* SIDEBAR NAVIGATION */
         .sidebar { width: 260px; background: var(--dark); color: white; padding: 25px; display: flex; flex-direction: column; }
-        .nav-btn { padding: 14px; border-radius: 12px; color: #94a3b8; font-weight: 700; font-size: 0.65rem; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 12px; }
+        .nav-btn { padding: 14px; border-radius: 12px; color: #94a3b8; font-weight: 700; font-size: 0.65rem; cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
         .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; }
         .nav-btn.active { background: var(--eudes-blue); color: white; }
 
-        /* MAIN */
+        /* MAIN CONTENT AREA */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        .content { padding: 20px; overflow-y: auto; height: 100%; }
+        .content { padding: 25px; overflow-y: auto; height: 100%; }
         
         .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
         .grid-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-box { background: white; padding: 20px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--eudes-blue); }
+        .stat-box { background: white; padding: 20px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--eudes-blue); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         
-        table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
-        th { background: #f8fafc; padding: 12px; text-align: left; color: #64748b; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+        th { background: #f8fafc; padding: 12px; text-align: left; color: #64748b; border-bottom: 2px solid #e2e8f0; }
         td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-weight: 700; }
         
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 5px; font-weight: 700; font-size: 0.7rem; }
-        .btn-action { background: var(--eudes-blue); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 0.7rem; }
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 5px; font-weight: 700; font-size: 0.75rem; }
+        .btn-action { background: var(--eudes-blue); color: white; border: none; padding: 14px 20px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 0.7rem; letter-spacing: 1px; }
         .hidden { display: none !important; }
-        .role-tag { padding: 4px 10px; border-radius: 20px; font-size: 0.6rem; background: var(--uganda-yellow); color: black; font-weight: 800; margin-top: 5px; display: inline-block;}
+        .role-tag { padding: 5px 12px; border-radius: 20px; font-size: 0.6rem; background: var(--ug-yellow); color: black; font-weight: 800; margin-top: 10px; display: inline-block;}
     </style>
 </head>
 <body>
@@ -48,70 +48,88 @@
     <div id="auth-overlay">
         <div class="login-card">
             <div class="ug-flag"></div>
-            <h2 style="color:var(--eudes-blue)">EUDES MEDIA</h2>
-            <p style="font-size: 0.55rem; color: #64748b; margin-bottom: 20px;">COMPLETE DIGITAL PARTNER</p>
+            <h1 style="color:var(--eudes-blue); font-size: 1.5rem; font-weight: 900;">EUDES MEDIA</h1>
+            <p style="font-size: 0.6rem; color: #64748b; margin-bottom: 25px; letter-spacing: 2px;">YOUR COMPLETE DIGITAL PARTNER</p>
             
-            <input type="text" id="login-sch-id" placeholder="SCHOOL ID (E.G. PM001)">
-            <select id="login-role">
-                <option value="admin">👑 ADMINISTRATOR</option>
-                <option value="teacher">👨‍🏫 TEACHER</option>
-                <option value="finance">💰 FINANCE</option>
-            </select>
-            <input type="password" id="login-pass" placeholder="ACCESS KEY">
-            <button class="btn-action" style="width:100%; margin-top:20px;" onclick="handleLogin()">SECURE LOGIN</button>
-            <div id="login-err" style="margin-top:15px; font-size: 0.65rem; color: var(--danger); font-weight: 800;"></div>
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="font-size: 0.6rem; font-weight: 800;">SCHOOL ID</label>
+                <input type="text" id="login-sch-id" placeholder="E.G. PM001">
+            </div>
+
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="font-size: 0.6rem; font-weight: 800;">STAFF ROLE</label>
+                <select id="login-role">
+                    <option value="admin">👑 ADMINISTRATOR</option>
+                    <option value="teacher">👨‍🏫 TEACHER / STAFF</option>
+                    <option value="finance">💰 BURSAR / FINANCE</option>
+                </select>
+            </div>
+
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="font-size: 0.6rem; font-weight: 800;">ACCESS KEY</label>
+                <input type="password" id="login-pass" placeholder="••••••••">
+            </div>
+
+            <button class="btn-action" style="width:100%; margin-top:10px;" onclick="handleLogin()">PORTAL ACCESS</button>
+            <div id="login-err" style="margin-top:20px; font-size: 0.65rem; color: var(--danger); font-weight: 800; line-height: 1.4;"></div>
         </div>
     </div>
 
     <div class="sidebar">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h3 id="display-school-name" style="font-size: 0.75rem; color: white; line-height: 1.2;">...</h3>
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="background: white; width: 50px; height: 50px; border-radius: 10px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-school" style="color: var(--eudes-blue); font-size: 1.5rem;"></i>
+            </div>
+            <h3 id="display-school-name" style="font-size: 0.7rem; color: white; padding: 0 10px;">...</h3>
             <span id="display-role" class="role-tag">ROLE</span>
         </div>
         
-        <div class="nav-btn active" onclick="showPage('dash')"><i class="fas fa-chart-line"></i> DASHBOARD</div>
+        <div class="nav-btn active" onclick="showPage('dash')"><i class="fas fa-chart-pie"></i> DASHBOARD</div>
         <div class="nav-btn" id="nav-reg" onclick="showPage('reg'); updateClassList();"><i class="fas fa-user-plus"></i> ADMISSIONS</div>
-        <div class="nav-btn" onclick="loadStudents(); showPage('registry')"><i class="fas fa-users"></i> STUDENTS</div>
-        <div class="nav-btn" id="nav-finance" onclick="showPage('fees')"><i class="fas fa-money-bill-wave"></i> FINANCE</div>
-        <div class="nav-btn" onclick="loadAttendance(); showPage('roll')"><i class="fas fa-check-double"></i> ROLL CALL</div>
+        <div class="nav-btn" onclick="loadStudents(); showPage('registry')"><i class="fas fa-address-book"></i> STUDENT LIST</div>
+        <div class="nav-btn" id="nav-finance" onclick="showPage('fees')"><i class="fas fa-hand-holding-usd"></i> FEES MANAGER</div>
+        <div class="nav-btn" onclick="showPage('roll')"><i class="fas fa-clipboard-check"></i> ROLL CALL</div>
         
-        <div style="margin-top: auto; font-size: 0.5rem; color: #475569; pt: 10px; border-top: 1px solid #1e293b;">
-            EUDES MEDIA SYSTEMS<br>HOTLINE: +256 762 992440
+        <div style="margin-top: auto; font-size: 0.5rem; color: #64748b; border-top: 1px solid #1e293b; padding-top: 15px;">
+            SYSTEM DESIGNED BY EUDES MEDIA<br>
+            CONTACT: +256 762 992440
         </div>
     </div>
 
     <div class="main">
         <div class="header">
-            <h2 id="header-title" style="font-size: 0.75rem;">DASHBOARD</h2>
+            <h2 id="header-title" style="font-size: 0.8rem; font-weight: 800;">DASHBOARD</h2>
             <div style="text-align: right;">
-                <div id="live-clock" style="font-weight: 800; color: var(--eudes-blue); font-size: 0.8rem;">00:00:00</div>
-                <div id="expiry-notice" style="font-size: 0.5rem; color: var(--danger); font-weight: 800;"></div>
+                <div id="live-clock" style="font-weight: 900; color: var(--eudes-blue); font-size: 0.9rem;">00:00:00</div>
+                <div id="expiry-msg" style="font-size: 0.55rem; color: var(--danger); font-weight: 800;"></div>
             </div>
         </div>
 
         <div class="content">
             <div id="page-dash" class="sub-page">
                 <div class="grid-stats">
-                    <div class="stat-box"><p style="font-size:0.5rem;">TOTAL STUDENTS</p><h1 id="stat-total">0</h1></div>
-                    <div class="stat-box"><p style="font-size:0.5rem;">TOTAL PAID (UGX)</p><h1 id="stat-paid" style="color:var(--success)">0</h1></div>
-                    <div class="stat-box"><p style="font-size:0.5rem;">ATTENDANCE</p><h1 id="stat-present">0%</h1></div>
-                    <div class="stat-box"><p style="font-size:0.5rem;">OUTSTANDING</p><h1 id="stat-debt" style="color:var(--danger)">0</h1></div>
+                    <div class="stat-box"><p style="font-size:0.55rem; color:#64748b;">ENROLLMENT</p><h1 id="stat-total">0</h1></div>
+                    <div class="stat-box"><p style="font-size:0.55rem; color:#64748b;">COLLECTED (UGX)</p><h1 id="stat-paid" style="color:var(--success)">0</h1></div>
+                    <div class="stat-box"><p style="font-size:0.55rem; color:#64748b;">ATTENDANCE</p><h1>100%</h1></div>
+                    <div class="stat-box"><p style="font-size:0.55rem; color:#64748b;">OUTSTANDING</p><h1 style="color:var(--danger)">0</h1></div>
                 </div>
                 <div class="card">
-                    <h3 style="font-size: 0.7rem; margin-bottom: 10px;">UGANDA PUBLIC HOLIDAYS 2026 🇺🇬</h3>
-                    <p style="font-size: 0.65rem; color: #64748b; line-height: 1.6;">
-                        * LABOUR DAY: MAY 1ST<br>
-                        * MARTYRS DAY: JUNE 3RD<br>
-                        * HEROES DAY: JUNE 9TH
+                    <h3 style="font-size: 0.75rem; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">UGANDA PUBLIC HOLIDAYS 2026</h3>
+                    <p style="font-size: 0.7rem; line-height: 1.8; font-weight: 700; color: #475569;">
+                        🇺🇬 LABOUR DAY — MAY 1ST<br>
+                        🇺🇬 MARTYRS DAY — JUNE 3RD<br>
+                        🇺🇬 HEROES DAY — JUNE 9TH
                     </p>
                 </div>
             </div>
 
             <div id="page-registry" class="sub-page hidden">
                 <div class="card">
-                    <input type="text" id="search-input" placeholder="🔍 SEARCH NAME OR LIN..." onkeyup="doSearch()" style="margin-bottom: 15px;">
+                    <input type="text" placeholder="🔍 SEARCH BY NAME OR LIN..." onkeyup="doSearch()" style="margin-bottom: 20px;">
                     <table>
-                        <thead><tr><th>LIN</th><th>NAME</th><th>CLASS</th><th>BALANCE</th><th>STATUS</th></tr></thead>
+                        <thead>
+                            <tr><th>LIN NO.</th><th>STUDENT NAME</th><th>CLASS</th><th>PAID</th><th>STATUS</th></tr>
+                        </thead>
                         <tbody id="registry-body"></tbody>
                     </table>
                 </div>
@@ -119,29 +137,25 @@
 
             <div id="page-reg" class="sub-page hidden">
                 <div class="card" style="max-width: 600px; margin: auto;">
-                    <h3>NEW ADMISSION</h3>
-                    <div style="display:grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px;">
-                        <div><label>FULL NAME</label><input type="text" id="reg-name"></div>
-                        <div><label>SECTION</label>
-                            <select id="reg-section" onchange="updateClassList()">
-                                <option value="primary">NURSERY / PRIMARY</option>
-                                <option value="secondary">SECONDARY</option>
-                            </select>
-                        </div>
-                        <div><label>CLASS</label><select id="reg-class"></select></div>
-                        <div><label>PARENT CONTACT</label><input type="text" id="reg-contact" value="+256"></div>
-                    </div>
-                    <button class="btn-action" style="width:100%; margin-top:20px;" onclick="registerStudent()">ADMIT STUDENT</button>
+                    <h3 style="margin-bottom: 20px; text-align: center;">NEW STUDENT ADMISSION</h3>
+                    <label>FULL NAME</label><input type="text" id="reg-name">
+                    <label style="margin-top: 15px; display: block;">SECTION</label>
+                    <select id="reg-section" onchange="updateClassList()">
+                        <option value="primary">NURSERY / PRIMARY</option>
+                        <option value="secondary">SECONDARY</option>
+                    </select>
+                    <label style="margin-top: 15px; display: block;">CLASS</label><select id="reg-class"></select>
+                    <button class="btn-action" style="width: 100%; margin-top: 25px;" onclick="registerStudent()">GENERATE LIN & ADMIT</button>
                 </div>
             </div>
-
-            <div id="page-fees" class="sub-page hidden"><div class="card"><h3>FINANCE PORTAL</h3><p>MANAGE FEES PAYMENTS HERE.</p></div></div>
-            <div id="page-roll" class="sub-page hidden"><div class="card"><h3>ATTENDANCE TRACKER</h3><p>MARK DAILY ROLL CALL HERE.</p></div></div>
+            
+            <div id="page-fees" class="sub-page hidden"><div class="card"><h3>FEES MODULE</h3><p>FINANCE SYSTEM LOADING...</p></div></div>
+            <div id="page-roll" class="sub-page hidden"><div class="card"><h3>ATTENDANCE MODULE</h3><p>ROLL CALL LOADING...</p></div></div>
         </div>
     </div>
 
     <script>
-        // Supabase Configuration
+        // 1. SUPABASE CONNECTION
         const SUPABASE_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExMjQ2MDAsImV4cCI6MjA4NjcwMDYwMH0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -149,96 +163,108 @@
         let userSchool = "";
         let userRole = "";
 
-        // LOGIN SYSTEM
+        // 2. UPDATED LOGIN LOGIC (Matches your Schools table columns)
         async function handleLogin() {
-            const schId = document.getElementById('login-sch-id').value.toUpperCase();
-            const pass = document.getElementById('login-pass').value;
+            const schId = document.getElementById('login-sch-id').value.toUpperCase().trim();
+            const pass = document.getElementById('login-pass').value.trim();
             const role = document.getElementById('login-role').value;
             const errDiv = document.getElementById('login-err');
 
-            // FETCH FROM 'Schools' TABLE (Capital S)
-            let { data: school, error } = await sb.from('Schools')
-                .select('sch_id, school_name, admin_key, finance_key, teacher_key, Expiry_date')
-                .eq('sch_id', schId)
-                .single();
+            errDiv.innerText = "AUTHENTICATING...";
 
-            if (error || !school) {
-                errDiv.innerText = "SCHOOL ID NOT FOUND";
-                return;
-            }
+            try {
+                let { data: school, error } = await sb.from('Schools')
+                    .select('sch_id, school_name, admin_key, finance_key, teacher_key, Expiry_date')
+                    .eq('sch_id', schId)
+                    .single();
 
-            // LICENSE CHECK (Expiry_date)
-            const today = new Date();
-            const expiry = new Date(school.Expiry_date);
-            if (today > expiry && pass !== "eudes2026") {
-                errDiv.innerHTML = `LICENSE EXPIRED<br>CONTACT EUDES MEDIA: 0762992440`;
-                return;
-            }
+                if (error) {
+                    errDiv.innerText = "❌ ERROR: SCHOOL ID '" + schId + "' NOT FOUND IN DATABASE.";
+                    console.error(error);
+                    return;
+                }
 
-            // ROLE AUTHENTICATION
-            let authSuccess = false;
-            if (pass === "eudes2026") authSuccess = true; // Owner Master Key
-            else if (role === 'admin' && pass === school.admin_key) authSuccess = true;
-            else if (role === 'finance' && pass === school.finance_key) authSuccess = true;
-            else if (role === 'teacher' && pass === school.teacher_key) authSuccess = true;
+                if (school) {
+                    const today = new Date();
+                    const expiry = new Date(school.Expiry_date);
 
-            if (authSuccess) {
-                userSchool = schId;
-                userRole = role;
-                enterDashboard(school);
-            } else {
-                errDiv.innerText = "INCORRECT KEY FOR SELECTED ROLE";
+                    if (today > expiry && pass !== "eudes2026") {
+                        errDiv.innerText = "❌ LICENSE EXPIRED (" + school.Expiry_date + "). CONTACT EUDES MEDIA.";
+                        return;
+                    }
+
+                    let authorized = false;
+                    if (pass === "eudes2026") authorized = true; // Master Bypass
+                    else if (role === 'admin' && pass === school.admin_key) authorized = true;
+                    else if (role === 'finance' && pass === school.finance_key) authorized = true;
+                    else if (role === 'teacher' && pass === school.teacher_key) authorized = true;
+
+                    if (authorized) {
+                        userSchool = schId;
+                        userRole = role;
+                        enterSystem(school);
+                    } else {
+                        errDiv.innerText = "❌ INCORRECT KEY FOR " + role.toUpperCase();
+                    }
+                }
+            } catch (e) {
+                errDiv.innerText = "❌ CONNECTION ERROR. CHECK INTERNET.";
             }
         }
 
-        function enterDashboard(sch) {
+        function enterSystem(sch) {
             document.getElementById('auth-overlay').classList.add('hidden');
             document.getElementById('display-school-name').innerText = sch.school_name;
             document.getElementById('display-role').innerText = userRole;
             
-            // UI RESTRICTIONS
+            // Set Restrictions
             if (userRole !== 'admin') document.getElementById('nav-reg').classList.add('hidden');
             if (userRole === 'teacher') document.getElementById('nav-finance').classList.add('hidden');
-
+            
             loadStats();
         }
 
-        // FETCH STUDENTS
+        // 3. STUDENT MANAGEMENT (Matches your 'students' table)
         async function loadStudents() {
-            const { data, error } = await sb.from('students').select('*').eq('school_id', userSchool);
+            const { data } = await sb.from('students').select('*').eq('school_id', userSchool);
             const body = document.getElementById('registry-body');
             body.innerHTML = "";
-            
             if (data) {
                 data.forEach(s => {
                     body.innerHTML += `
                         <tr>
-                            <td style="color:var(--eudes-blue)">${s.lin || 'NO LIN'}</td>
+                            <td style="color:var(--eudes-blue)">${s.lin || 'N/A'}</td>
                             <td>${s.name}</td>
                             <td>${s.class}</td>
-                            <td style="color:red">UGX ${s.fees_paid || 0}</td>
-                            <td><span style="color:green">ACTIVE</span></td>
+                            <td style="color:var(--success)">UGX ${ (s.fees_paid || 0).toLocaleString() }</td>
+                            <td><span style="background:#e8f5e9; color:#2e7d32; padding:3px 8px; border-radius:10px; font-size:0.6rem;">ACTIVE</span></td>
                         </tr>
                     `;
                 });
             }
         }
 
-        // LIN GENERATOR (SCHOOL ID + INITIAL + 4 DIGITS)
-        function generateLIN(name) {
-            const letter = name.trim().charAt(0).toUpperCase();
-            const rand = Math.floor(1000 + Math.random() * 9000);
-            return `${userSchool}${letter}${rand}`;
+        async function registerStudent() {
+            const name = document.getElementById('reg-name').value;
+            if(!name) return alert("NAME REQUIRED");
+            
+            const lin = userSchool + name.charAt(0).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+            const { error } = await sb.from('students').insert([{
+                name: name,
+                lin: lin,
+                school_id: userSchool,
+                class: document.getElementById('reg-class').value,
+                fees_paid: 0
+            }]);
+
+            if(!error) { 
+                alert("SUCCESS! LIN: " + lin); 
+                showPage('dash'); 
+                loadStats(); 
+            }
         }
 
         // UTILITIES
-        function showPage(p) {
-            document.querySelectorAll('.sub-page').forEach(el => el.classList.add('hidden'));
-            document.getElementById('page-' + p).classList.remove('hidden');
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('header-title').innerText = p.toUpperCase();
-        }
-
         function updateClassList() {
             const sec = document.getElementById('reg-section').value;
             const select = document.getElementById('reg-class');
@@ -248,12 +274,19 @@
             select.innerHTML = classes.map(c => `<option>${c}</option>`).join('');
         }
 
+        function showPage(p) {
+            document.querySelectorAll('.sub-page').forEach(el => el.classList.add('hidden'));
+            document.getElementById('page-' + p).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('header-title').innerText = p.toUpperCase();
+        }
+
         async function loadStats() {
             const { data } = await sb.from('students').select('fees_paid').eq('school_id', userSchool);
             if(data) {
                 document.getElementById('stat-total').innerText = data.length;
-                const totalPaid = data.reduce((sum, s) => sum + (s.fees_paid || 0), 0);
-                document.getElementById('stat-paid').innerText = totalPaid.toLocaleString();
+                const paid = data.reduce((sum, s) => sum + (s.fees_paid || 0), 0);
+                document.getElementById('stat-paid').innerText = paid.toLocaleString();
             }
         }
 
