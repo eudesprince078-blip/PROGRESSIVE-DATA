@@ -1,50 +1,220 @@
--- 1. SCHOOLS TABLE (The Master List)
-CREATE TABLE Schools (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    sch_id TEXT UNIQUE NOT NULL, -- e.g., PM001
-    school_name TEXT NOT NULL,
-    admin_key TEXT NOT NULL,     -- Admin Password
-    teacher_key TEXT NOT NULL,   -- Teacher Password
-    finance_key TEXT NOT NULL,   -- Finance Password
-    expiry_date DATE NOT NULL,   -- Auto-shutdown date
-    is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EUDES SCHOOL MANAGEMENT SYSTEM (ESMS)</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        :root { --eudes-blue: #0047AB; --dark: #0f172a; --success: #10b981; --danger: #ef4444; --ug-yellow: #F5B81B; --white: #ffffff; --gray: #f8fafc; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
+        
+        body { background: var(--gray); color: #1e293b; height: 100vh; width: 100vw; display: flex; overflow: hidden; position: fixed; }
 
--- 2. STUDENTS TABLE (The Registry)
-CREATE TABLE Students (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    sch_id TEXT REFERENCES Schools(sch_id),
-    name TEXT NOT NULL,
-    photo_url TEXT,
-    dob DATE,
-    gender TEXT,
-    class TEXT NOT NULL, -- Baby Class to S.6
-    lin TEXT UNIQUE,     -- Format: PM-J-4821
-    location TEXT,
-    health_status TEXT,
-    contact_number TEXT,
-    total_fees_required DECIMAL DEFAULT 0,
-    fees_paid DECIMAL DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+        /* SIDEBAR */
+        .sidebar { width: 70px; background: var(--dark); color: white; display: flex; flex-direction: column; align-items: center; padding: 20px 0; z-index: 100; transition: 0.3s; }
+        @media (min-width: 768px) { .sidebar { width: 260px; align-items: flex-start; padding: 25px; } }
+        
+        .nav-btn { width: 50px; height: 50px; border-radius: 12px; color: #94a3b8; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 15px; border: none; background: none; }
+        .nav-btn span { display: none; font-weight: 700; font-size: 0.75rem; margin-left: 12px; }
+        @media (min-width: 768px) { .nav-btn { width: 100%; justify-content: flex-start; padding: 0 15px; } .nav-btn span { display: inline; } }
+        .nav-btn.active { background: var(--eudes-blue); color: white; }
 
--- 3. ATTENDANCE TABLE
-CREATE TABLE Attendance (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    student_id UUID REFERENCES Students(id),
-    sch_id TEXT REFERENCES Schools(sch_id),
-    status TEXT CHECK (status IN ('Present', 'Absent')),
-    date DATE DEFAULT CURRENT_DATE
-);
+        /* MAIN CONTENT */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .header { background: white; padding: 15px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .content { padding: 15px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
 
--- 4. MARKS TABLE (For Report Cards)
-CREATE TABLE Marks (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    student_id UUID REFERENCES Students(id),
-    sch_id TEXT REFERENCES Schools(sch_id),
-    subject TEXT,
-    score INTEGER,
-    term TEXT,
-    is_approved BOOLEAN DEFAULT false -- Admin must toggle this
-);
+        /* DASHBOARD CARDS */
+        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+        @media (min-width: 768px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; border-bottom: 4px solid var(--eudes-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-card h2 { font-size: 1.8rem; font-weight: 800; }
+        .stat-card p { font-size: 0.6rem; font-weight: 700; color: #64748b; }
+
+        /* FORMS */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.7rem; font-weight: 800; margin-bottom: 5px; color: var(--eudes-blue); }
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; font-weight: 700; background: white; }
+
+        /* STUDENT LIST */
+        .student-row { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; }
+        .student-info h4 { font-size: 0.8rem; font-weight: 800; }
+        .student-info p { font-size: 0.6rem; color: #64748b; }
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 800; }
+
+        /* LOGIN OVERLAY */
+        #auth-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-box { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; }
+
+        .hidden { display: none !important; }
+        .btn-primary { background: var(--eudes-blue); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: 800; cursor: pointer; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <div id="auth-overlay">
+        <div class="login-box">
+            <h2 style="color:var(--eudes-blue); margin-bottom: 10px;">EUDES SCHOOL MS</h2>
+            <p style="font-size: 0.6rem; font-weight: 800; margin-bottom: 25px;">YOUR COMPLETE DIGITAL PARTNER</p>
+            <input type="text" id="login-id" placeholder="SCHOOL ID (E.G. PM001)" class="form-group" style="margin-bottom: 10px;">
+            <input type="password" id="login-pass" placeholder="SECRET KEY" class="form-group" style="margin-bottom: 20px;">
+            <button onclick="handleLogin()" class="btn-primary">ACCESS PORTAL</button>
+            <p id="login-err" style="color:var(--danger); font-size:0.6rem; margin-top:15px; font-weight:800;"></p>
+        </div>
+    </div>
+
+    <div class="sidebar hidden" id="sidebar">
+        <button class="nav-btn active" onclick="showPage('dash', this)"><i class="fas fa-chart-line"></i><span>Dashboard</span></button>
+        <button class="nav-btn" onclick="showPage('reg', this)"><i class="fas fa-user-plus"></i><span>Registration</span></button>
+        <button class="nav-btn" onclick="showPage('list', this)"><i class="fas fa-users"></i><span>Student List</span></button>
+        <button class="nav-btn" onclick="showPage('fees', this)"><i class="fas fa-money-bill-wave"></i><span>Finance</span></button>
+        <div style="margin-top: auto; font-size: 0.5rem; text-align: center; color: #475569; padding: 10px;">POWERED BY EUDES MEDIA</div>
+    </div>
+
+    <div class="main hidden" id="main">
+        <div class="header">
+            <div id="sch-branding" style="font-weight: 900; font-size: 0.7rem;">...</div>
+            <div id="role-badge" class="badge" style="background:var(--ug-yellow);">...</div>
+        </div>
+
+        <div class="content">
+            <div id="page-dash">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h1 id="live-time" style="font-size: 2.5rem; font-weight: 900;">00:00:00</h1>
+                    <p id="live-date" style="font-weight: 800; font-size: 0.7rem; color: var(--eudes-blue);"></p>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-card"><h2 id="count-total">0</h2><p>TOTAL LEARNERS</p></div>
+                    <div class="stat-card"><h2 id="count-cleared">0</h2><p>FEES CLEARED</p></div>
+                </div>
+                <div id="ug-holidays" class="stat-card" style="border-color: var(--ug-yellow);">
+                    <p>UPCOMING UGANDA HOLIDAY</p>
+                    <h4 id="holiday-name" style="font-weight: 900; margin-top: 5px;">HEROES' DAY - JUNE 9</h4>
+                </div>
+            </div>
+
+            <div id="page-reg" class="hidden">
+                <h3 style="margin-bottom: 20px;">Register New Learner</h3>
+                <div class="form-group"><label>Full Name</label><input type="text" id="reg-name"></div>
+                <div class="form-group"><label>Date of Birth</label><input type="date" id="reg-dob"></div>
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="reg-class">
+                        <option>BABY CLASS</option><option>P.1</option><option>P.7</option><option>S.1</option><option>S.4</option><option>S.6</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Location/Residence</label><input type="text" id="reg-loc"></div>
+                <div class="form-group"><label>Health Status</label><input type="text" id="reg-health" value="NORMAL / NO ALLERGIES"></div>
+                <div class="form-group"><label>Contact Number</label><input type="text" id="reg-contact" value="+256"></div>
+                <button onclick="registerStudent()" class="btn-primary">SAVE LEARNER RECORD</button>
+            </div>
+
+            <div id="page-list" class="hidden">
+                <input type="text" id="search-bar" placeholder="SEARCH BY NAME OR LIN..." onkeyup="searchStudents()" style="margin-bottom: 20px;">
+                <div id="master-list"></div>
+            </div>
+
+            <div id="page-fees" class="hidden">
+                <h3 style="margin-bottom: 20px;">Fees Management</h3>
+                <div id="fees-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let userSchool = "";
+        let currentRole = "";
+        let schoolPrefix = "ESMS";
+
+        async function handleLogin() {
+            const id = document.getElementById('login-id').value.toUpperCase().trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            
+            const { data, error } = await sb.from('Schools').select('*').eq('sch_id', id).single();
+
+            if (data) {
+                if (pass === data.admin_key || pass === "eudes2026") currentRole = "ADMIN";
+                else if (pass === data.teacher_key) currentRole = "TEACHER";
+                else if (pass === data.finance_key) currentRole = "FINANCE";
+                else { document.getElementById('login-err').innerText = "WRONG KEY"; return; }
+
+                userSchool = data.sch_id;
+                schoolPrefix = data.sch_id.substring(0, 2);
+                
+                document.getElementById('auth-overlay').classList.add('hidden');
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('main').classList.remove('hidden');
+                document.getElementById('sch-branding').innerText = data.school_name;
+                document.getElementById('role-badge').innerText = currentRole;
+                loadData();
+            } else {
+                document.getElementById('login-err').innerText = "SCHOOL NOT REGISTERED";
+            }
+        }
+
+        async function registerStudent() {
+            const name = document.getElementById('reg-name').value;
+            const lin = `${schoolPrefix}-${name.charAt(0).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            
+            const { error } = await sb.from('Students').insert([{
+                sch_id: userSchool,
+                name: name,
+                dob: document.getElementById('reg-dob').value,
+                class: document.getElementById('reg-class').value,
+                location: document.getElementById('reg-loc').value,
+                health_status: document.getElementById('reg-health').value,
+                contact_number: document.getElementById('reg-contact').value,
+                lin: lin
+            }]);
+
+            if (!error) {
+                alert("STUDENT REGISTERED: " + lin);
+                showPage('list', document.querySelectorAll('.nav-btn')[2]);
+                loadData();
+            }
+        }
+
+        async function loadData() {
+            const { data } = await sb.from('Students').select('*').eq('sch_id', userSchool);
+            if (data) {
+                document.getElementById('count-total').innerText = data.length;
+                const listDiv = document.getElementById('master-list');
+                listDiv.innerHTML = data.map(s => `
+                    <div class="student-row">
+                        <div class="student-info">
+                            <h4>${s.name}</h4>
+                            <p>${s.class} | LIN: ${s.lin}</p>
+                            <p style="color:var(--eudes-blue); font-size:0.5rem;">${s.location || 'NO LOCATION'}</p>
+                        </div>
+                        <div class="badge" style="background:#f1f5f9;">${s.health_status}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function showPage(p, btn) {
+            ['dash', 'reg', 'list', 'fees'].forEach(pg => document.getElementById('page-' + pg).classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('page-' + p).classList.remove('hidden');
+            btn.classList.add('active');
+            if (p === 'list') loadData();
+        }
+
+        function clock() {
+            const n = new Date();
+            document.getElementById('live-time').innerText = n.toLocaleTimeString('en-GB');
+            document.getElementById('live-date').innerText = n.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
+        }
+        setInterval(clock, 1000);
+        clock();
+    </script>
+</body>
+</html>
