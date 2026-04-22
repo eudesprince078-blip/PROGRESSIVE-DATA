@@ -2,52 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUDES MEDIA | UGANDA SCHOOL ENGINE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EUDES MEDIA | SCHOOL ENGINE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
         :root { --eudes-blue: #0047AB; --dark: #0f172a; --success: #10b981; --danger: #ef4444; --ug-yellow: #F5B81B; --bg: #f8fafc; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: #1e293b; height: 100vh; display: flex; overflow: hidden; }
-
-        /* AUTH SCREEN */
-        #auth-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: white; padding: 35px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; border: 4px solid var(--eudes-blue); }
-
-        /* SIDEBAR */
-        .sidebar { width: 280px; background: var(--dark); color: white; padding: 25px; display: flex; flex-direction: column; transition: 0.3s; }
-        .nav-btn { padding: 16px; border-radius: 12px; color: #94a3b8; font-weight: 700; font-size: 0.75rem; cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; text-transform: uppercase; }
-        .nav-btn.active { background: var(--eudes-blue); color: white; box-shadow: 0 10px 15px -3px rgba(0, 71, 171, 0.3); }
-
-        /* MAIN CONTENT */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .header { background: white; padding: 15px 25px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-        .content { padding: 20px; overflow-y: auto; height: 100%; }
-
-        /* DASHBOARD CARDS */
-        .clock-section { text-align: center; margin-bottom: 30px; }
-        .live-date { font-weight: 800; color: var(--ug-yellow); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; }
-        .big-time { font-size: 3.5rem; font-weight: 900; color: var(--dark); line-height: 1; margin-bottom: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        .lesson-banner { background: var(--ug-yellow); color: var(--dark); padding: 12px; border-radius: 15px; font-weight: 900; font-size: 0.8rem; margin: 0 auto 30px; max-width: 300px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        body { background: var(--bg); color: #1e293b; height: 100vh; width: 100vw; display: flex; overflow: hidden; position: fixed; }
+
+        /* MOBILE RESPONSIVE SIDEBAR */
+        .sidebar { width: 70px; background: var(--dark); color: white; display: flex; flex-direction: column; align-items: center; padding: 20px 0; z-index: 100; transition: width 0.3s; }
+        @media (min-width: 768px) { .sidebar { width: 260px; align-items: flex-start; padding: 25px; } }
         
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 15px 5px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-bottom: 4px solid var(--ug-yellow); }
-        .stat-card h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 2px; }
-        .stat-card p { font-size: 0.6rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+        .nav-btn { width: 50px; height: 50px; border-radius: 12px; color: #94a3b8; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
+        .nav-btn span { display: none; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; margin-left: 12px; }
+        @media (min-width: 768px) { .nav-btn { width: 100%; justify-content: flex-start; padding: 0 15px; } .nav-btn span { display: inline; } }
+        .nav-btn.active { background: var(--eudes-blue); color: white; box-shadow: 0 8px 15px rgba(0, 71, 171, 0.3); }
 
-        /* SEARCH BAR */
-        .search-container { background: white; padding: 12px 20px; border-radius: 15px; display: flex; align-items: center; gap: 10px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
-        .search-container input { border: none; outline: none; font-size: 0.9rem; width: 100%; font-weight: 600; }
+        /* MAIN CONTENT AREA */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .header { background: white; padding: 15px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .content { padding: 15px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
 
-        /* TABS */
-        .tab-bar { display: flex; border-bottom: 1px solid #e2e8f0; margin-bottom: 20px; }
-        .tab { padding: 12px 20px; font-weight: 800; font-size: 0.7rem; color: #64748b; cursor: pointer; text-transform: uppercase; }
-        .tab.active { color: var(--dark); border-bottom: 3px solid var(--dark); }
+        /* DASHBOARD DESIGN (As per your Screenshot) */
+        .clock-section { text-align: center; margin: 10px 0 20px; }
+        .live-date { font-weight: 800; color: var(--eudes-blue); font-size: 0.7rem; text-transform: uppercase; }
+        .big-time { font-size: 2.8rem; font-weight: 900; color: var(--dark); letter-spacing: -1px; margin: 5px 0; }
+        .lesson-banner { background: var(--ug-yellow); color: var(--dark); padding: 10px; border-radius: 12px; font-weight: 900; font-size: 0.75rem; text-align: center; box-shadow: 0 4px 12px rgba(245, 184, 27, 0.2); margin-bottom: 20px; }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 12px 5px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--eudes-blue); }
+        .stat-card h2 { font-size: 1.4rem; font-weight: 800; }
+        .stat-card p { font-size: 0.55rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
 
+        /* SEARCH & LIST */
+        .search-container { background: white; padding: 10px 15px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #e2e8f0; margin-bottom: 15px; }
+        .search-container input { border: none; outline: none; width: 100%; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+
+        .student-row { background: white; padding: 15px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .student-info h4 { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; }
+        .student-info p { font-size: 0.6rem; color: #64748b; font-weight: 600; }
+        .lin-badge { background: #f1f5f9; padding: 4px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 800; color: var(--eudes-blue); }
+
+        #auth-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 350px; text-align: center; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -55,82 +57,44 @@
 
     <div id="auth-overlay">
         <div class="login-card">
-            <h1 style="color:var(--eudes-blue); font-weight: 900; text-transform: uppercase;">Eudes Media</h1>
-            <p style="font-size: 0.55rem; margin-bottom: 25px; text-transform: uppercase;">Complete Digital Partner</p>
-            <input type="text" id="login-sch-id" placeholder="SCHOOL ID" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px; text-transform: uppercase;">
-            <input type="password" id="login-pass" placeholder="SECRET KEY" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px;">
-            <button class="btn-action" onclick="handleLogin()" style="width:100%; background:var(--eudes-blue); color:white; border:none; padding:15px; border-radius:10px; font-weight:800; cursor:pointer;">PORTAL LOGIN</button>
-            <div id="login-err" style="margin-top:10px; color:var(--danger); font-size:0.6rem; font-weight:800;"></div>
+            <h2 style="color:var(--eudes-blue); font-weight:900; text-transform:uppercase; margin-bottom:20px;">Eudes Media</h2>
+            <input type="text" id="login-id" placeholder="SCHOOL ID" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px; text-transform:uppercase;">
+            <input type="password" id="login-pass" placeholder="KEY" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
+            <button onclick="handleLogin()" style="width:100%; background:var(--eudes-blue); color:white; border:none; padding:15px; border-radius:8px; font-weight:800; cursor:pointer;">ACCESS PORTAL</button>
+            <div id="login-err" style="color:var(--danger); font-size:0.6rem; margin-top:10px; font-weight:800;"></div>
         </div>
     </div>
 
-    <div class="sidebar hidden" id="main-sidebar">
-        <div style="margin-bottom: 40px; text-align: center;">
-            <h3 id="display-school-name" style="font-size: 0.85rem; text-transform: uppercase; line-height: 1.3;">Progressive Mothers Gayaza</h3>
-            <span id="display-role" style="background: var(--ug-yellow); color: black; padding: 4px 12px; border-radius: 20px; font-size: 0.55rem; font-weight: 900; margin-top: 10px; display: inline-block;">ADMINISTRATOR</span>
-        </div>
-        <div class="nav-btn active" id="btn-dash" onclick="showPage('dash')"><i class="fas fa-chart-line"></i> Dashboard</div>
-        <div class="nav-btn" id="btn-reg" onclick="showPage('registry')"><i class="fas fa-user-graduate"></i> Students</div>
-        <div style="margin-top: auto; font-size: 0.55rem; color: #475569; text-align: center;">EUDES MEDIA UGANDA<br>+256 762 992440</div>
+    <div class="sidebar hidden" id="sidebar">
+        <div class="nav-btn active" onclick="showPage('dash', this)"><i class="fas fa-th-large"></i><span>Dash</span></div>
+        <div class="nav-btn" onclick="showPage('students', this)"><i class="fas fa-user-graduate"></i><span>List</span></div>
     </div>
 
-    <div class="main hidden" id="main-area">
+    <div class="main hidden" id="main">
         <div class="header">
-            <h2 id="header-title" style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--eudes-blue);">System Access</h2>
-            <div style="display: flex; gap: 15px; color: #64748b;">
-                <i class="fas fa-share-nodes"></i>
-                <i class="fas fa-bell"></i>
-            </div>
+            <h3 id="school-name-display" style="font-size:0.7rem; font-weight:800; text-transform:uppercase;">...</h3>
+            <i class="fas fa-user-circle" style="font-size: 1.2rem; color: var(--eudes-blue);"></i>
         </div>
 
         <div class="content">
-            <div id="page-dash" class="sub-page">
+            <div id="page-dash">
                 <div class="clock-section">
-                    <p class="live-date" id="live-date">Monday, 6 April 2026</p>
-                    <h1 class="big-time" id="big-time">08:52:19</h1>
+                    <p class="live-date" id="live-date">...</p>
+                    <h1 class="big-time" id="big-time">00:00:00</h1>
                 </div>
-
-                <div class="lesson-banner">
-                    <span style="display:block; font-size: 0.5rem; opacity: 0.8;">08:30 AM - 10:30 AM</span>
-                    LESSON PERIOD 1
-                </div>
-
+                <div class="lesson-banner">LESSON PERIOD 1 (ACTIVE)</div>
                 <div class="stat-grid">
-                    <div class="stat-card">
-                        <h2 id="stat-total">134</h2>
-                        <p>Total</p>
-                    </div>
-                    <div class="stat-card" style="border-bottom-color: var(--success);">
-                        <h2 id="stat-cleared" style="color: var(--success);">133</h2>
-                        <p>Cleared</p>
-                    </div>
-                    <div class="stat-card" style="border-bottom-color: var(--danger);">
-                        <h2 id="stat-absent" style="color: var(--danger);">3</h2>
-                        <p>Absent</p>
-                    </div>
+                    <div class="stat-card"><h2>134</h2><p>Total</p></div>
+                    <div class="stat-card" style="border-color: var(--success);"><h2 style="color:var(--success);">133</h2><p>Cleared</p></div>
+                    <div class="stat-card" style="border-color: var(--danger);"><h2 style="color:var(--danger);">1</h2><p>Absent</p></div>
                 </div>
-
-                <div class="tab-bar">
-                    <div class="tab active">Records</div>
-                    <div class="tab">Admission</div>
-                    <div class="tab">Roll Call</div>
-                </div>
-
-                <div class="search-container">
-                    <i class="fas fa-search" style="color: #cbd5e1;"></i>
-                    <input type="text" placeholder="Search Students..." onkeyup="filterStudents(this.value)">
-                </div>
-                
-                <div id="quick-list" style="background: white; border-radius: 15px; padding: 10px;">
-                    </div>
+                <div class="search-container"><i class="fas fa-search" style="color:#cbd5e1;"></i><input type="text" placeholder="QUICK SEARCH..." onkeyup="filterList(this.value)"></div>
+                <div id="dash-list"></div>
             </div>
 
-            <div id="page-registry" class="sub-page hidden">
-                <div class="search-container">
-                    <i class="fas fa-search" style="color: #cbd5e1;"></i>
-                    <input type="text" placeholder="Search Database...">
-                </div>
-                <div id="registry-list"></div>
+            <div id="page-students" class="hidden">
+                <div class="search-container"><i class="fas fa-search"></i><input type="text" placeholder="SEARCH DATABASE..."></div>
+                <div id="full-list"></div>
             </div>
         </div>
     </div>
@@ -143,49 +107,63 @@
         let userSchool = "";
 
         async function handleLogin() {
-            const id = document.getElementById('login-sch-id').value.toUpperCase().trim();
+            const id = document.getElementById('login-id').value.toUpperCase().trim();
             const pass = document.getElementById('login-pass').value.trim();
             
-            const { data, error } = await sb.from('Schools').select('*').ilike('sch_id', `%${id}%`);
+            // Fixed: Explicitly selecting school to ensure ID is correct
+            const { data, error } = await sb.from('Schools').select('*').ilike('sch_id', id);
 
             if (data && data.length > 0) {
                 const s = data[0];
                 if (pass === "eudes2026" || pass === s.admin_key) {
                     userSchool = s.sch_id;
                     document.getElementById('auth-overlay').classList.add('hidden');
-                    document.getElementById('main-sidebar').classList.remove('hidden');
-                    document.getElementById('main-area').classList.remove('hidden');
-                    document.getElementById('display-school-name').innerText = s.school_name;
-                    loadStats();
+                    document.getElementById('sidebar').classList.remove('hidden');
+                    document.getElementById('main').classList.remove('hidden');
+                    document.getElementById('school-name-display').innerText = s.school_name;
+                    loadData();
                 } else {
-                    document.getElementById('login-err').innerText = "WRONG ACCESS KEY";
+                    document.getElementById('login-err').innerText = "INVALID KEY";
                 }
             } else {
                 document.getElementById('login-err').innerText = "SCHOOL ID NOT FOUND";
             }
         }
 
-        async function loadStats() {
-            const { data } = await sb.from('students').select('*').eq('school_id', userSchool);
-            if (data) {
-                document.getElementById('stat-total').innerText = data.length;
-                // Example logic for cleared/absent (you can change this to match your columns)
-                document.getElementById('stat-cleared').innerText = data.filter(s => s.fees_paid > 0).length;
-                document.getElementById('stat-absent').innerText = "0"; 
+        async function loadData() {
+            // WHY RECORDS ARE NOT FOUND: 
+            // 1. Check if column name in Supabase is 'school_id' or 'sch_id'
+            // 2. Ensure value in table is exactly 'PM001'
+            const { data, error } = await sb.from('students').select('*').eq('school_id', userSchool);
+            
+            const listDiv = document.getElementById('dash-list');
+            if (data && data.length > 0) {
+                listDiv.innerHTML = data.map(s => `
+                    <div class="student-row">
+                        <div class="student-info">
+                            <h4>${s.name}</h4>
+                            <p>${s.class || 'NO CLASS'}</p>
+                        </div>
+                        <div class="lin-badge">${s.lin || 'N/A'}</div>
+                    </div>
+                `).join('');
+            } else {
+                listDiv.innerHTML = `<div style="text-align:center; padding:40px; color:#64748b; font-size:0.7rem; font-weight:800;">NO RECORDS FOUND IN SUPABASE FOR ${userSchool}</div>`;
             }
         }
 
-        function showPage(p) {
-            document.querySelectorAll('.sub-page').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        function showPage(p, btn) {
+            document.getElementById('page-dash').classList.add('hidden');
+            document.getElementById('page-students').classList.add('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
             document.getElementById('page-' + p).classList.remove('hidden');
-            document.getElementById('btn-' + p).classList.add('active');
+            btn.classList.add('active');
         }
 
         function updateClock() {
             const now = new Date();
-            const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', dateOptions);
+            document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
             document.getElementById('big-time').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
         }
 
