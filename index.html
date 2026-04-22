@@ -1,176 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EUDES MEDIA | SCHOOL ENGINE</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <style>
-        :root { --eudes-blue: #0047AB; --dark: #0f172a; --success: #10b981; --danger: #ef4444; --ug-yellow: #F5B81B; --bg: #f8fafc; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
-        
-        body { background: var(--bg); color: #1e293b; height: 100vh; width: 100vw; display: flex; overflow: hidden; position: fixed; }
+-- 1. SCHOOLS TABLE (The Master List)
+CREATE TABLE Schools (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    sch_id TEXT UNIQUE NOT NULL, -- e.g., PM001
+    school_name TEXT NOT NULL,
+    admin_key TEXT NOT NULL,     -- Admin Password
+    teacher_key TEXT NOT NULL,   -- Teacher Password
+    finance_key TEXT NOT NULL,   -- Finance Password
+    expiry_date DATE NOT NULL,   -- Auto-shutdown date
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-        /* FIXED SIDEBAR */
-        .sidebar { width: 70px; background: var(--dark); color: white; display: flex; flex-direction: column; align-items: center; padding: 20px 0; z-index: 100; flex-shrink: 0; }
-        @media (min-width: 768px) { .sidebar { width: 260px; align-items: flex-start; padding: 25px; } }
-        
-        .nav-btn { width: 50px; height: 50px; border-radius: 12px; color: #94a3b8; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 15px; }
-        .nav-btn span { display: none; font-weight: 700; font-size: 0.75rem; margin-left: 12px; }
-        @media (min-width: 768px) { .nav-btn { width: 100%; justify-content: flex-start; padding: 0 15px; } .nav-btn span { display: inline; } }
-        .nav-btn.active { background: var(--eudes-blue); color: white; box-shadow: 0 8px 15px rgba(0, 71, 171, 0.3); }
+-- 2. STUDENTS TABLE (The Registry)
+CREATE TABLE Students (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    sch_id TEXT REFERENCES Schools(sch_id),
+    name TEXT NOT NULL,
+    photo_url TEXT,
+    dob DATE,
+    gender TEXT,
+    class TEXT NOT NULL, -- Baby Class to S.6
+    lin TEXT UNIQUE,     -- Format: PM-J-4821
+    location TEXT,
+    health_status TEXT,
+    contact_number TEXT,
+    total_fees_required DECIMAL DEFAULT 0,
+    fees_paid DECIMAL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-        /* MAIN AREA */
-        .main { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .header { background: white; padding: 15px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .content { padding: 15px; overflow-y: auto; flex-grow: 1; -webkit-overflow-scrolling: touch; }
+-- 3. ATTENDANCE TABLE
+CREATE TABLE Attendance (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_id UUID REFERENCES Students(id),
+    sch_id TEXT REFERENCES Schools(sch_id),
+    status TEXT CHECK (status IN ('Present', 'Absent')),
+    date DATE DEFAULT CURRENT_DATE
+);
 
-        /* DASHBOARD DESIGN */
-        .clock-section { text-align: center; margin-bottom: 20px; }
-        .big-time { font-size: 3rem; font-weight: 900; color: var(--dark); letter-spacing: -1px; line-height: 1; margin: 5px 0; }
-        .lesson-banner { background: var(--ug-yellow); color: var(--dark); padding: 12px; border-radius: 15px; font-weight: 900; font-size: 0.75rem; text-align: center; margin-bottom: 25px; }
-        
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 15px 5px; border-radius: 18px; text-align: center; border-bottom: 4px solid var(--eudes-blue); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .stat-card h2 { font-size: 1.5rem; font-weight: 800; }
-        .stat-card p { font-size: 0.55rem; font-weight: 700; color: #64748b; }
-
-        /* LIST ITEMS */
-        .student-row { background: white; padding: 16px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; }
-        .student-info h4 { font-size: 0.85rem; font-weight: 800; }
-        .student-info p { font-size: 0.65rem; color: #64748b; }
-        .lin-badge { background: #f1f5f9; padding: 6px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; color: var(--eudes-blue); }
-
-        #auth-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 25px; }
-        .login-card { background: white; padding: 35px; border-radius: 25px; width: 100%; max-width: 380px; text-align: center; border: 4px solid var(--eudes-blue); }
-        .hidden { display: none !important; }
-    </style>
-</head>
-<body>
-
-    <div id="auth-overlay">
-        <div class="login-card">
-            <h2 style="color:var(--eudes-blue); font-weight:900; margin-bottom: 25px;">EUDES SYSTEM</h2>
-            <input type="text" id="login-id" placeholder="SCHOOL ID (PM001)" style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:12px; font-weight: 700;">
-            <input type="password" id="login-pass" placeholder="SECRET KEY" style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:20px; font-weight: 700;">
-            <button onclick="handleLogin()" style="width:100%; background:var(--eudes-blue); color:white; border:none; padding:16px; border-radius:12px; font-weight:900; cursor:pointer;">PORTAL LOGIN</button>
-            <div id="login-err" style="color:var(--danger); font-size:0.65rem; margin-top:15px; font-weight:800;"></div>
-        </div>
-    </div>
-
-    <div class="sidebar hidden" id="sidebar">
-        <div class="nav-btn active" onclick="showPage('dash', this)"><i class="fas fa-th-large"></i><span>Dash</span></div>
-        <div class="nav-btn" onclick="showPage('students', this)"><i class="fas fa-user-graduate"></i><span>Registry</span></div>
-        <div style="margin-top: auto; font-size: 0.5rem; text-align: center; color: #94a3b8; padding-bottom: 10px;">
-            EUDES MEDIA<br>+256 762 992440
-        </div>
-    </div>
-
-    <div class="main hidden" id="main">
-        <div class="header">
-            <h3 id="school-name-display" style="font-size:0.75rem; font-weight:800;">LOADING...</h3>
-            <i class="fas fa-user-circle" style="font-size: 1.2rem; color: var(--eudes-blue);"></i>
-        </div>
-
-        <div class="content">
-            <div id="page-dash">
-                <div class="clock-section">
-                    <p id="live-date" style="font-weight: 800; font-size: 0.7rem; color: var(--eudes-blue);">...</p>
-                    <h1 class="big-time" id="big-time">00:00:00</h1>
-                </div>
-                <div class="lesson-banner">SESSION: PERIOD 1 (ACTIVE)</div>
-                
-                <div class="stat-grid">
-                    <div class="stat-card"><h2 id="stat-total">0</h2><p>Total</p></div>
-                    <div class="stat-card" style="border-color: var(--success);"><h2 id="stat-cleared" style="color:var(--success);">0</h2><p>Cleared</p></div>
-                    <div class="stat-card" style="border-color: var(--danger);"><h2 id="stat-absent" style="color:var(--danger);">0</h2><p>Absent</p></div>
-                </div>
-
-                <div id="dash-list"></div>
-            </div>
-
-            <div id="page-students" class="hidden">
-                <div id="full-list"></div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const SUPABASE_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        let userSchool = "";
-
-        async function handleLogin() {
-            const id = document.getElementById('login-id').value.toUpperCase().trim();
-            const pass = document.getElementById('login-pass').value.trim();
-            
-            // Step 1: Login using 'sch_id' from 'Schools' table
-            const { data, error } = await sb.from('Schools').select('*').eq('sch_id', id);
-
-            if (data && data.length > 0) {
-                const s = data[0];
-                if (pass === "eudes2026" || pass === s.admin_key || pass === s.teacher_key) {
-                    userSchool = s.sch_id; 
-                    document.getElementById('auth-overlay').classList.add('hidden');
-                    document.getElementById('sidebar').classList.remove('hidden');
-                    document.getElementById('main').classList.remove('hidden');
-                    document.getElementById('school-name-display').innerText = s.school_name;
-                    loadData();
-                } else {
-                    document.getElementById('login-err').innerText = "INVALID ACCESS KEY";
-                }
-            } else {
-                document.getElementById('login-err').innerText = "SCHOOL ID NOT FOUND";
-            }
-        }
-
-        async function loadData() {
-            // Step 2: Fetch students using 'sch_id' from 'Students' table
-            const { data, error } = await sb.from('Students')
-                .select('*')
-                .eq('sch_id', userSchool);
-            
-            const listDiv = document.getElementById('dash-list');
-            
-            if (data && data.length > 0) {
-                document.getElementById('stat-total').innerText = data.length;
-                listDiv.innerHTML = data.map(s => `
-                    <div class="student-row">
-                        <div class="student-info">
-                            <h4>${s.name}</h4>
-                            <p>${s.class || 'SECTION A'}</p>
-                        </div>
-                        <div class="lin-badge">${s.lin || 'N/A'}</div>
-                    </div>
-                `).join('');
-            } else {
-                listDiv.innerHTML = `<div style="text-align:center; padding:50px; font-size:0.7rem; color:#64748b;">
-                    NO RECORDS FOUND FOR ${userSchool}
-                </div>`;
-            }
-        }
-
-        function showPage(p, btn) {
-            document.getElementById('page-dash').classList.add('hidden');
-            document.getElementById('page-students').classList.add('hidden');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('page-' + p).classList.remove('hidden');
-            btn.classList.add('active');
-        }
-
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-            document.getElementById('big-time').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-        }
-
-        setInterval(updateClock, 1000);
-        updateClock();
-    </script>
-</body>
-</html>
+-- 4. MARKS TABLE (For Report Cards)
+CREATE TABLE Marks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_id UUID REFERENCES Students(id),
+    sch_id TEXT REFERENCES Schools(sch_id),
+    subject TEXT,
+    score INTEGER,
+    term TEXT,
+    is_approved BOOLEAN DEFAULT false -- Admin must toggle this
+);
