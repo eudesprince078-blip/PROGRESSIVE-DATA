@@ -2,271 +2,180 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESMS ELITE | EUDES MEDIA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eudes Media - Elite System V3</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        :root { --main: #0047AB; --bg: #f4f7fe; --dark: #0f172a; --accent: #F5B81B; --white: #ffffff; --text-gray: #64748b; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--dark); height: 100vh; display: flex; overflow: hidden; }
-
-        /* SIDEBAR UPGRADE */
-        .sidebar { width: 280px; background: var(--dark); display: flex; flex-direction: column; padding: 30px 20px; transition: 0.3s; z-index: 100; }
-        .nav-item { width: 100%; display: flex; align-items: center; padding: 16px 20px; color: #94a3b8; cursor: pointer; border-radius: 16px; margin-bottom: 8px; border: none; background: transparent; transition: 0.3s; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
-        .nav-item i { font-size: 1.2rem; margin-right: 15px; width: 25px; }
-        .nav-item.active { background: var(--main); color: white; box-shadow: 0 10px 20px rgba(0, 71, 171, 0.2); }
-        .nav-item:hover:not(.active) { background: rgba(255,255,255,0.05); color: white; }
-
-        /* MAIN AREA */
-        .main { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .top-bar { height: 80px; background: var(--white); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; }
-        .content-area { flex: 1; padding: 40px; overflow-y: auto; }
-
-        /* DASHBOARD CARDS */
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; margin-bottom: 40px; }
-        .card { background: var(--white); padding: 25px; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(226, 232, 240, 0.8); }
-        .icon-box { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 15px; }
-
-        /* FORM STYLING */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .input-group { margin-bottom: 20px; }
-        label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-gray); margin-bottom: 8px; text-transform: uppercase; }
-        input, select, textarea { width: 100%; padding: 14px 18px; border-radius: 12px; border: 1.5px solid #e2e8f0; background: #f8fafc; font-size: 0.95rem; font-weight: 600; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--main); background: var(--white); box-shadow: 0 0 0 4px rgba(0, 71, 171, 0.1); }
-
-        .btn-primary { background: var(--main); color: white; padding: 16px 30px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0, 71, 171, 0.2); }
-
-        /* TABLE UPGRADE */
-        .table-container { background: white; border-radius: 24px; overflow: hidden; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; padding: 18px 24px; text-align: left; font-size: 0.75rem; font-weight: 800; color: var(--text-gray); text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 18px 24px; font-size: 0.9rem; font-weight: 600; border-bottom: 1px solid #f1f5f9; }
-        .avatar { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; background: #eee; }
-
-        .status-badge { padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; }
-        .status-active { background: #dcfce7; color: #166534; }
-
-        .hidden { display: none !important; }
+        :root {
+            --sidebar-dark: #0a1128;
+            --active-blue: #0056b3;
+            --text-light: #ffffff;
+        }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; background: #f0f2f5; }
+        
+        /* Sidebar Styling based on your screenshot */
+        .sidebar {
+            width: 260px; background: var(--sidebar-dark); color: var(--text-light);
+            display: flex; flex-direction: column; padding-top: 20px;
+        }
+        .brand-section { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-menu { flex-grow: 1; padding-top: 20px; }
+        .nav-item {
+            padding: 15px 25px; cursor: pointer; display: flex; align-items: center;
+            transition: 0.3s; font-size: 14px;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.1); }
+        .nav-item.active { background: var(--active-blue); border-radius: 0 30px 30px 0; margin-right: 15px; }
+        
+        /* Main Content Area */
+        .content { flex-grow: 1; display: flex; flex-direction: column; }
+        .top-bar { height: 60px; background: #4a90e2; color: white; display: flex; align-items: center; padding: 0 20px; font-weight: bold; }
+        .data-container { padding: 25px; overflow-y: auto; }
+        
+        /* Table Styling */
+        .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .data-table th { background: #f8f9fa; padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6; color: #333; }
+        .data-table td { padding: 12px 15px; border-bottom: 1px solid #eee; color: #555; }
+        
+        .support-footer {
+            padding: 20px; background: rgba(255,255,255,0.05); margin: 15px;
+            border-radius: 12px; font-size: 11px;
+        }
+        .support-number { color: #ffcc00; font-size: 14px; display: block; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <nav class="sidebar">
-        <div style="margin-bottom: 50px; padding-left: 10px;">
-            <h1 style="color: white; font-weight: 800; font-size: 1.4rem;">EUDES<span style="color: var(--accent);">.</span></h1>
-            <p style="color: #475569; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px;">ELITE SYSTEM V3</p>
+    <div class="sidebar">
+        <div class="brand-section">
+            <h2 style="margin: 0; letter-spacing: 1px;">EUDES<span style="color:#ffcc00;">.</span></h2>
+            <div style="font-size: 10px; opacity: 0.6;">ELITE SYSTEM V3</div>
         </div>
         
-        <button class="nav-item active" onclick="showPage('dash', this)"><i class="fas fa-grid-2"></i>Dashboard</button>
-        <button class="nav-item" onclick="showPage('reg', this)"><i class="fas fa-user-plus"></i>Admissions</button>
-        <button class="nav-item" onclick="showPage('students', this)"><i class="fas fa-users-rectangle"></i>Student List</button>
-        <button class="nav-item" onclick="showPage('finance', this)"><i class="fas fa-vault"></i>Finance Vault</button>
-
-        <div style="margin-top: auto; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 20px;">
-            <p style="color: white; font-size: 0.7rem; font-weight: 700;">SUPPORT LINE</p>
-            <p style="color: var(--accent); font-size: 0.8rem; font-weight: 800;">+256 762 992440</p>
+        <div class="nav-menu">
+            <div class="nav-item" onclick="switchTab('dashboard')">Dashboard</div>
+            <div class="nav-item active" id="btn-students" onclick="switchTab('students')">Admissions / Student List</div>
+            <div class="nav-item" id="btn-finance" onclick="switchTab('finance')">Finance Vault</div>
         </div>
-    </nav>
 
-    <main class="main">
-        <header class="top-bar">
-            <div>
-                <h2 id="school-title" style="font-weight: 800; font-size: 1.1rem; color: var(--dark);">...</h2>
-                <p style="font-size: 0.7rem; color: var(--text-gray); font-weight: 600;">UGANDA NATIONAL EDUCATION PORTAL</p>
-            </div>
-            <div style="display: flex; align-items: center; gap: 20px;">
-                <div style="text-align: right;">
-                    <p style="font-size: 0.8rem; font-weight: 800;">ADMINISTRATOR</p>
-                    <p style="font-size: 0.65rem; color: var(--main); font-weight: 700;">SYSTEM ACTIVE</p>
-                </div>
-                <img id="header-logo" src="" style="width: 45px; height: 45px; border-radius: 12px; background: #eee; border: 1px solid #e2e8f0;">
-            </div>
-        </header>
-
-        <div class="content-area">
-            
-            <div id="page-dash">
-                <div class="stat-grid">
-                    <div class="card">
-                        <div class="icon-box" style="background: #e0e7ff; color: #4338ca;"><i class="fas fa-graduation-cap"></i></div>
-                        <h3 id="count-total" style="font-size: 1.8rem; font-weight: 800;">0</h3>
-                        <p style="font-size: 0.75rem; color: var(--text-gray); font-weight: 700;">ENROLLED STUDENTS</p>
-                    </div>
-                    <div class="card">
-                        <div class="icon-box" style="background: #dcfce7; color: #15803d;"><i class="fas fa-wallet"></i></div>
-                        <h3 id="count-fees" style="font-size: 1.8rem; font-weight: 800;">0</h3>
-                        <p style="font-size: 0.75rem; color: var(--text-gray); font-weight: 700;">TOTAL COLLECTIONS (UGX)</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="page-reg" class="hidden">
-                <div class="card" style="max-width: 900px; margin: 0 auto;">
-                    <h2 style="margin-bottom: 30px; font-weight: 800;">STUDENT ADMISSION FORM</h2>
-                    
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label>Full Legal Name</label>
-                            <input type="text" id="reg-name" placeholder="As per birth certificate">
-                        </div>
-                        <div class="input-group">
-                            <label>Student LIN (Auto-Generated)</label>
-                            <input type="text" id="reg-lin" readonly style="background: #edf2f7; color: var(--main);">
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label>Age</label>
-                            <input type="number" id="reg-age">
-                        </div>
-                        <div class="input-group">
-                            <label>Date of Birth</label>
-                            <input type="date" id="reg-dob">
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label>Current Class</label>
-                            <select id="reg-class">
-                                <option>Nursery</option><option>P.1</option><option>P.2</option><option>P.3</option>
-                                <option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label>Health / Medical Status</label>
-                            <input type="text" id="reg-health" placeholder="e.g. Normal, Asthma, Allergies">
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label>Physical Location / Residence</label>
-                            <input type="text" id="reg-loc" placeholder="Village, Zone, or Street">
-                        </div>
-                        <div class="input-group">
-                            <label>Guardian Contact Number</label>
-                            <input type="tel" id="reg-tel" value="+256 ">
-                        </div>
-                    </div>
-
-                    <button class="btn-primary" onclick="submitAdmission()" id="btn-save">REGISTER STUDENT TO DATABASE</button>
-                </div>
-            </div>
-
-            <div id="page-students" class="hidden">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Student</th>
-                                <th>LIN</th>
-                                <th>Class</th>
-                                <th>Location</th>
-                                <th>Health</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="student-list-body">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-
+        <div class="support-footer">
+            SUPPORT LINE
+            <span class="support-number">+256 762 992440</span>
+            <div style="margin-top: 10px; opacity: 0.7;">Eudes Media &copy; 2026</div>
         </div>
-    </main>
+    </div>
+
+    <div class="content">
+        <div class="top-bar">
+            SYSTEM ACCESS | EUDES MEDIA CONTROL CENTER
+        </div>
+
+        <div class="data-container">
+            <div id="student-view">
+                <h3 id="school-name-display">Loading School Data...</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>DOB</th>
+                            <th>Location</th>
+                            <th>Health Status</th>
+                            <th>Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-list-rows">
+                        </tbody>
+                </table>
+            </div>
+
+            <div id="finance-view" style="display:none;">
+                <h3>Financial Records (UGX)</h3>
+                <div id="finance-content"></div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        const S_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-        const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        const supa = supabase.createClient(S_URL, S_KEY);
+        // Use your specific Supabase credentials
+        const sbUrl = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+        const sbKey = 'sbp_publishable_1PetUo8klWCLfupRq52CVg_Y_Y';
+        const _supabase = supabase.createClient(sbUrl, sbKey);
 
-        let activeSchoolId = "PM001"; // Pulled from your login session
+        async function loadStudentData() {
+            const rowContainer = document.getElementById('student-list-rows');
+            rowContainer.innerHTML = '<tr><td colspan="7">Fetching records...</td></tr>';
 
-        // GENERATE LIN AUTOMATICALLY
-        function genLIN() {
-            const num = Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('reg-lin').value = `PM-${num}`;
-        }
+            // Querying your Supabase table
+            const { data, error } = await _supabase
+                .from('students')
+                .select('name, age, dob, physical_location, health_status, contact_number')
+                .order('created_at', { ascending: true });
 
-        async function init() {
-            const { data: sch } = await supa.from('Schools').select('*').eq('sch_id', activeSchoolId).single();
-            if(sch) {
-                document.getElementById('school-title').innerText = sch.school_name.toUpperCase();
-                document.getElementById('header-logo').src = sch.logo_url || ""; 
+            if (error) {
+                rowContainer.innerHTML = `<tr><td colspan="7" style="color:red;">Error: ${error.message}</td></tr>`;
+                return;
             }
-            fetchStudents();
-            genLIN();
-        }
 
-        async function fetchStudents() {
-            const { data } = await supa.from('Students').select('*').eq('sch_id', activeSchoolId);
-            if(data) {
-                document.getElementById('count-total').innerText = data.length;
-                const tbody = document.getElementById('student-list-body');
-                tbody.innerHTML = data.map(s => `
+            if (data.length === 0) {
+                rowContainer.innerHTML = '<tr><td colspan="7">No students found in the list.</td></tr>';
+                return;
+            }
+
+            rowContainer.innerHTML = '';
+            data.forEach((student, index) => {
+                const row = `
                     <tr>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 35px; height: 35px; border-radius: 8px; background: #4338ca; color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.7rem;">${s.name.charAt(0)}</div>
-                                <div>${s.name}</div>
-                            </div>
-                        </td>
-                        <td style="color: var(--main); font-family: monospace;">${s.lin || 'N/A'}</td>
-                        <td>${s.class}</td>
-                        <td style="color: var(--text-gray); font-size: 0.8rem;">${s.location || 'Unknown'}</td>
-                        <td><span style="font-size: 0.75rem; font-weight: 700;">${s.health_status || 'Normal'}</span></td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                    </tr>
-                `).join('');
-            }
+                        <td>${index + 1}</td>
+                        <td>${student.name || 'N/A'}</td>
+                        <td>${student.age || 'N/A'}</td>
+                        <td>${student.dob || 'N/A'}</td>
+                        <td>${student.physical_location || 'N/A'}</td>
+                        <td>${student.health_status || 'Healthy'}</td>
+                        <td>${student.contact_number || 'N/A'}</td>
+                    </tr>`;
+                rowContainer.innerHTML += row;
+            });
+
+            // Updating the header dynamically for the school
+            document.getElementById('school-name-display').innerText = "Progressive Mother's Primary School - Student Registry";
         }
 
-        async function submitAdmission() {
-            const btn = document.getElementById('btn-save');
-            const studentData = {
-                sch_id: activeSchoolId,
-                name: document.getElementById('reg-name').value,
-                lin: document.getElementById('reg-lin').value,
-                age: document.getElementById('reg-age').value,
-                dob: document.getElementById('reg-dob').value,
-                class: document.getElementById('reg-class').value,
-                health_status: document.getElementById('reg-health').value,
-                location: document.getElementById('reg-loc').value,
-                contact: document.getElementById('reg-tel').value
-            };
+        async function loadFinanceData() {
+            const container = document.getElementById('finance-content');
+            const { data, error } = await _supabase.from('finance').select('*');
 
-            if(!studentData.name) return alert("Please enter the student's name");
-
-            btn.innerText = "PROCESSING...";
-            btn.disabled = true;
-
-            const { error } = await supa.from('Students').insert([studentData]);
-
-            if(!error) {
-                alert("ADMISSION SUCCESSFUL");
-                location.reload();
-            } else {
-                alert("DATABASE ERROR: " + error.message);
-                btn.disabled = false;
-                btn.innerText = "REGISTER STUDENT";
+            if (error || !data) {
+                container.innerHTML = "Unable to load financial vault.";
+                return;
             }
+
+            let tableHtml = '<table class="data-table"><tr><th>Account</th><th>Status</th><th>Amount</th></tr>';
+            data.forEach(item => {
+                tableHtml += `<tr>
+                    <td>${item.account_name}</td>
+                    <td>${item.status}</td>
+                    <td><b>${item.amount.toLocaleString()} UGX</b></td>
+                </tr>`;
+            });
+            tableHtml += '</table>';
+            container.innerHTML = tableHtml;
         }
 
-        function showPage(p, btn) {
-            ['dash', 'reg', 'students', 'finance'].forEach(id => document.getElementById('page-'+id)?.classList.add('hidden'));
-            document.getElementById('page-'+p).classList.remove('hidden');
+        function switchTab(tab) {
+            document.getElementById('student-view').style.display = tab === 'students' ? 'block' : 'none';
+            document.getElementById('finance-view').style.display = tab === 'finance' ? 'block' : 'none';
             
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            btn.classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('btn-' + tab).classList.add('active');
+
+            if (tab === 'students') loadStudentData();
+            if (tab === 'finance') loadFinanceData();
         }
 
-        window.onload = init;
+        // Initialize on load
+        window.onload = () => loadStudentData();
     </script>
 </body>
 </html>
