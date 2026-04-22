@@ -15,32 +15,26 @@
 
         /* AUTH SCREEN */
         #auth-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: white; padding: 40px; border-radius: 30px; width: 380px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 2px solid var(--eudes-blue); }
+        .login-card { background: white; padding: 30px; border-radius: 25px; width: 350px; text-align: center; border: 3px solid var(--eudes-blue); }
         .ug-flag { height: 6px; background: linear-gradient(90deg, #000, #F5B81B, #d90429, #000, #F5B81B, #d90429); margin-bottom: 20px; border-radius: 5px; }
 
         /* SIDEBAR */
-        .sidebar { width: 260px; background: var(--dark); color: white; padding: 25px; display: flex; flex-direction: column; }
-        .nav-btn { padding: 14px; border-radius: 12px; color: #94a3b8; font-weight: 700; font-size: 0.65rem; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 12px; }
-        .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; }
+        .sidebar { width: 250px; background: var(--dark); color: white; padding: 20px; display: flex; flex-direction: column; }
+        .nav-btn { padding: 12px; border-radius: 10px; color: #94a3b8; font-weight: 700; font-size: 0.6rem; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
         .nav-btn.active { background: var(--eudes-blue); color: white; }
 
         /* MAIN */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+        .header { background: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
         .content { padding: 20px; overflow-y: auto; height: 100%; }
         
         .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
-        .grid-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-box { background: white; padding: 20px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--eudes-blue); }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
-        th { background: #f8fafc; padding: 12px; text-align: left; color: #64748b; }
-        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-weight: 700; }
+        .grid-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .stat-box { background: white; padding: 15px; border-radius: 12px; text-align: center; border-bottom: 3px solid var(--eudes-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         
         input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 5px; font-weight: 700; font-size: 0.7rem; }
-        .btn-action { background: var(--eudes-blue); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 0.7rem; }
+        .btn-action { background: var(--eudes-blue); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 0.7rem; width: 100%; margin-top: 15px; }
         .hidden { display: none !important; }
-        .role-tag { padding: 4px 10px; border-radius: 20px; font-size: 0.6rem; background: var(--ug-yellow); color: black; font-weight: 800; margin-top: 5px; display: inline-block;}
     </style>
 </head>
 <body>
@@ -48,8 +42,8 @@
     <div id="auth-overlay">
         <div class="login-card">
             <div class="ug-flag"></div>
-            <h2 style="color:var(--eudes-blue)">EUDES MEDIA</h2>
-            <p style="font-size: 0.55rem; color: #64748b; margin-bottom: 20px;">COMPLETE DIGITAL PARTNER</p>
+            <h2 style="color:var(--eudes-blue); font-weight: 900;">EUDES MEDIA</h2>
+            <p style="font-size: 0.5rem; letter-spacing: 2px; color: #64748b; margin-bottom: 20px;">YOUR COMPLETE DIGITAL PARTNER</p>
             
             <input type="text" id="login-sch-id" placeholder="SCHOOL ID (E.G. PM001)">
             <select id="login-role">
@@ -58,62 +52,53 @@
                 <option value="finance">💰 FINANCE</option>
             </select>
             <input type="password" id="login-pass" placeholder="ACCESS KEY">
-            <button class="btn-action" style="width:100%; margin-top:20px;" onclick="handleLogin()">SECURE LOGIN</button>
-            <div id="login-err" style="margin-top:15px; font-size: 0.65rem; color: var(--danger); font-weight: 800;"></div>
+            <button class="btn-action" onclick="handleLogin()">PORTAL LOGIN</button>
+            <div id="login-err" style="margin-top:15px; font-size: 0.6rem; color: var(--danger); font-weight: 800;"></div>
         </div>
     </div>
 
     <div class="sidebar">
         <div style="text-align: center; margin-bottom: 30px;">
             <h3 id="display-school-name" style="font-size: 0.7rem; color: white;">...</h3>
-            <span id="display-role" class="role-tag">ROLE</span>
+            <span id="display-role" style="font-size: 0.5rem; background: var(--ug-yellow); color: black; padding: 2px 8px; border-radius: 10px; font-weight: 800;">ROLE</span>
         </div>
-        <div class="nav-btn active" onclick="showPage('dash')"><i class="fas fa-chart-line"></i> DASHBOARD</div>
-        <div class="nav-btn" id="nav-reg" onclick="showPage('reg'); updateClassList();"><i class="fas fa-user-plus"></i> ADMISSIONS</div>
+        <div class="nav-btn active" onclick="showPage('dash')"><i class="fas fa-th-large"></i> DASHBOARD</div>
         <div class="nav-btn" onclick="loadStudents(); showPage('registry')"><i class="fas fa-users"></i> STUDENTS</div>
-        <div class="nav-btn" id="nav-finance" onclick="showPage('fees')"><i class="fas fa-money-bill-wave"></i> FINANCE</div>
-        <div style="margin-top: auto; font-size: 0.5rem; color: #475569; border-top: 1px solid #1e293b; padding-top: 10px;">
-            EUDES MEDIA UGANDA<br>SUPPORT: +256 762 992440
-        </div>
+        <div class="nav-btn" id="nav-reg" onclick="showPage('reg')"><i class="fas fa-plus-circle"></i> ADMISSIONS</div>
+        <div style="margin-top: auto; font-size: 0.5rem; color: #475569;">SUPPORT: +256 762 992440</div>
     </div>
 
     <div class="main">
         <div class="header">
-            <h2 id="header-title" style="font-size: 0.75rem;">DASHBOARD</h2>
+            <h2 id="header-title" style="font-size: 0.7rem;">DASHBOARD</h2>
             <div id="live-clock" style="font-weight: 800; color: var(--eudes-blue); font-size: 0.8rem;">00:00:00</div>
         </div>
 
         <div class="content">
             <div id="page-dash" class="sub-page">
                 <div class="grid-stats">
-                    <div class="stat-box"><p style="font-size:0.5rem;">TOTAL STUDENTS</p><h1 id="stat-total">0</h1></div>
-                    <div class="stat-box"><p style="font-size:0.5rem;">FEES PAID (UGX)</p><h1 id="stat-paid" style="color:var(--success)">0</h1></div>
-                    <div class="stat-box"><p style="font-size:0.5rem;">ATTENDANCE</p><h1>100%</h1></div>
-                    <div class="stat-box"><p style="font-size:0.5rem;">OUTSTANDING</p><h1 style="color:var(--danger)">0</h1></div>
-                </div>
-                <div class="card">
-                    <h3 style="font-size: 0.7rem; margin-bottom: 10px;">UGANDA PUBLIC HOLIDAYS 2026</h3>
-                    <p style="font-size: 0.65rem; color: #64748b; line-height: 1.6;">
-                        MAY 1ST: LABOUR DAY | JUNE 3RD: MARTYRS DAY | JUNE 9TH: HEROES DAY
-                    </p>
+                    <div class="stat-box"><p style="font-size:0.5rem;">TOTAL</p><h1 id="stat-total">0</h1></div>
+                    <div class="stat-box"><p style="font-size:0.5rem;">PAID (UGX)</p><h1 id="stat-paid" style="color:var(--success)">0</h1></div>
+                    <div class="stat-box"><p style="font-size:0.5rem;">PRESENT</p><h1>100%</h1></div>
+                    <div class="stat-box"><p style="font-size:0.5rem;">DEBT</p><h1 style="color:var(--danger)">0</h1></div>
                 </div>
             </div>
 
             <div id="page-registry" class="sub-page hidden">
                 <div class="card">
-                    <table>
-                        <thead><tr><th>LIN</th><th>NAME</th><th>CLASS</th><th>PAID</th></tr></thead>
+                    <table style="width:100%; border-collapse:collapse; font-size:0.65rem;">
+                        <thead><tr style="text-align:left; color:#64748b;"><th>LIN</th><th>NAME</th><th>CLASS</th></tr></thead>
                         <tbody id="registry-body"></tbody>
                     </table>
                 </div>
             </div>
 
             <div id="page-reg" class="sub-page hidden">
-                <div class="card" style="max-width: 500px; margin: auto;">
-                    <h3>ADMIT NEW STUDENT</h3>
+                <div class="card" style="max-width: 400px; margin: auto;">
+                    <h3>NEW ADMISSION</h3>
                     <input type="text" id="reg-name" placeholder="FULL NAME">
-                    <select id="reg-class"></select>
-                    <button class="btn-action" style="width:100%; margin-top:20px;" onclick="registerStudent()">ADMIT</button>
+                    <select id="reg-class"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+                    <button class="btn-action" onclick="registerStudent()">SAVE STUDENT</button>
                 </div>
             </div>
         </div>
@@ -128,30 +113,31 @@
         let userRole = "";
 
         async function handleLogin() {
-            const schIdInput = document.getElementById('login-sch-id').value.toUpperCase().trim();
+            const schIdRaw = document.getElementById('login-sch-id').value.trim();
+            const schIdUpper = schIdRaw.toUpperCase();
             const pass = document.getElementById('login-pass').value.trim();
             const role = document.getElementById('login-role').value;
             const errDiv = document.getElementById('login-err');
 
-            errDiv.innerText = "AUTHENTICATING...";
+            errDiv.innerText = "🔍 CONNECTING...";
 
-            // Query using 'ilike' to catch any casing or space issues
-            let { data: school, error } = await sb.from('Schools')
+            // Use 'ilike' to find the ID regardless of spaces or case in Supabase
+            let { data: schools, error } = await sb.from('Schools')
                 .select('*')
-                .ilike('sch_id', schIdInput)
-                .maybeSingle();
+                .ilike('sch_id', `%${schIdUpper}%`);
 
             if (error) {
                 alert("DATABASE ERROR: " + error.message);
                 return;
             }
 
-            if (!school) {
-                alert("SCHOOL ID '" + schIdInput + "' NOT FOUND IN SUPABASE.");
-                errDiv.innerText = "ID NOT FOUND";
+            if (!schools || schools.length === 0) {
+                alert("COULD NOT FIND '" + schIdUpper + "' IN TABLE 'Schools'. Check your Supabase Row!");
+                errDiv.innerText = "SCHOOL ID NOT FOUND";
                 return;
             }
 
+            const school = schools[0];
             const today = new Date();
             const expiry = new Date(school.Expiry_date);
 
@@ -180,12 +166,7 @@
         async function loadStudents() {
             const { data } = await sb.from('students').select('*').eq('school_id', userSchool);
             const body = document.getElementById('registry-body');
-            body.innerHTML = "";
-            if(data) {
-                data.forEach(s => {
-                    body.innerHTML += `<tr><td>${s.lin || 'N/A'}</td><td>${s.name}</td><td>${s.class}</td><td>${s.fees_paid || 0}</td></tr>`;
-                });
-            }
+            body.innerHTML = data ? data.map(s => `<tr><td>${s.lin || 'N/A'}</td><td>${s.name}</td><td>${s.class}</td></tr>`).join('') : "";
         }
 
         async function loadStats() {
@@ -200,14 +181,7 @@
         function showPage(p) {
             document.querySelectorAll('.sub-page').forEach(el => el.classList.add('hidden'));
             document.getElementById('page-' + p).classList.remove('hidden');
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('header-title').innerText = p.toUpperCase();
-        }
-
-        function updateClassList() {
-            const select = document.getElementById('reg-class');
-            const classes = ['BABY', 'MIDDLE', 'TOP', 'P.1', 'P.2', 'P.3', 'P.4', 'P.5', 'P.6', 'P.7'];
-            select.innerHTML = classes.map(c => `<option>${c}</option>`).join('');
         }
 
         setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString(); }, 1000);
