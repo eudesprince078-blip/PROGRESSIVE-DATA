@@ -11,106 +11,107 @@
     <style>
         :root { --main: #0047AB; --bg: #f8fafc; --dark: #0f172a; --accent: #F5B81B; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
-        body { background: var(--bg); color: var(--dark); height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        body { background: var(--bg); height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
 
-        .login-card { background: white; padding: 45px; border-radius: 40px; width: 90%; max-width: 420px; text-align: center; border-bottom: 8px solid var(--accent); box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
-        .logo-box { background: var(--main); width: 70px; height: 70px; border-radius: 22px; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; }
+        .card { background: white; padding: 40px; border-radius: 35px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border-bottom: 8px solid var(--accent); }
+        input { width: 100%; padding: 18px; border-radius: 15px; border: 2px solid #f1f5f9; background: #f8fafc; font-weight: 700; margin-bottom: 15px; text-align: center; outline: none; }
+        input:focus { border-color: var(--main); }
         
-        input { width: 100%; padding: 18px; border-radius: 18px; border: 2px solid #f1f5f9; background: #f8fafc; font-weight: 700; outline: none; margin-bottom: 20px; text-align: center; transition: 0.3s; }
-        input:focus { border-color: var(--main); background: white; }
+        .btn { background: var(--main); color: white; padding: 18px; border-radius: 15px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 1rem; }
+        .btn:disabled { background: #cbd5e1; }
         
-        .btn-blue { background: var(--main); color: white; padding: 20px; border-radius: 20px; border: none; font-weight: 800; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.3s; }
-        .btn-blue:active { transform: scale(0.98); }
-        
-        .err-text { color: #ef4444; font-size: 0.75rem; margin-top: 20px; font-weight: 900; min-height: 1.2em; }
+        #msg { margin-top: 20px; font-size: 0.7rem; font-weight: 900; color: #ef4444; line-height: 1.4; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen">
-        <div class="login-card">
-            <div class="logo-box">
-                <i class="fas fa-fingerprint" style="color:white; font-size:2rem;"></i>
-            </div>
-            <h1 style="font-weight: 900; font-size: 1.8rem; letter-spacing: -1px;">ESMS ELITE</h1>
-            <p style="font-size: 0.6rem; color: #64748b; font-weight: 800; margin-bottom: 35px;">EUDES MEDIA | COMPLETE DIGITAL PARTNER</p>
-            
-            <input type="text" id="sid" placeholder="SCHOOL ID" autocomplete="off">
-            <input type="password" id="spin" placeholder="SECURITY PIN">
-            
-            <button onclick="login()" id="login-btn" class="btn-blue">UNLOCK SYSTEM</button>
-            <div id="err" class="err-text"></div>
+    <div class="card" id="login-box">
+        <div style="background: var(--main); width: 60px; height: 60px; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white;">
+            <i class="fas fa-shield-alt font-size: 1.5rem;"></i>
         </div>
+        <h1 style="font-size: 1.5rem; font-weight: 900;">ESMS ELITE</h1>
+        <p style="font-size: 0.6rem; color: #64748b; margin-bottom: 30px;">EUDES MEDIA | DIGITAL PARTNER</p>
+
+        <input type="text" id="schId" placeholder="SCHOOL ID">
+        <input type="password" id="pin" placeholder="PIN">
+        
+        <button onclick="login()" id="btn" class="btn">UNLOCK SYSTEM</button>
+        <div id="msg"></div>
     </div>
 
-    <div id="success-screen" class="hidden" style="text-align: center; padding: 20px;">
-        <i class="fas fa-check-circle" style="color: #16a34a; font-size: 4rem; margin-bottom: 20px;"></i>
-        <h1 id="welcome-name">SYSTEM UNLOCKED</h1>
-        <p>Redirecting to Dashboard...</p>
+    <div id="dash" class="hidden" style="text-align:center;">
+        <h1 style="color: #16a34a;">✅ ACCESS GRANTED</h1>
+        <p id="welcome"></p>
+        <button onclick="location.reload()" class="btn" style="margin-top:20px; width: auto; padding: 10px 30px;">LOGOUT</button>
     </div>
 
     <script>
-        // Double-check these credentials in your Supabase Settings -> API
-        const S_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-        const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
+        // Credentials check
+        const URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+        const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         
-        const sb = supabase.createClient(S_URL, S_KEY);
+        const supabaseClient = supabase.createClient(URL, KEY);
 
         async function login() {
-            const btn = document.getElementById('login-btn');
-            const errDiv = document.getElementById('err');
-            const id = document.getElementById('sid').value.toUpperCase().trim();
-            const pin = document.getElementById('spin').value.trim();
+            const btn = document.getElementById('btn');
+            const msg = document.getElementById('msg');
+            const id = document.getElementById('schId').value.toUpperCase().trim();
+            const pass = document.getElementById('pin').value.trim();
 
-            if (!id || !pin) {
-                errDiv.innerText = "PLEASE FILL ALL FIELDS";
-                return;
-            }
+            if(!id || !pass) { msg.innerText = "FILL ALL FIELDS"; return; }
 
-            btn.innerText = "VERIFYING...";
             btn.disabled = true;
-            errDiv.innerText = "";
+            btn.innerText = "CONNECTING...";
+            msg.style.color = "#64748b";
+            msg.innerText = "REACHING DATABASE...";
 
             try {
-                const { data: sch, error } = await sb
+                // Fetching the school record
+                const { data, error } = await supabaseClient
                     .from('Schools')
                     .select('*')
                     .eq('sch_id', id)
-                    .single();
+                    .maybeSingle();
 
-                if (error) throw error;
-
-                if (!sch) {
-                    errDiv.innerText = "INVALID SCHOOL ID";
-                } else {
-                    // DATE LOGIC (Using UTC to avoid local timezone shifts)
-                    const now = new Date();
-                    const todayNum = (now.getFullYear() * 10000) + ((now.getMonth() + 1) * 100) + now.getDate();
-                    
-                    const parts = sch.expiry_date.split('-'); 
-                    const expNum = (parseInt(parts[0]) * 10000) + (parseInt(parts[1]) * 100) + parseInt(parts[2]);
-
-                    if (todayNum > expNum) {
-                        errDiv.innerText = "SYSTEM EXPIRED. CONTACT EUDES MEDIA.";
-                    } else if (!sch.is_active) {
-                        errDiv.innerText = "ACCOUNT IS CURRENTLY INACTIVE";
-                    } else if (pin === sch.admin_key || pin === sch.teacher_key || pin === "eudes2026") {
-                        // SUCCESS
-                        document.getElementById('auth-screen').classList.add('hidden');
-                        document.getElementById('success-screen').classList.remove('hidden');
-                        document.getElementById('welcome-name').innerText = "WELCOME, " + sch.school_name;
-                        // You can add your dashboard redirect here
-                    } else {
-                        errDiv.innerText = "INCORRECT SECURITY PIN";
-                    }
+                if (error) {
+                    msg.style.color = "red";
+                    msg.innerText = "SUPABASE ERROR: " + error.message;
+                    console.error(error);
+                    return;
                 }
-            } catch (e) {
-                console.error(e);
-                errDiv.innerText = "CONNECTION ERROR: " + (e.message || "CHECK NETWORK");
+
+                if (!data) {
+                    msg.style.color = "red";
+                    msg.innerText = "SCHOOL ID NOT FOUND";
+                    return;
+                }
+
+                // DATE LOGIC
+                const today = new Date();
+                const todayNum = (today.getFullYear() * 10000) + ((today.getMonth() + 1) * 100) + today.getDate();
+                
+                const expArr = data.expiry_date.split('-');
+                const expNum = (parseInt(expArr[0]) * 10000) + (parseInt(expArr[1]) * 100) + parseInt(expArr[2]);
+
+                if (todayNum > expNum) {
+                    msg.style.color = "red";
+                    msg.innerText = "SYSTEM EXPIRED. CONTACT EUDES MEDIA.";
+                } else if (pass === data.admin_key || pass === "eudes2026") {
+                    document.getElementById('login-box').classList.add('hidden');
+                    document.getElementById('dash').classList.remove('hidden');
+                    document.getElementById('welcome').innerText = "WELCOME TO " + data.school_name;
+                } else {
+                    msg.style.color = "red";
+                    msg.innerText = "WRONG SECURITY PIN";
+                }
+
+            } catch (err) {
+                msg.style.color = "red";
+                msg.innerText = "NETWORK CRITICAL: CHECK INTERNET";
             } finally {
-                btn.innerText = "UNLOCK SYSTEM";
                 btn.disabled = false;
+                btn.innerText = "UNLOCK SYSTEM";
             }
         }
     </script>
