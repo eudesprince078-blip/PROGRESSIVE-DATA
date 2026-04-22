@@ -3,123 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESMS ULTIMATE | EUDES MEDIA</title>
+    <title>ESMS PRO | EUDES MEDIA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --eudes-blue: #0047AB; --dark: #0f172a; --success: #10b981; --danger: #ef4444; --ug-yellow: #F5B81B; --white: #ffffff; --gray: #f1f5f9; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; }
-        body { background: var(--gray); color: #1e293b; height: 100vh; width: 100vw; display: flex; overflow: hidden; position: fixed; }
+        :root { --primary: #0047AB; --accent: #F5B81B; --bg: #f8fafc; --sidebar: #0f172a; --text: #334155; --success: #10b981; --danger: #ef4444; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; text-transform: uppercase; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
 
-        /* SIDEBAR PRO */
-        .sidebar { width: 75px; background: var(--dark); color: white; display: flex; flex-direction: column; align-items: center; padding: 25px 0; z-index: 100; flex-shrink: 0; border-right: 2px solid var(--eudes-blue); }
-        @media (min-width: 768px) { .sidebar { width: 280px; align-items: flex-start; padding: 30px; } }
-        .nav-btn { width: 55px; height: 55px; border-radius: 14px; color: #94a3b8; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 12px; border: none; background: none; transition: 0.3s; }
-        .nav-btn span { display: none; font-weight: 800; font-size: 0.75rem; margin-left: 15px; }
-        @media (min-width: 768px) { .nav-btn { width: 100%; justify-content: flex-start; padding: 0 18px; } .nav-btn span { display: inline; } }
-        .nav-btn.active { background: var(--eudes-blue); color: white; box-shadow: 0 8px 20px rgba(0, 71, 171, 0.3); }
-
-        /* MAIN CONTENT */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .header { background: white; padding: 15px 25px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-        .content { padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
-
-        /* CARDS */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border-left: 6px solid var(--eudes-blue); }
+        /* PROFESSIONAL SIDEBAR */
+        .sidebar { width: 80px; background: var(--sidebar); display: flex; flex-direction: column; align-items: center; padding: 20px 0; transition: 0.3s; border-right: 3px solid var(--primary); }
+        @media (min-width: 992px) { .sidebar { width: 260px; align-items: flex-start; padding: 30px 20px; } }
         
-        /* FORM STYLING */
-        .form-box { background: white; padding: 25px; border-radius: 20px; border: 1px solid #e2e8f0; max-width: 500px; margin: auto; }
-        .input-group { margin-bottom: 18px; }
-        label { display: block; font-size: 0.65rem; font-weight: 900; color: var(--eudes-blue); margin-bottom: 6px; }
-        input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-weight: 700; font-size: 0.85rem; outline: none; }
+        .nav-item { width: 100%; display: flex; align-items: center; padding: 15px; margin-bottom: 8px; border-radius: 12px; color: #94a3b8; cursor: pointer; text-decoration: none; border: none; background: none; transition: 0.2s; }
+        .nav-item i { font-size: 1.2rem; min-width: 40px; text-align: center; }
+        .nav-item span { display: none; font-weight: 700; font-size: 0.75rem; letter-spacing: 1px; }
+        @media (min-width: 992px) { .nav-item span { display: block; } }
+        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; box-shadow: 0 10px 15px -3px rgba(0, 71, 171, 0.4); }
 
-        /* LISTS */
-        .item-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #eef2f6; }
-        .student-photo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #eee; margin-right: 15px; border: 2px solid var(--eudes-blue); }
+        /* MAIN CONTENT AREA */
+        .main { flex: 1; display: flex; flex-direction: column; }
+        .top-bar { height: 70px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; }
+        .view-port { flex: 1; padding: 30px; overflow-y: auto; }
 
+        /* PRO CARDS & TABLES */
+        .glass-card { background: white; padding: 25px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .data-table th { text-align: left; padding: 12px; font-size: 0.65rem; color: #64748b; border-bottom: 2px solid var(--bg); }
+        .data-table td { padding: 15px 12px; font-size: 0.75rem; font-weight: 700; border-bottom: 1px solid var(--bg); }
+        
+        /* STUDENT ROW */
+        .student-avatar { width: 40px; height: 40px; border-radius: 10px; background: #e2e8f0; object-fit: cover; border: 2px solid var(--primary); }
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 800; }
+        
+        /* ACTION BUTTONS */
+        .btn-circle { width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; margin-right: 5px; color: white; transition: 0.2s; }
+        .btn-edit { background: var(--primary); }
+        .btn-del { background: var(--danger); }
+        
         .hidden { display: none !important; }
-        .btn-full { background: var(--eudes-blue); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; }
-        .badge { padding: 4px 10px; border-radius: 8px; font-size: 0.6rem; font-weight: 900; }
-        
-        /* AUTH OVERLAY */
-        #auth-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: white; padding: 40px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; border-bottom: 5px solid var(--eudes-blue); }
+        .input-pro { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #f1f5f9; background: #f8fafc; font-weight: 700; outline: none; margin-bottom: 15px; }
+        .input-pro:focus { border-color: var(--primary); background: white; }
     </style>
 </head>
 <body>
 
-    <div id="auth-overlay">
-        <div class="login-card">
-            <h2 style="color:var(--eudes-blue); font-weight: 900; font-size: 1.6rem;">ESMS ULTIMATE</h2>
-            <p style="font-size: 0.6rem; font-weight: 800; color: #64748b; margin-bottom: 30px;">EUDES MEDIA | YOUR COMPLETE DIGITAL PARTNER</p>
-            <input type="text" id="login-id" placeholder="SCHOOL ID" class="input-group">
-            <input type="password" id="login-pass" placeholder="SECURITY PIN" class="input-group">
-            <button onclick="handleLogin()" class="btn-full">AUTHENTICATE SYSTEM</button>
-            <p id="err-msg" style="color:var(--danger); font-size: 0.65rem; margin-top: 15px; font-weight: 900;"></p>
+    <aside class="sidebar">
+        <div style="margin-bottom: 40px; text-align: center;">
+            <i class="fas fa-shield-halved" style="color: var(--primary); font-size: 2rem;"></i>
         </div>
-    </div>
-
-    <div class="sidebar hidden" id="sidebar">
-        <button class="nav-btn active" onclick="showPage('dash', this)"><i class="fas fa-home"></i><span>DASHBOARD</span></button>
-        <button class="nav-btn admin-only" onclick="showPage('reg', this)"><i class="fas fa-user-plus"></i><span>ADMISSIONS</span></button>
-        <button class="nav-btn finance-hide" onclick="showPage('fees', this)"><i class="fas fa-wallet"></i><span>FEES OFFICE</span></button>
-        <button class="nav-btn" onclick="showPage('marks', this)"><i class="fas fa-file-invoice"></i><span>ACADEMICS</span></button>
-        <button class="nav-btn" onclick="showPage('attend', this)"><i class="fas fa-check-square"></i><span>ATTENDANCE</span></button>
-        <div style="margin-top: auto; font-size: 0.5rem; text-align: center; color: #94a3b8; font-weight: 900;">SUPPORT: +256 762 992440</div>
-    </div>
-
-    <div class="main hidden" id="main">
-        <div class="header">
-            <h3 id="school-title" style="font-size: 0.75rem; font-weight: 900;">...</h3>
-            <div id="role-tag" class="badge" style="background:var(--ug-yellow);">...</div>
+        <button class="nav-item active" onclick="showView('dash', this)"><i class="fas fa-grid-2"></i><span>DASHBOARD</span></button>
+        <button class="nav-item" onclick="showView('students', this)"><i class="fas fa-user-graduate"></i><span>STUDENT REGISTRY</span></button>
+        <button class="nav-item" onclick="showView('finance', this)"><i class="fas fa-file-invoice-dollar"></i><span>FINANCIAL LEDGER</span></button>
+        <button class="nav-item" onclick="showView('marks', this)"><i class="fas fa-chart-line"></i><span>ACADEMIC RECORDS</span></button>
+        <div style="margin-top: auto; padding: 20px; font-size: 0.5rem; font-weight: 900; color: #64748b;">
+            EUDES MEDIA LTD<br>+256 762 992440
         </div>
+    </aside>
 
-        <div class="content">
-            <div id="page-dash">
-                <div style="text-align: center; margin-bottom: 25px;">
-                    <h1 id="clock" style="font-size: 3rem; font-weight: 900; letter-spacing: -2px;">00:00</h1>
-                    <p id="date-label" style="font-weight: 800; color: var(--eudes-blue); font-size: 0.7rem;"></p>
-                </div>
-                <div class="grid">
-                    <div class="card"><h3>LEARNERS</h3><h2 id="dash-students">0</h2></div>
-                    <div class="card"><h3>CASH COLLECTED</h3><h2 id="dash-cash">0</h2></div>
-                    <div class="card" style="border-left-color: var(--danger);"><h3>RENEWAL</h3><h2 id="dash-expiry" style="font-size: 0.7rem;">...</h2></div>
-                </div>
+    <main class="main">
+        <header class="top-bar">
+            <div><h2 id="sch-name" style="font-size: 0.9rem; font-weight: 800;">PROGRESSIVE MOTHER'S SCHOOL</h2></div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <select id="term-filter" class="badge" style="border: 1px solid #ddd;">
+                    <option>TERM 1</option><option>TERM 2</option><option>TERM 3</option>
+                </select>
+                <select id="year-filter" class="badge" style="border: 1px solid #ddd;">
+                    <option>2026</option><option>2027</option>
+                </select>
+                <div class="badge" style="background: var(--primary); color: white;">ADMIN</div>
             </div>
+        </header>
 
-            <div id="page-reg" class="hidden">
-                <div class="form-box">
-                    <h2 style="margin-bottom: 20px;">STUDENT ADMISSION</h2>
-                    <div class="input-group"><label>STUDENT FULL NAME</label><input type="text" id="r-name"></div>
-                    <div class="input-group"><label>CLASS</label>
-                        <select id="r-class">
-                            <option>BABY CLASS</option><option>TOP CLASS</option><option>P.1</option><option>P.7</option><option>S.1</option><option>S.6</option>
-                        </select>
+        <section class="view-port">
+            
+            <div id="view-dash">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+                    <div class="glass-card">
+                        <p style="font-size: 0.6rem; font-weight: 800; color: #64748b;">TOTAL ENROLLMENT</p>
+                        <h1 id="count-all" style="font-size: 2.5rem; font-weight: 800;">0</h1>
                     </div>
-                    <div class="input-group"><label>PHYSICAL LOCATION (RESIDENCE)</label><input type="text" id="r-loc"></div>
-                    <div class="input-group"><label>HEALTH STATUS</label><input type="text" id="r-health" value="NORMAL"></div>
-                    <div class="input-group"><label>CONTACT NUMBER</label><input type="text" id="r-contact" value="+256"></div>
-                    <div class="input-group"><label>TERMLY FEES (UGX)</label><input type="number" id="r-fees" value="500000"></div>
-                    <button onclick="saveLearner()" class="btn-full">SAVE & GENERATE LIN</button>
+                    <div class="glass-card" style="border-left: 5px solid var(--success);">
+                        <p style="font-size: 0.6rem; font-weight: 800; color: #64748b;">FEES CLEARED</p>
+                        <h1 id="count-cleared" style="font-size: 2.5rem; font-weight: 800;">0</h1>
+                    </div>
+                    <div class="glass-card" style="border-left: 5px solid var(--danger);">
+                        <p style="font-size: 0.6rem; font-weight: 800; color: #64748b;">FEES DEFICIT</p>
+                        <h1 id="count-deficit" style="font-size: 1.5rem; font-weight: 800; color: var(--danger);">0 UGX</h1>
+                    </div>
                 </div>
             </div>
 
-            <div id="page-fees" class="hidden">
-                <h2 style="margin-bottom: 20px;">FEE BALANCES & PAYMENTS</h2>
-                <div id="fees-list"></div>
+            <div id="view-students" class="hidden">
+                <div class="glass-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3>STUDENT DIRECTORY</h3>
+                        <button onclick="toggleModal('reg-modal')" class="badge" style="background: var(--primary); color: white; cursor: pointer; border: none; padding: 10px 20px;">+ ADMIT NEW</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>PHOTO</th><th>LIN / ID</th><th>NAME</th><th>CLASS</th><th>STATUS</th><th>ACTIONS</th></tr>
+                        </thead>
+                        <tbody id="student-tbody"></tbody>
+                    </table>
+                </div>
             </div>
 
-            <div id="page-marks" class="hidden">
-                <h2 style="margin-bottom: 20px;">ACADEMIC PERFORMANCE</h2>
-                <div id="marks-list"></div>
+            <div id="view-finance" class="hidden">
+                <div class="glass-card">
+                    <h3>COLLECTION HISTORY</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>DATE</th><th>STUDENT</th><th>TERM</th><th>AMOUNT PAID</th><th>METHOD</th></tr>
+                        </thead>
+                        <tbody id="finance-tbody"></tbody>
+                    </table>
+                </div>
             </div>
 
-            <div id="page-attend" class="hidden">
-                <h2 style="margin-bottom: 20px;">DAILY ATTENDANCE</h2>
-                <div id="attend-list"></div>
+        </section>
+    </main>
+
+    <div id="reg-modal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div class="glass-card" style="width: 100%; max-width: 500px;">
+            <h2 style="margin-bottom: 20px;">NEW ADMISSION</h2>
+            <label style="font-size: 0.6rem; font-weight: 900;">FULL NAME</label>
+            <input type="text" id="adm-name" class="input-pro">
+            
+            <label style="font-size: 0.6rem; font-weight: 900;">STUDENT PHOTO (URL)</label>
+            <input type="text" id="adm-photo" class="input-pro" placeholder="Paste link or use Storage">
+            
+            <label style="font-size: 0.6rem; font-weight: 900;">CLASS</label>
+            <select id="adm-class" class="input-pro">
+                <option>P.1</option><option>P.7</option><option>S.1</option><option>S.4</option>
+            </select>
+            
+            <label style="font-size: 0.6rem; font-weight: 900;">INITIAL FEES PAID (UGX)</label>
+            <input type="number" id="adm-paid" class="input-pro" value="0">
+            
+            <div style="display: flex; gap: 10px;">
+                <button onclick="submitAdmission()" style="flex: 1; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: 800;">FINALIZE</button>
+                <button onclick="toggleModal('reg-modal')" style="flex: 1; background: #e2e8f0; border: none; padding: 15px; border-radius: 10px; font-weight: 800;">CANCEL</button>
             </div>
         </div>
     </div>
@@ -129,112 +155,71 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentSch = "";
-        let currentRole = "";
-        let prefix = "";
+        let schID = "PM001";
 
-        // AUTH & STRING-BASED EXPIRY LOGIC (FIXED)
-        async function handleLogin() {
-            const id = document.getElementById('login-id').value.toUpperCase().trim();
-            const pin = document.getElementById('login-pass').value.trim();
-            const { data: sch } = await sb.from('Schools').select('*').eq('sch_id', id).single();
+        async function fetchAll() {
+            const { data: students } = await sb.from('Students').select('*').eq('sch_id', schID);
+            
+            // Update Stats
+            document.getElementById('count-all').innerText = students.length;
+            let cleared = students.filter(s => s.fees_paid >= s.total_fees_required).length;
+            document.getElementById('count-cleared').innerText = cleared;
 
-            if (sch) {
-                // STRING COMPARISON TO PREVENT TIMEZONE BUGS
-                const now = new Date();
-                const today = now.getFullYear() + '-' + 
-                              String(now.getMonth() + 1).padStart(2, '0') + '-' + 
-                              String(now.getDate()).padStart(2, '0');
-                
-                // Compare today string (e.g. "2026-04-22") against expiry string (e.g. "2027-01-01")
-                if (today > sch.expiry_date) {
-                    document.getElementById('err-msg').innerHTML = "SYSTEM EXPIRED.<br>CONTACT EUDES MEDIA: +256762992440";
-                    return;
-                }
-                
-                if (sch.is_active === false) {
-                    document.getElementById('err-msg').innerHTML = "ACCOUNT DEACTIVATED.<br>CONTACT EUDES MEDIA: +256762992440";
-                    return;
-                }
-
-                if (pin === sch.admin_key || pin === "eudes2026") currentRole = "ADMIN";
-                else if (pin === sch.teacher_key) currentRole = "TEACHER";
-                else if (pin === sch.finance_key) currentRole = "FINANCE";
-                else { document.getElementById('err-msg').innerText = "WRONG PIN"; return; }
-
-                currentSch = id; prefix = id.substring(0, 2);
-                initApp(sch);
-            } else { document.getElementById('err-msg').innerText = "SCHOOL NOT FOUND"; }
-        }
-
-        function initApp(sch) {
-            document.getElementById('auth-overlay').classList.add('hidden');
-            document.getElementById('sidebar').classList.remove('hidden');
-            document.getElementById('main').classList.remove('hidden');
-            document.getElementById('school-title').innerText = sch.school_name;
-            document.getElementById('role-tag').innerText = currentRole;
-            document.getElementById('dash-expiry').innerText = sch.expiry_date;
-
-            if (currentRole === "TEACHER") document.querySelectorAll('.finance-hide').forEach(e => e.remove());
-            if (currentRole !== "ADMIN") document.querySelectorAll('.admin-only').forEach(e => e.remove());
-            loadDash();
-        }
-
-        async function saveLearner() {
-            const name = document.getElementById('r-name').value;
-            const lin = `${prefix}-${name.charAt(0).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
-            const { error } = await sb.from('Students').insert([{
-                sch_id: currentSch, name, lin,
-                class: document.getElementById('r-class').value,
-                location: document.getElementById('r-loc').value,
-                health_status: document.getElementById('r-health').value,
-                contact_number: document.getElementById('r-contact').value,
-                total_fees_required: document.getElementById('r-fees').value
-            }]);
-            if (!error) { alert("ADMITTED: " + lin); loadDash(); showPage('dash', document.querySelector('.nav-btn')); }
-        }
-
-        async function loadDash() {
-            const { data } = await sb.from('Students').select('*').eq('sch_id', currentSch);
-            if (data) {
-                document.getElementById('dash-students').innerText = data.length;
-                let cash = data.reduce((s, row) => s + (Number(row.fees_paid) || 0), 0);
-                document.getElementById('dash-cash').innerText = cash.toLocaleString() + " UGX";
-            }
-        }
-
-        async function loadFees() {
-            const { data } = await sb.from('Students').select('*').eq('sch_id', currentSch);
-            const div = document.getElementById('fees-list');
-            div.innerHTML = data.map(s => `
-                <div class="item-card">
-                    <div><strong>${s.name}</strong><br><small>BAL: ${(s.total_fees_required - s.fees_paid).toLocaleString()}</small></div>
-                    <button class="btn-full" style="width:auto; padding:8px 12px; font-size:0.6rem;" onclick="pay('${s.id}', ${s.fees_paid})">PAY</button>
-                </div>
+            // Render Table
+            const tbody = document.getElementById('student-tbody');
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td><img src="${s.photo_url || 'https://via.placeholder.com/40'}" class="student-avatar"></td>
+                    <td><span class="badge" style="background: #f1f5f9; color: var(--primary);">${s.lin}</span></td>
+                    <td>${s.name}</td>
+                    <td>${s.class}</td>
+                    <td><span class="badge" style="background: ${s.fees_paid >= s.total_fees_required ? 'var(--success)' : 'var(--danger)'}; color: white;">
+                        ${s.fees_paid >= s.total_fees_required ? 'CLEARED' : 'DEBT'}
+                    </span></td>
+                    <td>
+                        <button class="btn-circle btn-edit" onclick="editStudent('${s.id}')"><i class="fas fa-pen"></i></button>
+                        <button class="btn-circle btn-del" onclick="deleteStudent('${s.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
             `).join('');
         }
 
-        async function pay(id, current) {
-            const amt = prompt("ENTER AMOUNT:");
-            if (amt) { await sb.from('Students').update({ fees_paid: Number(current) + Number(amt) }).eq('id', id); loadFees(); loadDash(); }
+        async function submitAdmission() {
+            const name = document.getElementById('adm-name').value;
+            const lin = `PM-${name.charAt(0).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const { error } = await sb.from('Students').insert([{
+                sch_id: schID, name, lin,
+                photo_url: document.getElementById('adm-photo').value,
+                class: document.getElementById('adm-class').value,
+                fees_paid: document.getElementById('adm-paid').value,
+                total_fees_required: 500000, // Example default
+                term: document.getElementById('term-filter').value,
+                year: document.getElementById('year-filter').value
+            }]);
+            if (!error) { toggleModal('reg-modal'); fetchAll(); }
         }
 
-        function showPage(p, btn) {
-            ['dash', 'reg', 'fees', 'marks', 'attend'].forEach(id => {
-                const el = document.getElementById('page-' + id);
+        async function deleteStudent(id) {
+            if(confirm("ARE YOU SURE YOU WANT TO REMOVE THIS LEARNER?")) {
+                await sb.from('Students').delete().eq('id', id);
+                fetchAll();
+            }
+        }
+
+        function showView(v, btn) {
+            ['dash', 'students', 'finance', 'marks'].forEach(id => {
+                const el = document.getElementById('view-' + id);
                 if (el) el.classList.add('hidden');
             });
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('page-' + p).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            document.getElementById('view-' + v).classList.remove('hidden');
             btn.classList.add('active');
-            if (p === 'fees') loadFees();
         }
 
-        setInterval(() => {
-            const n = new Date();
-            document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
-            document.getElementById('date-label').innerText = n.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
-        }, 1000);
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+
+        // Initial Load
+        fetchAll();
     </script>
 </body>
 </html>
