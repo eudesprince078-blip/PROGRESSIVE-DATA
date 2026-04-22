@@ -11,37 +11,38 @@
             --active-blue: #0056b3;
             --text-light: #ffffff;
         }
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; background: #f0f2f5; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; background: #f0f2f5; overflow: hidden; }
         
-        /* Sidebar Styling based on your screenshot */
+        /* Sidebar Styling */
         .sidebar {
             width: 260px; background: var(--sidebar-dark); color: var(--text-light);
-            display: flex; flex-direction: column; padding-top: 20px;
+            display: flex; flex-direction: column; height: 100vh;
         }
-        .brand-section { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .brand-section { padding: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .nav-menu { flex-grow: 1; padding-top: 20px; }
         .nav-item {
             padding: 15px 25px; cursor: pointer; display: flex; align-items: center;
-            transition: 0.3s; font-size: 14px;
+            transition: 0.3s; font-size: 14px; opacity: 0.8;
         }
-        .nav-item:hover { background: rgba(255,255,255,0.1); }
-        .nav-item.active { background: var(--active-blue); border-radius: 0 30px 30px 0; margin-right: 15px; }
+        .nav-item:hover { opacity: 1; background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: var(--active-blue); border-radius: 0 30px 30px 0; margin-right: 15px; opacity: 1; }
         
-        /* Main Content Area */
-        .content { flex-grow: 1; display: flex; flex-direction: column; }
-        .top-bar { height: 60px; background: #4a90e2; color: white; display: flex; align-items: center; padding: 0 20px; font-weight: bold; }
-        .data-container { padding: 25px; overflow-y: auto; }
+        /* Main Content */
+        .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .top-bar { height: 60px; background: #4a90e2; color: white; display: flex; align-items: center; padding: 0 20px; font-weight: bold; font-size: 14px; }
+        .data-container { padding: 25px; overflow-y: auto; flex-grow: 1; }
         
         /* Table Styling */
-        .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .data-table th { background: #f8f9fa; padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6; color: #333; }
-        .data-table td { padding: 12px 15px; border-bottom: 1px solid #eee; color: #555; }
+        .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .data-table th { background: #f8f9fa; padding: 15px; text-align: left; border-bottom: 2px solid #eee; color: #333; font-size: 13px; }
+        .data-table td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; color: #555; font-size: 13px; }
         
         .support-footer {
-            padding: 20px; background: rgba(255,255,255,0.05); margin: 15px;
+            padding: 20px; background: rgba(255,255,255,0.03); margin: 15px;
             border-radius: 12px; font-size: 11px;
         }
-        .support-number { color: #ffcc00; font-size: 14px; display: block; margin-top: 5px; }
+        .support-number { color: #ffcc00; font-size: 14px; display: block; margin-top: 5px; font-weight: bold; }
+        .error-msg { color: #ff4d4d; padding: 20px; background: #fff1f1; border-radius: 8px; border: 1px solid #ffcccc; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -53,7 +54,7 @@
         </div>
         
         <div class="nav-menu">
-            <div class="nav-item" onclick="switchTab('dashboard')">Dashboard</div>
+            <div class="nav-item" id="btn-dashboard" onclick="switchTab('dashboard')">Dashboard</div>
             <div class="nav-item active" id="btn-students" onclick="switchTab('students')">Admissions / Student List</div>
             <div class="nav-item" id="btn-finance" onclick="switchTab('finance')">Finance Vault</div>
         </div>
@@ -61,7 +62,7 @@
         <div class="support-footer">
             SUPPORT LINE
             <span class="support-number">+256 762 992440</span>
-            <div style="margin-top: 10px; opacity: 0.7;">Eudes Media &copy; 2026</div>
+            <div style="margin-top: 10px; opacity: 0.5;">Eudes Media &copy; 2026</div>
         </div>
     </div>
 
@@ -72,7 +73,13 @@
 
         <div class="data-container">
             <div id="student-view">
-                <h3 id="school-name-display">Loading School Data...</h3>
+                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 id="school-header" style="margin:0; color: #333;">Progressive Mother's School - Student Registry</h3>
+                    <button onclick="fetchStudents()" style="padding: 8px 15px; background: #4a90e2; color: white; border: none; border-radius: 4px; cursor: pointer;">Refresh List</button>
+                </div>
+                
+                <div id="error-display" style="display:none;"></div>
+
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -80,46 +87,53 @@
                             <th>Name</th>
                             <th>Age</th>
                             <th>DOB</th>
-                            <th>Location</th>
+                            <th>Physical Location</th>
                             <th>Health Status</th>
                             <th>Contact</th>
                         </tr>
                     </thead>
                     <tbody id="student-list-rows">
-                        </tbody>
+                        <tr><td colspan="7">Connecting to database...</td></tr>
+                    </tbody>
                 </table>
             </div>
 
             <div id="finance-view" style="display:none;">
-                <h3>Financial Records (UGX)</h3>
-                <div id="finance-content"></div>
+                <h3 style="color: #333;">Finance Vault (UGX)</h3>
+                <div id="finance-content">Loading financial data...</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Use your specific Supabase credentials
+        // Use your project credentials
         const sbUrl = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-        const sbKey = 'sbp_publishable_1PetUo8klWCLfupRq52CVg_Y_Y';
+        // Note: Replace the 'YOUR_ACTUAL_ANON_KEY' below with the actual long key from your Supabase Dashboard (Settings > API)
+        const sbKey = 'YOUR_ACTUAL_ANON_KEY'; 
         const _supabase = supabase.createClient(sbUrl, sbKey);
 
-        async function loadStudentData() {
+        async function fetchStudents() {
             const rowContainer = document.getElementById('student-list-rows');
+            const errorDisplay = document.getElementById('error-display');
+            
+            errorDisplay.style.display = 'none';
             rowContainer.innerHTML = '<tr><td colspan="7">Fetching records...</td></tr>';
 
-            // Querying your Supabase table
+            // Querying the students table
             const { data, error } = await _supabase
-                .from('students')
+                .from('students') 
                 .select('name, age, dob, physical_location, health_status, contact_number')
                 .order('created_at', { ascending: true });
 
             if (error) {
-                rowContainer.innerHTML = `<tr><td colspan="7" style="color:red;">Error: ${error.message}</td></tr>`;
+                errorDisplay.innerHTML = `<div class="error-msg"><b>Database Error:</b> ${error.message} <br><small>Check if your API key and Table name "students" are correct.</small></div>`;
+                errorDisplay.style.display = 'block';
+                rowContainer.innerHTML = '<tr><td colspan="7" style="color:red;">Error loading data.</td></tr>';
                 return;
             }
 
-            if (data.length === 0) {
-                rowContainer.innerHTML = '<tr><td colspan="7">No students found in the list.</td></tr>';
+            if (!data || data.length === 0) {
+                rowContainer.innerHTML = '<tr><td colspan="7">The student list is currently empty.</td></tr>';
                 return;
             }
 
@@ -127,40 +141,33 @@
             data.forEach((student, index) => {
                 const row = `
                     <tr>
-                        <td>${index + 1}</td>
-                        <td>${student.name || 'N/A'}</td>
-                        <td>${student.age || 'N/A'}</td>
-                        <td>${student.dob || 'N/A'}</td>
-                        <td>${student.physical_location || 'N/A'}</td>
-                        <td>${student.health_status || 'Healthy'}</td>
-                        <td>${student.contact_number || 'N/A'}</td>
+                        <td><b>${index + 1}</b></td>
+                        <td>${student.name || '-'}</td>
+                        <td>${student.age || '-'}</td>
+                        <td>${student.dob || '-'}</td>
+                        <td>${student.physical_location || '-'}</td>
+                        <td>${student.health_status || 'Good'}</td>
+                        <td>${student.contact_number || '-'}</td>
                     </tr>`;
                 rowContainer.innerHTML += row;
             });
-
-            // Updating the header dynamically for the school
-            document.getElementById('school-name-display').innerText = "Progressive Mother's Primary School - Student Registry";
         }
 
-        async function loadFinanceData() {
+        async function fetchFinance() {
             const container = document.getElementById('finance-content');
             const { data, error } = await _supabase.from('finance').select('*');
 
-            if (error || !data) {
-                container.innerHTML = "Unable to load financial vault.";
+            if (error) {
+                container.innerHTML = `<div class="error-msg">Finance Error: ${error.message}</div>`;
                 return;
             }
 
-            let tableHtml = '<table class="data-table"><tr><th>Account</th><th>Status</th><th>Amount</th></tr>';
+            let html = '<table class="data-table"><tr><th>Source</th><th>Amount</th></tr>';
             data.forEach(item => {
-                tableHtml += `<tr>
-                    <td>${item.account_name}</td>
-                    <td>${item.status}</td>
-                    <td><b>${item.amount.toLocaleString()} UGX</b></td>
-                </tr>`;
+                html += `<tr><td>${item.label}</td><td><b>${item.amount.toLocaleString()} UGX</b></td></tr>`;
             });
-            tableHtml += '</table>';
-            container.innerHTML = tableHtml;
+            html += '</table>';
+            container.innerHTML = html;
         }
 
         function switchTab(tab) {
@@ -170,12 +177,12 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('btn-' + tab).classList.add('active');
 
-            if (tab === 'students') loadStudentData();
-            if (tab === 'finance') loadFinanceData();
+            if (tab === 'students') fetchStudents();
+            if (tab === 'finance') fetchFinance();
         }
 
-        // Initialize on load
-        window.onload = () => loadStudentData();
+        // Load students by default
+        window.onload = fetchStudents;
     </script>
 </body>
 </html>
