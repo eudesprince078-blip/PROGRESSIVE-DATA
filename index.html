@@ -6,41 +6,21 @@
     <title>Eudes Media - Elite System V3</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --sidebar-dark: #0a1128;
-            --active-blue: #0056b3;
-            --text-light: #ffffff;
-        }
+        :root { --sidebar-dark: #0a1128; --active-blue: #0056b3; --text-light: #ffffff; }
         body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; background: #f0f2f5; overflow: hidden; }
-        
-        /* Sidebar Styling */
-        .sidebar {
-            width: 260px; background: var(--sidebar-dark); color: var(--text-light);
-            display: flex; flex-direction: column; height: 100vh;
-        }
+        .sidebar { width: 260px; background: var(--sidebar-dark); color: var(--text-light); display: flex; flex-direction: column; height: 100vh; }
         .brand-section { padding: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .nav-menu { flex-grow: 1; padding-top: 20px; }
-        .nav-item {
-            padding: 15px 25px; cursor: pointer; display: flex; align-items: center;
-            transition: 0.3s; font-size: 14px; opacity: 0.8;
-        }
+        .nav-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; transition: 0.3s; font-size: 14px; opacity: 0.8; }
         .nav-item:hover { opacity: 1; background: rgba(255,255,255,0.05); }
         .nav-item.active { background: var(--active-blue); border-radius: 0 30px 30px 0; margin-right: 15px; opacity: 1; }
-        
-        /* Main Content Area */
         .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
         .top-bar { height: 60px; background: #4a90e2; color: white; display: flex; align-items: center; padding: 0 20px; font-weight: bold; font-size: 14px; }
         .data-container { padding: 25px; overflow-y: auto; flex-grow: 1; }
-        
-        /* Table Styling */
         .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .data-table th { background: #f8f9fa; padding: 15px; text-align: left; border-bottom: 2px solid #eee; color: #333; font-size: 13px; }
         .data-table td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; color: #555; font-size: 13px; }
-        
-        .support-footer {
-            padding: 20px; background: rgba(255,255,255,0.03); margin: 15px;
-            border-radius: 12px; font-size: 11px;
-        }
+        .support-footer { padding: 20px; background: rgba(255,255,255,0.03); margin: 15px; border-radius: 12px; font-size: 11px; }
         .support-number { color: #ffcc00; font-size: 14px; display: block; margin-top: 5px; font-weight: bold; }
         .error-msg { color: #ff4d4d; padding: 20px; background: #fff1f1; border-radius: 8px; border: 1px solid #ffcccc; margin-bottom: 20px; }
     </style>
@@ -52,13 +32,11 @@
             <h2 style="margin: 0; letter-spacing: 1px;">EUDES<span style="color:#ffcc00;">.</span></h2>
             <div style="font-size: 10px; opacity: 0.6;">ELITE SYSTEM V3</div>
         </div>
-        
         <div class="nav-menu">
             <div class="nav-item" id="btn-dashboard" onclick="switchTab('dashboard')">Dashboard</div>
             <div class="nav-item active" id="btn-students" onclick="switchTab('students')">Admissions / Student List</div>
             <div class="nav-item" id="btn-finance" onclick="switchTab('finance')">Finance Vault</div>
         </div>
-
         <div class="support-footer">
             SUPPORT LINE
             <span class="support-number">+256 762 992440</span>
@@ -67,19 +45,14 @@
     </div>
 
     <div class="content">
-        <div class="top-bar">
-            SYSTEM ACCESS | EUDES MEDIA CONTROL CENTER
-        </div>
-
+        <div class="top-bar">SYSTEM ACCESS | EUDES MEDIA CONTROL CENTER</div>
         <div class="data-container">
             <div id="student-view">
                 <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h3 style="margin:0; color: #333;">Progressive Mother's School - Student Registry</h3>
                     <button onclick="fetchStudents()" style="padding: 8px 15px; background: #4a90e2; color: white; border: none; border-radius: 4px; cursor: pointer;">Refresh List</button>
                 </div>
-                
                 <div id="error-display" style="display:none;"></div>
-
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -87,82 +60,79 @@
                             <th>Name</th>
                             <th>Age</th>
                             <th>DOB</th>
-                            <th>Physical Location</th>
+                            <th>Location</th>
                             <th>Health Status</th>
                             <th>Contact</th>
                         </tr>
                     </thead>
                     <tbody id="student-list-rows">
-                        <tr><td colspan="7">Loading student data...</td></tr>
+                        <tr><td colspan="7">Loading records...</td></tr>
                     </tbody>
                 </table>
             </div>
-
             <div id="finance-view" style="display:none;">
                 <h3 style="color: #333;">Finance Vault (UGX)</h3>
-                <div id="finance-content">Loading financial records...</div>
+                <div id="finance-content">Loading records...</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Supabase Configuration
         const sbUrl = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const sbKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM'; 
-        
         const _supabase = supabase.createClient(sbUrl, sbKey);
+
+        // Function to calculate age from DOB
+        function calculateAge(dobString) {
+            if (!dobString) return '-';
+            const birthDate = new Date(dobString);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; }
+            return age;
+        }
 
         async function fetchStudents() {
             const rowContainer = document.getElementById('student-list-rows');
             const errorDisplay = document.getElementById('error-display');
-            
             errorDisplay.style.display = 'none';
-            rowContainer.innerHTML = '<tr><td colspan="7">Fetching records...</td></tr>';
+            rowContainer.innerHTML = '<tr><td colspan="7">Fetching from Supabase...</td></tr>';
 
-            // Fetching data from your 'students' table
+            // Removed 'age' from the select query to prevent the error
             const { data, error } = await _supabase
                 .from('students')
-                .select('name, age, dob, physical_location, health_status, contact_number')
+                .select('name, dob, physical_location, health_status, contact_number')
                 .order('created_at', { ascending: true });
 
             if (error) {
-                errorDisplay.innerHTML = `<div class="error-msg"><b>Database Connection Error:</b> ${error.message}</div>`;
+                errorDisplay.innerHTML = `<div class="error-msg"><b>Database Error:</b> ${error.message}</div>`;
                 errorDisplay.style.display = 'block';
-                rowContainer.innerHTML = '<tr><td colspan="7" style="color:red;">Error loading list.</td></tr>';
-                return;
-            }
-
-            if (!data || data.length === 0) {
-                rowContainer.innerHTML = '<tr><td colspan="7">No students found in the database.</td></tr>';
+                rowContainer.innerHTML = '<tr><td colspan="7" style="color:red;">Failed to load.</td></tr>';
                 return;
             }
 
             rowContainer.innerHTML = '';
             data.forEach((student, index) => {
-                const row = `
+                rowContainer.innerHTML += `
                     <tr>
                         <td><b>${index + 1}</b></td>
-                        <td>${student.name || 'N/A'}</td>
-                        <td>${student.age || 'N/A'}</td>
-                        <td>${student.dob || 'N/A'}</td>
-                        <td>${student.physical_location || 'N/A'}</td>
+                        <td>${student.name || '-'}</td>
+                        <td>${calculateAge(student.dob)}</td>
+                        <td>${student.dob || '-'}</td>
+                        <td>${student.physical_location || '-'}</td>
                         <td>${student.health_status || 'Stable'}</td>
-                        <td>${student.contact_number || 'N/A'}</td>
+                        <td>${student.contact_number || '-'}</td>
                     </tr>`;
-                rowContainer.innerHTML += row;
             });
         }
 
         async function fetchFinance() {
             const container = document.getElementById('finance-content');
             const { data, error } = await _supabase.from('finance').select('*');
-
-            if (error) {
-                container.innerHTML = `<div class="error-msg">Finance Error: ${error.message}</div>`;
-                return;
-            }
-
-            let html = '<table class="data-table"><tr><th>Category</th><th>Amount (UGX)</th></tr>';
+            if (error) { container.innerHTML = "Error loading finance data."; return; }
+            
+            let html = '<table class="data-table"><tr><th>Category</th><th>Amount</th></tr>';
             data.forEach(item => {
                 html += `<tr><td>${item.label}</td><td><b>${item.amount.toLocaleString()} UGX</b></td></tr>`;
             });
@@ -173,15 +143,12 @@
         function switchTab(tab) {
             document.getElementById('student-view').style.display = tab === 'students' ? 'block' : 'none';
             document.getElementById('finance-view').style.display = tab === 'finance' ? 'block' : 'none';
-            
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('btn-' + tab).classList.add('active');
-
             if (tab === 'students') fetchStudents();
             if (tab === 'finance') fetchFinance();
         }
 
-        // Initialize display
         window.onload = fetchStudents;
     </script>
 </body>
