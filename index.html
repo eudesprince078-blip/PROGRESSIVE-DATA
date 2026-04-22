@@ -16,13 +16,14 @@ body {
     color:white;
 }
 
-.container { padding:20px; }
+.container { padding:20px; max-width:1200px; margin:auto; }
 
 .card {
     background:#1e293b;
     padding:20px;
     border-radius:12px;
     margin-bottom:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.3);
 }
 
 input, select {
@@ -41,6 +42,8 @@ button {
     color:white;
     cursor:pointer;
 }
+
+button:hover { background:#16a34a; }
 
 table {
     width:100%;
@@ -75,11 +78,11 @@ th, td {
 <div id="login">
     <div class="card">
         <h2>Login</h2>
-        <input id="schoolId" placeholder="School ID">
+        <input id="schoolId" placeholder="School ID (e.g PM001)">
         <input id="username" placeholder="Username">
         <input id="password" type="password" placeholder="Password">
         <button onclick="login()">Login</button>
-        <p id="msg"></p>
+        <p id="msg" style="color:red;"></p>
     </div>
 </div>
 
@@ -87,7 +90,8 @@ th, td {
 <div id="dashboard" style="display:none">
 
 <div class="card">
-    <h2>Dashboard</h2>
+    <h2>📊 Dashboard</h2>
+    <button onclick="logout()" style="background:red;">Logout</button>
 </div>
 
 <div class="stats">
@@ -97,7 +101,7 @@ th, td {
 </div>
 
 <div class="card">
-    <h3>Add Student</h3>
+    <h3>➕ Add Student</h3>
     <input id="name" placeholder="Name">
     <input id="class" placeholder="Class">
     <input id="contact" placeholder="Contact">
@@ -106,7 +110,7 @@ th, td {
 </div>
 
 <div class="card">
-    <h3>Students</h3>
+    <h3>👨‍🎓 Students</h3>
     <table>
         <thead>
             <tr>
@@ -128,7 +132,7 @@ th, td {
 <script>
 
 const SUPABASE_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
-const SUPABASE_KEY = "YOUR_SUPABASE_KEY";
+const SUPABASE_KEY = "PASTE_YOUR_KEY_HERE"; // keep your key
 
 let SCHOOL_ID = null;
 let students = [];
@@ -136,9 +140,9 @@ let students = [];
 // LOGIN
 async function login() {
 
-    const school = document.getElementById("schoolId").value;
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+    const school = document.getElementById("schoolId").value.trim();
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
 
     const res = await fetch(`${SUPABASE_URL}/rest/v1/users?school_id=eq.${school}&username=eq.${username}&password=eq.${password}`, {
         headers:{
@@ -150,7 +154,7 @@ async function login() {
     const data = await res.json();
 
     if(data.length === 0){
-        document.getElementById("msg").innerText = "Login failed";
+        document.getElementById("msg").innerText = "❌ Invalid login";
         return;
     }
 
@@ -162,32 +166,45 @@ async function login() {
     loadStudents();
 }
 
-// LOAD
+// LOAD STUDENTS
 async function loadStudents(){
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/Students?school_id=eq.${SCHOOL_ID}`, {
-        headers:{
-            apikey:SUPABASE_KEY,
-            Authorization:`Bearer ${SUPABASE_KEY}`
-        }
-    });
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/students?school_id=eq.${SCHOOL_ID}`, {
+            headers:{
+                apikey:SUPABASE_KEY,
+                Authorization:`Bearer ${SUPABASE_KEY}`
+            }
+        });
 
-    students = await res.json();
-    render();
+        const text = await res.text();
+
+        if(!res.ok){
+            console.error("Load Error:", text);
+            alert("Error loading: " + text);
+            return;
+        }
+
+        students = JSON.parse(text);
+        render();
+
+    } catch(err){
+        console.error(err);
+    }
 }
 
-// ADD
+// ADD STUDENT
 async function addStudent(){
 
     const data = {
         name:document.getElementById("name").value,
         class:document.getElementById("class").value,
         contact:document.getElementById("contact").value,
-        fees_expected:parseInt(document.getElementById("fees").value),
+        fees_expected:parseInt(document.getElementById("fees").value) || 0,
         fees_paid:0,
         school_id:SCHOOL_ID
     };
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/Students`,{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/students`,{
         method:"POST",
         headers:{
             apikey:SUPABASE_KEY,
@@ -198,12 +215,15 @@ async function addStudent(){
         body:JSON.stringify(data)
     });
 
-    const txt = await res.text();
+    const text = await res.text();
 
     if(!res.ok){
-        alert("Error: "+txt);
+        console.error("❌ Save Error:", text);
+        alert("Error saving: " + text);
         return;
     }
+
+    console.log("✅ Saved:", text);
 
     loadStudents();
 }
@@ -225,15 +245,15 @@ function render(){
             <td>${s.name}</td>
             <td>${s.class}</td>
             <td>${s.fees_paid||0}</td>
-            <td>${bal}</td>
+            <td style="color:${bal>0?'red':'lightgreen'}">${bal}</td>
         </tr>`;
     });
 
     document.getElementById("table").innerHTML = html;
 
     document.getElementById("totalStudents").innerText = students.length;
-    document.getElementById("totalPaid").innerText = paid;
-    document.getElementById("totalBalance").innerText = expected-paid;
+    document.getElementById("totalPaid").innerText = "UGX " + paid.toLocaleString();
+    document.getElementById("totalBalance").innerText = "UGX " + (expected-paid).toLocaleString();
 
     drawChart(paid, expected);
 }
@@ -246,10 +266,16 @@ function drawChart(paid, expected){
         data:{
             labels:["Paid","Expected"],
             datasets:[{
+                label:"UGX",
                 data:[paid, expected]
             }]
         }
     });
+}
+
+// LOGOUT
+function logout(){
+    location.reload();
 }
 
 </script>
