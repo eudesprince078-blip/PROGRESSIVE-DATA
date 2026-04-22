@@ -1,285 +1,68 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EUDES MEDIA PRO SYSTEM</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-body {
-    margin:0;
-    font-family: Arial;
-    background:#0f172a;
-    color:white;
-}
-
-.container { padding:20px; max-width:1200px; margin:auto; }
-
-.card {
-    background:#1e293b;
-    padding:20px;
-    border-radius:12px;
-    margin-bottom:20px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.3);
-}
-
-input, select {
-    padding:10px;
-    width:100%;
-    margin:5px 0;
-    border-radius:8px;
-    border:none;
-}
-
-button {
-    padding:10px;
-    border:none;
-    border-radius:8px;
-    background:#22c55e;
-    color:white;
-    cursor:pointer;
-}
-
-button:hover { background:#16a34a; }
-
-table {
-    width:100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding:10px;
-    border-bottom:1px solid #333;
-}
-
-.stats {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:15px;
-}
-
-.stat {
-    background:#1e293b;
-    padding:15px;
-    border-radius:10px;
-    text-align:center;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise System Implementation</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-
-<div class="container">
-
-<!-- LOGIN -->
-<div id="login">
-    <div class="card">
-        <h2>Login</h2>
-        <input id="schoolId" placeholder="School ID (e.g PM001)">
-        <input id="username" placeholder="Username">
-        <input id="password" type="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <p id="msg" style="color:red;"></p>
-    </div>
-</div>
-
-<!-- DASHBOARD -->
-<div id="dashboard" style="display:none">
-
-<div class="card">
-    <h2>📊 Dashboard</h2>
-    <button onclick="logout()" style="background:red;">Logout</button>
-</div>
-
-<div class="stats">
-    <div class="stat"><h2 id="totalStudents">0</h2><p>Students</p></div>
-    <div class="stat"><h2 id="totalPaid">0</h2><p>Fees Paid</p></div>
-    <div class="stat"><h2 id="totalBalance">0</h2><p>Balance</p></div>
-</div>
-
-<div class="card">
-    <h3>➕ Add Student</h3>
-    <input id="name" placeholder="Name">
-    <input id="class" placeholder="Class">
-    <input id="contact" placeholder="Contact">
-    <input id="fees" placeholder="Fees Expected">
-    <button onclick="addStudent()">Save Student</button>
-</div>
-
-<div class="card">
-    <h3>👨‍🎓 Students</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Class</th>
-                <th>Paid</th>
-                <th>Balance</th>
-            </tr>
-        </thead>
-        <tbody id="table"></tbody>
-    </table>
-</div>
-
-<canvas id="chart"></canvas>
-
-</div>
-</div>
-
-<script>
-
-const SUPABASE_URL = "https://kjftrwuucjdnhfwesrup.supabase.co";
-const SUPABASE_KEY = "PASTE_YOUR_KEY_HERE"; // keep your key
-
-let SCHOOL_ID = null;
-let students = [];
-
-// LOGIN
-async function login() {
-
-    const school = document.getElementById("schoolId").value.trim();
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/users?school_id=eq.${school}&username=eq.${username}&password=eq.${password}`, {
-        headers:{
-            apikey:SUPABASE_KEY,
-            Authorization:`Bearer ${SUPABASE_KEY}`
-        }
-    });
-
-    const data = await res.json();
-
-    if(data.length === 0){
-        document.getElementById("msg").innerText = "❌ Invalid login";
-        return;
-    }
-
-    SCHOOL_ID = school;
-
-    document.getElementById("login").style.display="none";
-    document.getElementById("dashboard").style.display="block";
-
-    loadStudents();
-}
-
-// LOAD STUDENTS
-async function loadStudents(){
-    try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/students?school_id=eq.${SCHOOL_ID}`, {
-            headers:{
-                apikey:SUPABASE_KEY,
-                Authorization:`Bearer ${SUPABASE_KEY}`
-            }
-        });
-
-        const text = await res.text();
-
-        if(!res.ok){
-            console.error("Load Error:", text);
-            alert("Error loading: " + text);
-            return;
-        }
-
-        students = JSON.parse(text);
-        render();
-
-    } catch(err){
-        console.error(err);
-    }
-}
-
-// ADD STUDENT
-async function addStudent(){
-
-    const data = {
-        name:document.getElementById("name").value,
-        class:document.getElementById("class").value,
-        contact:document.getElementById("contact").value,
-        fees_expected:parseInt(document.getElementById("fees").value) || 0,
-        fees_paid:0,
-        school_id:SCHOOL_ID
-    };
-
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/students`,{
-        method:"POST",
-        headers:{
-            apikey:SUPABASE_KEY,
-            Authorization:`Bearer ${SUPABASE_KEY}`,
-            "Content-Type":"application/json",
-            "Prefer":"return=representation"
-        },
-        body:JSON.stringify(data)
-    });
-
-    const text = await res.text();
-
-    if(!res.ok){
-        console.error("❌ Save Error:", text);
-        alert("Error saving: " + text);
-        return;
-    }
-
-    console.log("✅ Saved:", text);
-
-    loadStudents();
-}
-
-// RENDER
-function render(){
-
-    let html="";
-    let paid=0;
-    let expected=0;
-
-    students.forEach(s=>{
-        const bal = (s.fees_expected||0)-(s.fees_paid||0);
-        paid += s.fees_paid||0;
-        expected += s.fees_expected||0;
-
-        html += `
-        <tr>
-            <td>${s.name}</td>
-            <td>${s.class}</td>
-            <td>${s.fees_paid||0}</td>
-            <td style="color:${bal>0?'red':'lightgreen'}">${bal}</td>
-        </tr>`;
-    });
-
-    document.getElementById("table").innerHTML = html;
-
-    document.getElementById("totalStudents").innerText = students.length;
-    document.getElementById("totalPaid").innerText = "UGX " + paid.toLocaleString();
-    document.getElementById("totalBalance").innerText = "UGX " + (expected-paid).toLocaleString();
-
-    drawChart(paid, expected);
-}
-
-// CHART
-function drawChart(paid, expected){
-
-    new Chart(document.getElementById("chart"), {
-        type:'bar',
-        data:{
-            labels:["Paid","Expected"],
-            datasets:[{
-                label:"UGX",
-                data:[paid, expected]
-            }]
-        }
-    });
-}
-
-// LOGOUT
-function logout(){
-    location.reload();
-}
-
-</script>
-
+    <header>
+        <h1>EudES Media Control Center</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Multi-School Management</h2>
+            <p>Manage multiple schools effectively with an intuitive interface.</p>
+        </section>
+        <section>
+            <h2>Role-Based Access Control</h2>
+            <ul>
+                <li>Admin</li>
+                <li>Teachers</li>
+                <li>Finance Officer</li>
+                <li>Digital Officer</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Student Management</h2>
+            <p>Auto-generated school IDs format: FirstLetter+4Digits.</p>
+        </section>
+        <section>
+            <h2>Fee Tracking</h2>
+            <p>Comprehensive fee tracking with installments and auto-shutdown after 1 year.</p>
+        </section>
+        <section>
+            <h2>Attendance Management</h2>
+            <p>Efficient attendance marking system.</p>
+        </section>
+        <section>
+            <h2>Marks Entry</h2>
+            <p>Supports marks entry for all Uganda classes (P1-P7, S1-S6).</p>
+        </section>
+        <section>
+            <h2>Digital Report Card</h2>
+            <p>Generation with admin approval.</p>
+        </section>
+        <section>
+            <h2>Search and Export Functionality</h2>
+            <p>Search through records and export data efficiently.</p>
+        </section>
+        <section>
+            <h2>Public Holidays Calendar</h2>
+            <p>Integrated public holidays calendar.</p>
+        </section>
+        <section>
+            <h2>User Interface</h2>
+            <p>Professional dark theme UI with a real-time dashboard showing date and time.</p>
+        </section>
+        <section>
+            <h2>Supabase Integration</h2>
+            <p>Full integration with Supabase for database management.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 EudES Media. All rights reserved.</p>
+    </footer>
 </body>
 </html>
-```
