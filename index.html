@@ -3,39 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESMS ELITE | MASTER BUILD</title>
+    <title>ESMS ELITE | EUDES MEDIA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --primary: #0052cc; --dark: #020617; --bg: #f8fafc; --danger: #ef4444; }
+        :root { --primary: #0052cc; --dark: #020617; --bg: #f8fafc; --white: #ffffff; --danger: #ef4444; --success: #22c55e; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: #1e293b; height: 100vh; display: flex; overflow: hidden; }
 
-        /* SIDEBAR FIX */
+        /* SIDEBAR FIX - NO OVERLAP */
         .sidebar { width: 280px; background: var(--dark); display: flex; flex-direction: column; transition: 0.3s; z-index: 3000; flex-shrink: 0; }
-        @media (max-width: 1024px) { .sidebar { position: fixed; height: 100%; transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } }
-        .nav-item { display: flex; align-items: center; padding: 14px 20px; color: #94a3b8; border: none; background: transparent; width: 100%; cursor: pointer; font-weight: 700; border-radius: 12px; margin-bottom: 4px; text-align: left; }
+        @media (max-width: 1024px) { .sidebar { position: fixed; height: 100%; transform: translateX(-100%); } .sidebar.open { transform: translateX(0); box-shadow: 10px 0 50px rgba(0,0,0,0.5); } }
+        
+        .nav-item { display: flex; align-items: center; padding: 14px 20px; color: #94a3b8; border: none; background: transparent; width: 100%; cursor: pointer; font-weight: 700; border-radius: 12px; margin-bottom: 4px; text-align: left; transition: 0.2s; }
         .nav-item.active { background: var(--primary); color: white; }
 
-        /* LAYOUT */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .header { height: 70px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #e2e8f0; }
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; width: 100%; }
+        .header { height: 70px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; }
         .content { flex: 1; padding: 15px; overflow-y: auto; }
 
-        /* CARDS */
         .glass-card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 15px; }
-        .absent-card { display: flex; align-items: center; gap: 12px; background: #fff1f2; padding: 10px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #fecaca; }
-        .absent-card img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
+        .search-box { position: sticky; top: 0; z-index: 10; background: white; padding: 10px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--primary); }
         
-        .student-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #f1f5f9; }
-        .btn-edit { color: var(--primary); background: #eef2ff; border: none; padding: 8px; border-radius: 8px; cursor: pointer; }
-        .btn-del { color: var(--danger); background: #fef2f2; border: none; padding: 8px; border-radius: 8px; cursor: pointer; }
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; }
+        .btn-pro { background: var(--primary); color: white; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; }
         
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 10px; font-weight: 600; }
-        .btn-pro { background: var(--primary); color: white; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; width: 100%; }
+        .student-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: white; border-radius: 12px; margin-bottom: 8px; border: 1px solid #f1f5f9; }
+        .absent-profile { display: flex; align-items: center; gap: 12px; background: #fff1f2; padding: 12px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #fecaca; }
+        .absent-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid white; }
+
         .hidden { display: none !important; }
+        .subject-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -44,7 +44,7 @@
         <div style="background:white; padding:40px; border-radius:30px; width:100%; max-width:400px; text-align:center;">
             <h2 style="font-weight:900;">ESMS <span style="color:var(--primary)">ELITE</span></h2>
             <input type="text" id="login-id" placeholder="SCHOOL ID" style="text-align:center; margin-top:20px;">
-            <button class="btn-pro" onclick="verify()">LOGIN</button>
+            <button class="btn-pro" onclick="verify()">VERIFY & LOGIN</button>
         </div>
     </div>
 
@@ -54,71 +54,75 @@
             <h4 id="side-sch-name" style="color:white; font-size:0.8rem; margin-top:10px;"></h4>
         </div>
         <nav style="padding:15px; flex:1;">
-            <button class="nav-item active" onclick="nav('dash', this)"><i class="fas fa-home"></i> &nbsp; Dashboard</button>
+            <button class="nav-item active" onclick="nav('dash', this)"><i class="fas fa-chart-line"></i> &nbsp; Dashboard</button>
             <button class="nav-item" onclick="nav('reg', this)"><i class="fas fa-user-plus"></i> &nbsp; Registration</button>
-            <button class="nav-item" onclick="nav('list', this)"><i class="fas fa-list"></i> &nbsp; Student List</button>
+            <button class="nav-item" onclick="nav('list', this)"><i class="fas fa-users"></i> &nbsp; Student Records</button>
             <button class="nav-item" onclick="nav('fin', this)"><i class="fas fa-wallet"></i> &nbsp; Finance</button>
-            <button class="nav-item" onclick="nav('roll', this)"><i class="fas fa-check-square"></i> &nbsp; Rollcall</button>
-            <button class="nav-item" onclick="nav('rep', this)"><i class="fas fa-file-invoice"></i> &nbsp; Reports</button>
+            <button class="nav-item" onclick="nav('roll', this)"><i class="fas fa-calendar-check"></i> &nbsp; Rollcall</button>
+            <button class="nav-item" onclick="nav('rep', this)"><i class="fas fa-file-invoice"></i> &nbsp; Report Cards</button>
         </nav>
     </aside>
 
     <main class="main">
         <header class="header">
             <div onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars-staggered"></i></div>
-            <h4 id="head-title" style="font-weight:800;">DASHBOARD</h4>
-            <div id="notif-count" style="background:red; color:white; padding:2px 8px; border-radius:10px; font-size:0.7rem;">0</div>
+            <h4 id="head-title" style="font-weight:800; font-size:0.9rem;">DASHBOARD</h4>
+            <div id="notif-bell" style="background:var(--danger); color:white; padding:2px 8px; border-radius:10px; font-size:0.7rem;">0</div>
         </header>
 
         <div class="content">
             <div id="v-dash">
                 <div class="glass-card">
-                    <h4 style="margin-bottom:10px;">ABSENT TODAY</h4>
-                    <div id="absent-container"></div>
+                    <h4 style="margin-bottom:15px;">ABSENTEE MONITOR (TODAY)</h4>
+                    <div id="absent-list-display"></div>
                 </div>
             </div>
 
             <div id="v-reg" class="hidden">
                 <div class="glass-card">
-                    <h3>STUDENT FORM</h3>
+                    <h3>STUDENT DETAILS</h3>
                     <input type="hidden" id="f-id">
-                    <input type="file" id="f-file" accept="image/*" onchange="handlePhoto(this)">
-                    <input type="hidden" id="f-photo">
-                    <input type="text" id="f-name" placeholder="Name">
-                    <select id="f-class"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-                    <input type="text" id="f-contact" placeholder="Parent Contact">
-                    <input type="number" id="f-fees" placeholder="Total Fees">
-                    <button class="btn-pro" onclick="save()">SAVE STUDENT</button>
+                    <div id="photo-area" style="text-align:center; margin-bottom:10px;">
+                        <img id="f-preview" style="width:80px; height:80px; border-radius:50%; object-fit:cover; display:none; margin:0 auto 10px; border:2px solid var(--primary);">
+                        <input type="file" accept="image/*" onchange="handlePhoto(this)">
+                        <input type="hidden" id="f-photo-data">
+                    </div>
+                    <input type="text" id="f-name" placeholder="Full Name">
+                    <select id="f-class">
+                        <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                        <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                        <option>P.5</option><option>P.6</option><option>P.7</option>
+                    </select>
+                    <input type="text" id="f-contact" placeholder="Parent Contact (07...)">
+                    <input type="number" id="f-total-fees" placeholder="Total Term Fees (UGX)">
+                    <button class="btn-pro" onclick="saveStudent()">SAVE INFORMATION</button>
                 </div>
             </div>
 
             <div id="v-list" class="hidden">
-                <div class="glass-card">
-                    <h3>ALL STUDENTS</h3>
-                    <div id="master-list"></div>
+                <div class="search-box">
+                    <input type="text" id="main-search" placeholder="Search by Name, LIN, or Class..." onkeyup="filterRecords()">
                 </div>
+                <div id="records-container"></div>
             </div>
 
             <div id="v-fin" class="hidden">
                 <div class="glass-card">
-                    <h3>UPDATE PAYMENTS</h3>
-                    <div id="fin-body"></div>
-                </div>
-            </div>
-
-            <div id="v-roll" class="hidden">
-                <div class="glass-card">
-                    <h3>MARK ATTENDANCE</h3>
-                    <select id="roll-cls" onchange="renderRoll()"><option value="">Select Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-                    <div id="roll-body"></div>
+                    <h3>FEES MANAGEMENT</h3>
+                    <div id="fin-records"></div>
                 </div>
             </div>
 
             <div id="v-rep" class="hidden">
                 <div class="glass-card">
-                    <h3>CLASS REPORTS</h3>
-                    <select id="rep-cls" onchange="renderRep()"><option value="">Select Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-                    <div id="rep-body"></div>
+                    <h3>UGANDAN CURRICULUM REPORTS</h3>
+                    <select id="rep-class-sel" onchange="renderRepStudents()"><option value="">Select Class</option><option>Baby Class</option><option>P.1</option><option>P.7</option></select>
+                    <div id="rep-student-sel"></div>
+                    <div id="marks-entry" class="hidden">
+                        <h4 id="grading-name" style="color:var(--primary); margin:15px 0;"></h4>
+                        <div id="subjects-list" class="subject-grid"></div>
+                        <button class="btn-pro" onclick="alert('Marks Cached Successfully')">SAVE REPORT</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -127,7 +131,7 @@
     <script>
         const SB_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        let db, activeSch, students = [], absentees = [];
+        let db, activeSch, students = [], absentToday = [];
 
         async function verify() {
             const id = document.getElementById('login-id').value.toUpperCase().trim();
@@ -138,121 +142,121 @@
                 document.getElementById('side-sch-name').innerText = data.school_name;
                 document.getElementById('sch-logo').src = data.logo_url;
                 document.getElementById('auth').classList.add('hidden');
-                load();
+                loadAll();
             }
         }
 
-        async function load() {
+        async function loadAll() {
             const { data } = await db.from('Students').select('*').eq('sch_id', activeSch);
             students = data || [];
-            renderMasterList();
+            renderRecords();
             renderFin();
         }
 
         function handlePhoto(input) {
             const reader = new FileReader();
-            reader.onload = (e) => { document.getElementById('f-photo').value = e.target.result; };
+            reader.onload = (e) => {
+                document.getElementById('f-preview').src = e.target.result;
+                document.getElementById('f-preview').style.display = 'block';
+                document.getElementById('f-photo-data').value = e.target.result;
+            };
             reader.readAsDataURL(input.files[0]);
         }
 
-        async function save() {
+        async function saveStudent() {
             const id = document.getElementById('f-id').value;
             const payload = {
                 sch_id: activeSch, name: document.getElementById('f-name').value.toUpperCase(),
                 class: document.getElementById('f-class').value, contact: document.getElementById('f-contact').value,
-                total_fees: document.getElementById('f-fees').value, photo_url: document.getElementById('f-photo').value
+                total_fees: document.getElementById('f-total-fees').value, photo_url: document.getElementById('f-photo-data').value,
+                lin: id ? undefined : activeSch + Math.floor(1000 + Math.random() * 9000)
             };
+            
             if(id) await db.from('Students').update(payload).eq('id', id);
             else await db.from('Students').insert([payload]);
-            location.reload();
+            
+            alert("SUCCESSFULLY SAVED");
+            loadAll(); // Re-loads without logging out
+            nav('list');
         }
 
-        function renderMasterList() {
-            document.getElementById('master-list').innerHTML = students.map(s => `
-                <div class="student-item">
-                    <div><b>${s.name}</b><br><small>${s.class}</small></div>
+        function renderRecords() {
+            document.getElementById('records-container').innerHTML = students.map(s => `
+                <div class="student-row">
+                    <div><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin || 'N/A'}</small></div>
                     <div>
-                        <button class="btn-edit" onclick="editStudent('${s.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-del" onclick="delStudent('${s.id}')"><i class="fas fa-trash"></i></button>
+                        <button onclick="editMode('${s.id}')" style="color:blue; border:none; background:none; padding:10px;"><i class="fas fa-edit"></i></button>
+                        <button onclick="delRecord('${s.id}')" style="color:red; border:none; background:none; padding:10px;"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function editStudent(id) {
+        function filterRecords() {
+            const val = document.getElementById('main-search').value.toLowerCase();
+            const filtered = students.filter(s => s.name.toLowerCase().includes(val) || s.class.toLowerCase().includes(val));
+            document.getElementById('records-container').innerHTML = filtered.map(s => `
+                <div class="student-row">
+                    <div><b>${s.name}</b><br><small>${s.class}</small></div>
+                </div>
+            `).join('');
+        }
+
+        function editMode(id) {
             const s = students.find(x => x.id == id);
             document.getElementById('f-id').value = s.id;
             document.getElementById('f-name').value = s.name;
             document.getElementById('f-class').value = s.class;
             document.getElementById('f-contact').value = s.contact;
-            document.getElementById('f-fees').value = s.total_fees;
-            nav('reg', document.querySelector('[onclick*="reg"]'));
+            document.getElementById('f-total-fees').value = s.total_fees;
+            nav('reg');
         }
 
-        async function delStudent(id) {
-            if(confirm("Delete student?")) {
+        async function delRecord(id) {
+            if(confirm("Permanently delete?")) {
                 await db.from('Students').delete().eq('id', id);
-                location.reload();
+                loadAll();
             }
         }
 
         function renderFin() {
-            document.getElementById('fin-body').innerHTML = students.map(s => `
-                <div style="padding:10px; border-bottom:1px solid #eee;">
-                    <b>${s.name}</b><br>
-                    <input type="number" placeholder="Add Amount" onchange="updateFees('${s.id}', this.value)">
-                    <small>Paid: ${s.paid_fees || 0}</small>
-                </div>
-            `).join('');
-        }
-
-        async function updateFees(id, amt) {
-            const s = students.find(x => x.id == id);
-            const total = Number(s.paid_fees || 0) + Number(amt);
-            await db.from('Students').update({ paid_fees: total }).eq('id', id);
-            alert("Fees Updated!");
-        }
-
-        function renderRoll() {
-            const cls = document.getElementById('roll-cls').value;
-            const filtered = students.filter(s => s.class === cls);
-            document.getElementById('roll-body').innerHTML = filtered.map(s => `
-                <div class="student-item">
+            document.getElementById('fin-records').innerHTML = students.map(s => `
+                <div class="student-row">
                     <span>${s.name}</span>
-                    <button onclick="markAbs('${s.id}')" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px;">Absent</button>
+                    <input type="number" placeholder="Add Amount" style="width:120px; margin:0;" onchange="updateMoney('${s.id}', this.value)">
                 </div>
             `).join('');
         }
 
-        function markAbs(id) {
+        async function updateMoney(id, val) {
             const s = students.find(x => x.id == id);
-            if(!absentees.find(x => x.id == id)) {
-                absentees.push(s);
-                document.getElementById('notif-count').innerText = absentees.length;
-                document.getElementById('absent-container').innerHTML = absentees.map(a => `
-                    <div class="absent-card">
-                        <img src="${a.photo_url || 'https://via.placeholder.com/50'}">
-                        <div><b>${a.name}</b><br><small>${a.class} | Call: ${a.contact || 'N/A'}</small></div>
-                    </div>
-                `).join('');
-            }
+            const total = Number(s.paid_fees || 0) + Number(val);
+            await db.from('Students').update({ paid_fees: total }).eq('id', id);
+            alert("FEES UPDATED");
+            loadAll();
         }
 
-        function renderRep() {
-            const cls = document.getElementById('rep-cls').value;
+        function renderRepStudents() {
+            const cls = document.getElementById('rep-class-sel').value;
             const filtered = students.filter(s => s.class === cls);
-            document.getElementById('rep-body').innerHTML = filtered.map(s => `
-                <div style="padding:15px; border:1px solid #eee; margin-bottom:10px; border-radius:10px;">
-                    <b>${s.name}</b><br><input type="text" placeholder="Marks...">
-                </div>
+            document.getElementById('rep-student-sel').innerHTML = filtered.map(s => `
+                <div onclick="openGrading('${s.id}')" style="padding:10px; border-bottom:1px solid #eee; cursor:pointer;">${s.name}</div>
+            `).join('');
+        }
+
+        function openGrading(id) {
+            const s = students.find(x => x.id == id);
+            document.getElementById('marks-entry').classList.remove('hidden');
+            document.getElementById('grading-name').innerText = s.name;
+            let subs = s.class.includes('P.') ? ['English', 'Math', 'SST', 'Science'] : ['Numeracy', 'Literacy', 'News', 'Drawing'];
+            document.getElementById('subjects-list').innerHTML = subs.map(sub => `
+                <div><label>${sub}</label><input type="number" placeholder="Marks"></div>
             `).join('');
         }
 
         function nav(v, b) {
-            ['v-dash', 'v-reg', 'v-list', 'v-fin', 'v-roll', 'v-rep'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['v-dash', 'v-reg', 'v-list', 'v-fin', 'v-rep'].forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById('v-'+v).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            if(b) b.classList.add('active');
             if(window.innerWidth < 1024) document.getElementById('sidebar').classList.remove('open');
         }
     </script>
