@@ -3,49 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESMS ELITE | FIXED PRO</title>
+    <title>ESMS ELITE PRO | EUDES MEDIA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --primary: #0052cc; --sidebar: #020617; --bg: #f8fafc; }
+        :root { --primary: #0052cc; --sidebar: #020617; --bg: #f8fafc; --danger: #ef4444; --success: #22c55e; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: #1e293b; height: 100vh; display: flex; overflow: hidden; }
 
-        /* FIXED SIDEBAR - NO BLUR COVERING */
-        .sidebar { width: 280px; background: var(--sidebar); display: flex; flex-direction: column; transition: 0.3s ease; z-index: 2000; flex-shrink: 0; }
-        @media (max-width: 1024px) { 
-            .sidebar { position: fixed; height: 100%; transform: translateX(-100%); } 
-            .sidebar.open { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.5); } 
-        }
-
-        .nav-item { display: flex; align-items: center; padding: 16px 20px; color: #94a3b8; border: none; background: transparent; width: 100%; cursor: pointer; font-weight: 700; font-size: 0.85rem; border-radius: 12px; margin-bottom: 5px; text-align: left; transition: 0.2s; }
+        /* SIDEBAR - NO OVERLAP FIX */
+        .sidebar { width: 280px; background: var(--sidebar); display: flex; flex-direction: column; transition: 0.3s; z-index: 2000; flex-shrink: 0; }
+        @media (max-width: 1024px) { .sidebar { position: fixed; height: 100%; transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } }
+        
+        .nav-item { display: flex; align-items: center; padding: 14px 20px; color: #94a3b8; border: none; background: transparent; width: 100%; cursor: pointer; font-weight: 700; font-size: 0.8rem; border-radius: 12px; margin-bottom: 4px; transition: 0.2s; }
         .nav-item.active { background: var(--primary); color: white; }
         .nav-item i { width: 25px; font-size: 1.1rem; }
 
-        /* MAIN AREA */
+        /* MAIN CONTENT */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; width: 100%; }
         .header { height: 70px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; }
-        .content { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .content { flex: 1; padding: 20px; overflow-y: auto; }
 
-        /* DASHBOARD CARDS */
-        .stat-card { background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        /* DASHBOARD & FINANCE CARDS */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; }
+        .stat-card h2 { font-size: 1.5rem; font-weight: 800; margin: 5px 0; }
+        .stat-card label { font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
 
-        /* FORMS & TABLES */
+        /* TABLE & FORMS */
         .glass-card { background: white; border-radius: 24px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px; font-weight: 600; background: #fdfdfd; }
-        .btn-pro { background: var(--primary); color: white; padding: 16px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; width: 100%; }
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 15px; font-weight: 600; font-size: 0.85rem; }
+        .btn-pro { background: var(--primary); color: white; padding: 14px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; width: 100%; }
         
-        /* PHOTO STYLING */
-        #photo-preview { width: 120px; height: 120px; border-radius: 20px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px dashed #cbd5e1; overflow: hidden; }
-        #photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .student-photo { width: 45px; height: 45px; border-radius: 10px; object-fit: cover; background: #f1f5f9; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; }
+        .badge-red { background: #fef2f2; color: #ef4444; }
 
         .hidden { display: none !important; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1500; display: none; }
         .overlay.active { display: block; }
-        .close-btn { display: none; color: white; font-size: 1.5rem; position: absolute; right: 20px; top: 20px; cursor: pointer; }
-        @media (max-width: 1024px) { .close-btn { display: block; } }
     </style>
 </head>
 <body>
@@ -54,94 +52,114 @@
 
     <div id="auth" style="position:fixed; inset:0; background:var(--sidebar); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;">
         <div style="background:white; padding:40px; border-radius:30px; width:100%; max-width:400px; text-align:center;">
-            <h2 style="font-weight:900; letter-spacing:-1px;">ESMS ELITE</h2>
-            <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:30px; font-weight:700;">DIGITAL PARTNER: EUDES MEDIA</p>
+            <h2 style="font-weight:900;">ESMS ELITE</h2>
+            <p style="font-size:0.7rem; color:#94a3b8; margin-bottom:25px;">EUDES MEDIA DIGITAL PARTNER</p>
             <input type="text" id="login-id" placeholder="SCHOOL ID (e.g. PM001)" style="text-align:center">
-            <button class="btn-pro" onclick="verify()">UNLOCK SYSTEM</button>
-            <p id="auth-err" style="color:red; font-size:0.7rem; margin-top:10px; font-weight:800;"></p>
+            <button class="btn-pro" onclick="verify()">UNLOCK PORTAL</button>
         </div>
     </div>
 
     <aside class="sidebar" id="sidebar">
-        <div class="close-btn" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
-        <div style="padding:40px 20px 20px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.05);">
-            <img id="sch-logo" style="height:60px; margin-bottom:10px; background:white; border-radius:10px; padding:5px;">
-            <h4 id="side-sch-name" style="color:white; font-size:0.85rem; text-transform:uppercase;"></h4>
+        <div style="padding:35px 20px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.05);">
+            <img id="sch-logo" style="height:50px; margin-bottom:10px; background:white; border-radius:10px; padding:4px;">
+            <h4 id="side-sch-name" style="color:white; font-size:0.8rem; text-transform:uppercase;"></h4>
         </div>
         <nav style="padding:15px; flex:1; overflow-y:auto;">
-            <button class="nav-item active" onclick="nav('dash', this)"><i class="fas fa-th-large"></i> Dashboard</button>
+            <button class="nav-item active" onclick="nav('dash', this)"><i class="fas fa-chart-line"></i> Dashboard</button>
             <button class="nav-item" onclick="nav('reg', this)"><i class="fas fa-user-plus"></i> Enrollment</button>
-            <button class="nav-item" onclick="nav('list', this)"><i class="fas fa-address-book"></i> Student List</button>
+            <button class="nav-item" onclick="nav('list', this)"><i class="fas fa-users"></i> Student List</button>
+            <button class="nav-item" onclick="nav('fin', this)"><i class="fas fa-wallet"></i> Finance & Fees</button>
             <button class="nav-item" onclick="nav('roll', this)"><i class="fas fa-calendar-check"></i> Rollcall</button>
-            <button class="nav-item" onclick="nav('sms', this)"><i class="fas fa-paper-plane"></i> Broadcasting</button>
+            <button class="nav-item" onclick="nav('sms', this)"><i class="fas fa-bullhorn"></i> Bulk Broadcast</button>
+            <button class="nav-item" onclick="nav('rep', this)"><i class="fas fa-file-invoice"></i> Digital Reports</button>
         </nav>
-        <div style="padding:20px; background:rgba(0,0,0,0.3); color:white; font-size:0.7rem; font-weight:700;">
-            SUPPORT: +256 762 992440
+        <div style="padding:20px; background:rgba(0,0,0,0.3); color:white; font-size:0.65rem;">
+            EUDES MEDIA | +256 762 992440
         </div>
     </aside>
 
     <main class="main">
         <header class="header">
-            <div onclick="toggleMenu()" style="cursor:pointer; font-size:1.2rem;"><i class="fas fa-bars-staggered"></i></div>
-            <h4 id="head-title" style="font-weight:800; font-size:0.9rem;">ESMS DASHBOARD</h4>
-            <div style="background:#f0f9ff; color:#0369a1; padding:6px 12px; border-radius:10px; font-size:0.6rem; font-weight:900;">LIVE</div>
+            <div onclick="toggleMenu()" style="cursor:pointer;"><i class="fas fa-bars-staggered"></i></div>
+            <h4 id="head-title" style="font-weight:800; font-size:0.9rem;">DASHBOARD</h4>
+            <div id="notif-count" style="background:#fef2f2; color:#ef4444; padding:5px 12px; border-radius:8px; font-size:0.6rem; font-weight:900;">0 ALERTS</div>
         </header>
 
         <div class="content">
             <div id="v-dash">
-                <div class="stat-card">
-                    <div style="background:#eff6ff; padding:15px; border-radius:15px;"><i class="fas fa-user-graduate" style="color:var(--primary);"></i></div>
-                    <div><h2 id="total-std">0</h2><label style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase;">Registered Students</label></div>
+                <div class="stat-grid">
+                    <div class="stat-card"><h2><span id="d-total">0</span></h2><label>Total Students</label></div>
+                    <div class="stat-card"><h2><span id="d-absent">0</span></h2><label>Today Absent</label></div>
+                    <div class="stat-card"><h2><span id="d-demand" style="color:var(--danger)">0</span></h2><label>Total Demanding</label></div>
+                </div>
+                <div class="glass-card">
+                    <h4 style="font-weight:800; margin-bottom:15px;">FINANCE SUMMARY</h4>
+                    <p style="font-size:0.8rem; color:#64748b;">Expected Total: <b id="d-exp">UGX 0</b></p>
+                    <p style="font-size:0.8rem; color:#64748b;">Total Paid: <b id="d-paid" style="color:var(--success)">UGX 0</b></p>
                 </div>
             </div>
 
             <div id="v-reg" class="hidden">
                 <div class="glass-card">
-                    <h3 style="margin-bottom:20px; font-weight:800;">NEW ENROLLMENT</h3>
-                    <div id="photo-preview"><i class="fas fa-user" style="font-size:2rem; color:#cbd5e1;"></i></div>
-                    <label style="font-size:0.7rem; font-weight:800; color:#64748b; display:block; text-align:center; margin-bottom:10px;">STUDENT PHOTO</label>
-                    <input type="file" id="f-photo" accept="image/*" onchange="previewPhoto(this)" style="font-size:0.7rem;">
-                    
-                    <input type="text" id="f-name" placeholder="FULL NAME">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <h3 id="form-title" style="margin-bottom:20px;">NEW ENROLLMENT</h3>
+                    <input type="hidden" id="f-id">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                        <input type="text" id="f-name" placeholder="FULL NAME">
+                        <input type="text" id="f-class" placeholder="CLASS (e.g. P.4)">
                         <input type="number" id="f-age" placeholder="AGE">
                         <input type="date" id="f-dob">
+                        <input type="text" id="f-loc" placeholder="LOCATION">
+                        <input type="text" id="f-health" placeholder="HEALTH STATUS">
+                        <input type="text" id="f-lin" readonly placeholder="LIN (AUTO)">
+                        <input type="text" id="f-pcode" placeholder="PAYMENT CODE">
+                        <input type="number" id="f-total-fees" placeholder="TOTAL FEES (UGX)">
                     </div>
-                    <input type="text" id="f-loc" placeholder="PHYSICAL LOCATION">
-                    <input type="text" id="f-health" value="NORMAL" placeholder="HEALTH STATUS">
-                    <input type="text" id="f-lin" readonly style="color:var(--primary); background:#f1f5f9; text-align:center; font-family:monospace;">
-                    
-                    <button class="btn-pro" onclick="save()">REGISTER LEARNER</button>
+                    <button class="btn-pro" onclick="save()">SAVE RECORD</button>
                 </div>
             </div>
 
             <div id="v-list" class="hidden">
                 <div class="glass-card">
-                    <input type="text" placeholder="Search by name or LIN..." onkeyup="search(this)" style="margin-bottom:20px;">
+                    <input type="text" placeholder="Search Directory..." onkeyup="search(this)">
                     <div style="overflow-x:auto;">
-                        <table style="width:100%; border-collapse:collapse; min-width:500px;">
-                            <thead style="text-align:left; border-bottom:2px solid #f1f5f9; font-size:0.7rem; color:#94a3b8;">
-                                <tr><th style="padding:10px;">PHOTO</th><th>NAME</th><th>LIN</th><th>ACTIONS</th></tr>
+                        <table style="width:100%; border-collapse:collapse; min-width:700px;">
+                            <thead style="text-align:left; font-size:0.7rem; color:#94a3b8; border-bottom:2px solid #f1f5f9;">
+                                <tr><th>PHOTO</th><th>NAME</th><th>LIN</th><th>PAY CODE</th><th>CLASS</th><th>ACTIONS</th></tr>
                             </thead>
-                            <tbody id="table-body"></tbody>
+                            <tbody id="list-body"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <div id="v-fin" class="hidden">
+                <div class="glass-card">
+                    <h3>FEES MANAGEMENT</h3>
+                    <div id="fin-list"></div>
+                </div>
+            </div>
+
             <div id="v-roll" class="hidden">
                 <div class="glass-card">
-                    <h3 style="margin-bottom:10px;">DAILY ROLLCALL</h3>
-                    <div id="roll-list" style="margin-top:20px;"></div>
-                    <button class="btn-pro" style="margin-top:20px;" onclick="alert('Attendance Saved')">SUBMIT ATTENDANCE</button>
+                    <h3>DAILY ATTENDANCE</h3>
+                    <select id="roll-class-filter" onchange="loadRollcall()"><option>Select Class</option></select>
+                    <div id="roll-body"></div>
                 </div>
             </div>
 
             <div id="v-sms" class="hidden">
                 <div class="glass-card">
-                    <h3 style="margin-bottom:15px;">BROADCAST SMS</h3>
-                    <textarea placeholder="Type message to all parents here..." rows="5"></textarea>
-                    <button class="btn-pro">SEND BROADCAST</button>
+                    <h3>BULK BROADCASTING</h3>
+                    <select id="sms-type">
+                        <option value="fees">Fees Demand (Auto-Calculate)</option>
+                        <option value="general">General Announcement</option>
+                        <option value="absent">Absence Alert</option>
+                    </select>
+                    <textarea id="sms-msg" rows="5" placeholder="Type message... Use {name}, {demand} for auto-fill"></textarea>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-pro" style="background:#25d366" onclick="broadcast('whatsapp')"><i class="fab fa-whatsapp"></i> WhatsApp All</button>
+                        <button class="btn-pro" onclick="broadcast('email')"><i class="fas fa-envelope"></i> Email All</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -150,7 +168,7 @@
     <script>
         const SB_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        let db, activeSch;
+        let db, activeSch, students = [];
 
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('open');
@@ -159,89 +177,101 @@
 
         async function verify() {
             const id = document.getElementById('login-id').value.toUpperCase();
-            if(!id) return;
             db = supabase.createClient(SB_URL, SB_KEY);
-            const { data, error } = await db.from('Schools').select('*').eq('sch_id', id).single();
+            const { data } = await db.from('Schools').select('*').eq('sch_id', id).single();
             if(data) {
                 activeSch = id;
                 document.getElementById('side-sch-name').innerText = data.school_name;
-                document.getElementById('head-title').innerText = data.school_name;
                 document.getElementById('sch-logo').src = data.logo_url;
                 document.getElementById('auth').classList.add('hidden');
-                genLIN(); load();
-            } else { document.getElementById('auth-err').innerText = "INVALID SCHOOL ID"; }
-        }
-
-        function previewPhoto(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => document.getElementById('photo-preview').innerHTML = `<img src="${e.target.result}">`;
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function genLIN() { 
-            const pre = activeSch.substring(0,3);
-            document.getElementById('f-lin').value = pre + "-" + Math.floor(1000 + Math.random()*9000); 
-        }
-
-        async function load() {
-            const { data } = await db.from('Students').select('*').eq('sch_id', activeSch);
-            if(data) {
-                document.getElementById('total-std').innerText = data.length;
-                document.getElementById('table-body').innerHTML = data.map(s => `
-                    <tr style="border-bottom:1px solid #f8fafc;">
-                        <td style="padding:10px;"><img src="${s.photo_url || 'https://via.placeholder.com/40'}" style="width:40px;height:40px;border-radius:10px;object-fit:cover;"></td>
-                        <td style="font-weight:700; font-size:0.8rem;">${s.name}</td>
-                        <td style="font-family:monospace; font-size:0.75rem; color:var(--primary); font-weight:800;">${s.lin}</td>
-                        <td style="white-space:nowrap;">
-                            <button style="border:none; background:#eff6ff; color:var(--primary); padding:8px; border-radius:8px; margin-right:5px;"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteStd('${s.id}')" style="border:none; background:#fef2f2; color:#ef4444; padding:8px; border-radius:8px;"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `).join('');
-                
-                document.getElementById('roll-list').innerHTML = data.map(s => `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:white; border-radius:12px; margin-bottom:8px; border:1px solid #f1f5f9;">
-                        <span style="font-weight:700; font-size:0.8rem;">${s.name}</span>
-                        <input type="checkbox" style="width:22px; height:22px; margin:0;">
-                    </div>
-                `).join('');
-            }
-        }
-
-        async function save() {
-            const entry = {
-                sch_id: activeSch, name: document.getElementById('f-name').value.toUpperCase(),
-                age: document.getElementById('f-age').value, dob: document.getElementById('f-dob').value,
-                location: document.getElementById('f-loc').value.toUpperCase(), 
-                health_status: document.getElementById('f-health').value.toUpperCase(),
-                lin: document.getElementById('f-lin').value,
-                contact: "+256 762 992440"
-            };
-            if(!entry.name) return alert("Enter Name");
-            await db.from('Students').insert([entry]);
-            alert("STUDENT ENROLLED"); location.reload();
-        }
-
-        async function deleteStd(id) {
-            if(confirm("Permanently delete this record?")) {
-                await db.from('Students').delete().eq('id', id);
                 load();
             }
         }
 
+        async function load() {
+            const { data } = await db.from('Students').select('*').eq('sch_id', activeSch);
+            students = data || [];
+            updateDashboard();
+            renderList();
+            genLIN();
+        }
+
+        function updateDashboard() {
+            document.getElementById('d-total').innerText = students.length;
+            let totalExp = 0, totalPaid = 0;
+            students.forEach(s => {
+                totalExp += Number(s.total_fees || 0);
+                totalPaid += Number(s.paid_fees || 0);
+            });
+            document.getElementById('d-exp').innerText = "UGX " + totalExp.toLocaleString();
+            document.getElementById('d-paid').innerText = "UGX " + totalPaid.toLocaleString();
+            document.getElementById('d-demand').innerText = "UGX " + (totalExp - totalPaid).toLocaleString();
+        }
+
+        function renderList() {
+            document.getElementById('list-body').innerHTML = students.map(s => `
+                <tr style="border-bottom:1px solid #f8fafc;">
+                    <td style="padding:12px;"><img src="https://via.placeholder.com/45" class="student-photo"></td>
+                    <td style="font-weight:700; font-size:0.8rem;">${s.name}</td>
+                    <td style="font-family:monospace; font-size:0.75rem; color:var(--primary); font-weight:800;">${s.lin}</td>
+                    <td style="font-weight:600;">${s.payment_code || 'N/A'}</td>
+                    <td>${s.class}</td>
+                    <td>
+                        <button onclick="editStd('${s.id}')" style="border:none; background:#eff6ff; color:var(--primary); padding:8px; border-radius:8px;"><i class="fas fa-edit"></i></button>
+                        <button onclick="delStd('${s.id}')" style="border:none; background:#fef2f2; color:var(--danger); padding:8px; border-radius:8px;"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function editStd(id) {
+            const s = students.find(x => x.id == id);
+            document.getElementById('f-id').value = s.id;
+            document.getElementById('f-name').value = s.name;
+            document.getElementById('f-class').value = s.class;
+            document.getElementById('f-age').value = s.age;
+            document.getElementById('f-total-fees').value = s.total_fees;
+            document.getElementById('f-pcode').value = s.payment_code;
+            nav('reg', document.querySelector('[onclick*="reg"]'));
+            document.getElementById('form-title').innerText = "EDIT STUDENT";
+        }
+
+        async function save() {
+            const id = document.getElementById('f-id').value;
+            const entry = {
+                sch_id: activeSch, name: document.getElementById('f-name').value.toUpperCase(),
+                class: document.getElementById('f-class').value.toUpperCase(), age: document.getElementById('f-age').value,
+                total_fees: document.getElementById('f-total-fees').value, payment_code: document.getElementById('f-pcode').value,
+                lin: document.getElementById('f-lin').value || (activeSch + "-" + Math.floor(Math.random()*9000))
+            };
+            
+            if(id) await db.from('Students').update(entry).eq('id', id);
+            else await db.from('Students').insert([entry]);
+            
+            alert("RECORD UPDATED"); location.reload();
+        }
+
+        async function delStd(id) { if(confirm("Delete student?")) { await db.from('Students').delete().eq('id', id); load(); } }
+
+        function broadcast(channel) {
+            const type = document.getElementById('sms-type').value;
+            alert(`Broadcasting ${type} via ${channel} to ${students.length} parents...`);
+        }
+
         function nav(v, b) {
-            ['v-dash', 'v-reg', 'v-list', 'v-roll', 'v-sms'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['v-dash', 'v-reg', 'v-list', 'v-fin', 'v-roll', 'v-sms', 'v-rep'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.add('hidden');
+            });
             document.getElementById('v-'+v).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             b.classList.add('active');
-            if(window.innerWidth <= 1024) toggleMenu(); // AUTOMATICALLY CLOSE SIDEBAR ON MOBILE
+            if(window.innerWidth <= 1024) toggleMenu();
         }
 
         function search(i) {
             let q = i.value.toUpperCase();
-            document.querySelectorAll('#table-body tr').forEach(r => r.style.display = r.innerText.toUpperCase().includes(q) ? "" : "none");
+            document.querySelectorAll('#list-body tr').forEach(r => r.style.display = r.innerText.toUpperCase().includes(q) ? "" : "none");
         }
     </script>
 </body>
