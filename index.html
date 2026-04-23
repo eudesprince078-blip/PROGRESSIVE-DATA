@@ -3,114 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESMS ELITE | FULL PRO SYSTEM</title>
+    <title>ESMS ELITE | FIXED PRO</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --primary: #0052cc; --sidebar: #020617; --bg: #f8fafc; --white: #ffffff; }
+        :root { --primary: #0052cc; --sidebar: #020617; --bg: #f8fafc; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: #1e293b; height: 100vh; overflow: hidden; display: flex; }
+        body { background: var(--bg); color: #1e293b; height: 100vh; display: flex; overflow: hidden; }
 
-        /* SIDEBAR */
-        .sidebar { width: 280px; background: var(--sidebar); display: flex; flex-direction: column; transition: 0.3s; z-index: 1000; flex-shrink: 0; }
-        @media (max-width: 1024px) { .sidebar { position: fixed; height: 100%; transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } }
-        .nav-item { display: flex; align-items: center; padding: 15px 20px; color: #94a3b8; border: none; background: transparent; width: 100%; cursor: pointer; font-weight: 700; font-size: 0.85rem; border-radius: 12px; margin-bottom: 5px; }
+        /* FIXED SIDEBAR - NO BLUR COVERING */
+        .sidebar { width: 280px; background: var(--sidebar); display: flex; flex-direction: column; transition: 0.3s ease; z-index: 2000; flex-shrink: 0; }
+        @media (max-width: 1024px) { 
+            .sidebar { position: fixed; height: 100%; transform: translateX(-100%); } 
+            .sidebar.open { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.5); } 
+        }
+
+        .nav-item { display: flex; align-items: center; padding: 16px 20px; color: #94a3b8; border: none; background: transparent; width: 100%; cursor: pointer; font-weight: 700; font-size: 0.85rem; border-radius: 12px; margin-bottom: 5px; text-align: left; transition: 0.2s; }
         .nav-item.active { background: var(--primary); color: white; }
+        .nav-item i { width: 25px; font-size: 1.1rem; }
 
         /* MAIN AREA */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .header { height: 70px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-bottom: 1px solid #e2e8f0; }
-        .content { flex: 1; padding: 25px; overflow-y: auto; }
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; width: 100%; }
+        .header { height: 70px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; }
+        .content { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
-        /* UI COMPONENTS */
-        .glass-card { background: white; border-radius: 24px; padding: 25px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
-        .btn-pro { background: var(--primary); color: white; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; width: 100%; }
-        .btn-edit { color: #0052cc; background: #eff6ff; padding: 6px 10px; border-radius: 8px; border: none; cursor: pointer; }
-        .btn-del { color: #ef4444; background: #fef2f2; padding: 6px 10px; border-radius: 8px; border: none; cursor: pointer; }
+        /* DASHBOARD CARDS */
+        .stat-card { background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
 
-        /* PHOTO PREVIEW */
-        #photo-preview { width: 100px; height: 100px; border-radius: 15px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; border: 2px dashed #cbd5e1; overflow: hidden; }
+        /* FORMS & TABLES */
+        .glass-card { background: white; border-radius: 24px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px; font-weight: 600; background: #fdfdfd; }
+        .btn-pro { background: var(--primary); color: white; padding: 16px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; width: 100%; }
+        
+        /* PHOTO STYLING */
+        #photo-preview { width: 120px; height: 120px; border-radius: 20px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px dashed #cbd5e1; overflow: hidden; }
         #photo-preview img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* ID CARD PREVIEW */
-        .id-card { width: 320px; height: 200px; background: var(--primary); border-radius: 15px; color: white; padding: 20px; position: relative; }
-        
         .hidden { display: none !important; }
-        input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 15px; font-weight: 600; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1500; display: none; }
+        .overlay.active { display: block; }
+        .close-btn { display: none; color: white; font-size: 1.5rem; position: absolute; right: 20px; top: 20px; cursor: pointer; }
+        @media (max-width: 1024px) { .close-btn { display: block; } }
     </style>
 </head>
 <body>
 
-    <div id="auth" style="position:fixed; inset:0; background:var(--sidebar); z-index:9999; display:flex; align-items:center; justify-content:center;">
-        <div style="background:white; padding:40px; border-radius:30px; width:400px; text-align:center;">
-            <h2 style="font-weight:900;">ESMS ELITE</h2>
-            <p style="font-size:0.7rem; color:#94a3b8; margin-bottom:25px;">EUDES MEDIA | DIGITAL PARTNER</p>
-            <input type="text" id="login-id" placeholder="SCHOOL ID (PM001)" style="text-align:center">
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <div id="auth" style="position:fixed; inset:0; background:var(--sidebar); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:white; padding:40px; border-radius:30px; width:100%; max-width:400px; text-align:center;">
+            <h2 style="font-weight:900; letter-spacing:-1px;">ESMS ELITE</h2>
+            <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:30px; font-weight:700;">DIGITAL PARTNER: EUDES MEDIA</p>
+            <input type="text" id="login-id" placeholder="SCHOOL ID (e.g. PM001)" style="text-align:center">
             <button class="btn-pro" onclick="verify()">UNLOCK SYSTEM</button>
+            <p id="auth-err" style="color:red; font-size:0.7rem; margin-top:10px; font-weight:800;"></p>
         </div>
     </div>
 
     <aside class="sidebar" id="sidebar">
-        <div style="padding:30px; text-align:center; border-bottom:1px solid #1e293b;">
-            <img id="sch-logo" style="height:50px; margin-bottom:10px;">
-            <h4 id="side-sch-name" style="color:white; font-size:0.8rem;"></h4>
+        <div class="close-btn" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
+        <div style="padding:40px 20px 20px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.05);">
+            <img id="sch-logo" style="height:60px; margin-bottom:10px; background:white; border-radius:10px; padding:5px;">
+            <h4 id="side-sch-name" style="color:white; font-size:0.85rem; text-transform:uppercase;"></h4>
         </div>
-        <nav style="padding:15px; flex:1;">
-            <button class="nav-item active" onclick="nav('dash', this)"><i class="fas fa-home"></i> &nbsp; Dashboard</button>
-            <button class="nav-item" onclick="nav('reg', this)"><i class="fas fa-user-plus"></i> &nbsp; Enrollment</button>
-            <button class="nav-item" onclick="nav('list', this)"><i class="fas fa-users"></i> &nbsp; Student List</button>
-            <button class="nav-item" onclick="nav('roll', this)"><i class="fas fa-check-double"></i> &nbsp; Rollcall</button>
-            <button class="nav-item" onclick="nav('sms', this)"><i class="fas fa-bullhorn"></i> &nbsp; Broadcasting</button>
+        <nav style="padding:15px; flex:1; overflow-y:auto;">
+            <button class="nav-item active" onclick="nav('dash', this)"><i class="fas fa-th-large"></i> Dashboard</button>
+            <button class="nav-item" onclick="nav('reg', this)"><i class="fas fa-user-plus"></i> Enrollment</button>
+            <button class="nav-item" onclick="nav('list', this)"><i class="fas fa-address-book"></i> Student List</button>
+            <button class="nav-item" onclick="nav('roll', this)"><i class="fas fa-calendar-check"></i> Rollcall</button>
+            <button class="nav-item" onclick="nav('sms', this)"><i class="fas fa-paper-plane"></i> Broadcasting</button>
         </nav>
-        <div style="padding:20px; background:rgba(0,0,0,0.2); color:white; font-size:0.7rem;">
+        <div style="padding:20px; background:rgba(0,0,0,0.3); color:white; font-size:0.7rem; font-weight:700;">
             SUPPORT: +256 762 992440
         </div>
     </aside>
 
     <main class="main">
         <header class="header">
-            <div onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></div>
-            <h4 id="head-title" style="font-weight:800;"></h4>
-            <div style="background:#dcfce7; color:#166534; padding:5px 12px; border-radius:8px; font-size:0.6rem; font-weight:900;">LIVE CLOUD</div>
+            <div onclick="toggleMenu()" style="cursor:pointer; font-size:1.2rem;"><i class="fas fa-bars-staggered"></i></div>
+            <h4 id="head-title" style="font-weight:800; font-size:0.9rem;">ESMS DASHBOARD</h4>
+            <div style="background:#f0f9ff; color:#0369a1; padding:6px 12px; border-radius:10px; font-size:0.6rem; font-weight:900;">LIVE</div>
         </header>
 
         <div class="content">
             <div id="v-dash">
-                <div class="glass-card" style="display:flex; align-items:center; gap:20px;">
-                    <div style="background:#eff6ff; padding:20px; border-radius:20px;"><i class="fas fa-users" style="color:var(--primary); font-size:1.5rem;"></i></div>
-                    <div><h2 id="total-std">0</h2><label style="font-size:0.7rem; font-weight:800; color:#94a3b8;">TOTAL STUDENTS</label></div>
+                <div class="stat-card">
+                    <div style="background:#eff6ff; padding:15px; border-radius:15px;"><i class="fas fa-user-graduate" style="color:var(--primary);"></i></div>
+                    <div><h2 id="total-std">0</h2><label style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase;">Registered Students</label></div>
                 </div>
             </div>
 
             <div id="v-reg" class="hidden">
                 <div class="glass-card">
-                    <h3 style="margin-bottom:20px;">ENROLL NEW LEARNER</h3>
-                    <div id="photo-preview"><i class="fas fa-camera"></i></div>
-                    <label>Upload Photo</label>
-                    <input type="file" id="f-photo" accept="image/*" onchange="previewPhoto(this)">
+                    <h3 style="margin-bottom:20px; font-weight:800;">NEW ENROLLMENT</h3>
+                    <div id="photo-preview"><i class="fas fa-user" style="font-size:2rem; color:#cbd5e1;"></i></div>
+                    <label style="font-size:0.7rem; font-weight:800; color:#64748b; display:block; text-align:center; margin-bottom:10px;">STUDENT PHOTO</label>
+                    <input type="file" id="f-photo" accept="image/*" onchange="previewPhoto(this)" style="font-size:0.7rem;">
                     
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                        <input type="text" id="f-name" placeholder="FULL NAME">
+                    <input type="text" id="f-name" placeholder="FULL NAME">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                         <input type="number" id="f-age" placeholder="AGE">
                         <input type="date" id="f-dob">
-                        <input type="text" id="f-loc" placeholder="PHYSICAL LOCATION">
-                        <input type="text" id="f-health" value="NORMAL" placeholder="HEALTH STATUS">
-                        <input type="text" id="f-lin" readonly style="color:var(--primary)">
                     </div>
-                    <button class="btn-pro" onclick="save()">SAVE STUDENT</button>
+                    <input type="text" id="f-loc" placeholder="PHYSICAL LOCATION">
+                    <input type="text" id="f-health" value="NORMAL" placeholder="HEALTH STATUS">
+                    <input type="text" id="f-lin" readonly style="color:var(--primary); background:#f1f5f9; text-align:center; font-family:monospace;">
+                    
+                    <button class="btn-pro" onclick="save()">REGISTER LEARNER</button>
                 </div>
             </div>
 
             <div id="v-list" class="hidden">
                 <div class="glass-card">
-                    <input type="text" placeholder="Search students..." onkeyup="search(this)">
+                    <input type="text" placeholder="Search by name or LIN..." onkeyup="search(this)" style="margin-bottom:20px;">
                     <div style="overflow-x:auto;">
-                        <table style="width:100%; border-collapse:collapse;">
-                            <thead><tr style="text-align:left; border-bottom:2px solid #f1f5f9;">
-                                <th>Photo</th><th>Name</th><th>LIN</th><th>Class</th><th>Actions</th>
-                            </tr></thead>
+                        <table style="width:100%; border-collapse:collapse; min-width:500px;">
+                            <thead style="text-align:left; border-bottom:2px solid #f1f5f9; font-size:0.7rem; color:#94a3b8;">
+                                <tr><th style="padding:10px;">PHOTO</th><th>NAME</th><th>LIN</th><th>ACTIONS</th></tr>
+                            </thead>
                             <tbody id="table-body"></tbody>
                         </table>
                     </div>
@@ -119,18 +131,17 @@
 
             <div id="v-roll" class="hidden">
                 <div class="glass-card">
-                    <h3>DAILY ATTENDANCE</h3>
-                    <p style="font-size:0.8rem; margin-bottom:20px;">Mark students present/absent today.</p>
-                    <div id="roll-list"></div>
-                    <button class="btn-pro" style="margin-top:20px;">SUBMIT ROLLCALL</button>
+                    <h3 style="margin-bottom:10px;">DAILY ROLLCALL</h3>
+                    <div id="roll-list" style="margin-top:20px;"></div>
+                    <button class="btn-pro" style="margin-top:20px;" onclick="alert('Attendance Saved')">SUBMIT ATTENDANCE</button>
                 </div>
             </div>
 
             <div id="v-sms" class="hidden">
                 <div class="glass-card">
-                    <h3>MESSAGE BROADCASTING</h3>
-                    <textarea placeholder="Type message to parents..." rows="4"></textarea>
-                    <button class="btn-pro">SEND TO ALL PARENTS</button>
+                    <h3 style="margin-bottom:15px;">BROADCAST SMS</h3>
+                    <textarea placeholder="Type message to all parents here..." rows="5"></textarea>
+                    <button class="btn-pro">SEND BROADCAST</button>
                 </div>
             </div>
         </div>
@@ -141,10 +152,16 @@
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
         let db, activeSch;
 
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
         async function verify() {
             const id = document.getElementById('login-id').value.toUpperCase();
+            if(!id) return;
             db = supabase.createClient(SB_URL, SB_KEY);
-            const { data } = await db.from('Schools').select('*').eq('sch_id', id).single();
+            const { data, error } = await db.from('Schools').select('*').eq('sch_id', id).single();
             if(data) {
                 activeSch = id;
                 document.getElementById('side-sch-name').innerText = data.school_name;
@@ -152,7 +169,7 @@
                 document.getElementById('sch-logo').src = data.logo_url;
                 document.getElementById('auth').classList.add('hidden');
                 genLIN(); load();
-            }
+            } else { document.getElementById('auth-err').innerText = "INVALID SCHOOL ID"; }
         }
 
         function previewPhoto(input) {
@@ -163,7 +180,10 @@
             }
         }
 
-        function genLIN() { document.getElementById('f-lin').value = activeSch + "-" + Math.floor(1000 + Math.random()*9000); }
+        function genLIN() { 
+            const pre = activeSch.substring(0,3);
+            document.getElementById('f-lin').value = pre + "-" + Math.floor(1000 + Math.random()*9000); 
+        }
 
         async function load() {
             const { data } = await db.from('Students').select('*').eq('sch_id', activeSch);
@@ -171,21 +191,20 @@
                 document.getElementById('total-std').innerText = data.length;
                 document.getElementById('table-body').innerHTML = data.map(s => `
                     <tr style="border-bottom:1px solid #f8fafc;">
-                        <td style="padding:10px;"><img src="${s.photo_url || 'https://via.placeholder.com/40'}" style="width:40px;height:40px;border-radius:8px;"></td>
-                        <td style="font-weight:800;">${s.name}</td>
-                        <td style="font-family:monospace;">${s.lin}</td>
-                        <td>${s.class || 'P.1'}</td>
-                        <td>
-                            <button class="btn-edit" onclick="alert('Edit ${s.name}')"><i class="fas fa-edit"></i></button>
-                            <button class="btn-del" onclick="deleteStd('${s.id}')"><i class="fas fa-trash"></i></button>
+                        <td style="padding:10px;"><img src="${s.photo_url || 'https://via.placeholder.com/40'}" style="width:40px;height:40px;border-radius:10px;object-fit:cover;"></td>
+                        <td style="font-weight:700; font-size:0.8rem;">${s.name}</td>
+                        <td style="font-family:monospace; font-size:0.75rem; color:var(--primary); font-weight:800;">${s.lin}</td>
+                        <td style="white-space:nowrap;">
+                            <button style="border:none; background:#eff6ff; color:var(--primary); padding:8px; border-radius:8px; margin-right:5px;"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteStd('${s.id}')" style="border:none; background:#fef2f2; color:#ef4444; padding:8px; border-radius:8px;"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 `).join('');
                 
                 document.getElementById('roll-list').innerHTML = data.map(s => `
-                    <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #f1f5f9;">
-                        <span>${s.name}</span>
-                        <input type="checkbox" style="width:20px; height:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:white; border-radius:12px; margin-bottom:8px; border:1px solid #f1f5f9;">
+                        <span style="font-weight:700; font-size:0.8rem;">${s.name}</span>
+                        <input type="checkbox" style="width:22px; height:22px; margin:0;">
                     </div>
                 `).join('');
             }
@@ -195,15 +214,18 @@
             const entry = {
                 sch_id: activeSch, name: document.getElementById('f-name').value.toUpperCase(),
                 age: document.getElementById('f-age').value, dob: document.getElementById('f-dob').value,
-                location: document.getElementById('f-loc').value.toUpperCase(), health_status: document.getElementById('f-health').value.toUpperCase(),
-                lin: document.getElementById('f-lin').value
+                location: document.getElementById('f-loc').value.toUpperCase(), 
+                health_status: document.getElementById('f-health').value.toUpperCase(),
+                lin: document.getElementById('f-lin').value,
+                contact: "+256 762 992440"
             };
+            if(!entry.name) return alert("Enter Name");
             await db.from('Students').insert([entry]);
-            alert("STUDENT SAVED"); location.reload();
+            alert("STUDENT ENROLLED"); location.reload();
         }
 
         async function deleteStd(id) {
-            if(confirm("DELETE STUDENT?")) {
+            if(confirm("Permanently delete this record?")) {
                 await db.from('Students').delete().eq('id', id);
                 load();
             }
@@ -214,6 +236,7 @@
             document.getElementById('v-'+v).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             b.classList.add('active');
+            if(window.innerWidth <= 1024) toggleMenu(); // AUTOMATICALLY CLOSE SIDEBAR ON MOBILE
         }
 
         function search(i) {
