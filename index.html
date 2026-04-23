@@ -3,135 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESMS ELITE | EUDES MEDIA</title>
+    <title>ESMS ELITE | PRO SYSTEM</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --primary: #0052cc; --dark: #0f172a; --bg: #f1f5f9; --white: #ffffff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--dark); height: 100vh; overflow: hidden; }
+        :root { --primary: #0052cc; --accent: #4f46e5; --bg: #f8fafc; --sidebar: #0f172a; --white: #ffffff; --text: #1e293b; --glass: rgba(255, 255, 255, 0.7); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
 
-        /* --- AUTH SCREEN --- */
-        #auth-screen { position: fixed; inset: 0; background: #020617; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: var(--white); padding: 35px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
-        .auth-icon { background: var(--primary); width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 1.5rem; }
-        input { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #e2e8f0; background: #f8fafc; font-weight: 600; margin-bottom: 15px; outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--primary); background: white; }
-        .btn-pro { background: var(--primary); color: white; padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
+        /* SIDEBAR DESIGN - Pro Style */
+        .sidebar { width: 280px; background: var(--sidebar); display: flex; flex-direction: column; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; flex-shrink: 0; }
+        @media (max-width: 1024px) { .sidebar { position: fixed; height: 100%; transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } }
 
-        /* --- MAIN LAYOUT --- */
-        .app-shell { display: flex; height: 100vh; width: 100vw; position: relative; }
+        .sch-branding { padding: 30px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        #sch-logo { max-height: 60px; border-radius: 12px; margin-bottom: 12px; background: white; padding: 5px; }
+        .sch-name { color: white; font-weight: 800; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Sidebar - Hidden by default on Mobile */
-        .sidebar { width: 280px; background: #020617; color: white; display: flex; flex-direction: column; height: 100%; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 500; }
-        @media (max-width: 900px) { .sidebar { position: absolute; transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } }
+        .nav-menu { flex: 1; padding: 20px 15px; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; padding: 14px 18px; color: #94a3b8; text-decoration: none; border-radius: 12px; margin-bottom: 8px; font-weight: 600; transition: 0.2s; cursor: pointer; border: none; background: transparent; width: 100%; text-align: left; }
+        .nav-item i { font-size: 1.2rem; margin-right: 15px; width: 24px; text-align: center; }
+        .nav-item:hover, .nav-item.active { background: rgba(79, 70, 229, 0.1); color: white; }
+        .nav-item.active { background: var(--accent); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
 
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; background: var(--bg); position: relative; overflow: hidden; }
+        /* MAIN CONTENT AREA */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .top-bar { height: 80px; background: var(--glass); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; border-bottom: 1px solid #e2e8f0; z-index: 100; }
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text); }
+        @media (max-width: 1024px) { .menu-toggle { display: block; } }
 
-        /* --- TOP NAVIGATION --- */
-        .header { height: 70px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; }
-        .menu-btn { font-size: 1.4rem; color: var(--dark); cursor: pointer; display: none; }
-        @media (max-width: 900px) { .menu-btn { display: block; } }
+        /* DASHBOARD CARDS - Matching Image */
+        .content { flex: 1; padding: 30px; overflow-y: auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 24px; border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .stat-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
 
-        /* --- VIEW PANELS --- */
-        .view-container { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .pro-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        
-        /* --- FORM GRID --- */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .field label { font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 6px; }
+        /* PRO FORM & TABLE */
+        .glass-card { background: white; border-radius: 30px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 8px; margin-left: 5px; }
+        input, select { width: 100%; padding: 15px; border-radius: 14px; border: 2px solid #f1f5f9; background: #f8fafc; font-weight: 600; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--accent); background: white; }
+        .btn-save { background: var(--accent); color: white; padding: 18px; border-radius: 16px; border: none; font-weight: 800; width: 100%; cursor: pointer; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2); }
 
-        /* --- DATA TABLE (RESPONSIVE) --- */
-        .table-wrap { overflow-x: auto; background: white; border-radius: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { text-align: left; padding: 15px; font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; border-bottom: 1px solid #f1f5f9; }
-        td { padding: 15px; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid #f8fafc; }
-        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; background: #ecfdf5; color: #065f46; }
+        /* AUTH SCREEN */
+        #auth { position: fixed; inset: 0; background: radial-gradient(circle at top right, #1e3a8a, #0f172a); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .auth-box { background: white; padding: 40px; border-radius: 32px; width: 100%; max-width: 420px; text-align: center; }
 
         .hidden { display: none !important; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 400; display: none; }
-        .overlay.show { display: block; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; display: none; }
+        .overlay.active { display: block; }
     </style>
 </head>
 <body>
 
-    <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-    <div id="auth-screen">
-        <div class="auth-card">
-            <div class="auth-icon"><i class="fas fa-fingerprint"></i></div>
-            <h2 style="font-weight: 800; margin-bottom: 5px;">ESMS ELITE</h2>
-            <p style="font-size: 0.6rem; color: #94a3b8; font-weight: 700; margin-bottom: 25px;">EUDES MEDIA DIGITAL PARTNER</p>
-            
-            <input type="text" id="sch-id" placeholder="SCHOOL ID (e.g. PM001)" style="text-align:center">
-            <input type="password" id="sch-pin" placeholder="ACCESS PIN" style="text-align:center">
-            
-            <button class="btn-pro" onclick="login()">UNLOCK SYSTEM</button>
-            <p id="err" style="color: #ef4444; font-size: 0.7rem; font-weight: 700; margin-top: 15px;"></p>
+    <div id="auth">
+        <div class="auth-box">
+            <div style="background: var(--accent); width: 64px; height: 64px; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.8rem;"><i class="fas fa-shield-check"></i></div>
+            <h2 style="font-weight: 800; letter-spacing: -0.5px;">ESMS ELITE</h2>
+            <p style="font-size: 0.7rem; font-weight: 700; color: #94a3b8; margin-bottom: 30px;">EUDES MEDIA | DIGITAL PARTNER</p>
+            <input type="text" id="login-id" placeholder="SCHOOL ID (e.g., PM001)" style="text-align: center; margin-bottom: 15px;">
+            <input type="password" id="login-pin" placeholder="••••••" style="text-align: center; margin-bottom: 25px;">
+            <button class="btn-save" onclick="verify()">UNLOCK SYSTEM</button>
+            <p id="auth-msg" style="color: #ef4444; font-size: 0.7rem; font-weight: 700; margin-top: 15px;"></p>
         </div>
     </div>
 
-    <div class="app-shell hidden" id="app">
-        <aside class="sidebar" id="sidebar">
-            <div style="padding: 30px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <img id="logo" src="" style="max-height: 50px; margin-bottom: 10px;" onerror="this.style.display='none'">
-                <h4 id="sch-name" style="font-size: 0.8rem; font-weight: 800;"></h4>
+    <div class="sidebar" id="sidebar">
+        <div class="sch-branding">
+            <img id="sch-logo" src="" onerror="this.src='https://via.placeholder.com/60?text=LOGO'">
+            <div class="sch-name" id="side-name">SCHOOL PANEL</div>
+        </div>
+        <nav class="nav-menu">
+            <button class="nav-item active" onclick="nav('dash', this)"><i class="fas fa-grid-horizontal"></i> Dashboard</button>
+            <button class="nav-item" onclick="nav('reg', this)"><i class="fas fa-user-plus"></i> Enrollment</button>
+            <button class="nav-item" onclick="nav('list', this)"><i class="fas fa-users-viewfinder"></i> Student List</button>
+            <button class="nav-item"><i class="fas fa-book-open"></i> Academics</button>
+            <button class="nav-item"><i class="fas fa-file-invoice-dollar"></i> Fees & Finance</button>
+            <button class="nav-item"><i class="fas fa-bus"></i> Transport</button>
+            <button class="nav-item"><i class="fas fa-notes-medical"></i> Health & Clinic</button>
+        </nav>
+        <div style="padding: 25px; border-top: 1px solid rgba(255,255,255,0.05);">
+            <p style="color: #64748b; font-size: 0.6rem; font-weight: 800;">SUPPORT: EUDES MEDIA</p>
+            <p style="color: white; font-size: 0.8rem; font-weight: 700;">+256 762 992440</p>
+        </div>
+    </div>
+
+    <main class="main">
+        <header class="top-bar">
+            <div class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars-staggered"></i></div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <h3 id="header-title" style="font-weight: 800; font-size: 1.1rem;">WELCOME BACK</h3>
+                <span style="background: #ecfdf5; color: #065f46; padding: 5px 12px; border-radius: 10px; font-size: 0.65rem; font-weight: 800;">ACADEMIC YEAR 2026</span>
             </div>
-            
-            <nav style="flex: 1; padding: 20px;">
-                <div style="margin-bottom: 10px; cursor: pointer; padding: 12px; border-radius: 10px; background: var(--primary);" onclick="show('list')"><i class="fas fa-list-ul"></i> &nbsp; Learner List</div>
-                <div style="margin-bottom: 10px; cursor: pointer; padding: 12px; border-radius: 10px;" onclick="show('reg')"><i class="fas fa-plus-circle"></i> &nbsp; New Entry</div>
-            </nav>
+            <div style="width: 45px; height: 45px; border-radius: 14px; background: #f1f5f9; display: flex; align-items: center; justify-content: center;"><i class="fas fa-bell"></i></div>
+        </header>
 
-            <div style="padding: 25px; background: rgba(0,0,0,0.3); font-size: 0.7rem;">
-                <p style="color: #94a3b8; font-weight: 700;">SUPPORT: EUDES MEDIA</p>
-                <p style="color: white; font-weight: 800; margin-top: 4px;">+256 762 992440</p>
-            </div>
-        </aside>
-
-        <main class="main-content">
-            <header class="header">
-                <div class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
-                <h3 style="font-weight: 800; font-size: 0.9rem; color: var(--primary);">STUDENT MANAGEMENT</h3>
-                <div style="background: #eff6ff; color: #1d4ed8; padding: 6px 12px; border-radius: 8px; font-size: 0.6rem; font-weight: 800;">PRO VERSION</div>
-            </header>
-
-            <div class="view-container">
-                <div id="v-list">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px;">
-                        <input type="text" placeholder="Search by Name or LIN..." style="margin-bottom: 0;" onkeyup="search(this)">
+        <div class="content">
+            <div id="v-dash">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #eff6ff; color: #1e40af;"><i class="fas fa-user-graduate"></i></div>
+                        <div><h2 id="count-std">0</h2><label>Total Students</label></div>
                     </div>
-                    <div class="table-wrap pro-card">
-                        <table>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #fdf2f8; color: #9d174d;"><i class="fas fa-chalkboard-user"></i></div>
+                        <div><h2>12</h2><label>Teaching Staff</label></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #f0fdf4; color: #166534;"><i class="fas fa-money-check-dollar"></i></div>
+                        <div><h2>UGX 0</h2><label>Fees Collection</label></div>
+                    </div>
+                </div>
+                <div class="glass-card">
+                    <h4 style="font-weight: 800; margin-bottom: 15px;">RECENT ANNOUNCEMENTS</h4>
+                    <p style="color: #64748b; font-size: 0.9rem;">Welcome to the ESMS Elite Pro Dashboard. All systems are operational.</p>
+                </div>
+            </div>
+
+            <div id="v-reg" class="hidden">
+                <div class="glass-card">
+                    <h3 style="margin-bottom: 25px; font-weight: 800; color: var(--accent);">LEARNER ENROLLMENT</h3>
+                    <div class="form-row">
+                        <div class="input-group"><label>Full Name</label><input type="text" id="f-name"></div>
+                        <div class="input-group"><label>Age</label><input type="number" id="f-age"></div>
+                        <div class="input-group"><label>Date of Birth</label><input type="date" id="f-dob"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group"><label>Physical Location</label><input type="text" id="f-loc"></div>
+                        <div class="input-group"><label>Health Status</label><input type="text" id="f-health" value="NORMAL"></div>
+                        <div class="input-group"><label>LIN Number (Auto)</label><input type="text" id="f-lin" readonly style="color:var(--accent)"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group"><label>Class</label><select id="f-class"><option>Nursery</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
+                        <div class="input-group"><label>Contact Number</label><input type="tel" id="f-tel" value="+256 "></div>
+                    </div>
+                    <button class="btn-save" onclick="saveData()" id="save-btn">REGISTER STUDENT</button>
+                </div>
+            </div>
+
+            <div id="v-list" class="hidden">
+                <div class="glass-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                        <h3 style="font-weight: 800;">STUDENT DIRECTORY</h3>
+                        <input type="text" placeholder="Search Name or LIN..." style="max-width: 300px;" onkeyup="search(this)">
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
                             <thead>
-                                <tr><th>LIN No.</th><th>Name</th><th>Age/DOB</th><th>Location</th><th>Health</th><th>Class</th></tr>
+                                <tr style="text-align: left; border-bottom: 2px solid #f1f5f9;">
+                                    <th style="padding: 15px; font-size: 0.7rem; font-weight: 800; color: #94a3b8;">LIN NUMBER</th>
+                                    <th style="padding: 15px; font-size: 0.7rem; font-weight: 800; color: #94a3b8;">STUDENT NAME</th>
+                                    <th style="padding: 15px; font-size: 0.7rem; font-weight: 800; color: #94a3b8;">CLASS</th>
+                                    <th style="padding: 15px; font-size: 0.7rem; font-weight: 800; color: #94a3b8;">LOCATION</th>
+                                    <th style="padding: 15px; font-size: 0.7rem; font-weight: 800; color: #94a3b8;">HEALTH</th>
+                                </tr>
                             </thead>
-                            <tbody id="data-rows"></tbody>
+                            <tbody id="table-body"></tbody>
                         </table>
                     </div>
                 </div>
-
-                <div id="v-reg" class="hidden">
-                    <div class="pro-card">
-                        <h3 style="margin-bottom: 20px; font-weight: 800;">ENROLL NEW LEARNER</h3>
-                        <div class="grid">
-                            <div class="field"><label>Full Name</label><input type="text" id="f-name"></div>
-                            <div class="field"><label>Age</label><input type="number" id="f-age"></div>
-                            <div class="field"><label>Date of Birth</label><input type="date" id="f-dob"></div>
-                            <div class="field"><label>Physical Location</label><input type="text" id="f-loc"></div>
-                            <div class="field"><label>Health Status</label><input type="text" id="f-health" value="GOOD"></div>
-                            <div class="field"><label>Student LIN (Auto)</label><input type="text" id="f-lin" readonly style="color:var(--primary)"></div>
-                            <div class="field"><label>Contact</label><input type="tel" id="f-tel" value="+256 "></div>
-                            <div class="field"><label>Class</label><input type="text" id="f-class" placeholder="e.g. P.7"></div>
-                        </div>
-                        <button class="btn-pro" onclick="save()">SAVE TO DATABASE</button>
-                    </div>
-                </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
 
     <script>
         const SB_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
@@ -140,75 +177,70 @@
 
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('show');
+            document.getElementById('overlay').classList.toggle('active');
         }
 
-        async function login() {
-            const id = document.getElementById('sch-id').value.trim().toUpperCase();
+        async function verify() {
+            const id = document.getElementById('login-id').value.trim().toUpperCase();
             if(!id) return;
-            
             client = supabase.createClient(SB_URL, SB_KEY);
-            const { data, error } = await client.from('Schools').select('*').eq('sch_id', id).single();
-            
+            const { data } = await client.from('Schools').select('*').eq('sch_id', id).single();
             if(data) {
                 activeSch = id;
-                document.getElementById('sch-name').innerText = data.school_name;
-                document.getElementById('logo').src = data.logo_url;
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app').classList.remove('hidden');
-                genLIN();
-                load();
-            } else {
-                document.getElementById('err').innerText = "INVALID SCHOOL ID";
-            }
+                document.getElementById('side-name').innerText = data.school_name;
+                document.getElementById('header-title').innerText = "PORTAL: " + data.school_name;
+                document.getElementById('sch-logo').src = data.logo_url;
+                document.getElementById('auth').classList.add('hidden');
+                genLIN(); load();
+            } else { document.getElementById('auth-msg').innerText = "INVALID SCHOOL ID"; }
         }
 
-        function genLIN() {
-            document.getElementById('f-lin').value = "PMS-" + Math.floor(Math.random()*9000 + 1000);
+        function genLIN() { 
+            const prefix = activeSch.substring(0,2);
+            document.getElementById('f-lin').value = prefix + "-" + Math.floor(1000 + Math.random()*9000); 
         }
 
         async function load() {
             const { data } = await client.from('Students').select('*').eq('sch_id', activeSch);
             if(data) {
-                document.getElementById('data-rows').innerHTML = data.map(s => `
-                    <tr>
-                        <td style="font-family:monospace; color:var(--primary)">${s.lin}</td>
-                        <td style="font-weight:800">${s.name}</td>
-                        <td>${s.age} yrs <br><small style="color:#94a3b8">${s.dob}</small></td>
-                        <td>${s.location}</td>
-                        <td><span class="status-badge">${s.health_status}</span></td>
-                        <td>${s.class}</td>
+                document.getElementById('count-std').innerText = data.length;
+                document.getElementById('table-body').innerHTML = data.map(s => `
+                    <tr style="border-bottom: 1px solid #f8fafc;">
+                        <td style="padding: 15px; font-family: monospace; color: var(--accent); font-weight: 700;">${s.lin}</td>
+                        <td style="padding: 15px; font-weight: 700;">${s.name}</td>
+                        <td style="padding: 15px; font-weight: 600;">${s.class}</td>
+                        <td style="padding: 15px; font-size: 0.8rem;">${s.location}</td>
+                        <td style="padding: 15px;"><span style="background:#fef3c7; color:#92400e; padding:4px 10px; border-radius:8px; font-size:0.65rem; font-weight:800;">${s.health_status}</span></td>
                     </tr>
                 `).join('');
             }
         }
 
-        async function save() {
+        async function saveData() {
+            const btn = document.getElementById('save-btn');
             const entry = {
-                sch_id: activeSch,
-                name: document.getElementById('f-name').value.toUpperCase(),
-                age: document.getElementById('f-age').value,
-                dob: document.getElementById('f-dob').value,
-                location: document.getElementById('f-loc').value.toUpperCase(),
-                health_status: document.getElementById('f-health').value.toUpperCase(),
-                lin: document.getElementById('f-lin').value,
-                contact: document.getElementById('f-tel').value,
-                class: document.getElementById('f-class').value
+                sch_id: activeSch, name: document.getElementById('f-name').value.toUpperCase(),
+                age: document.getElementById('f-age').value, dob: document.getElementById('f-dob').value,
+                location: document.getElementById('f-loc').value.toUpperCase(), health_status: document.getElementById('f-health').value.toUpperCase(),
+                lin: document.getElementById('f-lin').value, contact: document.getElementById('f-tel').value, class: document.getElementById('f-class').value
             };
+            btn.innerText = "SAVING..."; btn.disabled = true;
             await client.from('Students').insert([entry]);
-            alert("STUDENT REGISTERED");
+            alert("STUDENT ENROLLED SUCCESSFULLY");
             location.reload();
         }
 
-        function show(v) {
-            document.getElementById('v-list').classList.toggle('hidden', v !== 'list');
-            document.getElementById('v-reg').classList.toggle('hidden', v !== 'reg');
-            if(window.innerWidth < 900) toggleMenu();
+        function nav(v, b) {
+            ['v-dash', 'v-reg', 'v-list'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('v-'+v).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            b.classList.add('active');
+            if(window.innerWidth < 1024) toggleMenu();
         }
 
         function search(i) {
             let q = i.value.toUpperCase();
-            document.querySelectorAll('#data-rows tr').forEach(r => {
+            document.querySelectorAll('#table-body tr').forEach(r => {
                 r.style.display = r.innerText.toUpperCase().includes(q) ? "" : "none";
             });
         }
