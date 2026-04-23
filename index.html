@@ -23,15 +23,13 @@
 
         .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: white; padding: 20px; border-radius: 20px; border-bottom: 4px solid var(--primary); text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .stat-card h2 { font-size: 1.4rem; font-weight: 800; }
         
         .glass-card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
         .student-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px; }
         .st-photo { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: #cbd5e1; }
         
         input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 12px; font-weight: 600; }
-        .btn-pro { background: var(--primary); color: white; padding: 16px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; width: 100%; transition: 0.2s; }
-        .btn-pro:active { transform: scale(0.98); }
+        .btn-pro { background: var(--primary); color: white; padding: 16px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; width: 100%; }
         .hidden { display: none !important; }
         
         #auth { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -44,7 +42,7 @@
             <h1 style="font-weight:900;">ESMS <span style="color:var(--primary)">ELITE</span></h1>
             <p style="font-size:0.7rem; font-weight:800; color:#94a3b8; margin-bottom:20px;">EUDES MEDIA SOLUTIONS</p>
             <input type="text" id="sch-login" placeholder="SCHOOL ID" style="text-align:center;">
-            <button class="btn-pro" onclick="verify()">UNLOCKED SYSTEM</button>
+            <button class="btn-pro" onclick="verify()">LOAD SYSTEM</button>
         </div>
     </div>
 
@@ -71,24 +69,19 @@
         <div class="content">
             <div id="v-dash">
                 <div class="stat-grid">
-                    <div class="stat-card"><h2><span id="st-count">0</span></h2><p style="font-size:0.6rem; font-weight:800; color:#64748b">STUDENTS</p></div>
-                    <div class="stat-card"><h2><span id="st-paid" style="color:var(--success)">0</span></h2><p style="font-size:0.6rem; font-weight:800; color:#64748b">PAID (UGX)</p></div>
-                    <div class="stat-card"><h2><span id="st-debt" style="color:var(--danger)">0</span></h2><p style="font-size:0.6rem; font-weight:800; color:#64748b">BALANCE</p></div>
-                </div>
-                <div class="glass-card">
-                    <h4 style="font-size:0.7rem; margin-bottom:10px;">SYSTEM STATUS</h4>
-                    <div id="debug-log" style="font-size:0.6rem; font-family:monospace; color:var(--danger)">Connected...</div>
+                    <div class="stat-card"><h2><span id="st-count">0</span></h2><p style="font-size:0.6rem; font-weight:800;">STUDENTS</p></div>
+                    <div class="stat-card"><h2><span id="st-paid" style="color:var(--success)">0</span></h2><p style="font-size:0.6rem; font-weight:800;">PAID (UGX)</p></div>
+                    <div class="stat-card"><h2><span id="st-debt" style="color:var(--danger)">0</span></h2><p style="font-size:0.6rem; font-weight:800;">BALANCE</p></div>
                 </div>
             </div>
 
             <div id="v-reg" class="hidden">
                 <div class="glass-card">
-                    <h3>STUDENT DATA ENTRY</h3>
+                    <h3>REGISTRATION</h3>
                     <input type="hidden" id="f-id">
                     <div style="text-align:center; margin-bottom:15px;">
                         <img id="f-preview" class="st-photo" style="width:100px; height:100px; display:none; margin:0 auto 10px;">
-                        <input type="file" accept="image/*" onchange="handleImg(this)">
-                        <input type="hidden" id="f-img">
+                        <input type="file" id="f-file" accept="image/*" onchange="previewImg(this)">
                     </div>
                     <input type="text" id="f-name" placeholder="Full Name">
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -101,29 +94,24 @@
                         <option>P.5</option><option>P.6</option><option>P.7</option>
                     </select>
                     <input type="text" id="f-contact" placeholder="Contact (+256...)">
-                    <input type="text" id="f-loc" placeholder="Physical Location">
-                    <input type="text" id="f-health" placeholder="Health Status (e.g. Normal)">
+                    <input type="text" id="f-loc" placeholder="Location">
+                    <input type="text" id="f-health" placeholder="Health Status (health_status)">
                     <input type="number" id="f-fees" placeholder="Total Fees">
-                    <button class="btn-pro" onclick="saveStudent()">SECURE SAVE</button>
+                    <button id="save-btn" class="btn-pro" onclick="saveStudent()">SECURE SAVE</button>
                 </div>
             </div>
 
             <div id="v-list" class="hidden"><div id="master-list"></div></div>
-
             <div id="v-fin" class="hidden"><div id="finance-list"></div></div>
 
             <div id="v-rep" class="hidden">
                 <div class="glass-card">
                     <select id="rep-cls" onchange="loadRepList()"><option value="">Select Class</option></select>
                     <div id="rep-st-list"></div>
-                    <div id="g-panel" class="hidden" style="margin-top:20px; padding-top:20px; border-top:2px solid #eee;">
-                        <h4 id="g-name" style="color:var(--primary)"></h4>
+                    <div id="g-panel" class="hidden">
+                        <h4 id="g-name" style="margin-top:20px; color:var(--primary)"></h4>
                         <div id="g-inputs" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;"></div>
-                        <div style="background:var(--dark); color:white; padding:20px; border-radius:20px; text-align:center; margin:15px 0;">
-                            <h1 id="res-agg">--</h1><p>Aggregates</p>
-                            <h4 id="res-div" style="color:var(--success)">--</h4>
-                        </div>
-                        <button class="btn-pro" onclick="saveReport()">SAVE REPORT</button>
+                        <button class="btn-pro" onclick="saveReport()" style="margin-top:15px;">SAVE REPORT</button>
                     </div>
                 </div>
             </div>
@@ -136,12 +124,9 @@
         let db, activeSch, students = [];
 
         function updateClock() {
-            const now = new Date();
-            document.getElementById('live-clock').innerText = now.toLocaleDateString() + ' | ' + now.toLocaleTimeString();
+            document.getElementById('live-clock').innerText = new Date().toLocaleString();
         }
         setInterval(updateClock, 1000);
-
-        function log(msg) { document.getElementById('debug-log').innerText = msg; }
 
         async function verify() {
             const id = document.getElementById('sch-login').value.toUpperCase().trim();
@@ -161,6 +146,58 @@
             updateUI();
         }
 
+        function previewImg(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { 
+                    document.getElementById('f-preview').src = e.target.result; 
+                    document.getElementById('f-preview').style.display='block'; 
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function saveStudent() {
+            const btn = document.getElementById('save-btn');
+            const file = document.getElementById('f-file').files[0];
+            const id = document.getElementById('f-id').value;
+            btn.innerText = "SAVING...";
+            btn.disabled = true;
+
+            let photoUrl = document.getElementById('f-preview').src;
+
+            // UPLOAD TO STORAGE IF NEW FILE (STOPS SLOWDOWN)
+            if (file) {
+                const fileName = `${activeSch}/${Date.now()}-${file.name}`;
+                const { data, error } = await db.storage.from('photos').upload(fileName, file);
+                if (!error) {
+                    const { data: urlData } = db.storage.from('photos').getPublicUrl(fileName);
+                    photoUrl = urlData.publicUrl;
+                }
+            }
+
+            const payload = {
+                sch_id: activeSch, name: document.getElementById('f-name').value.toUpperCase(),
+                age: document.getElementById('f-age').value, dob: document.getElementById('f-dob').value,
+                class: document.getElementById('f-class').value, contact: document.getElementById('f-contact').value,
+                location: document.getElementById('f-loc').value, health_status: document.getElementById('f-health').value,
+                total_fees: document.getElementById('f-fees').value, photo_url: photoUrl
+            };
+
+            if(!id) {
+                payload.lin = activeSch + "-" + Math.floor(1000 + Math.random()*8999);
+                payload.payment_code = "PAY-" + Math.floor(100000 + Math.random()*899999);
+            }
+
+            const { error } = id ? await db.from('Students').update(payload).eq('id', id) : await db.from('Students').insert([payload]);
+            
+            btn.innerText = "SECURE SAVE";
+            btn.disabled = false;
+            
+            if(!error) { alert("SUCCESS"); refresh(); nav('list'); } else { alert(error.message); }
+        }
+
+        // Standard Navigation and UI Refresh
         function updateUI() {
             let p = 0, t = 0;
             students.forEach(s => { p += Number(s.paid_fees || 0); t += Number(s.total_fees || 0); });
@@ -180,44 +217,15 @@
 
             document.getElementById('finance-list').innerHTML = students.map(s => `
                 <div class="student-item">
-                    <div style="flex:1"><b>${s.name}</b><br><small>PAY CODE: ${s.payment_code || 'N/A'}</small></div>
+                    <div style="flex:1"><b>${s.name}</b><br><small>${s.payment_code || 'N/A'}</small></div>
                     <div style="text-align:right">
                         <small>Bal: ${(s.total_fees - s.paid_fees).toLocaleString()}</small><br>
-                        <input type="number" placeholder="Add Pay" style="width:70px; margin:0;" onchange="updatePay('${s.id}', this.value)">
+                        <input type="number" placeholder="Pay" style="width:70px; margin:0;" onchange="updatePay('${s.id}', this.value)">
                     </div>
                 </div>`).join('');
 
             const cls = [...new Set(students.map(s => s.class))].sort();
             document.getElementById('rep-cls').innerHTML = '<option value="">Class</option>' + cls.map(c => `<option>${c}</option>`).join('');
-        }
-
-        function handleImg(input) {
-            const reader = new FileReader();
-            reader.onload = e => { 
-                document.getElementById('f-preview').src = e.target.result; 
-                document.getElementById('f-preview').style.display='block'; 
-                document.getElementById('f-img').value = e.target.result; 
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-
-        async function saveStudent() {
-            const id = document.getElementById('f-id').value;
-            const payload = {
-                sch_id: activeSch, name: document.getElementById('f-name').value.toUpperCase(),
-                age: document.getElementById('f-age').value, dob: document.getElementById('f-dob').value,
-                class: document.getElementById('f-class').value, contact: document.getElementById('f-contact').value,
-                location: document.getElementById('f-loc').value, 
-                health_status: document.getElementById('f-health').value, // FIXED COLUMN NAME
-                total_fees: document.getElementById('f-fees').value, photo_url: document.getElementById('f-img').value
-            };
-            if(!id) {
-                payload.lin = activeSch + "-" + Math.floor(1000 + Math.random()*8999);
-                payload.payment_code = "PAY-" + Math.floor(100000 + Math.random()*899999);
-            }
-            const { error } = id ? await db.from('Students').update(payload).eq('id', id) : await db.from('Students').insert([payload]);
-            if(error) { log("SAVE ERROR: " + error.message); alert(error.message); }
-            else { alert("✅ DATA SECURED!"); refresh(); nav('list'); }
         }
 
         async function updatePay(id, val) {
@@ -241,33 +249,13 @@
             const { data: rep } = await db.from('Reports').select('*').eq('student_id', id).single();
             document.getElementById('g-inputs').innerHTML = subs.map(sub => `
                 <div><label style="font-size:0.6rem;">${sub}</label>
-                <input type="number" class="mk" data-sub="${sub.toLowerCase()}" value="${rep ? rep[sub.toLowerCase()] || '' : ''}" oninput="calcG()"></div>`).join('');
-            if(rep) calcG();
-        }
-
-        function calcG() {
-            let pts = 0, all = true;
-            document.querySelectorAll('.mk').forEach(i => {
-                if(!i.value) all = false;
-                const m = Number(i.value);
-                if(m >= 90) pts += 1; else if(m >= 80) pts += 2; else if(m >= 75) pts += 3;
-                else if(m >= 70) pts += 4; else if(m >= 60) pts += 5; else if(m >= 50) pts += 6;
-                else if(m >= 45) pts += 7; else if(m >= 40) pts += 8; else pts += 9;
-            });
-            if(!all) return;
-            document.getElementById('res-agg').innerText = pts;
-            document.getElementById('res-div').innerText = "Division " + (pts <= 12 ? "1" : pts <= 24 ? "2" : pts <= 28 ? "3" : "U");
+                <input type="number" class="mk" data-sub="${sub.toLowerCase()}" value="${rep ? rep[sub.toLowerCase()] || '' : ''}"></div>`).join('');
         }
 
         async function saveReport() {
             const m = {}; document.querySelectorAll('.mk').forEach(i => m[i.getAttribute('data-sub')] = Number(i.value));
-            const payload = {
-                student_id: currentSid, sch_id: activeSch, ...m,
-                aggregates: parseInt(document.getElementById('res-agg').innerText),
-                division: document.getElementById('res-div').innerText
-            };
-            const { error } = await db.from('Reports').upsert(payload, { onConflict: 'student_id' });
-            if(!error) alert("REPORT ARCHIVED");
+            await db.from('Reports').upsert({ student_id: currentSid, sch_id: activeSch, ...m }, { onConflict: 'student_id' });
+            alert("REPORT SAVED");
         }
 
         function editS(id) {
@@ -276,9 +264,8 @@
             document.getElementById('f-name').value = s.name;
             document.getElementById('f-class').value = s.class;
             document.getElementById('f-fees').value = s.total_fees;
-            document.getElementById('f-img').value = s.photo_url || '';
             document.getElementById('f-preview').src = s.photo_url || '';
-            document.getElementById('f-preview').style.display = s.photo_url ? 'block' : 'none';
+            document.getElementById('f-preview').style.display = 'block';
             nav('reg');
         }
 
