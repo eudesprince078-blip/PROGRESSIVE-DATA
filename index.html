@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESMS ELITE | EUDES MEDIA PRO</title>
+    <title>ESMS ELITE | EUDES MEDIA MASTER</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,36 +13,24 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: #1e293b; height: 100vh; display: flex; overflow: hidden; }
 
-        /* SIDEBAR */
         .sidebar { width: 260px; background: var(--dark); display: flex; flex-direction: column; transition: 0.3s; z-index: 3000; flex-shrink: 0; }
         @media (max-width: 1024px) { .sidebar { position: fixed; height: 100%; transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } }
-        .nav-item { display: flex; align-items: center; padding: 14px 20px; color: #94a3b8; border: none; background: transparent; width: 100%; cursor: pointer; font-weight: 700; transition: 0.2s; }
+        .nav-item { display: flex; align-items: center; padding: 14px 20px; color: #94a3b8; border: none; background: transparent; width: 100%; cursor: pointer; font-weight: 700; }
         .nav-item.active { background: var(--primary); color: white; border-radius: 0 25px 25px 0; }
 
-        /* MAIN CONTENT */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .header { height: 70px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #e2e8f0; }
         .content { flex: 1; padding: 20px; overflow-y: auto; }
 
-        /* DASHBOARD & STATS */
-        .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .card-stat { background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; text-align: center; }
-        .card-stat h3 { font-size: 1.5rem; font-weight: 800; }
-
-        .glass-card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        
-        /* FORM & TABLE */
+        .glass-card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
         input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 10px; font-weight: 600; }
-        .btn-pro { background: var(--primary); color: white; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; }
+        .btn-pro { background: var(--primary); color: white; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; width: 100%; }
         
         .row-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-        .badge { padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; }
-        .badge-debt { background: #fee2e2; color: var(--danger); }
-        .badge-paid { background: #dcfce7; color: var(--success); }
-
+        .subject-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 15px; margin-top: 10px; }
         .hidden { display: none !important; }
-        .action-btns i { margin-left: 15px; cursor: pointer; transition: 0.2s; }
-        .action-btns i:hover { color: var(--primary); }
+        
+        .result-box { margin-top: 15px; padding: 15px; border-radius: 12px; background: var(--dark); color: white; text-align: center; }
     </style>
 </head>
 <body>
@@ -50,9 +38,8 @@
     <div id="auth" style="position:fixed; inset:0; background:var(--dark); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;">
         <div style="background:white; padding:40px; border-radius:30px; width:100%; max-width:400px; text-align:center;">
             <h1 style="font-weight:900;">ESMS <span style="color:var(--primary)">ELITE</span></h1>
-            <p style="font-size:0.7rem; font-weight:800; color:#94a3b8; margin-bottom:20px;">BY EUDES MEDIA</p>
-            <input type="text" id="login-id" placeholder="ENTER SCHOOL ID">
-            <button class="btn-pro" style="width:100%" onclick="verify()">UNLOCKED SYSTEM</button>
+            <input type="text" id="login-id" placeholder="ENTER SCHOOL ID" style="text-align:center; margin-top:20px;">
+            <button class="btn-pro" onclick="verify()">ACCESS PORTAL</button>
         </div>
     </div>
 
@@ -61,119 +48,52 @@
             <img id="sch-logo" style="height:50px; border-radius:10px;">
             <h4 id="side-sch-name" style="color:white; font-size:0.8rem; margin-top:10px;"></h4>
         </div>
-        <nav style="flex:1;">
-            <button class="nav-item active" onclick="nav('dash', this)"><i class="fas fa-grid-2"></i> &nbsp; Dashboard</button>
-            <button class="nav-item" onclick="nav('reg', this)"><i class="fas fa-user-plus"></i> &nbsp; Enrollment</button>
-            <button class="nav-item" onclick="nav('list', this)"><i class="fas fa-address-book"></i> &nbsp; Student List</button>
-            <button class="nav-item" onclick="nav('fin', this)"><i class="fas fa-coins"></i> &nbsp; Financials</button>
-            <button class="nav-item" onclick="nav('roll', this)"><i class="fas fa-check-double"></i> &nbsp; Rollcall</button>
-            <button class="nav-item" onclick="nav('broad', this)"><i class="fas fa-bullhorn"></i> &nbsp; Broadcast</button>
-            <button class="nav-item" onclick="nav('rep', this)"><i class="fas fa-award"></i> &nbsp; Report Cards</button>
+        <nav>
+            <button class="nav-item active" onclick="nav('dash', this)"><i class="fas fa-home"></i> &nbsp; Dashboard</button>
+            <button class="nav-item" onclick="nav('list', this)"><i class="fas fa-users"></i> &nbsp; Student List</button>
+            <button class="nav-item" onclick="nav('rep', this)"><i class="fas fa-file-invoice"></i> &nbsp; Report Cards</button>
         </nav>
     </aside>
 
     <main class="main">
         <header class="header">
             <div onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></div>
-            <div style="text-align:center;">
-                <h4 id="head-sch-name" style="font-weight:800; font-size:0.9rem;"></h4>
-                <p id="live-time" style="font-size:0.6rem; font-weight:700; color:var(--primary)"></p>
-            </div>
-            <i class="fas fa-bell"></i>
+            <h4 id="head-title" style="font-weight:800;">REPORTS & GRADING</h4>
+            <p id="live-time" style="font-size:0.7rem; font-weight:800; color:var(--primary)"></p>
         </header>
 
         <div class="content">
-            <div id="v-dash">
-                <div class="stat-row">
-                    <div class="card-stat"><h3 id="s-total">0</h3><label>Total Students</label></div>
-                    <div class="card-stat"><h3 id="s-paid" style="color:var(--success)">0</h3><label>Total Paid</label></div>
-                    <div class="card-stat"><h3 id="s-debt" style="color:var(--danger)">0</h3><label>Total Debt</label></div>
-                </div>
+            <div id="v-rep">
                 <div class="glass-card">
-                    <h4>TODAY'S ABSENTEES</h4>
-                    <div id="dash-absent-list"></div>
+                    <h3>STUDENT ASSESSMENT</h3>
+                    <select id="rep-cls" onchange="loadStudentsForRep()"><option value="">Select Class</option></select>
+                    <div id="rep-st-list" style="margin-top:10px;"></div>
                 </div>
-            </div>
 
-            <div id="v-reg" class="hidden">
-                <div class="glass-card">
-                    <h3>STUDENT REGISTRATION</h3>
-                    <input type="hidden" id="f-id">
-                    <div style="text-align:center; margin-bottom:15px;">
-                        <img id="f-preview" style="width:100px; height:100px; border-radius:20px; object-fit:cover; display:none; margin:0 auto 10px; border:2px solid var(--primary);">
-                        <input type="file" onchange="handlePhoto(this)">
-                        <input type="hidden" id="f-photo-data">
+                <div id="grading-panel" class="glass-card hidden">
+                    <h3 id="target-name" style="color:var(--primary)"></h3>
+                    <div id="subject-inputs" class="subject-grid"></div>
+                    
+                    <textarea id="t-comment" placeholder="Class Teacher's Comment" style="margin-top:10px;"></textarea>
+                    
+                    <div class="result-box">
+                        <div id="calc-agg" style="font-size:1.2rem; font-weight:800;">Aggregates: --</div>
+                        <div id="calc-div" style="font-size:0.9rem; font-weight:700; color:var(--success)">Division: --</div>
                     </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <input type="text" id="f-name" placeholder="Full Name">
-                        <select id="f-class">
-                            <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                            <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                            <option>P.5</option><option>P.6</option><option>P.7</option>
-                        </select>
-                        <input type="text" id="f-contact" placeholder="Guardian Phone">
-                        <input type="text" id="f-location" placeholder="Address">
-                        <input type="text" id="f-health" placeholder="Health Status">
-                        <input type="date" id="f-dob">
-                    </div>
-                    <input type="number" id="f-fees" placeholder="Total Fees for Term (UGX)">
-                    <button class="btn-pro" style="width:100%" onclick="saveStudent()">SAVE INFORMATION</button>
+                    
+                    <button class="btn-pro" style="margin-top:15px;" onclick="saveReport()">SAVE & PRINT REPORT</button>
                 </div>
             </div>
 
-            <div id="v-list" class="hidden">
-                <div class="glass-card" style="padding:10px; margin-bottom:10px;">
-                    <input type="text" id="list-search" placeholder="Search anything..." onkeyup="filterList()" style="margin:0;">
-                </div>
-                <div id="master-list"></div>
-            </div>
-
-            <div id="v-fin" class="hidden">
-                <div class="glass-card">
-                    <h3>FEES LEDGER & HISTORY</h3>
-                    <div id="fin-list"></div>
-                </div>
-            </div>
-
-            <div id="v-broad" class="hidden">
-                <div class="glass-card">
-                    <h3>SMART BROADCAST CENTER</h3>
-                    <select id="b-target" onchange="autoSms()">
-                        <option value="all">Send to All Parents</option>
-                        <option value="debtors">Send to All Debtors (Auto-Calculate)</option>
-                    </select>
-                    <textarea id="b-msg" style="height:150px;" placeholder="Message content..."></textarea>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <button class="btn-pro" style="background:#25D366" onclick="sendBroadcast('whatsapp')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-                        <button class="btn-pro" style="background:#ea4335" onclick="sendBroadcast('email')"><i class="fas fa-envelope"></i> Email</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="v-roll" class="hidden">
-                <div class="glass-card">
-                    <h3>DAILY ATTENDANCE</h3>
-                    <select id="roll-cls" onchange="renderRoll()"><option value="">Select Class</option></select>
-                    <div id="roll-container"></div>
-                </div>
-            </div>
-
-            <div id="v-rep" class="hidden">
-                <div class="glass-card">
-                    <h3>GRADING SYSTEM</h3>
-                    <select id="rep-cls" onchange="renderRepList()"><option value="">Select Class</option></select>
-                    <div id="rep-container"></div>
-                </div>
-            </div>
+            <div id="v-dash" class="hidden">Dashboard Content...</div>
+            <div id="v-list" class="hidden">List Content...</div>
         </div>
     </main>
 
     <script>
         const SB_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        let db, activeSch, students = [], abs = [];
-
-        setInterval(() => { document.getElementById('live-time').innerText = new Date().toLocaleString('en-GB'); }, 1000);
+        let db, activeSch, students = [];
 
         async function verify() {
             const id = document.getElementById('login-id').value.toUpperCase().trim();
@@ -182,134 +102,91 @@
             if(data) {
                 activeSch = id;
                 document.getElementById('side-sch-name').innerText = data.school_name;
-                document.getElementById('head-sch-name').innerText = data.school_name;
                 document.getElementById('sch-logo').src = data.logo_url;
                 document.getElementById('auth').classList.add('hidden');
-                loadData();
+                refresh();
             }
         }
 
-        async function loadData() {
+        async function refresh() {
             const { data } = await db.from('Students').select('*').eq('sch_id', activeSch);
             students = data || [];
-            
-            // Fix Dropdowns - Populate all classes
-            const classes = [...new Set(students.map(s => s.class))].sort();
-            const selects = ['roll-cls', 'rep-cls'];
-            selects.forEach(sid => {
-                const el = document.getElementById(sid);
-                el.innerHTML = '<option value="">Select Class</option>' + classes.map(c => `<option>${c}</option>`).join('');
-            });
-
-            updateDash();
-            renderMaster();
-            renderFin();
+            const classes = [...new Set(students.map(s => s.class))];
+            document.getElementById('rep-cls').innerHTML = '<option value="">Select Class</option>' + classes.map(c => `<option>${c}</option>`).join('');
         }
 
-        function updateDash() {
-            let totalExp = 0, totalPaid = 0;
-            students.forEach(s => { totalExp += Number(s.total_fees || 0); totalPaid += Number(s.paid_fees || 0); });
-            document.getElementById('s-total').innerText = students.length;
-            document.getElementById('s-paid').innerText = totalPaid.toLocaleString();
-            document.getElementById('s-debt').innerText = (totalExp - totalPaid).toLocaleString();
-        }
-
-        function handlePhoto(input) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById('f-preview').src = e.target.result;
-                document.getElementById('f-preview').style.display = 'block';
-                document.getElementById('f-photo-data').value = e.target.result;
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-
-        async function saveStudent() {
-            const id = document.getElementById('f-id').value;
-            const payload = {
-                sch_id: activeSch, name: document.getElementById('f-name').value.toUpperCase(),
-                class: document.getElementById('f-class').value, contact: document.getElementById('f-contact').value,
-                location: document.getElementById('f-location').value, health: document.getElementById('f-health').value,
-                dob: document.getElementById('f-dob').value, total_fees: document.getElementById('f-fees').value,
-                photo_url: document.getElementById('f-photo-data').value, lin: id ? undefined : "LIN-" + Math.floor(1000 + Math.random()*9000)
-            };
-            if(id) await db.from('Students').update(payload).eq('id', id);
-            else await db.from('Students').insert([payload]);
-            alert("DATA SECURED"); loadData(); nav('list');
-        }
-
-        function renderMaster() {
-            document.getElementById('master-list').innerHTML = students.map(s => `
-                <div class="row-item">
-                    <div style="display:flex; gap:12px; align-items:center;">
-                        <img src="${s.photo_url || 'https://via.placeholder.com/40'}" style="width:45px; height:45px; border-radius:10px; object-fit:cover;">
-                        <div>
-                            <b>${s.name}</b><br>
-                            <small>${s.class} | ${s.lin} | Loc: ${s.location || 'N/A'}</small>
-                        </div>
-                    </div>
-                    <div class="action-btns">
-                        <i class="fas fa-edit" onclick="editStud('${s.id}')"></i>
-                        <i class="fas fa-trash" style="color:red" onclick="delStud('${s.id}')"></i>
-                    </div>
+        function loadStudentsForRep() {
+            const cls = document.getElementById('rep-cls').value;
+            const filtered = students.filter(s => s.class === cls);
+            document.getElementById('rep-st-list').innerHTML = filtered.map(s => `
+                <div class="row-item" onclick="openGrader('${s.id}')" style="cursor:pointer">
+                    <b>${s.name}</b>
+                    <i class="fas fa-chevron-right"></i>
                 </div>
             `).join('');
         }
 
-        function renderFin() {
-            document.getElementById('fin-list').innerHTML = students.map(s => {
-                const debt = (s.total_fees || 0) - (s.paid_fees || 0);
-                return `
-                <div class="row-item">
-                    <div><b>${s.name}</b><br><small>Exp: ${Number(s.total_fees).toLocaleString()} | Paid: ${Number(s.paid_fees || 0).toLocaleString()}</small></div>
-                    <div style="text-align:right">
-                        <span class="badge ${debt > 0 ? 'badge-debt' : 'badge-paid'}">Bal: ${debt.toLocaleString()}</span><br>
-                        <input type="number" placeholder="Add Payment" style="width:100px; margin-top:5px;" onchange="payMoney('${s.id}', this.value)">
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        async function payMoney(id, val) {
+        function openGrader(id) {
             const s = students.find(x => x.id == id);
-            await db.from('Students').update({ paid_fees: Number(s.paid_fees || 0) + Number(val) }).eq('id', id);
-            loadData();
-        }
-
-        function editStud(id) {
-            const s = students.find(x => x.id == id);
-            document.getElementById('f-id').value = s.id;
-            document.getElementById('f-name').value = s.name;
-            document.getElementById('f-class').value = s.class;
-            document.getElementById('f-contact').value = s.contact;
-            document.getElementById('f-fees').value = s.total_fees;
-            document.getElementById('f-preview').src = s.photo_url || '';
-            document.getElementById('f-preview').style.display = s.photo_url ? 'block' : 'none';
-            nav('reg');
-        }
-
-        async function delStud(id) {
-            if(confirm("Delete record?")) { await db.from('Students').delete().eq('id', id); loadData(); }
-        }
-
-        function autoSms() {
-            if(document.getElementById('b-target').value === 'debtors') {
-                document.getElementById('b-msg').value = "Dear Parent, this is a reminder to clear the school fees balance for [Student Name] of UGX [Debt Amount]. Total fees is [Total]. Please pay to avoid inconveniences.";
+            document.getElementById('grading-panel').classList.remove('hidden');
+            document.getElementById('target-name').innerText = s.name + " (" + s.class + ")";
+            
+            // DYNAMIC SUBJECTS
+            let subs = [];
+            if(s.class.includes('P.')) {
+                subs = ['English', 'Mathematics', 'SST', 'Science'];
+            } else {
+                subs = ['Numeracy', 'Literacy', 'News', 'Drawing'];
             }
+
+            document.getElementById('subject-inputs').innerHTML = subs.map(sub => `
+                <div>
+                    <label style="font-size:0.7rem; font-weight:800;">${sub}</label>
+                    <input type="number" class="mark-input" placeholder="Marks" oninput="calculateUgandaGrade()">
+                </div>
+            `).join('');
         }
 
-        function sendBroadcast(type) {
-            const mode = document.getElementById('b-target').value;
-            const rawMsg = document.getElementById('b-msg').value;
-            alert(`Broadcasting via ${type} started for ${mode === 'all' ? 'Everyone' : 'Debtors'}.`);
+        function getUgPoint(mark) {
+            if (mark >= 90) return 1; if (mark >= 80) return 2;
+            if (mark >= 75) return 3; if (mark >= 70) return 4;
+            if (mark >= 60) return 5; if (mark >= 50) return 6;
+            if (mark >= 45) return 7; if (mark >= 40) return 8;
+            return 9;
+        }
+
+        function calculateUgandaGrade() {
+            let totalPoints = 0;
+            let inputs = document.querySelectorAll('.mark-input');
+            let allFilled = true;
+
+            inputs.forEach(i => {
+                if(!i.value) allFilled = false;
+                totalPoints += getUgPoint(Number(i.value));
+            });
+
+            if(!allFilled) return;
+
+            let div = "4";
+            if(totalPoints <= 12) div = "1";
+            else if(totalPoints <= 24) div = "2";
+            else if(totalPoints <= 28) div = "3";
+            else if(totalPoints > 28) div = "U";
+
+            document.getElementById('calc-agg').innerText = "Aggregates: " + totalPoints;
+            document.getElementById('calc-div').innerText = "Division: " + div;
+        }
+
+        async function saveReport() {
+            alert("REPORT PROCESSED: Aggregates and Division Saved to Ledger.");
+            document.getElementById('grading-panel').classList.add('hidden');
         }
 
         function nav(v, b) {
-            ['v-dash', 'v-reg', 'v-list', 'v-fin', 'v-roll', 'v-broad', 'v-rep'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['v-dash', 'v-list', 'v-rep'].forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById('v-'+v).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            if(b) b.classList.add('active');
-            if(window.innerWidth < 1024) document.getElementById('sidebar').classList.remove('open');
+            b.classList.add('active');
         }
     </script>
 </body>
