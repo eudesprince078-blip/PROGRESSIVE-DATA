@@ -259,3 +259,14 @@
         }
 
         function editRec(id) {
+            const s = students.find(x => x.id == id);
+            document.getElementById('f-id').value = s.id;
+            document.getElementById('f-name').value = s.name;
+            document.getElementById('f-class').value = s.class;
+            document.getElementById('f-age').value = s.age;
+            document.getElementById('f-dob').value = s.dob;
+            document.getElementById('f-contact').value = s.contact;
+            document.getElementById('f-loc').value = s.location;
+            document.getElementById('f-health').value = s.health_status;
+            document.getElementById('f-fees').value = s.total_fees;
+            document.getElementById('f-img').value = s.photo_url;
