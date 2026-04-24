@@ -8,37 +8,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #0052cc; --accent: #ff3b30; --success: #34c759; --dark: #020617; --bg: #f1f5f9; }
+        :root { --primary: #0052cc; --accent: #ff3b30; --success: #34c759; --dark: #020617; --bg: #f8fafc; --blue-light: #e0e7ff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
         /* HEADER */
-        .header { background: white; padding: 15px; border-bottom: 4px solid var(--primary); text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .sch-title { font-weight: 900; font-size: 1.1rem; text-transform: uppercase; color: var(--dark); }
+        .header { background: white; padding: 15px; border-bottom: 5px solid var(--primary); text-align: center; }
+        .sch-name { font-weight: 900; font-size: 1.2rem; color: var(--dark); text-transform: uppercase; letter-spacing: -0.5px; }
 
         /* VIEWPORT */
-        .main-view { flex: 1; overflow-y: auto; padding: 12px; padding-bottom: 90px; }
-        .section-title { font-weight: 800; font-size: 0.8rem; color: var(--primary); text-transform: uppercase; margin: 10px 0; display: flex; align-items: center; gap: 8px; }
+        .main-view { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; }
+        .card { background: white; border-radius: 25px; padding: 18px; margin-bottom: 12px; border: 1px solid #e2e8f0; position: relative; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         
-        /* CARDS */
-        .card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; position: relative; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; font-size: 0.75rem; color: #64748b; }
-        .info-tag { background: #f8fafc; padding: 4px 8px; border-radius: 6px; border: 1px solid #f1f5f9; font-weight: 600; }
+        /* STUDENT CARD STYLING */
+        .stud-img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; background: var(--blue-light); border: 2px solid var(--primary); }
+        .details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; font-size: 0.7rem; font-weight: 700; color: #475569; }
+        .tag { background: #f1f5f9; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
 
         /* INPUTS */
-        .search-bar { position: sticky; top: 0; z-index: 100; background: white; padding: 10px; border-radius: 15px; border: 2px solid var(--primary); margin-bottom: 15px; display: flex; gap: 5px; }
-        input, select { flex: 1; padding: 10px; border: none; font-weight: 700; outline: none; background: transparent; }
+        .search-area { position: sticky; top: 0; z-index: 100; background: white; padding: 12px; border-radius: 15px; border: 2px solid var(--primary); margin-bottom: 15px; display: flex; gap: 10px; align-items: center; }
+        input, select, textarea { border: none; outline: none; font-weight: 700; width: 100%; font-size: 0.9rem; }
         
         /* BUTTONS */
-        .btn-action { padding: 10px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; color: white; }
-        .btn-edit { position: absolute; top: 15px; right: 45px; color: var(--primary); background: none; font-size: 1.1rem; }
-        .btn-del { position: absolute; top: 15px; right: 15px; color: var(--accent); background: none; font-size: 1.1rem; }
+        .btn-p { background: var(--primary); color: white; padding: 15px; border-radius: 15px; border: none; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; }
+        .edit-tool { position: absolute; top: 15px; right: 45px; color: var(--primary); cursor: pointer; }
+        .del-tool { position: absolute; top: 15px; right: 15px; color: var(--accent); cursor: pointer; }
 
         /* NAV */
-        .nav { background: white; height: 75px; border-top: 1px solid #e2e8f0; display: flex; position: fixed; bottom: 0; width: 100%; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.6rem; font-weight: 800; }
+        .nav { background: white; height: 80px; border-top: 1px solid #e2e8f0; display: flex; position: fixed; bottom: 0; width: 100%; box-shadow: 0 -4px 10px rgba(0,0,0,0.03); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.65rem; font-weight: 800; }
         .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 1.3rem; margin-bottom: 4px; }
+        .nav-item i { font-size: 1.5rem; margin-bottom: 5px; }
 
         #auth-gate { position: fixed; inset: 0; background: var(--dark); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .hidden { display: none !important; }
@@ -47,82 +47,85 @@
 <body>
 
     <div id="auth-gate">
-        <div style="background:white; padding:35px; border-radius:30px; width:100%; max-width:380px; text-align:center;">
-            <h2 style="font-weight:900; margin-bottom:20px;">ESMS <span style="color:var(--primary)">LOGIN</span></h2>
-            <input type="text" id="auth-id" placeholder="SCHOOL ID" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:10px; width:100%; padding:15px;">
-            <input type="password" id="auth-key" placeholder="ACCESS KEY" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:15px; width:100%; padding:15px;">
-            <button onclick="login()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:10px; font-weight:900;">AUTHORIZE</button>
+        <div style="background:white; padding:40px; border-radius:35px; width:100%; max-width:400px; text-align:center;">
+            <h1 style="font-weight:900; margin-bottom:20px;">ESMS <span style="color:var(--primary)">ELITE</span></h1>
+            <input type="text" id="auth-id" placeholder="SCHOOL ID" style="background:#f1f5f9; padding:15px; border-radius:12px; margin-bottom:10px;">
+            <input type="password" id="auth-key" placeholder="ACCESS KEY" style="background:#f1f5f9; padding:15px; border-radius:12px; margin-bottom:15px;">
+            <button class="btn-p" onclick="login()">CONNECT SYSTEM</button>
         </div>
     </div>
 
     <header class="header">
-        <div id="display-sch" class="sch-title">SYSTEM LOCKED</div>
-        <div id="display-time" style="font-size:0.7rem; font-weight:800; color:var(--primary); margin-top:3px;"></div>
+        <div id="display-name" class="sch-name">AUTHORIZING...</div>
+        <div id="display-time" style="font-size:0.75rem; font-weight:800; color:var(--primary);"></div>
     </header>
 
-    <main class="main-view" id="view-scroll">
+    <main class="main-view" id="main-scroller">
         
         <div id="v-dash">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
-                <div class="card" style="text-align:center; border-bottom:4px solid var(--success);"><h2 id="st-p">0</h2><small>PRESENT</small></div>
-                <div class="card" style="text-align:center; border-bottom:4px solid var(--accent);"><h2 id="st-a">0</h2><small>ABSENT</small></div>
-                <div class="card" style="text-align:center; border-bottom:4px solid var(--primary);"><h2 id="st-c">0</h2><small>PAID (UGX)</small></div>
-                <div class="card" style="text-align:center; border-bottom:4px solid #64748b;"><h2 id="st-d">0</h2><small>DEBT (UGX)</small></div>
+            <div class="card" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div style="text-align:center;"><h2 id="st-p">0</h2><small>PRESENT</small></div>
+                <div style="text-align:center;"><h2 id="st-a">0</h2><small>ABSENT</small></div>
             </div>
             <div class="card">
-                <h4 style="margin-bottom:10px;">WHATSAPP BROADCAST</h4>
-                <textarea id="wa-body" placeholder="Write message to parents..." style="width:100%; height:70px; border:1px solid #e2e8f0; border-radius:10px; padding:10px; font-size:0.8rem;"></textarea>
-                <button onclick="sendBulkWA()" style="width:100%; margin-top:8px; padding:12px; background:#25D366; color:white; border:none; border-radius:10px; font-weight:800;"><i class="fab fa-whatsapp"></i> SEND TO ALL GUARDIANS</button>
+                <h3>BULK BROADCAST</h3>
+                <textarea id="bulk-text" placeholder="Type your message for WhatsApp and Email here..." style="background:#f8fafc; border:1px solid #e2e8f0; height:100px; padding:15px; border-radius:15px; margin:10px 0;"></textarea>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <button onclick="sendBulk('WhatsApp')" style="background:#25D366; color:white; border:none; padding:12px; border-radius:10px; font-weight:800;"><i class="fab fa-whatsapp"></i> WHATSAPP</button>
+                    <button onclick="sendBulk('Email')" style="background:#ea4335; color:white; border:none; padding:12px; border-radius:10px; font-weight:800;"><i class="fas fa-envelope"></i> EMAIL</button>
+                </div>
             </div>
         </div>
 
         <div id="v-list" class="hidden">
-            <div class="search-bar">
-                <i class="fas fa-search" style="padding:10px; color:var(--primary)"></i>
-                <input type="text" id="q-list" placeholder="Search Name, LIN or Class..." onkeyup="renderLists()">
+            <div class="search-area">
+                <select id="f-class" onchange="sync()" style="flex:0.5; color:var(--primary)">
+                    <option value="ALL">ALL CLASSES</option>
+                    <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                    <option>P.5</option><option>P.6</option><option>P.7</option>
+                </select>
+                <input type="text" id="f-search" placeholder="Search Name/LIN..." onkeyup="filterUI()">
             </div>
-            <div id="list-container"></div>
-        </div>
-
-        <div id="v-roll" class="hidden">
-            <select id="roll-class" onchange="renderLists()" style="background:white; border:2px solid var(--primary); border-radius:12px; padding:12px; margin-bottom:15px;">
-                <option value="ALL">SELECT CLASS FOR ROLLCALL</option>
-                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                <option>P.5</option><option>P.6</option><option>P.7</option>
-            </select>
-            <div id="roll-container"></div>
+            <div id="list-render"></div>
         </div>
 
         <div id="v-fin" class="hidden">
-            <select id="fin-class" onchange="renderLists()" style="background:white; border:2px solid var(--primary); border-radius:12px; padding:12px; margin-bottom:15px;">
-                <option value="ALL">SELECT CLASS FOR FINANCE</option>
-                <option>P.1</option><option>P.2</option><option>P.7</option>
-            </select>
-            <div id="fin-container"></div>
+            <div class="card">
+                <h3 style="margin-bottom:10px;">COLLECTION SUMMARY</h3>
+                <div style="display:flex; justify-content:space-between; font-weight:800;">
+                    <span>TOTAL REVENUE:</span> <span id="rev-total">0</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; color:var(--accent); font-weight:800;">
+                    <span>TOTAL DEBTS:</span> <span id="rev-debt">0</span>
+                </div>
+            </div>
+            <div id="fin-render"></div>
         </div>
 
         <div id="v-add" class="hidden">
             <div class="card">
-                <h3 style="margin-bottom:15px;">REGISTER NEW STUDENT</h3>
-                <input type="text" id="f-name" placeholder="Full Student Name" style="background:#f8fafc; border:1px solid #e2e8f0; width:100%; padding:12px; border-radius:10px; margin-bottom:8px;">
-                <input type="text" id="f-lin" placeholder="LIN Number" style="background:#f8fafc; border:1px solid #e2e8f0; width:100%; padding:12px; border-radius:10px; margin-bottom:8px;">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
-                    <select id="f-class" style="background:#f8fafc; border:1px solid #e2e8f0;"><option>P.1</option><option>P.2</option></select>
-                    <select id="f-gender" style="background:#f8fafc; border:1px solid #e2e8f0;"><option>Male</option><option>Female</option></select>
-                </div>
-                <input type="number" id="f-fees" placeholder="Total Term Fees (UGX)" style="background:#f8fafc; border:1px solid #e2e8f0; width:100%; padding:12px; border-radius:10px; margin-bottom:15px;">
-                <button onclick="saveStudent()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:10px; font-weight:900;">COMMIT TO DATABASE</button>
+                <h3>REGISTER STUDENT</h3>
+                <input type="text" id="r-name" placeholder="Name">
+                <input type="text" id="r-lin" placeholder="LIN">
+                <select id="r-class">
+                    <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                    <option>P.5</option><option>P.6</option><option>P.7</option>
+                </select>
+                <input type="number" id="r-fees" placeholder="Total Fees">
+                <input type="text" id="r-loc" placeholder="Location">
+                <input type="text" id="r-health" placeholder="Health Status">
+                <button class="btn-p" onclick="saveStudent()">COMMIT RECORD</button>
             </div>
         </div>
 
     </main>
 
     <nav class="nav">
-        <div class="nav-item active" onclick="nav('dash',this)"><i class="fas fa-home"></i>DASH</div>
-        <div class="nav-item" onclick="nav('list',this)"><i class="fas fa-address-book"></i>STUDENTS</div>
-        <div class="nav-item" onclick="nav('roll',this)"><i class="fas fa-check-double"></i>ROLLCALL</div>
-        <div class="nav-item" onclick="nav('fin',this)"><i class="fas fa-coins"></i>FINANCE</div>
+        <div class="nav-item active" onclick="nav('dash',this)"><i class="fas fa-chart-line"></i>DASH</div>
+        <div class="nav-item" onclick="nav('list',this)"><i class="fas fa-tasks"></i>ROLLCALL</div>
+        <div class="nav-item" onclick="nav('fin',this)"><i class="fas fa-file-invoice-dollar"></i>FINANCE</div>
         <div class="nav-item" onclick="nav('add',this)"><i class="fas fa-plus-circle"></i>ADD</div>
     </nav>
 
@@ -135,102 +138,113 @@
             const sid = document.getElementById('auth-id').value.toUpperCase().trim();
             const key = document.getElementById('auth-key').value.trim();
             db = supabase.createClient(SB_URL, SB_KEY);
-            const { data } = await db.from('Schools').select('*').eq('sch_id', sid).single();
+            const { data, error } = await db.from('Schools').select('*').eq('sch_id', sid).single();
             if(data && (key === data.admin_key || key === data.finance_key || key === data.teacher_key)) {
                 activeSch = sid;
-                document.getElementById('display-sch').innerText = data.sch_name;
+                document.getElementById('display-name').innerText = data.sch_name;
                 document.getElementById('auth-gate').classList.add('hidden');
                 sync();
-            } else { alert("INVALID CREDENTIALS"); }
+            } else { alert("Login Error: Incorrect ID or Key."); }
         }
 
         async function sync() {
-            const { data } = await db.from('Students').select('*').eq('sch_id', activeSch).order('name', { ascending: true });
+            const cls = document.getElementById('f-class').value;
+            let query = db.from('Students').select('*').eq('sch_id', activeSch);
+            if(cls !== 'ALL') query = query.eq('class', cls);
+            const { data } = await query.order('name', { ascending: true });
             students = data || [];
-            renderLists();
+            filterUI();
         }
 
-        function renderLists() {
-            const q = document.getElementById('q-list').value.toUpperCase();
-            const rClass = document.getElementById('roll-class').value;
-            const fClass = document.getElementById('fin-class').value;
+        function filterUI() {
+            const q = document.getElementById('f-search').value.toUpperCase();
+            const filtered = students.filter(s => s.name.includes(q) || (s.lin && s.lin.includes(q)));
 
-            let p=0, a=0, col=0, dbt=0;
+            let p=0, a=0, total=0, paid=0;
             students.forEach(s => {
                 s.is_absent ? a++ : p++;
-                col += (s.fees_paid || 0);
-                dbt += (s.total_fees - (s.fees_paid || 0));
+                total += (s.total_fees || 0);
+                paid += (s.fees_paid || 0);
             });
 
             document.getElementById('st-p').innerText = p;
             document.getElementById('st-a').innerText = a;
-            document.getElementById('st-c').innerText = col.toLocaleString();
-            document.getElementById('st-d').innerText = dbt.toLocaleString();
+            document.getElementById('rev-total').innerText = "UGX " + paid.toLocaleString();
+            document.getElementById('rev-debt').innerText = "UGX " + (total - paid).toLocaleString();
 
-            // 1. ALL INFORMATION LIST
-            const filteredAll = students.filter(s => s.name.includes(q) || (s.lin && s.lin.includes(q)) || s.class.includes(q));
-            document.getElementById('list-container').innerHTML = filteredAll.map(s => `
+            document.getElementById('list-render').innerHTML = filtered.map(s => `
                 <div class="card">
-                    <button class="btn-edit" onclick="editS('${s.id}')"><i class="fas fa-pen"></i></button>
-                    <button class="btn-del" onclick="delS('${s.id}')"><i class="fas fa-trash"></i></button>
-                    <div style="font-weight:900; color:var(--dark); font-size:1rem;">${s.name}</div>
-                    <div style="color:var(--primary); font-weight:800; font-size:0.7rem; margin-bottom:5px;">LIN: ${s.lin || 'N/A'}</div>
-                    <div class="info-grid">
-                        <div class="info-tag">Class: ${s.class}</div>
-                        <div class="info-tag">Gender: ${s.gender}</div>
-                        <div class="info-tag">Age: ${s.age || '?'}</div>
-                        <div class="info-tag">Loc: ${s.location || 'N/A'}</div>
+                    <i class="fas fa-pen edit-tool" onclick="editS('${s.id}')"></i>
+                    <i class="fas fa-trash del-tool" onclick="delS('${s.id}')"></i>
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        <img src="${s.photo_url || 'https://via.placeholder.com/65'}" class="stud-img">
+                        <div style="flex:1">
+                            <b style="font-size:1rem;">${s.name}</b><br>
+                            <span style="color:var(--primary); font-size:0.75rem; font-weight:800;">${s.lin || 'NO LIN'}</span>
+                        </div>
+                        <button style="background:${s.is_absent ? 'var(--accent)' : 'var(--success)'}; color:white; border:none; padding:10px; border-radius:10px; font-weight:900;" onclick="toggleAbs('${s.id}', ${s.is_absent})">
+                            ${s.is_absent ? 'ABSENT' : 'PRESENT'}
+                        </button>
+                    </div>
+                    <div class="details">
+                        <div class="tag">Class: ${s.class}</div>
+                        <div class="tag">Loc: ${s.location || 'N/A'}</div>
+                        <div class="tag">Health: ${s.health_status || 'Good'}</div>
+                        <div class="tag">Gender: ${s.gender}</div>
                     </div>
                 </div>`).join('');
 
-            // 2. ROLL CALL (BY CLASS)
-            const filteredRoll = students.filter(s => rClass === "ALL" || s.class === rClass);
-            document.getElementById('roll-container').innerHTML = filteredRoll.map(s => `
-                <div class="card" style="display:flex; align-items:center; gap:12px; border-left:8px solid ${s.is_absent ? 'var(--accent)' : 'var(--success)'}">
-                    <div style="flex:1"><b>${s.name}</b><br><small>${s.class}</small></div>
-                    <button class="btn-action" style="background:${s.is_absent ? 'var(--accent)' : 'var(--success)'}" onclick="toggleR('${s.id}', ${s.is_absent})">
-                        ${s.is_absent ? 'ABSENT' : 'PRESENT'}
-                    </button>
-                </div>`).join('');
-
-            // 3. FINANCE (BY CLASS)
-            const filteredFin = students.filter(s => fClass === "ALL" || s.class === fClass);
-            document.getElementById('fin-container').innerHTML = filteredFin.map(s => `
+            document.getElementById('fin-render').innerHTML = filtered.map(s => `
                 <div class="card">
-                    <div style="margin-bottom:8px;"><b>${s.name}</b> <small>(${s.class})</small></div>
-                    <div class="info-grid" style="margin-bottom:10px;">
-                        <div class="info-tag">Total: ${s.total_fees.toLocaleString()}</div>
-                        <div class="info-tag">Paid: ${s.fees_paid.toLocaleString()}</div>
-                        <div class="info-tag" style="color:var(--accent)">Debt: ${(s.total_fees - s.fees_paid).toLocaleString()}</div>
+                    <div style="font-weight:900;">${s.name} <span style="color:#64748b; font-size:0.7rem;">(${s.class})</span></div>
+                    <div class="details" style="margin-bottom:10px;">
+                        <div>TOTAL: ${s.total_fees.toLocaleString()}</div>
+                        <div style="color:var(--success)">PAID: ${s.fees_paid.toLocaleString()}</div>
                     </div>
-                    <input type="number" placeholder="Enter Amount Paid..." style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; width:100%;" onchange="payS('${s.id}', this.value)">
+                    <input type="number" placeholder="Enter Payment..." style="background:#f1f5f9; padding:12px; border-radius:10px;" onchange="updatePay('${s.id}', this.value)">
                 </div>`).join('');
         }
 
-        async function toggleR(id, stat) {
-            await db.from('Students').update({ is_absent: !stat }).eq('id', id);
+        async function toggleAbs(id, current) {
+            await db.from('Students').update({ is_absent: !current }).eq('id', id);
             sync();
         }
 
-        async function payS(id, val) {
+        async function updatePay(id, val) {
             const s = students.find(x => x.id == id);
-            const amt = Number(s.fees_paid || 0) + Number(val);
-            await db.from('Students').update({ fees_paid: amt }).eq('id', id);
+            const total = Number(s.fees_paid || 0) + Number(val);
+            await db.from('Students').update({ fees_paid: total }).eq('id', id);
             sync();
+        }
+
+        async function delS(id) {
+            if(confirm("Delete this student permanently?")) {
+                await db.from('Students').delete().eq('id', id);
+                sync();
+            }
         }
 
         async function saveStudent() {
-            const p = { sch_id: activeSch, name: document.getElementById('f-name').value.toUpperCase(), lin: document.getElementById('f-lin').value, class: document.getElementById('f-class').value, gender: document.getElementById('f-gender').value, total_fees: document.getElementById('f-fees').value, fees_paid: 0, is_absent: false };
+            const p = {
+                sch_id: activeSch,
+                name: document.getElementById('r-name').value.toUpperCase(),
+                lin: document.getElementById('r-lin').value,
+                class: document.getElementById('r-class').value,
+                total_fees: document.getElementById('r-fees').value,
+                location: document.getElementById('r-loc').value,
+                health_status: document.getElementById('r-health').value,
+                fees_paid: 0, is_absent: false, gender: 'Male'
+            };
             await db.from('Students').insert([p]);
+            alert("STUDENT ADDED");
             sync(); nav('list');
         }
 
         function nav(v, b) {
-            ['v-dash','v-list','v-roll','v-fin','v-add'].forEach(x => document.getElementById(x).classList.add('hidden'));
+            ['v-dash','v-list','v-fin','v-add'].forEach(x => document.getElementById(x).classList.add('hidden'));
             document.getElementById('v-'+v).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             if(b) b.classList.add('active');
-            document.getElementById('view-scroll').scrollTop = 0;
         }
 
         setInterval(() => {
