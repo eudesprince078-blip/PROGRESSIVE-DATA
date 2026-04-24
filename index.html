@@ -3,194 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EUDES MEDIA | CONTROL CENTER</title>
+    <title>EUDES MEDIA | ESMS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --navy: #001f3f; --blue-med: #003366; --gold: #ffcc00; --bg: #f4f7f9; --text-gray: #666; }
+        :root { --navy: #001f3f; --blue-bright: #4a90e2; --gold: #ffcc00; --bg: #f4f7f9; --red: #d0021b; --green: #34c759; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: #333; }
+        body { background: var(--bg); color: #333; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* TOP BLUE HEADER */
-        .top-bar { background: #4a90e2; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; color: white; }
-        .system-access { font-weight: 800; font-size: 0.9rem; text-transform: uppercase; }
-        
-        /* NAVY LOGOUT SECTION */
+        /* HEADER SECTION */
+        .top-status { background: var(--blue-bright); color: white; padding: 8px 15px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; display: flex; justify-content: space-between; }
         .school-header { background: var(--navy); padding: 15px; display: flex; justify-content: space-between; align-items: center; color: white; border-bottom: 3px solid var(--gold); }
-        .sch-info b { display: block; font-size: 0.9rem; }
-        .sch-info small { color: var(--gold); font-size: 0.7rem; font-weight: bold; }
-        .btn-logout { background: #d0021b; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: 800; font-size: 0.7rem; cursor: pointer; }
+        .sch-info b { display: block; font-size: 1rem; letter-spacing: 0.5px; }
+        .btn-logout { background: var(--red); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 800; font-size: 0.65rem; cursor: pointer; }
 
-        /* MAIN DASHBOARD CONTENT */
-        .dash-hero { background: var(--navy); padding: 30px 20px; text-align: center; color: white; }
-        .dash-date { color: var(--gold); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px; }
-        .dash-time { font-size: 3rem; font-weight: 800; margin-bottom: 20px; }
+        /* DASHBOARD HERO */
+        .hero { background: var(--navy); padding: 25px 20px 50px 20px; text-align: center; color: white; }
+        .hero-date { color: var(--gold); font-weight: 800; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px; }
+        .hero-time { font-size: 2.8rem; font-weight: 900; }
 
-        /* STATS BOXES */
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: -25px 15px 20px 15px; }
-        .stat-card { background: white; padding: 15px 5px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .stat-card h2 { font-size: 1.5rem; font-weight: 900; }
-        .stat-card small { color: #999; font-weight: 700; font-size: 0.6rem; text-transform: uppercase; }
+        /* STATS OVERLAY */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: -30px 15px 15px 15px; }
+        .stat-card { background: white; padding: 15px 5px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .stat-card h2 { font-size: 1.4rem; font-weight: 900; }
+        .stat-card small { color: #888; font-weight: 700; font-size: 0.6rem; text-transform: uppercase; }
 
-        /* TAB NAVIGATION */
-        .tab-nav { display: flex; background: white; border-bottom: 1px solid #ddd; }
-        .tab-item { flex: 1; text-align: center; padding: 15px 5px; font-size: 0.7rem; font-weight: 800; color: #888; cursor: pointer; border-bottom: 3px solid transparent; }
-        .tab-item.active { color: var(--navy); border-bottom: 3px solid var(--navy); }
+        /* NAVIGATION TABS */
+        .tabs { display: flex; background: white; border-bottom: 1px solid #ddd; overflow-x: auto; }
+        .tab { flex: 1; text-align: center; padding: 15px 10px; font-size: 0.75rem; font-weight: 800; color: #888; cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; }
+        .tab.active { color: var(--navy); border-bottom: 3px solid var(--navy); }
 
-        /* FINANCIAL SUMMARY CARD */
-        .content-area { padding: 20px 15px; }
-        .fin-card { background: var(--navy); border-radius: 15px; padding: 20px; color: white; margin-bottom: 20px; }
-        .fin-card h4 { color: var(--gold); text-transform: uppercase; font-size: 0.8rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .fin-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 600; font-size: 0.9rem; }
-        .fin-row span:last-child { font-weight: 800; }
+        /* CONTENT AREA */
+        .content { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; }
+        .card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
         
-        /* REPORT CARDS */
-        .report-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .report-card h4 { color: var(--navy); text-transform: uppercase; font-size: 0.9rem; font-weight: 900; }
+        /* CLASS SELECTOR */
+        .class-filter { background: white; border: 2px solid var(--navy); border-radius: 10px; padding: 10px; margin-bottom: 15px; width: 100%; font-weight: 800; color: var(--navy); }
 
-        /* FOOTER */
-        .footer { text-align: center; padding: 30px; color: #bbb; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        /* FINANCIAL CARD */
+        .fin-summary { background: var(--navy); color: white; border-radius: 15px; padding: 20px; }
+        .fin-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
+        .fin-row:last-child { border: none; }
+        .val-gold { color: var(--gold); font-weight: 900; }
 
-        .hidden { display: none; }
-        #login-overlay { position: fixed; inset: 0; background: var(--navy); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        /* STUDENT LIST STYLING */
+        .stud-row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .stud-row:last-child { border: none; }
+        .stud-img { width: 45px; height: 45px; border-radius: 10px; object-fit: cover; background: #eee; }
+        .stud-meta { flex: 1; }
+        .stud-meta b { font-size: 0.85rem; display: block; text-transform: uppercase; }
+        .stud-meta small { color: #777; font-size: 0.7rem; font-weight: 600; }
+
+        /* ACTIONS */
+        .btn-act { padding: 6px 12px; border-radius: 6px; border: none; font-weight: 800; font-size: 0.7rem; color: white; cursor: pointer; }
+        .btn-edit { color: var(--blue-bright); font-size: 1rem; margin-right: 15px; background: none; border: none; }
+        .btn-del { color: var(--red); font-size: 1rem; background: none; border: none; }
+
+        #login-screen { position: fixed; inset: 0; background: var(--navy); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="login-overlay">
+    <div id="login-screen">
         <div style="background:white; padding:40px; border-radius:20px; width:100%; max-width:380px; text-align:center;">
-            <img src="https://eudesmedia.com/logo.png" style="height:50px; margin-bottom:20px;" onerror="this.src='https://via.placeholder.com/50'">
-            <h2 style="font-weight:900; margin-bottom:20px; color:var(--navy)">SYSTEM LOGIN</h2>
+            <h2 style="font-weight:900; color:var(--navy); margin-bottom:20px;">ESMS LOGIN</h2>
             <input type="text" id="sid" placeholder="SCHOOL ID" style="width:100%; padding:15px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px; font-weight:700;">
             <input type="password" id="skey" placeholder="ACCESS KEY" style="width:100%; padding:15px; margin-bottom:20px; border:1px solid #ddd; border-radius:8px; font-weight:700;">
-            <button onclick="accessSystem()" style="width:100%; padding:15px; background:var(--navy); color:white; border:none; border-radius:8px; font-weight:900; cursor:pointer;">SIGN IN</button>
+            <button onclick="login()" style="width:100%; padding:15px; background:var(--navy); color:white; border:none; border-radius:8px; font-weight:900;">SIGN IN</button>
         </div>
     </div>
 
-    <div class="top-bar">
-        <div class="system-access">SYSTEM ACCESS | EUDES MEDIA CONTROL CENTER</div>
-        <div><i class="fas fa-plus-circle"></i></div>
+    <div class="top-status">
+        <span>ESMS SYSTEM ACCESS | EUDES MEDIA</span>
+        <i class="fas fa-plus-circle"></i>
     </div>
 
     <div class="school-header">
         <div class="sch-info">
-            <b id="display-sch-name">AUTHORIZING...</b>
-            <small>DIRECTOR</small>
+            <b id="sch-name">...</b>
+            <small id="user-role" style="color:var(--gold); font-weight:800; font-size:0.65rem; text-transform:uppercase;">DIRECTOR</small>
         </div>
         <button class="btn-logout" onclick="location.reload()">LOGOUT</button>
     </div>
 
-    <div class="dash-hero">
-        <div class="dash-date" id="live-date">...</div>
-        <div class="dash-time" id="live-time">00:00:00</div>
+    <div class="hero">
+        <div class="hero-date" id="date-box">...</div>
+        <div class="hero-time" id="time-box">00:00:00</div>
     </div>
 
-    <div class="stats-row">
+    <div class="stats-grid">
         <div class="stat-card">
-            <h2 id="stat-pupils">0</h2>
+            <h2 id="st-total">0</h2>
             <small>PUPILS</small>
         </div>
         <div class="stat-card">
-            <h2 id="stat-present" style="color:#34c759">0</h2>
+            <h2 id="st-present" style="color:var(--green)">0</h2>
             <small>PRESENT</small>
         </div>
         <div class="stat-card">
-            <h2 id="stat-absent" style="color:#ff3b30">0</h2>
+            <h2 id="st-absent" style="color:var(--red)">0</h2>
             <small>ABSENT</small>
         </div>
     </div>
 
-    <div class="tab-nav">
-        <div class="tab-item active" onclick="setTab('dir', this)">Director</div>
-        <div class="tab-item" onclick="setTab('rec', this)">Records</div>
-        <div class="tab-item" onclick="setTab('adm', this)">Admission</div>
-        <div class="tab-item" onclick="setTab('att', this)">Attendance</div>
+    <div class="tabs">
+        <div class="tab active" onclick="setTab('director', this)">Director</div>
+        <div class="tab" onclick="setTab('records', this)">Records</div>
+        <div class="tab" onclick="setTab('finance', this)">Finance</div>
+        <div class="tab" onclick="setTab('admission', this)">Admission</div>
+        <div class="tab" onclick="setTab('rollcall', this)">Roll Call</div>
     </div>
 
-    <div class="content-area">
+    <main class="content" id="main-content">
         
-        <div id="tab-dir">
-            <div class="fin-card">
-                <h4>FINANCIAL SUMMARY</h4>
-                <div class="fin-row">
-                    <span>Total Expected:</span> <span id="f-exp">UGX 0</span>
-                </div>
-                <div class="fin-row">
-                    <span>Total Paid:</span> <span id="f-paid" style="color:#34c759">UGX 0</span>
-                </div>
-                <div class="fin-row">
-                    <span>Balance:</span> <span id="f-bal" style="color:#ff3b30">UGX 0</span>
-                </div>
+        <div id="v-director">
+            <div class="fin-summary">
+                <div class="fin-row"><span>Total Expected:</span> <span id="f-exp" class="val-gold">UGX 0</span></div>
+                <div class="fin-row"><span>Total Paid:</span> <span id="f-paid" style="color:var(--green)">UGX 0</span></div>
+                <div class="fin-row"><span>Total Balances:</span> <span id="f-bal" style="color:var(--red)">UGX 0</span></div>
             </div>
-
-            <div class="report-card">
-                <h4>DAILY ABSENTEE REPORT</h4>
-                <div id="absentee-list" style="margin-top:15px; color:#999; font-size:0.8rem;">No absentees reported yet.</div>
+            <div class="card" style="margin-top:15px;">
+                <h4 style="font-size:0.8rem; font-weight:900; color:var(--navy); margin-bottom:10px;">DAILY ABSENTEE LOG</h4>
+                <div id="absentee-render" style="font-size:0.75rem; color:#888;">Fetching daily report...</div>
             </div>
         </div>
 
-        <div id="tab-rec" class="hidden"><div class="report-card"><h4>STUDENT RECORDS</h4><p>Accessing database...</p></div></div>
-        <div id="tab-adm" class="hidden"><div class="report-card"><h4>NEW ADMISSIONS</h4><p>Registration portal...</p></div></div>
-        <div id="tab-att" class="hidden"><div class="report-card"><h4>ATTENDANCE LOGS</h4><p>Class registers...</p></div></div>
+        <div id="v-records" class="hidden">
+            <input type="text" id="rec-search" placeholder="Search Name or LIN..." onkeyup="renderAll()" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-bottom:15px; font-weight:700;">
+            <div id="rec-render"></div>
+        </div>
 
-    </div>
+        <div id="v-finance" class="hidden">
+            <select id="fin-class" class="class-filter" onchange="renderAll()">
+                <option value="ALL">-- SELECT CLASS --</option>
+                <option>P.1</option><option>P.2</option><option>P.7</option>
+            </select>
+            <div id="fin-render"></div>
+        </div>
 
-    <div class="footer">
-        EUDES MEDIA | +256 200 930 932
+        <div id="v-admission" class="hidden">
+            <div class="card">
+                <h3 style="margin-bottom:15px; font-size:1rem;">NEW ADMISSION</h3>
+                <input type="text" id="a-name" placeholder="Full Student Name" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+                <input type="text" id="a-lin" placeholder="LIN Number" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+                <select id="a-class" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+                </select>
+                <input type="number" id="a-fees" placeholder="Total Term Fees" style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ddd;">
+                <button onclick="saveStudent()" style="width:100%; padding:15px; background:var(--navy); color:white; border:none; border-radius:10px; font-weight:900;">REGISTER PUPIL</button>
+            </div>
+        </div>
+
+        <div id="v-rollcall" class="hidden">
+            <select id="roll-class" class="class-filter" onchange="renderAll()">
+                <option value="ALL">-- SELECT CLASS --</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
+            <div id="roll-render"></div>
+        </div>
+
+    </main>
+
+    <div style="text-align:center; padding:15px; color:#bbb; font-size:0.65rem; font-weight:800; letter-spacing:1px;">
+        EUDES MEDIA | SUPPORT: +256 200 930 932
     </div>
 
     <script>
         const SB_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        let db, activeSch;
+        let db, activeSch, students = [];
 
-        async function accessSystem() {
+        async function login() {
             const id = document.getElementById('sid').value.toUpperCase().trim();
             const key = document.getElementById('skey').value.trim();
             db = supabase.createClient(SB_URL, SB_KEY);
-            
-            const { data, error } = await db.from('Schools').select('*').eq('sch_id', id).single();
-            if (data && key === data.admin_key) {
+            const { data } = await db.from('Schools').select('*').eq('sch_id', id).single();
+            if(data && key === data.admin_key) {
                 activeSch = id;
-                document.getElementById('display-sch-name').innerText = data.sch_name.toUpperCase();
-                document.getElementById('login-overlay').classList.add('hidden');
-                refreshData();
-            } else {
-                alert("ACCESS DENIED: Invalid School ID or Key.");
-            }
+                document.getElementById('sch-name').innerText = data.sch_name.toUpperCase();
+                document.getElementById('login-screen').classList.add('hidden');
+                sync();
+            } else { alert("ACCESS DENIED"); }
         }
 
-        async function refreshData() {
-            const { data } = await db.from('Students').select('*').eq('sch_id', activeSch);
-            if (!data) return;
+        async function sync() {
+            const { data } = await db.from('Students').select('*').eq('sch_id', activeSch).order('name', { ascending: true });
+            students = data || [];
+            renderAll();
+        }
 
-            let present = 0, absent = 0, exp = 0, paid = 0;
-            data.forEach(s => {
-                s.is_absent ? absent++ : present++;
+        function renderAll() {
+            const q = document.getElementById('rec-search').value.toUpperCase();
+            const fCls = document.getElementById('fin-class').value;
+            const rCls = document.getElementById('roll-class').value;
+
+            let p=0, a=0, exp=0, paid=0;
+            students.forEach(s => {
+                s.is_absent ? a++ : p++;
                 exp += (s.total_fees || 0);
                 paid += (s.fees_paid || 0);
             });
 
-            document.getElementById('stat-pupils').innerText = data.length;
-            document.getElementById('stat-present').innerText = present;
-            document.getElementById('stat-absent').innerText = absent;
+            document.getElementById('st-total').innerText = students.length;
+            document.getElementById('st-present').innerText = p;
+            document.getElementById('st-absent').innerText = a;
             document.getElementById('f-exp').innerText = "UGX " + exp.toLocaleString();
             document.getElementById('f-paid').innerText = "UGX " + paid.toLocaleString();
-            document.getElementById('f-bal').innerText = "UGX " + (exp - paid).toLocaleString();
+            document.getElementById('f-bal').innerText = "UGX " + (exp-paid).toLocaleString();
+
+            // Records List
+            document.getElementById('rec-render').innerHTML = students.filter(s => s.name.includes(q) || (s.lin && s.lin.includes(q))).map(s => `
+                <div class="stud-row">
+                    <img src="${s.photo_url || 'https://via.placeholder.com/45'}" class="stud-img">
+                    <div class="stud-meta"><b>${s.name}</b><small>${s.class} | LIN: ${s.lin || 'N/A'}</small></div>
+                    <button class="btn-edit" onclick="alert('Edit Mode: Coming Soon')"><i class="fas fa-pen"></i></button>
+                    <button class="btn-del" onclick="deletePupil('${s.id}')"><i class="fas fa-trash"></i></button>
+                </div>`).join('');
+
+            // Finance List
+            document.getElementById('fin-render').innerHTML = students.filter(s => fCls === "ALL" || s.class === fCls).map(s => `
+                <div class="card">
+                    <div style="font-weight:800; font-size:0.8rem; margin-bottom:5px;">${s.name}</div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:700; color:#666;">
+                        <span>Bal: UGX ${(s.total_fees - s.fees_paid).toLocaleString()}</span>
+                        <input type="number" placeholder="Amt" style="width:70px; border:1px solid #ddd; padding:2px;" onchange="updateFees('${s.id}', this.value)">
+                    </div>
+                </div>`).join('');
+
+            // Roll Call List
+            document.getElementById('roll-render').innerHTML = students.filter(s => rCls === "ALL" || s.class === rCls).map(s => `
+                <div class="card" style="display:flex; align-items:center; justify-content:space-between;">
+                    <b>${s.name}</b>
+                    <button class="btn-act" style="background:${s.is_absent ? 'var(--red)' : 'var(--green)'}" onclick="togglePresence('${s.id}', ${s.is_absent})">
+                        ${s.is_absent ? 'ABSENT' : 'PRESENT'}
+                    </button>
+                </div>`).join('');
+        }
+
+        async function togglePresence(id, stat) {
+            await db.from('Students').update({ is_absent: !stat }).eq('id', id);
+            sync();
+        }
+
+        async function updateFees(id, val) {
+            const s = students.find(x => x.id == id);
+            const amt = Number(s.fees_paid || 0) + Number(val);
+            await db.from('Students').update({ fees_paid: amt }).eq('id', id);
+            sync();
+        }
+
+        async function deletePupil(id) {
+            if(confirm("Delete student permanently?")) {
+                await db.from('Students').delete().eq('id', id);
+                sync();
+            }
+        }
+
+        async function saveStudent() {
+            const p = { sch_id: activeSch, name: document.getElementById('a-name').value.toUpperCase(), lin: document.getElementById('a-lin').value, class: document.getElementById('a-class').value, total_fees: document.getElementById('a-fees').value, fees_paid: 0, is_absent: false };
+            await db.from('Students').insert([p]);
+            sync(); alert("SAVED");
         }
 
         function setTab(name, el) {
-            ['dir','rec','adm','att'].forEach(t => document.getElementById('tab-'+t).classList.add('hidden'));
-            document.getElementById('tab-'+name).classList.remove('hidden');
-            document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+            ['director','records','finance','admission','rollcall'].forEach(v => document.getElementById('v-'+v).classList.add('hidden'));
+            document.getElementById('v-'+name).classList.remove('hidden');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
         }
 
         setInterval(() => {
             const now = new Date();
-            document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-            document.getElementById('live-time').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+            document.getElementById('date-box').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('time-box').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
         }, 1000);
     </script>
 </body>
