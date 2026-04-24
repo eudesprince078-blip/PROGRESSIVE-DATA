@@ -3,127 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESMS | EUDES MEDIA CONTROL</title>
+    <title>ESMS | EUDES MEDIA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #0052cc; --accent: #ff3b30; --success: #34c759; --dark: #020617; --bg: #f8fafc; }
+        :root { --primary: #0052cc; --accent: #ff3b30; --success: #34c759; --dark: #020617; --bg: #f1f5f9; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* HEADER & DASHBOARD BOXES */
-        .header { background: white; padding: 15px; border-bottom: 5px solid var(--primary); text-align: center; }
-        .view-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; }
-        .stat-box { background: white; padding: 15px; border-radius: 20px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        /* HEADER */
+        .header { background: white; padding: 15px; border-bottom: 4px solid var(--primary); text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .sch-title { font-weight: 900; font-size: 1.1rem; text-transform: uppercase; color: var(--dark); }
 
-        /* INPUTS & SELECTS */
-        .filter-bar { background: white; padding: 10px; border-radius: 15px; margin-bottom: 15px; border: 2px solid var(--primary); position: sticky; top: 0; z-index: 100; }
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; margin-bottom: 8px; font-weight: 600; }
-        .btn-main { background: var(--primary); color: white; padding: 15px; border-radius: 12px; border: none; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; }
-
-        /* LIST ITEMS */
-        .student-card { background: white; padding: 15px; border-radius: 18px; margin-bottom: 10px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px; }
-        .btn-icon { padding: 8px; border-radius: 8px; border: none; cursor: pointer; color: white; font-size: 0.9rem; }
-
-        /* NAVIGATION */
-        .nav-bar { background: white; height: 75px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; position: fixed; bottom: 0; width: 100%; }
-        .nav-item { flex: 1; text-align: center; color: #94a3b8; font-size: 0.65rem; font-weight: 800; cursor: pointer; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 1.5rem; display: block; margin-bottom: 2px; }
+        /* VIEWPORT */
+        .main-view { flex: 1; overflow-y: auto; padding: 12px; padding-bottom: 90px; }
+        .section-title { font-weight: 800; font-size: 0.8rem; color: var(--primary); text-transform: uppercase; margin: 10px 0; display: flex; align-items: center; gap: 8px; }
         
-        .hidden { display: none !important; }
+        /* CARDS */
+        .card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; position: relative; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; font-size: 0.75rem; color: #64748b; }
+        .info-tag { background: #f8fafc; padding: 4px 8px; border-radius: 6px; border: 1px solid #f1f5f9; font-weight: 600; }
+
+        /* INPUTS */
+        .search-bar { position: sticky; top: 0; z-index: 100; background: white; padding: 10px; border-radius: 15px; border: 2px solid var(--primary); margin-bottom: 15px; display: flex; gap: 5px; }
+        input, select { flex: 1; padding: 10px; border: none; font-weight: 700; outline: none; background: transparent; }
+        
+        /* BUTTONS */
+        .btn-action { padding: 10px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; color: white; }
+        .btn-edit { position: absolute; top: 15px; right: 45px; color: var(--primary); background: none; font-size: 1.1rem; }
+        .btn-del { position: absolute; top: 15px; right: 15px; color: var(--accent); background: none; font-size: 1.1rem; }
+
+        /* NAV */
+        .nav { background: white; height: 75px; border-top: 1px solid #e2e8f0; display: flex; position: fixed; bottom: 0; width: 100%; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.6rem; font-weight: 800; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 1.3rem; margin-bottom: 4px; }
+
         #auth-gate { position: fixed; inset: 0; background: var(--dark); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="auth-gate">
-        <div style="background:white; padding:40px; border-radius:30px; width:100%; max-width:400px; text-align:center;">
-            <img src="https://eudesmedia.com/logo.png" style="width:80px; margin-bottom:10px;">
-            <h2 style="font-weight:900;">SYSTEM ACCESS</h2>
-            <input type="text" id="auth-id" placeholder="SCHOOL ID">
-            <input type="password" id="auth-key" placeholder="ACCESS KEY">
-            <button class="btn-main" onclick="login()">ENTER CONTROL CENTER</button>
+        <div style="background:white; padding:35px; border-radius:30px; width:100%; max-width:380px; text-align:center;">
+            <h2 style="font-weight:900; margin-bottom:20px;">ESMS <span style="color:var(--primary)">LOGIN</span></h2>
+            <input type="text" id="auth-id" placeholder="SCHOOL ID" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:10px; width:100%; padding:15px;">
+            <input type="password" id="auth-key" placeholder="ACCESS KEY" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:15px; width:100%; padding:15px;">
+            <button onclick="login()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:10px; font-weight:900;">AUTHORIZE</button>
         </div>
     </div>
 
     <header class="header">
-        <div id="sch-name" style="font-weight:900; font-size: 1.2rem;">LOADING...</div>
-        <div id="top-time" style="font-size:0.8rem; font-weight:700; color:var(--primary);"></div>
+        <div id="display-sch" class="sch-title">SYSTEM LOCKED</div>
+        <div id="display-time" style="font-size:0.7rem; font-weight:800; color:var(--primary); margin-top:3px;"></div>
     </header>
 
-    <main class="view-container">
+    <main class="main-view" id="view-scroll">
         
         <div id="v-dash">
-            <div class="stat-grid">
-                <div class="stat-box"><h3 id="d-present">0</h3><small>PRESENT</small></div>
-                <div class="stat-box"><h3 id="d-absent">0</h3><small>ABSENT</small></div>
-                <div class="stat-box"><h3 id="d-collected" style="color:var(--success)">0</h3><small>COLLECTED</small></div>
-                <div class="stat-box"><h3 id="d-debts" style="color:var(--accent)">0</h3><small>DEBTS</small></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                <div class="card" style="text-align:center; border-bottom:4px solid var(--success);"><h2 id="st-p">0</h2><small>PRESENT</small></div>
+                <div class="card" style="text-align:center; border-bottom:4px solid var(--accent);"><h2 id="st-a">0</h2><small>ABSENT</small></div>
+                <div class="card" style="text-align:center; border-bottom:4px solid var(--primary);"><h2 id="st-c">0</h2><small>PAID (UGX)</small></div>
+                <div class="card" style="text-align:center; border-bottom:4px solid #64748b;"><h2 id="st-d">0</h2><small>DEBT (UGX)</small></div>
             </div>
-            <div class="stat-box" style="margin-top:10px;">
-                <h4>BULK COMMUNICATIONS</h4>
-                <textarea id="wa-msg" placeholder="Type WhatsApp message here..." style="width:100%; margin-top:10px; height:80px; padding:10px; border-radius:10px;"></textarea>
-                <button class="btn-main" style="background:#25D366; margin-top:5px;" onclick="sendWA()">SEND BULK WHATSAPP</button>
+            <div class="card">
+                <h4 style="margin-bottom:10px;">WHATSAPP BROADCAST</h4>
+                <textarea id="wa-body" placeholder="Write message to parents..." style="width:100%; height:70px; border:1px solid #e2e8f0; border-radius:10px; padding:10px; font-size:0.8rem;"></textarea>
+                <button onclick="sendBulkWA()" style="width:100%; margin-top:8px; padding:12px; background:#25D366; color:white; border:none; border-radius:10px; font-weight:800;"><i class="fab fa-whatsapp"></i> SEND TO ALL GUARDIANS</button>
             </div>
         </div>
 
         <div id="v-list" class="hidden">
-            <div class="filter-bar">
-                <select id="filter-class" onchange="sync()">
-                    <option value="ALL">ALL CLASSES</option>
-                    <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                    <option>P.5</option><option>P.6</option><option>P.7</option>
-                </select>
-                <input type="text" id="search-box" placeholder="Search Name or LIN..." onkeyup="filterUI()">
+            <div class="search-bar">
+                <i class="fas fa-search" style="padding:10px; color:var(--primary)"></i>
+                <input type="text" id="q-list" placeholder="Search Name, LIN or Class..." onkeyup="renderLists()">
             </div>
-            <div id="render-list"></div>
+            <div id="list-container"></div>
         </div>
 
-        <div id="v-reg" class="hidden">
-            <div class="stat-box">
-                <h3>NEW REGISTRATION</h3>
-                <input type="text" id="f-name" placeholder="Full Student Name">
-                <input type="text" id="f-lin" placeholder="LIN Number">
-                <select id="f-class">
-                    <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
-                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                    <option>P.5</option><option>P.6</option><option>P.7</option>
-                </select>
-                <select id="f-gender"><option>Male</option><option>Female</option></select>
-                <input type="number" id="f-total" placeholder="Total Fees UGX">
-                <input type="text" id="f-loc" placeholder="Location">
-                <button class="btn-main" onclick="register()">SAVE STUDENT</button>
-            </div>
+        <div id="v-roll" class="hidden">
+            <select id="roll-class" onchange="renderLists()" style="background:white; border:2px solid var(--primary); border-radius:12px; padding:12px; margin-bottom:15px;">
+                <option value="ALL">SELECT CLASS FOR ROLLCALL</option>
+                <option>Baby Class</option><option>Middle Class</option><option>Top Class</option>
+                <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                <option>P.5</option><option>P.6</option><option>P.7</option>
+            </select>
+            <div id="roll-container"></div>
         </div>
 
         <div id="v-fin" class="hidden">
-            <div class="filter-bar">
-                <select id="fin-class" onchange="sync()">
-                    <option value="ALL">SELECT CLASS</option>
-                    <option>P.1</option><option>P.2</option><option>P.7</option>
-                </select>
+            <select id="fin-class" onchange="renderLists()" style="background:white; border:2px solid var(--primary); border-radius:12px; padding:12px; margin-bottom:15px;">
+                <option value="ALL">SELECT CLASS FOR FINANCE</option>
+                <option>P.1</option><option>P.2</option><option>P.7</option>
+            </select>
+            <div id="fin-container"></div>
+        </div>
+
+        <div id="v-add" class="hidden">
+            <div class="card">
+                <h3 style="margin-bottom:15px;">REGISTER NEW STUDENT</h3>
+                <input type="text" id="f-name" placeholder="Full Student Name" style="background:#f8fafc; border:1px solid #e2e8f0; width:100%; padding:12px; border-radius:10px; margin-bottom:8px;">
+                <input type="text" id="f-lin" placeholder="LIN Number" style="background:#f8fafc; border:1px solid #e2e8f0; width:100%; padding:12px; border-radius:10px; margin-bottom:8px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+                    <select id="f-class" style="background:#f8fafc; border:1px solid #e2e8f0;"><option>P.1</option><option>P.2</option></select>
+                    <select id="f-gender" style="background:#f8fafc; border:1px solid #e2e8f0;"><option>Male</option><option>Female</option></select>
+                </div>
+                <input type="number" id="f-fees" placeholder="Total Term Fees (UGX)" style="background:#f8fafc; border:1px solid #e2e8f0; width:100%; padding:12px; border-radius:10px; margin-bottom:15px;">
+                <button onclick="saveStudent()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:10px; font-weight:900;">COMMIT TO DATABASE</button>
             </div>
-            <div id="render-fin"></div>
         </div>
 
     </main>
 
-    <nav class="nav-bar">
-        <div class="nav-item active" onclick="nav('dash',this)"><i class="fas fa-th-large"></i>DASH</div>
-        <div class="nav-item" onclick="nav('list',this)"><i class="fas fa-clipboard-check"></i>ROLLCALL</div>
-        <div class="nav-item" onclick="nav('reg',this)"><i class="fas fa-user-plus"></i>ADD</div>
-        <div class="nav-item" onclick="nav('fin',this)"><i class="fas fa-wallet"></i>FINANCE</div>
+    <nav class="nav">
+        <div class="nav-item active" onclick="nav('dash',this)"><i class="fas fa-home"></i>DASH</div>
+        <div class="nav-item" onclick="nav('list',this)"><i class="fas fa-address-book"></i>STUDENTS</div>
+        <div class="nav-item" onclick="nav('roll',this)"><i class="fas fa-check-double"></i>ROLLCALL</div>
+        <div class="nav-item" onclick="nav('fin',this)"><i class="fas fa-coins"></i>FINANCE</div>
+        <div class="nav-item" onclick="nav('add',this)"><i class="fas fa-plus-circle"></i>ADD</div>
     </nav>
 
     <script>
         const SB_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-        let db, activeSch, students = [], role = 'admin';
+        let db, activeSch, students = [];
 
         async function login() {
             const sid = document.getElementById('auth-id').value.toUpperCase().trim();
@@ -132,101 +138,103 @@
             const { data } = await db.from('Schools').select('*').eq('sch_id', sid).single();
             if(data && (key === data.admin_key || key === data.finance_key || key === data.teacher_key)) {
                 activeSch = sid;
-                document.getElementById('sch-name').innerText = data.sch_name;
+                document.getElementById('display-sch').innerText = data.sch_name;
                 document.getElementById('auth-gate').classList.add('hidden');
                 sync();
-            } else { alert("ACCESS DENIED"); }
+            } else { alert("INVALID CREDENTIALS"); }
         }
 
         async function sync() {
-            const cls = document.getElementById('filter-class').value;
-            let q = db.from('Students').select('*').eq('sch_id', activeSch);
-            if(cls !== 'ALL') q = q.eq('class', cls);
-            
-            const { data } = await q.order('name', { ascending: true });
+            const { data } = await db.from('Students').select('*').eq('sch_id', activeSch).order('name', { ascending: true });
             students = data || [];
-            filterUI();
+            renderLists();
         }
 
-        function filterUI() {
-            const search = document.getElementById('search-box').value.toUpperCase();
-            const filtered = students.filter(s => s.name.includes(search) || (s.lin && s.lin.includes(search)));
+        function renderLists() {
+            const q = document.getElementById('q-list').value.toUpperCase();
+            const rClass = document.getElementById('roll-class').value;
+            const fClass = document.getElementById('fin-class').value;
 
-            // DASHBOARD STATS
-            let p = 0, a = 0, col = 0, dbt = 0;
+            let p=0, a=0, col=0, dbt=0;
             students.forEach(s => {
                 s.is_absent ? a++ : p++;
                 col += (s.fees_paid || 0);
                 dbt += (s.total_fees - (s.fees_paid || 0));
             });
-            document.getElementById('d-present').innerText = p;
-            document.getElementById('d-absent').innerText = a;
-            document.getElementById('d-collected').innerText = col.toLocaleString();
-            document.getElementById('d-debts').innerText = dbt.toLocaleString();
 
-            // ROLL CALL LIST
-            document.getElementById('render-list').innerHTML = filtered.map(s => `
-                <div class="student-card">
-                    <div style="flex:1"><b>${s.name}</b><br><small>${s.lin || 'NO LIN'} | ${s.class}</small></div>
-                    <button class="btn-icon" style="background:${s.is_absent ? 'var(--accent)' : 'var(--success)'}" onclick="mark('${s.id}', ${s.is_absent})">
-                        ${s.is_absent ? 'ABSENT' : 'PRESENT'}
-                    </button>
-                    <i class="fas fa-edit" style="color:var(--primary)" onclick="editStud('${s.id}')"></i>
+            document.getElementById('st-p').innerText = p;
+            document.getElementById('st-a').innerText = a;
+            document.getElementById('st-c').innerText = col.toLocaleString();
+            document.getElementById('st-d').innerText = dbt.toLocaleString();
+
+            // 1. ALL INFORMATION LIST
+            const filteredAll = students.filter(s => s.name.includes(q) || (s.lin && s.lin.includes(q)) || s.class.includes(q));
+            document.getElementById('list-container').innerHTML = filteredAll.map(s => `
+                <div class="card">
+                    <button class="btn-edit" onclick="editS('${s.id}')"><i class="fas fa-pen"></i></button>
+                    <button class="btn-del" onclick="delS('${s.id}')"><i class="fas fa-trash"></i></button>
+                    <div style="font-weight:900; color:var(--dark); font-size:1rem;">${s.name}</div>
+                    <div style="color:var(--primary); font-weight:800; font-size:0.7rem; margin-bottom:5px;">LIN: ${s.lin || 'N/A'}</div>
+                    <div class="info-grid">
+                        <div class="info-tag">Class: ${s.class}</div>
+                        <div class="info-tag">Gender: ${s.gender}</div>
+                        <div class="info-tag">Age: ${s.age || '?'}</div>
+                        <div class="info-tag">Loc: ${s.location || 'N/A'}</div>
+                    </div>
                 </div>`).join('');
 
-            // FINANCE LIST
-            document.getElementById('render-fin').innerHTML = filtered.map(s => `
-                <div class="student-card">
-                    <div style="flex:1"><b>${s.name}</b><br><small>Bal: ${(s.total_fees - (s.fees_paid||0)).toLocaleString()}</small></div>
-                    <input type="number" placeholder="Amt" style="width:90px; margin:0;" onchange="pay('${s.id}', this.value)">
+            // 2. ROLL CALL (BY CLASS)
+            const filteredRoll = students.filter(s => rClass === "ALL" || s.class === rClass);
+            document.getElementById('roll-container').innerHTML = filteredRoll.map(s => `
+                <div class="card" style="display:flex; align-items:center; gap:12px; border-left:8px solid ${s.is_absent ? 'var(--accent)' : 'var(--success)'}">
+                    <div style="flex:1"><b>${s.name}</b><br><small>${s.class}</small></div>
+                    <button class="btn-action" style="background:${s.is_absent ? 'var(--accent)' : 'var(--success)'}" onclick="toggleR('${s.id}', ${s.is_absent})">
+                        ${s.is_absent ? 'ABSENT' : 'PRESENT'}
+                    </button>
+                </div>`).join('');
+
+            // 3. FINANCE (BY CLASS)
+            const filteredFin = students.filter(s => fClass === "ALL" || s.class === fClass);
+            document.getElementById('fin-container').innerHTML = filteredFin.map(s => `
+                <div class="card">
+                    <div style="margin-bottom:8px;"><b>${s.name}</b> <small>(${s.class})</small></div>
+                    <div class="info-grid" style="margin-bottom:10px;">
+                        <div class="info-tag">Total: ${s.total_fees.toLocaleString()}</div>
+                        <div class="info-tag">Paid: ${s.fees_paid.toLocaleString()}</div>
+                        <div class="info-tag" style="color:var(--accent)">Debt: ${(s.total_fees - s.fees_paid).toLocaleString()}</div>
+                    </div>
+                    <input type="number" placeholder="Enter Amount Paid..." style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; width:100%;" onchange="payS('${s.id}', this.value)">
                 </div>`).join('');
         }
 
-        async function mark(id, stat) {
+        async function toggleR(id, stat) {
             await db.from('Students').update({ is_absent: !stat }).eq('id', id);
             sync();
         }
 
-        async function pay(id, val) {
+        async function payS(id, val) {
             const s = students.find(x => x.id == id);
-            const newTotal = Number(s.fees_paid || 0) + Number(val);
-            const { error } = await db.from('Students').update({ fees_paid: newTotal }).eq('id', id);
-            if(!error) {
-                // LOG TRANSACTION
-                await db.from('Finance_History').insert([{ student_id: id, amount: val, sch_id: activeSch, timestamp: new Date().toISOString() }]);
-                alert("Payment Stored in History");
-                sync();
-            }
+            const amt = Number(s.fees_paid || 0) + Number(val);
+            await db.from('Students').update({ fees_paid: amt }).eq('id', id);
+            sync();
         }
 
-        async function register() {
-            const p = {
-                sch_id: activeSch,
-                name: document.getElementById('f-name').value.toUpperCase(),
-                lin: document.getElementById('f-lin').value,
-                class: document.getElementById('f-class').value,
-                gender: document.getElementById('f-gender').value,
-                total_fees: document.getElementById('f-total').value,
-                location: document.getElementById('f-loc').value,
-                is_absent: false,
-                fees_paid: 0
-            };
+        async function saveStudent() {
+            const p = { sch_id: activeSch, name: document.getElementById('f-name').value.toUpperCase(), lin: document.getElementById('f-lin').value, class: document.getElementById('f-class').value, gender: document.getElementById('f-gender').value, total_fees: document.getElementById('f-fees').value, fees_paid: 0, is_absent: false };
             await db.from('Students').insert([p]);
-            alert("STUDENT REGISTERED");
-            sync();
-            nav('list');
+            sync(); nav('list');
         }
 
         function nav(v, b) {
-            ['v-dash','v-list','v-reg','v-fin'].forEach(x => document.getElementById(x).classList.add('hidden'));
+            ['v-dash','v-list','v-roll','v-fin','v-add'].forEach(x => document.getElementById(x).classList.add('hidden'));
             document.getElementById('v-'+v).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             if(b) b.classList.add('active');
+            document.getElementById('view-scroll').scrollTop = 0;
         }
 
         setInterval(() => {
-            const now = new Date();
-            document.getElementById('top-time').innerText = now.toLocaleString('en-GB', { 
+            document.getElementById('display-time').innerText = new Date().toLocaleString('en-GB', { 
                 weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' 
             }).toUpperCase();
         }, 1000);
