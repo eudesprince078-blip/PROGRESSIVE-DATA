@@ -214,4 +214,139 @@
                 photo_url: document.getElementById('f-img').value
             };
 
-            if(id) { await db.from('Students').update(packet).eq('id', id
+            if(id) { await db.from('Students').update(packet).eq('id', id); }
+            else {
+                packet.lin = activeSch + "-" + Math.floor(1000 + Math.random()*8999);
+                await db.from('Students').insert([packet]);
+            }
+
+            pushAlert("Record Updated: " + packet.name);
+            await refreshRegistry();
+            clearForm();
+            switchNav('list');
+            btn.innerText = "SAVE STUDENT RECORD"; btn.disabled = false;
+        }
+
+        function updateDisplay() {
+            let totalCollected = 0, totalDebt = 0, pCount = 0;
+            students.forEach(s => {
+                totalCollected += (s.paid_fees || 0);
+                totalDebt += (s.total_fees - (s.paid_fees || 0));
+                if(presentList[s.id]) pCount++;
+            });
+
+            document.getElementById('st-total').innerText = students.length;
+            document.getElementById('st-income').innerText = totalCollected.toLocaleString();
+            document.getElementById('st-debt').innerText = totalDebt.toLocaleString();
+            document.getElementById('st-present').innerText = pCount;
+
+            // List Render
+            document.getElementById('render-list').innerHTML = students.map(s => `
+                <div class="list-item">
+                    <img src="${s.photo_url || ''}" class="list-img">
+                    <div class="list-info">
+                        <h4>${s.name}</h4>
+                        <p>${s.class} | LIN: ${s.lin}</p>
+                    </div>
+                    <i class="fas fa-user-edit" style="color:var(--primary); font-size:1.3rem; padding:10px" onclick="editStudent('${s.id}')"></i>
+                    <i class="fas fa-trash-alt" style="color:var(--accent); font-size:1.3rem; padding:10px" onclick="deleteStudent('${s.id}')"></i>
+                </div>`).join('');
+
+            // Roll Call Render
+            document.getElementById('render-roll').innerHTML = students.map(s => `
+                <div class="list-item" onclick="markRoll('${s.id}')" style="border-left: 10px solid ${presentList[s.id] ? 'var(--success)' : '#e2e8f0'}">
+                    <div class="list-info"><h4>${s.name}</h4><p>${s.class}</p></div>
+                    <i class="fas ${presentList[s.id] ? 'fa-check-circle' : 'fa-circle'}" style="color:${presentList[s.id] ? 'var(--success)' : '#e2e8f0'}; font-size:1.8rem;"></i>
+                </div>`).join('');
+
+            // Finance Render
+            document.getElementById('render-fin').innerHTML = students.map(s => `
+                <div class="list-item">
+                    <div class="list-info"><h4>${s.name}</h4><p>Bal: ${(s.total_fees - (s.paid_fees||0)).toLocaleString()} UGX</p></div>
+                    <input type="number" placeholder="Enter Payment" style="width:130px; margin:0;" onchange="recordPayment('${s.id}', this.value)">
+                </div>`).join('');
+        }
+
+        function markRoll(id) {
+            presentList[id] = !presentList[id];
+            updateDisplay();
+        }
+
+        async function recordPayment(id, amt) {
+            if(!amt || amt <= 0) return;
+            const s = students.find(x => x.id == id);
+            const sum = Number(s.paid_fees || 0) + Number(amt);
+            await db.from('Students').update({ paid_fees: sum }).eq('id', id);
+            pushAlert("Payment: " + amt + " for " + s.name);
+            refreshRegistry();
+        }
+
+        async function deleteStudent(id) {
+            if(confirm("Permanently delete this student from Eudes Media database?")) {
+                await db.from('Students').delete().eq('id', id);
+                pushAlert("Student record erased.");
+                refreshRegistry();
+            }
+        }
+
+        function editStudent(id) {
+            const s = students.find(x => x.id == id);
+            document.getElementById('f-id').value = s.id;
+            document.getElementById('f-name').value = s.name;
+            document.getElementById('f-class').value = s.class;
+            document.getElementById('f-age').value = s.age;
+            document.getElementById('f-dob').value = s.dob;
+            document.getElementById('f-contact').value = s.contact;
+            document.getElementById('f-loc').value = s.location;
+            document.getElementById('f-health').value = s.health_status;
+            document.getElementById('f-fees').value = s.total_fees;
+            document.getElementById('f-img').value = s.photo_url;
+            document.getElementById('f-preview').src = s.photo_url;
+            document.getElementById('f-preview').style.display = 'block';
+            document.getElementById('form-title').innerText = "EDIT STUDENT DATA";
+            document.getElementById('cancel-btn').classList.remove('hidden');
+            switchNav('reg');
+        }
+
+        function runSearch() {
+            const val = document.getElementById('search-input').value.toUpperCase();
+            const filtered = students.filter(s => s.name.includes(val) || s.class.toUpperCase().includes(val) || s.lin.includes(val));
+            document.getElementById('render-list').innerHTML = filtered.map(s => `
+                <div class="list-item">
+                    <img src="${s.photo_url || ''}" class="list-img">
+                    <div class="list-info"><h4>${s.name}</h4><p>${s.class} | LIN: ${s.lin}</p></div>
+                    <i class="fas fa-user-edit" onclick="editStudent('${s.id}')"></i>
+                </div>`).join('');
+        }
+
+        function pushAlert(msg) {
+            const box = document.getElementById('notif-box');
+            const now = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            box.innerHTML = `<div style="margin-bottom:8px; border-left:4px solid var(--primary); padding-left:10px;">
+                <span style="color:var(--dark)">${now}</span>: ${msg}</div>` + box.innerHTML;
+        }
+
+        function clearForm() {
+            ['f-id','f-name','f-age','f-dob','f-contact','f-loc','f-health','f-fees','f-img'].forEach(i => document.getElementById(i).value="");
+            document.getElementById('f-preview').style.display = 'none';
+            document.getElementById('form-title').innerText = "STUDENT REGISTRATION";
+            document.getElementById('cancel-btn').classList.add('hidden');
+        }
+
+        function switchNav(view, btn) {
+            ['v-dash', 'v-list', 'v-roll', 'v-reg', 'v-fin'].forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById('v-'+view).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            document.getElementById('main-scroll').scrollTop = 0;
+        }
+
+        setInterval(() => {
+            const d = new Date();
+            document.getElementById('display-clock').innerText = d.toLocaleString('en-GB', { 
+                weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            }).toUpperCase();
+        }, 1000);
+    </script>
+</body>
+</html>
