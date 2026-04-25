@@ -2,16 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Live Control</title>
+    <title>Eudes Media | Diagnostic Mode</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #003366; --gold: #ffc107; --white: #ffffff; --green: #2b9348; --red: #d90429; }
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; padding: 0; }
         
-        /* LOGIN BOX */
+        /* DIAGNOSTIC OVERLAY */
+        #debugLog { position: fixed; top: 0; left: 0; right: 0; background: #000; color: #0f0; font-family: monospace; font-size: 10px; padding: 5px; z-index: 3000; max-height: 60px; overflow-y: auto; display: block; border-bottom: 2px solid var(--gold); }
+        
         #gate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
-        .login-box { background:white; padding:40px 30px; border-radius:25px; width:90%; max-width:360px; text-align:center; box-shadow:0 15px 35px rgba(0,0,0,0.4); }
+        .login-box { background:white; padding:30px; border-radius:25px; width:90%; max-width:360px; text-align:center; box-shadow:0 15px 35px rgba(0,0,0,0.4); }
         
         .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .hero { background: #001a33; padding: 25px; text-align: center; color: white; border-bottom: 4px solid var(--blue); }
@@ -27,29 +29,24 @@
         .visible-tab { display: block !important; }
 
         .card { background: white; border-radius: 15px; padding: 20px; margin: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-left: 8px solid var(--blue); }
-        
-        input, select { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 15px; font-weight: 700; box-sizing: border-box; font-size: 14px; }
-        label { font-size: 11px; font-weight: 900; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 5px; padding-left: 5px; letter-spacing: 1px; }
-        
-        .btn-main { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 16px; letter-spacing: 1px; }
-        .btn-main:active { background: var(--gold); color: var(--blue); }
+        input, select { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 15px; font-weight: 700; box-sizing: border-box; }
+        .btn-main { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 16px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
+<div id="debugLog">SYSTEM INITIALIZED: Awaiting Authentication...</div>
+
 <div id="gate">
     <div class="login-box">
-        <h2 style="color:var(--blue); margin:0; font-size:28px;">EUDES MEDIA</h2>
-        <p style="font-size:10px; font-weight:900; color:#aaa; margin-bottom:30px; letter-spacing:2px;">CONTROL CENTER</p>
+        <h2 style="color:var(--blue); margin:0;">EUDES MEDIA</h2>
+        <p style="font-size:10px; font-weight:900; color:#aaa; margin-bottom:20px;">DIAGNOSTIC CONSOLE</p>
         
-        <label>SCHOOL ID</label>
-        <input id="login_id" type="text" placeholder="PM001" style="text-align:center;">
+        <input id="login_id" type="text" placeholder="SCHOOL ID (PM001)" style="text-align:center;">
+        <input id="login_key" type="password" placeholder="ACCESS KEY" style="text-align:center;">
         
-        <label>ACCESS KEY</label>
-        <input id="login_key" type="password" placeholder="••••••" style="text-align:center;">
-        
-        <button onclick="startSystem()" class="btn-main">AUTHENTICATE</button>
+        <button onclick="startSystem()" class="btn-main">LOGIN & SYNC</button>
     </div>
 </div>
 
@@ -78,44 +75,31 @@
     </div>
 
     <div id="v-sum" class="hidden">
-        <div class="card" style="background:var(--blue); color:white;">
-            <h4 style="color:var(--gold); margin-top:0;">FINANCIAL STANDING</h4>
-            <div id="fin_view" style="font-size:15px; line-height:1.6;">Syncing Records...</div>
-        </div>
-        <div class="card">
-            <h4 style="margin-top:0;">TODAY'S ABSENTEES</h4>
-            <div id="abs_view" style="font-weight:700;">No data.</div>
-        </div>
+        <div class="card" style="background:var(--blue); color:white;"><h4 style="color:var(--gold); margin-top:0;">FINANCE</h4><div id="fin_view">No data fetched.</div></div>
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="search_in" placeholder="Search LIN or Name..." oninput="draw()"></div>
+        <div style="padding:15px;"><input id="search_in" placeholder="Search..." oninput="draw()"></div>
         <div id="list_view"></div>
     </div>
 
     <div id="v-adm" class="hidden">
         <div class="card">
-            <h3 style="margin-top:0;">NEW REGISTRATION</h3>
-            <label>Name</label><input id="reg_name">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label>Age</label><input id="reg_age" type="number"></div>
-                <div><label>DOB</label><input id="reg_dob" type="date"></div>
-            </div>
-            <label>Class</label>
+            <h3>ADMISSION</h3>
+            <input id="reg_name" placeholder="Full Name">
+            <input id="reg_age" type="number" placeholder="Age">
+            <input id="reg_dob" type="date">
             <select id="reg_class"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Location</label><input id="reg_loc">
-            <label>Health</label><input id="reg_health" value="Normal">
-            <label>Contact</label><input id="reg_phone">
-            <label>Fees Expected</label><input id="reg_exp" type="number">
-            <button onclick="commit()" class="btn-main">SAVE TO CLOUD</button>
+            <input id="reg_loc" placeholder="Physical Location">
+            <input id="reg_phone" placeholder="Parent Contact">
+            <input id="reg_exp" type="number" placeholder="Fees Expected">
+            <button onclick="commit()" class="btn-main">SAVE RECORD</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
         <div id="roll_view" style="padding-top:10px;"></div>
     </div>
-
-    <div style="text-align:center; padding:40px; font-size:10px; font-weight:900; color:#bbb;">EUDES MEDIA | +256762992440</div>
 </div>
 
 <script>
@@ -125,39 +109,58 @@
 
     let _data = [];
     let _sch = "";
-    let _role = "";
+
+    function log(msg, error = false) {
+        const d = document.getElementById('debugLog');
+        d.innerHTML = (error ? '<span style="color:red">ERROR: ' : '<span>') + msg + '</span><br>' + d.innerHTML;
+    }
 
     async function startSystem() {
-        const id = document.getElementById('login_id').value.trim().toUpperCase();
+        _sch = document.getElementById('login_id').value.trim().toUpperCase();
         const key = document.getElementById('login_key').value.trim().toUpperCase();
 
-        if(id === "PM001") {
-            if(key === "PM2026") _role = "Admin";
-            else if(key === "FINANCE256") _role = "Finance";
-            else if(key === "TEACHER2026") _role = "Teacher";
-            else { alert("INVALID ACCESS KEY"); return; }
-            
-            _sch = id;
-            document.getElementById('txt_sch_name').innerText = "PROGRESSIVE MOTHER'S SCHOOL";
-            document.getElementById('txt_portal').innerText = _role.toUpperCase() + " PORTAL";
-            
-            const map = { Admin:['sum','rec','adm','roll'], Finance:['rec','adm'], Teacher:['roll','adm'] };
-            map[_role].forEach(t => document.getElementById('t-'+t).classList.add('visible-tab'));
-            
-            await forceSync();
-            document.getElementById('gate').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            show(map[_role][0]);
-            setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
+        if(_sch === "PM001") {
+            log("School ID Validated.");
+            if(key === "PM2026") {
+                log("Key accepted. Initializing App...");
+                document.getElementById('txt_sch_name').innerText = "PROGRESSIVE MOTHER'S SCHOOL";
+                ['sum','rec','adm','roll'].forEach(t => document.getElementById('t-'+t).classList.add('visible-tab'));
+                
+                document.getElementById('gate').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                show('sum');
+                
+                // Start Clock
+                setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
+                
+                await forceSync();
+            } else {
+                log("INVALID KEY ENTERED.", true);
+            }
         } else {
-            alert("SCHOOL ID NOT FOUND");
+            log("SCHOOL ID NOT FOUND IN SYSTEM.", true);
         }
     }
 
     async function forceSync() {
-        // This is the fix: It clears old data and forces a fresh download using PM001
-        const { data, error } = await _db.from('students').select('*').eq('school_id', _sch).order('name');
-        if(!error) { _data = data; draw(); stats(); }
+        log("Attempting to reach Supabase Cloud...");
+        try {
+            const { data, error } = await _db.from('students').select('*').eq('school_id', _sch).order('name');
+            
+            if(error) {
+                log("DATABASE ERROR: " + error.message, true);
+            } else if (!data || data.length === 0) {
+                log("CONNECTION OK, BUT 0 STUDENTS FOUND FOR " + _sch, true);
+                _data = [];
+            } else {
+                log("SUCCESS: " + data.length + " students downloaded.");
+                _data = data;
+                draw();
+                stats();
+            }
+        } catch (e) {
+            log("CRITICAL SYSTEM CRASH: " + e.message, true);
+        }
     }
 
     function stats() {
@@ -166,10 +169,7 @@
         document.getElementById('stat_total').innerText = _data.length;
         document.getElementById('stat_present').innerText = _data.filter(s => !s.is_absent).length;
         document.getElementById('stat_absent').innerText = _data.filter(s => s.is_absent).length;
-        document.getElementById('fin_view').innerHTML = `<b>Expected:</b> UGX ${e.toLocaleString()}<br><b>Collected:</b> UGX ${p.toLocaleString()}<br><b>Balance:</b> <span style="color:var(--gold)">UGX ${(e-p).toLocaleString()}</span>`;
-        
-        const abList = _data.filter(s => s.is_absent).map(s => `• ${s.name} (${s.class})`).join('<br>');
-        document.getElementById('abs_view').innerHTML = abList || "All pupils are present.";
+        document.getElementById('fin_view').innerHTML = `Expected: ${e.toLocaleString()}<br>Paid: ${p.toLocaleString()}`;
     }
 
     function draw() {
@@ -187,6 +187,7 @@
     }
 
     async function commit() {
+        log("Uploading new student...");
         const student = {
             school_id: _sch,
             name: document.getElementById('reg_name').value.toUpperCase(),
@@ -195,12 +196,12 @@
             dob: document.getElementById('reg_dob').value,
             class: document.getElementById('reg_class').value,
             location: document.getElementById('reg_loc').value,
-            health_status: document.getElementById('reg_health').value,
             contact: document.getElementById('reg_phone').value,
             fees_expected: parseInt(document.getElementById('reg_exp').value) || 0
         };
         const { error } = await _db.from('students').insert([student]);
-        if(!error) { alert("SAVED SUCCESSFULLY"); forceSync(); }
+        if(error) log("SAVE FAILED: " + error.message, true);
+        else { log("SAVE SUCCESSFUL."); forceSync(); }
     }
 
     async function toggle(id, st) {
