@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Progressive Mother's School</title>
+    <title>Eudes Media | Universal School Control</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #003366; --gold: #ffc107; --white: #ffffff; --green: #2b9348; --red: #d90429; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--white); margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--white); margin: 0; padding: 0; overflow-x: hidden; }
         
         #loginGate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; }
         .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
@@ -16,51 +16,52 @@
         #clock { font-size: 32px; font-weight: 800; color: var(--gold); }
 
         .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
-        .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
+        .stat-card { background: white; padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
         .stat-val { font-size: 18px; font-weight: 900; color: var(--blue); display: block; }
 
-        .nav-tabs { display: flex; background: var(--blue); position: sticky; top: 65px; z-index: 999; }
+        .nav-tabs { display: flex; background: var(--blue); position: sticky; top: 65px; z-index: 999; border-bottom: 2px solid var(--gold); }
         .tab { flex: 1; text-align: center; padding: 15px; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.5); cursor: pointer; display: none; }
         .tab.active { color: var(--gold); border-bottom: 4px solid var(--gold); background: rgba(0,0,0,0.2); }
         .visible-tab { display: block !important; }
 
         .card { background: white; border-radius: 12px; padding: 15px; margin: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-left: 6px solid var(--blue); position: relative; }
-        .p-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 2px solid var(--blue); margin-right: 12px; }
+        .p-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 2px solid var(--blue); margin-right: 12px; background: #eee; }
         
         input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; font-weight: 600; box-sizing: border-box; }
         label { font-size: 10px; font-weight: 800; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 2px; }
         
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 15px; border: none; border-radius: 10px; font-weight: 900; cursor: pointer; }
+        .btn-pay { background: var(--green); color: white; padding: 5px 10px; border-radius: 5px; border: none; font-size: 10px; font-weight: 800; }
         .hidden { display: none !important; }
         
-        .history-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; background: #f8f9fa; }
-        .history-table td, th { padding: 8px; border: 1px solid #ddd; text-align: left; }
+        .history-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+        .history-table td, th { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
     </style>
 </head>
 <body>
 
 <div id="loginGate">
-    <h1 style="color:white; margin-bottom:0;">EUDES MEDIA</h1>
-    <p style="color:var(--gold); margin-top:5px; font-weight:800; letter-spacing:1px;">SCHOOL PORTAL LOGIN</p>
-    <input id="key" type="text" placeholder="ENTER ACCESS KEY" style="text-align:center; max-width:300px; border:3px solid var(--gold);">
-    <button onclick="secureLogin()" class="btn-main" style="max-width:300px; background:var(--gold); color:var(--blue);">LOGIN NOW</button>
+    <h1 style="color:white; margin:0;">EUDES MEDIA</h1>
+    <p style="color:var(--gold); margin-top:5px; font-weight:800; letter-spacing:1px;">SYSTEM CONTROL CENTER</p>
+    <input id="keyInput" type="text" placeholder="ENTER ACCESS KEY" style="text-align:center; max-width:300px; border:3px solid var(--gold); border-radius: 15px;">
+    <button onclick="secureLogin()" class="btn-main" style="max-width:300px; background:var(--gold); color:var(--blue); border-radius: 15px;">AUTHENTICATE</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div><b id="displaySchoolName" style="font-size:14px;">PROGRESSIVE MOTHER'S SCHOOL</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">LEVEL</span></div>
+        <div><b id="schoolDisplay" style="font-size:14px;">LOADING...</b><br><span id="roleBadge" style="font-size:9px; color:var(--gold);">...</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:900;">LOGOUT</button>
     </div>
 
     <div class="hero">
         <div id="clock">00:00:00</div>
-        <div id="status" style="font-size:10px; font-weight:900; margin-top:5px;">...</div>
+        <div id="schoolStatus" style="font-size:10px; font-weight:900; margin-top:5px;">● SCHOOL IN SESSION</div>
     </div>
 
     <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="c-tot">0</span><span style="font-size:8px; font-weight:800;">ENROLLED</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-pres" style="color:var(--green)">0</span><span style="font-size:8px; font-weight:800;">PRESENT</span></div>
-        <div class="stat-card"><span class="stat-val" id="c-abs" style="color:var(--red)">0</span><span style="font-size:8px; font-weight:800;">ABSENT</span></div>
+        <div class="stat-card"><span class="stat-val" id="stat-tot">0</span><span style="font-size:8px; font-weight:800;">ENROLLED</span></div>
+        <div class="stat-card"><span class="stat-val" id="stat-pres" style="color:var(--green)">0</span><span style="font-size:8px; font-weight:800;">PRESENT</span></div>
+        <div class="stat-card"><span class="stat-val" id="stat-abs" style="color:var(--red)">0</span><span style="font-size:8px; font-weight:800;">ABSENT</span></div>
     </div>
 
     <div class="nav-tabs">
@@ -70,159 +71,218 @@
         <div class="tab" id="tab-roll" onclick="tab('roll')">Roll-Call</div>
     </div>
 
-    <div id="v-sum" class="hidden">
+    <div id="view-sum" class="hidden">
         <div class="card" style="background:var(--blue); color:white;">
             <h4 style="color:var(--gold); margin-top:0;">FINANCIAL STANDING</h4>
-            <div id="finSummary">Loading...</div>
+            <div id="dirFinances">Calculating...</div>
         </div>
-        <div id="absenteeDetails" style="padding:5px;"></div>
-    </div>
-
-    <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="Search LIN, Name, or Class..." oninput="renderUI()"></div>
-        <div id="dataList"></div>
-    </div>
-
-    <div id="v-adm" class="hidden">
         <div class="card">
-            <h3 id="admTitle">ADMISSION</h3>
+            <h4 style="margin-top:0;">DAILY ABSENTEE REPORT</h4>
+            <div id="absenteeList" style="font-size:13px; font-weight:600;">None</div>
+        </div>
+    </div>
+
+    <div id="view-rec" class="hidden">
+        <div style="padding:15px;"><input id="search" placeholder="Search LIN, Name, or Class..." oninput="renderApp()"></div>
+        <div id="studentList"></div>
+    </div>
+
+    <div id="view-adm" class="hidden">
+        <div class="card">
+            <h3 id="formTitle">NEW ADMISSION</h3>
             <input type="hidden" id="editId">
-            <label>Photo URL</label><input id="p_url" placeholder="Image Link">
-            <label>Full Name</label><input id="name">
-            <label>LIN</label><input id="lin_field">
+            <label>Student Photo</label><input id="f_photo" placeholder="Paste URL">
+            <label>Full Name</label><input id="f_name">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label>Age</label><input id="age" type="number"></div>
-                <div><label>Academic Year</label><input id="acad_year" value="2026"></div>
+                <div><label>LIN</label><input id="f_lin" placeholder="Auto"></div>
+                <div><label>Acad Year</label><input id="f_year" value="2026"></div>
             </div>
-            <label>Date of Birth</label><input id="dob" type="date">
-            <label>Class</label><select id="cls"><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Parent Contact</label><input id="contact">
-            <label>Location</label><input id="loc">
-            <label>Health Status</label><input id="health">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label>Age</label><input id="f_age" type="number"></div>
+                <div><label>DOB</label><input id="f_dob" type="date"></div>
+            </div>
+            <label>Class</label><select id="f_class"><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <label>Location</label><input id="f_loc">
+            <label>Health Status</label><input id="f_health" value="Normal">
+            <label>Parent Contact</label><input id="f_phone">
             
-            <div id="financeBox" style="background:#f4f4f4; padding:15px; border-radius:10px;">
-                <label>Fees Expected (UGX)</label><input id="f_exp" type="number">
-                <label>New Payment</label>
+            <div style="background:#f9f9f9; padding:15px; border-radius:10px; border:1px dashed var(--blue);">
+                <label>Expected Fees (UGX)</label><input id="f_exp" type="number" value="0">
+                <label>Add Payment</label>
                 <div style="display:flex; gap:5px;"><input id="p_amt" type="number" placeholder="Amt"><input id="p_date" type="date"></div>
-                <div id="historyContainer"></div>
+                <div id="payHistory"></div>
             </div>
-            <button onclick="saveStudent()" class="btn-main" style="margin-top:15px;">SAVE STUDENT</button>
+            <button onclick="saveStudent()" class="btn-main" style="margin-top:15px;">COMMIT TO DATABASE</button>
         </div>
     </div>
 
-    <div id="v-roll" class="hidden">
-        <div style="padding:15px;">
-            <select id="rollClassSelect" onchange="renderUI()"><option value="">-- Select Class --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-        </div>
-        <div id="rollData"></div>
+    <div id="view-roll" class="hidden">
+        <div style="padding:15px;"><select id="rollClass" onchange="renderApp()"><option value="">-- Choose Class --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
+        <div id="rollBody"></div>
     </div>
 
+    <div style="text-align:center; padding:30px; font-size:10px; font-weight:800; color:#aaa;">EUDES MEDIA | +256762992440</div>
 </div>
 
 <script>
-    const SUPA_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-    const _client = supabase.createClient(SUPA_URL, SUPA_KEY);
+    const S_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
+    const _db = supabase.createClient(S_URL, S_KEY);
 
-    let cachedData = [];
-    let currentRole = "";
-    let schoolID = "PMS-256"; // Fixed for Progressive Mother's
+    let dbData = [];
+    let myRole = "";
+    let mySchoolId = "";
+    let mySchoolName = "";
 
     async function secureLogin() {
-        const inputKey = document.getElementById('key').value.trim().toUpperCase();
+        const val = document.getElementById('keyInput').value.trim().toUpperCase();
         
-        // HARDCODED KEYS AS PER YOUR REQUEST
-        const adminKey = "PM2026";
-        const financeKey = "FINANCE256";
-        const teacherKey = "TEACHER2026";
+        // AUTO-GENERATING RULES:
+        // Progressive Mothers: PM001 | Keys: PM2026, FINANCE256, TEACHER2026
+        // For other schools, you can add them to this logic:
+        const schools = [
+            { id: "PM001", name: "Progressive Mother's School", admin: "PM2026", finance: "FINANCE256", teacher: "TEACHER2026" }
+        ];
 
-        if (inputKey === adminKey) currentRole = "Admin";
-        else if (inputKey === financeKey) currentRole = "Finance";
-        else if (inputKey === teacherKey) currentRole = "Teacher";
-        else { alert("WRONG ACCESS KEY"); return; }
+        const match = schools.find(s => s.admin === val || s.finance === val || s.teacher === val);
 
-        document.getElementById('userRoleBadge').innerText = currentRole.toUpperCase();
-        setupAccess();
-        await loadData();
-        
-        document.getElementById('loginGate').classList.add('hidden');
-        document.getElementById('mainApp').classList.remove('hidden');
-        startClock();
+        if (match) {
+            mySchoolId = match.id;
+            mySchoolName = match.name;
+            myRole = (val === match.admin) ? "Admin" : (val === match.finance ? "Finance" : "Teacher");
+            
+            document.getElementById('schoolDisplay').innerText = mySchoolName.toUpperCase();
+            document.getElementById('roleBadge').innerText = myRole.toUpperCase() + " PORTAL";
+            
+            setupTabs();
+            await fetchData();
+            
+            document.getElementById('loginGate').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            startClock();
+        } else {
+            alert("KEY ERROR: Access Denied");
+        }
     }
 
-    function setupAccess() {
-        const map = { Admin:['sum','rec','adm','roll'], Finance:['rec','adm'], Teacher:['roll','adm'] };
+    function setupTabs() {
+        const access = { Admin:['sum','rec','adm','roll'], Finance:['rec','adm'], Teacher:['roll','adm'] };
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('visible-tab'));
-        map[currentRole].forEach(id => document.getElementById('tab-'+id).classList.add('visible-tab'));
-        tab(map[currentRole][0]);
+        access[myRole].forEach(id => document.getElementById('tab-'+id).classList.add('visible-tab'));
+        tab(access[myRole][0]);
     }
 
-    async function loadData() {
-        const { data, error } = await _client.from('students').select('*').eq('school_id', schoolID).order('name');
-        if(!error) { cachedData = data; renderUI(); updateStats(); }
-        else { console.log("Data Load Error:", error); }
+    async function fetchData() {
+        const { data, error } = await _db.from('students').select('*').eq('school_id', mySchoolId).order('name');
+        if(!error) { dbData = data; renderApp(); stats(); }
     }
 
-    function updateStats() {
-        let tExp = 0, tPaid = 0;
-        cachedData.forEach(s => { tExp += (s.fees_expected || 0); tPaid += (s.fees_paid || 0); });
-        document.getElementById('c-tot').innerText = cachedData.length;
-        document.getElementById('c-pres').innerText = cachedData.filter(s => !s.is_absent).length;
-        document.getElementById('c-abs').innerText = cachedData.filter(s => s.is_absent).length;
-        document.getElementById('finSummary').innerHTML = `<p>Expected: ${tExp.toLocaleString()}</p><p>Paid: ${tPaid.toLocaleString()}</p><p>Balance: ${(tExp-tPaid).toLocaleString()}</p>`;
+    function stats() {
+        let exp = 0, paid = 0;
+        dbData.forEach(s => { exp += (s.fees_expected || 0); paid += (s.fees_paid || 0); });
+        
+        document.getElementById('stat-tot').innerText = dbData.length;
+        document.getElementById('stat-pres').innerText = dbData.filter(s => !s.is_absent).length;
+        document.getElementById('stat-abs').innerText = dbData.filter(s => s.is_absent).length;
+        
+        document.getElementById('dirFinances').innerHTML = `
+            <div style="display:flex; justify-content:space-between;"><span>Expected:</span> <b>${exp.toLocaleString()}</b></div>
+            <div style="display:flex; justify-content:space-between;"><span>Received:</span> <b style="color:var(--green)">${paid.toLocaleString()}</b></div>
+            <div style="display:flex; justify-content:space-between; margin-top:5px; border-top:1px solid #555;"><span>Balance:</span> <b style="color:var(--red)">${(exp-paid).toLocaleString()}</b></div>
+        `;
+
+        const abs = dbData.filter(s => s.is_absent).map(s => `• ${s.name} (${s.class})`).join('<br>');
+        document.getElementById('absenteeList').innerHTML = abs || "All students present today.";
     }
 
-    function renderUI() {
-        const query = document.getElementById('searchBar').value.toLowerCase();
-        document.getElementById('dataList').innerHTML = cachedData.filter(s => s.name.toLowerCase().includes(query)).map(s => `
-            <div class="card" onclick="editMode('${s.id}')">
-                <div style="display:flex;">
-                    <img src="${s.photo_url || 'https://via.placeholder.com/60'}" class="p-img">
-                    <div><b>${s.name}</b><br><small>${s.class} | ${s.lin || 'N/A'}</small></div>
+    function renderApp() {
+        const q = document.getElementById('search').value.toLowerCase();
+        document.getElementById('studentList').innerHTML = dbData.filter(s => s.name.toLowerCase().includes(q) || s.lin?.includes(q)).map(s => `
+            <div class="card" onclick="edit('${s.id}')">
+                <div style="display:flex; align-items:center;">
+                    <img src="${s.photo_url || ''}" class="p-img" onerror="this.src='https://via.placeholder.com/60'">
+                    <div><b style="font-size:14px;">${s.name}</b><br><small>${s.class} | LIN: ${s.lin || 'NONE'}</small></div>
+                </div>
+                <div style="margin-top:8px; font-size:11px; color:var(--red); font-weight:700;">
+                    BAL: UGX ${((s.fees_expected||0)-(s.fees_paid||0)).toLocaleString()}
                 </div>
             </div>
         `).join('');
 
-        const rCls = document.getElementById('rollClassSelect').value;
-        document.getElementById('rollData').innerHTML = cachedData.filter(s => s.class === rCls).map(s => `
-            <div class="card" style="display:flex; justify-content:space-between;">
+        const rc = document.getElementById('rollClass').value;
+        document.getElementById('rollBody').innerHTML = dbData.filter(s => s.class === rc).map(s => `
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
                 <b>${s.name}</b>
-                <button onclick="markAtt('${s.id}', ${!s.is_absent})" style="color:white; background:${s.is_absent?'var(--red)':'var(--green)'}">${s.is_absent?'ABSENT':'PRESENT'}</button>
+                <button onclick="mark('${s.id}', ${!s.is_absent})" style="border:none; padding:10px 15px; border-radius:8px; color:white; font-weight:900; background:${s.is_absent?'var(--red)':'var(--green)'}">${s.is_absent?'ABSENT':'PRESENT'}</button>
             </div>
         `).join('');
     }
 
-    function editMode(id) {
-        const s = cachedData.find(x => x.id == id);
+    function edit(id) {
+        const s = dbData.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
-        document.getElementById('name').value = s.name;
-        document.getElementById('lin_field').value = s.lin || "";
-        document.getElementById('cls').value = s.class;
+        document.getElementById('f_name').value = s.name;
+        document.getElementById('f_lin').value = s.lin || "";
+        document.getElementById('f_class').value = s.class;
         document.getElementById('f_exp').value = s.fees_expected;
+        document.getElementById('f_photo').value = s.photo_url || "";
+        document.getElementById('f_age').value = s.age || "";
+        document.getElementById('f_dob').value = s.dob || "";
+        document.getElementById('f_phone').value = s.contact || "";
+        document.getElementById('f_loc').value = s.location || "";
+        document.getElementById('f_health').value = s.health_status || "Normal";
+        
+        const h = s.payment_history ? JSON.parse(s.payment_history) : [];
+        document.getElementById('payHistory').innerHTML = `<table class="history-table">` + h.map(x => `<tr><td>${x.date}</td><td>${x.amount.toLocaleString()}</td></tr>`).join('') + `</table>`;
         tab('adm');
     }
 
     async function saveStudent() {
         const id = document.getElementById('editId').value;
-        const payload = {
-            school_id: schoolID,
-            name: document.getElementById('name').value.toUpperCase(),
-            lin: document.getElementById('lin_field').value || "LIN-"+Math.random(),
-            class: document.getElementById('cls').value,
-            fees_expected: parseInt(document.getElementById('f_exp').value) || 0
+        const pAmt = parseInt(document.getElementById('p_amt').value) || 0;
+        const pDate = document.getElementById('p_date').value;
+        
+        let hist = []; let paid = 0;
+        if(id) {
+            const s = dbData.find(x => x.id == id);
+            hist = s.payment_history ? JSON.parse(s.payment_history) : [];
+            paid = s.fees_paid || 0;
+        }
+
+        if(pAmt > 0 && pDate) { hist.push({date: pDate, amount: pAmt}); paid += pAmt; }
+
+        const body = {
+            school_id: mySchoolId,
+            name: document.getElementById('f_name').value.toUpperCase(),
+            lin: document.getElementById('f_lin').value || "LIN-"+Math.floor(10000+Math.random()*90000),
+            class: document.getElementById('f_class').value,
+            age: document.getElementById('f_age').value,
+            dob: document.getElementById('f_dob').value,
+            location: document.getElementById('f_loc').value,
+            contact: document.getElementById('f_phone').value,
+            health_status: document.getElementById('f_health').value,
+            academic_year: document.getElementById('f_year').value,
+            fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
+            fees_paid: paid,
+            payment_history: JSON.stringify(hist),
+            photo_url: document.getElementById('f_photo').value
         };
-        const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("SAVED"); await loadData(); tab('rec'); }
+
+        const { error } = id ? await _db.from('students').update(body).eq('id', id) : await _db.from('students').insert([body]);
+        if(!error) { alert("DATA SAVED"); await fetchData(); tab('rec'); }
+        else alert("DB Error: " + error.message);
     }
 
-    async function markAtt(id, stat) {
-        await _client.from('students').update({ is_absent: stat }).eq('id', id);
-        loadData();
+    async function mark(id, stat) {
+        await _db.from('students').update({ is_absent: stat }).eq('id', id);
+        fetchData();
     }
 
     function tab(t) {
-        ['v-sum','v-rec','v-adm','v-roll'].forEach(v => document.getElementById(v).classList.add('hidden'));
-        document.getElementById('v-'+t).classList.remove('hidden');
+        ['view-sum','view-rec','view-adm','view-roll'].forEach(v => document.getElementById(v).classList.add('hidden'));
+        document.getElementById('view-'+t).classList.remove('hidden');
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-'+t).classList.add('active');
     }
 
     function startClock() { setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000); }
