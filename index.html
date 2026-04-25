@@ -2,15 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Diagnostic Mode</title>
+    <title>Eudes Media | Cloud-Force</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #003366; --gold: #ffc107; --white: #ffffff; --green: #2b9348; --red: #d90429; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; padding: 0; }
-        
-        /* DIAGNOSTIC OVERLAY */
-        #debugLog { position: fixed; top: 0; left: 0; right: 0; background: #000; color: #0f0; font-family: monospace; font-size: 10px; padding: 5px; z-index: 3000; max-height: 60px; overflow-y: auto; display: block; border-bottom: 2px solid var(--gold); }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; padding: 0; overflow-x: hidden; }
         
         #gate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
         .login-box { background:white; padding:30px; border-radius:25px; width:90%; max-width:360px; text-align:center; box-shadow:0 15px 35px rgba(0,0,0,0.4); }
@@ -36,29 +33,26 @@
 </head>
 <body>
 
-<div id="debugLog">SYSTEM INITIALIZED: Awaiting Authentication...</div>
-
 <div id="gate">
     <div class="login-box">
         <h2 style="color:var(--blue); margin:0;">EUDES MEDIA</h2>
         <p style="font-size:10px; font-weight:900; color:#aaa; margin-bottom:20px;">DIAGNOSTIC CONSOLE</p>
-        
-        <input id="login_id" type="text" placeholder="SCHOOL ID (PM001)" style="text-align:center;">
+        <input id="login_id" type="text" placeholder="SCHOOL ID" style="text-align:center;" value="PM001">
         <input id="login_key" type="password" placeholder="ACCESS KEY" style="text-align:center;">
-        
-        <button onclick="startSystem()" class="btn-main">LOGIN & SYNC</button>
+        <button onclick="startApp()" class="btn-main">AUTHENTICATE & FORCE SYNC</button>
     </div>
 </div>
 
 <div id="app" class="hidden">
     <div class="header">
         <div><b id="txt_sch_name">...</b><br><span id="txt_portal" style="font-size:9px; color:var(--gold);">...</span></div>
-        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 15px; border-radius:10px; font-weight:900;">LOGOUT</button>
+        <button onclick="forceSync()" style="background:var(--green); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; margin-right:5px;">RE-SYNC</button>
+        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900;">LOGOUT</button>
     </div>
 
     <div class="hero">
         <div id="clock">00:00:00</div>
-        <div style="font-size:10px; font-weight:900; margin-top:5px; color:var(--gold);">● SYSTEM ONLINE</div>
+        <div style="font-size:10px; font-weight:900; margin-top:5px; color:var(--gold);">● CONNECTION STATUS: <span id="db_status">WAITING...</span></div>
     </div>
 
     <div class="dashboard">
@@ -75,17 +69,17 @@
     </div>
 
     <div id="v-sum" class="hidden">
-        <div class="card" style="background:var(--blue); color:white;"><h4 style="color:var(--gold); margin-top:0;">FINANCE</h4><div id="fin_view">No data fetched.</div></div>
+        <div class="card" style="background:var(--blue); color:white;"><h4 style="color:var(--gold); margin-top:0;">FINANCE</h4><div id="fin_view">Waiting for data...</div></div>
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="search_in" placeholder="Search..." oninput="draw()"></div>
+        <div style="padding:15px;"><input id="search_in" placeholder="Search Pupils..." oninput="draw()"></div>
         <div id="list_view"></div>
     </div>
 
     <div id="v-adm" class="hidden">
         <div class="card">
-            <h3>ADMISSION</h3>
+            <h3>NEW ADMISSION</h3>
             <input id="reg_name" placeholder="Full Name">
             <input id="reg_age" type="number" placeholder="Age">
             <input id="reg_dob" type="date">
@@ -100,6 +94,8 @@
     <div id="v-roll" class="hidden">
         <div id="roll_view" style="padding-top:10px;"></div>
     </div>
+    
+    <div style="text-align:center; padding:30px; font-size:10px; font-weight:900; color:#bbb;">EUDES MEDIA | +256762992440</div>
 </div>
 
 <script>
@@ -110,56 +106,41 @@
     let _data = [];
     let _sch = "";
 
-    function log(msg, error = false) {
-        const d = document.getElementById('debugLog');
-        d.innerHTML = (error ? '<span style="color:red">ERROR: ' : '<span>') + msg + '</span><br>' + d.innerHTML;
-    }
-
-    async function startSystem() {
+    function startApp() {
         _sch = document.getElementById('login_id').value.trim().toUpperCase();
         const key = document.getElementById('login_key').value.trim().toUpperCase();
 
-        if(_sch === "PM001") {
-            log("School ID Validated.");
-            if(key === "PM2026") {
-                log("Key accepted. Initializing App...");
-                document.getElementById('txt_sch_name').innerText = "PROGRESSIVE MOTHER'S SCHOOL";
-                ['sum','rec','adm','roll'].forEach(t => document.getElementById('t-'+t).classList.add('visible-tab'));
-                
-                document.getElementById('gate').classList.add('hidden');
-                document.getElementById('app').classList.remove('hidden');
-                show('sum');
-                
-                // Start Clock
-                setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
-                
-                await forceSync();
-            } else {
-                log("INVALID KEY ENTERED.", true);
-            }
+        if(_sch === "PM001" && key === "PM2026") {
+            document.getElementById('txt_sch_name').innerText = "PROGRESSIVE MOTHER'S SCHOOL";
+            ['sum','rec','adm','roll'].forEach(t => document.getElementById('t-'+t).classList.add('visible-tab'));
+            document.getElementById('gate').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            show('sum');
+            
+            // Force Clock & Sync
+            setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
+            forceSync();
         } else {
-            log("SCHOOL ID NOT FOUND IN SYSTEM.", true);
+            alert("WRONG ID OR KEY");
         }
     }
 
     async function forceSync() {
-        log("Attempting to reach Supabase Cloud...");
+        document.getElementById('db_status').innerText = "SYNCING...";
+        document.getElementById('db_status').style.color = "var(--gold)";
+        
         try {
             const { data, error } = await _db.from('students').select('*').eq('school_id', _sch).order('name');
-            
-            if(error) {
-                log("DATABASE ERROR: " + error.message, true);
-            } else if (!data || data.length === 0) {
-                log("CONNECTION OK, BUT 0 STUDENTS FOUND FOR " + _sch, true);
-                _data = [];
-            } else {
-                log("SUCCESS: " + data.length + " students downloaded.");
-                _data = data;
-                draw();
-                stats();
-            }
+            if(error) throw error;
+
+            _data = data || [];
+            document.getElementById('db_status').innerText = "LIVE";
+            document.getElementById('db_status').style.color = "var(--green)";
+            draw();
+            stats();
         } catch (e) {
-            log("CRITICAL SYSTEM CRASH: " + e.message, true);
+            document.getElementById('db_status').innerText = "ERROR: " + e.message;
+            document.getElementById('db_status').style.color = "var(--red)";
         }
     }
 
@@ -169,7 +150,7 @@
         document.getElementById('stat_total').innerText = _data.length;
         document.getElementById('stat_present').innerText = _data.filter(s => !s.is_absent).length;
         document.getElementById('stat_absent').innerText = _data.filter(s => s.is_absent).length;
-        document.getElementById('fin_view').innerHTML = `Expected: ${e.toLocaleString()}<br>Paid: ${p.toLocaleString()}`;
+        document.getElementById('fin_view').innerHTML = `<b>Expected:</b> UGX ${e.toLocaleString()}<br><b>Collected:</b> UGX ${p.toLocaleString()}<br><b>Balance:</b> UGX ${(e-p).toLocaleString()}`;
     }
 
     function draw() {
@@ -187,7 +168,6 @@
     }
 
     async function commit() {
-        log("Uploading new student...");
         const student = {
             school_id: _sch,
             name: document.getElementById('reg_name').value.toUpperCase(),
@@ -200,8 +180,7 @@
             fees_expected: parseInt(document.getElementById('reg_exp').value) || 0
         };
         const { error } = await _db.from('students').insert([student]);
-        if(error) log("SAVE FAILED: " + error.message, true);
-        else { log("SAVE SUCCESSFUL."); forceSync(); }
+        if(!error) { alert("SUCCESS: RECORD SAVED"); forceSync(); }
     }
 
     async function toggle(id, st) {
