@@ -2,33 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | School Enterprise</title>
+    <title>Eudes Media | Progressive Mother's Management</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #003366; --gold: #ffc107; --white: #ffffff; --green: #2b9348; --red: #d90429; --light: #f4f7f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
         
-        /* Header & Navigation */
         .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 2000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .nav-tabs { display: flex; background: var(--blue); overflow-x: auto; position: sticky; top: 70px; z-index: 1999; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .hero { background: #001a33; padding: 20px; text-align: center; color: white; }
+        
+        /* Stats Dashboard */
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
+        .stat-card { background: white; padding: 15px 5px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 5px solid var(--blue); }
+        .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); display: block; }
+
+        .nav-tabs { display: flex; background: var(--blue); overflow-x: auto; position: sticky; top: 70px; z-index: 1999; }
         .tab { flex: 0 0 auto; padding: 15px 20px; font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.5); cursor: pointer; text-transform: uppercase; }
         .tab.active { color: var(--gold); border-bottom: 4px solid var(--gold); background: rgba(0,0,0,0.2); }
 
-        /* Dashboard Stats */
-        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; background: #001a33; }
-        .stat-card { background: white; padding: 15px 5px; border-radius: 12px; text-align: center; border-top: 5px solid var(--blue); }
-        .stat-val { font-size: 18px; font-weight: 900; color: var(--blue); display: block; }
-
         .container { padding: 15px; max-width: 900px; margin: 0 auto; }
         .card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 12px; border-left: 6px solid var(--blue); }
-        .pfp-box { width: 50px; height: 50px; border-radius: 10px; background: #eee; overflow: hidden; border: 1px solid #ddd; }
-        .pfp-box img { width: 100%; height: 100%; object-fit: cover; }
+        .pfp { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: #eee; border: 1px solid #ddd; }
         
-        /* Form & Inputs */
-        .form-box { background: white; border-radius: 20px; padding: 20px; border-top: 6px solid var(--blue); box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; box-sizing: border-box; margin-bottom: 10px; font-size: 14px; }
-        label { font-size: 10px; font-weight: 900; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 4px; }
+        /* Specialized Sections */
+        .fin-row { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 0; border-bottom: 1px dashed #eee; }
+        .absent-card { border-left-color: var(--red); opacity: 0.9; }
+        
+        .form-box { background: white; border-radius: 20px; padding: 20px; border-top: 6px solid var(--blue); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        input, select { width: 100%; padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; box-sizing: border-box; margin-bottom: 10px; font-weight: 600; }
+        label { font-size: 10px; font-weight: 900; color: var(--blue); display: block; margin-bottom: 5px; text-transform: uppercase; }
         
         .btn { padding: 12px; border-radius: 10px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         .btn-blue { background: var(--blue); color: white; width: 100%; }
@@ -36,20 +39,25 @@
         .btn-del { background: var(--red); color: white; font-size: 10px; }
         
         .hidden { display: none !important; }
-        .class-row { display: flex; justify-content: space-between; padding: 10px; background: #fdfdfd; border-bottom: 1px solid #eee; font-weight: 700; color: var(--blue); }
+        .badge { font-size: 9px; padding: 3px 7px; border-radius: 5px; color: white; font-weight: 800; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div><b>PROGRESSIVE MOTHER'S</b><br><span id="db_status" style="font-size:10px;">● CONNECTED</span></div>
+        <div><b>PROGRESSIVE MOTHER'S</b><br><span id="db_status" style="font-size:10px;">● CONNECTING</span></div>
         <button onclick="forceSync()" class="btn" style="background:var(--green); color:white; padding:5px 10px;">SYNC</button>
     </div>
 
+    <div class="hero">
+        <h2 id="clock" style="margin:0; font-size:32px; color:var(--gold);">00:00:00</h2>
+        <div style="font-size:10px; font-weight:900; letter-spacing:1px;">EUDES MEDIA ENTERPRISE SYSTEM</div>
+    </div>
+
     <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="stat_total">0</span><small>PUPILS</small></div>
+        <div class="stat-card"><span class="stat-val" id="stat_total">0</span><small>ENROLLED</small></div>
         <div class="stat-card"><span class="stat-val" id="stat_present" style="color:var(--green)">0</span><small>PRESENT</small></div>
-        <div class="stat-card"><span class="stat-val" id="stat_debt" style="color:var(--red)">0</span><small>DEBTORS</small></div>
+        <div class="stat-card"><span class="stat-val" id="stat_absent" style="color:var(--red)">0</span><small>ABSENT</small></div>
     </div>
 
     <div class="nav-tabs">
@@ -61,45 +69,42 @@
 
     <div class="container">
         <div id="v-dir">
-            <div class="form-box">
-                <h3 style="margin:0 0 15px 0; color:var(--blue);">Enrollment by Class</h3>
-                <div id="class_stats_list">Loading class data...</div>
+            <div class="form-box" style="margin-bottom:15px;">
+                <h3 style="margin:0 0 10px 0;">Absentees Today</h3>
+                <div id="absentee_list">No absentees reported.</div>
             </div>
             <div class="form-box">
-                <h3 style="margin:0 0 15px 0; color:var(--blue);">Financial History</h3>
-                <div id="fin_summary">Calculating fees...</div>
+                <h3 style="margin:0 0 10px 0;">Financial Standing</h3>
+                <div id="financial_summary">Loading...</div>
             </div>
         </div>
 
         <div id="v-rec" class="hidden">
-            <input id="search_in" placeholder="Search by Name, Class or LIN..." oninput="draw()">
+            <input id="search_in" placeholder="Search Name, Class, LIN..." oninput="draw()" style="margin-bottom:15px;">
             <div id="list_view"></div>
         </div>
 
         <div id="v-adm" class="hidden">
             <div class="form-box">
-                <h3 style="margin-top:0;">Student Admission</h3>
-                <label>Upload Photo (Base64/Link)</label>
-                <input type="file" id="reg_file" accept="image/*" onchange="handlePhoto(this)">
-                <input type="hidden" id="reg_photo_data">
-                
+                <h3 id="form_title" style="margin-top:0;">New Admission</h3>
+                <label>Photo URL</label>
+                <input id="reg_photo" placeholder="Paste image link">
                 <label>Full Name</label>
-                <input id="reg_name" placeholder="John Doe">
-                
+                <input id="reg_name">
                 <label>Class</label>
                 <select id="reg_class">
                     <option>Baby</option><option>Middle</option><option>Top</option>
                     <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
                     <option>P.5</option><option>P.6</option><option>P.7</option>
                 </select>
-
                 <label>Parent Contact</label>
                 <input id="reg_phone" placeholder="2567...">
-
-                <label>Fees Expected (UGX)</label>
+                <label>Total Fees (UGX)</label>
                 <input id="reg_exp" type="number" value="0">
-
-                <button onclick="commit()" id="save_btn" class="btn btn-blue">Register & Generate LIN</button>
+                <label>Amount Paid (UGX)</label>
+                <input id="reg_paid" type="number" value="0">
+                <button onclick="commit()" id="save_btn" class="btn btn-blue" style="margin-top:10px;">Save Student Record</button>
+                <button onclick="resetForm()" class="btn" style="width:100%; margin-top:5px; font-size:10px;">Cancel</button>
             </div>
         </div>
 
@@ -108,164 +113,46 @@
         </div>
     </div>
 
-    <div style="text-align:center; padding:30px; font-size:10px; font-weight:900; color:#ccc;">
-        EUDES MEDIA SOLUTIONS | +256762992440
+    <div style="text-align:center; padding:40px; font-size:10px; font-weight:900; color:#aaa;">
+        DESIGNED BY EUDES MEDIA | +256762992440
     </div>
 
 <script>
     const S_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _db = supabase.createClient(S_URL, S_KEY);
-    
-    let _data = [];
-    const _schName = "PROGRESSIVE MOTHER'S"; 
     const _schID = "PM001";
+    let _data = [];
     let _editingId = null;
 
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
+
     async function forceSync() {
+        document.getElementById('db_status').innerText = "● SYNCING...";
         let { data, error } = await _db.from('Students').select('*').eq('sch_id', _schID).order('name');
         if(!error) {
             _data = data || [];
-            updateStats();
-            draw();
+            document.getElementById('db_status').innerText = "● LIVE";
+            updateUI();
         }
     }
 
-    function updateStats() {
-        const classes = ["Baby","Middle","Top","P.1","P.2","P.3","P.4","P.5","P.6","P.7"];
-        let html = "";
-        let totalExp = 0, totalPaid = 0;
+    function updateUI() {
+        const enrolled = _data.length;
+        const absent = _data.filter(s => s.is_absent).length;
+        const present = enrolled - absent;
 
-        classes.forEach(c => {
-            const count = _data.filter(s => s.class === c).length;
-            html += `<div class="class-row"><span>${c}</span><span>${count} Pupils</span></div>`;
-        });
-        
+        document.getElementById('stat_total').innerText = enrolled;
+        document.getElementById('stat_present').innerText = present;
+        document.getElementById('stat_absent').innerText = absent;
+
+        // Financial & Absentee Summaries
+        let finHtml = "";
+        let absHtml = "";
+
         _data.forEach(s => {
-            totalExp += (s.fees_expected || 0);
-            totalPaid += (s.fees_paid || 0);
-        });
-
-        document.getElementById('class_stats_list').innerHTML = html;
-        document.getElementById('stat_total').innerText = _data.length;
-        document.getElementById('stat_present').innerText = _data.filter(s => !s.is_absent).length;
-        document.getElementById('stat_debt').innerText = _data.filter(s => (s.fees_expected - s.fees_paid) > 0).length;
-        
-        document.getElementById('fin_summary').innerHTML = `
-            <p><b>Total Expected:</b> UGX ${totalExp.toLocaleString()}</p>
-            <p><b>Total Collected:</b> UGX ${totalPaid.toLocaleString()}</p>
-            <p style="color:red"><b>Outstanding:</b> UGX ${(totalExp - totalPaid).toLocaleString()}</p>
-        `;
-    }
-
-    function draw() {
-        const q = document.getElementById('search_in').value.toLowerCase();
-        const filtered = _data.filter(s => 
-            s.name.toLowerCase().includes(q) || 
-            s.class.toLowerCase().includes(q) || 
-            (s.lin && s.lin.toLowerCase().includes(q))
-        );
-
-        document.getElementById('list_view').innerHTML = filtered.map(s => `
-            <div class="card">
-                <div class="pfp-box"><img src="${s.photo_url || 'https://via.placeholder.com/50'}"></div>
-                <div style="flex:1;">
-                    <b style="color:var(--blue);">${s.name}</b><br>
-                    <small>${s.class} | LIN: ${s.lin}</small><br>
-                    <small>Parent: ${s.contact || 'No Contact'}</small>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:5px;">
-                    <button onclick="editStud('${s.id}')" class="btn btn-edit">EDIT</button>
-                    <button onclick="delStud('${s.id}')" class="btn btn-del">DEL</button>
-                </div>
-            </div>
-        `).join('');
-
-        document.getElementById('roll_view').innerHTML = _data.map(s => `
-            <div class="card" style="justify-content:space-between;">
-                <div><b>${s.name}</b><br><small>${s.class}</small></div>
-                <button onclick="markAbs('${s.id}', ${!s.is_absent})" class="btn" style="background:${s.is_absent?'var(--red)':'var(--green)'}; color:white;">
-                    ${s.is_absent ? 'ABSENT' : 'PRESENT'}
-                </button>
-            </div>
-        `).join('');
-    }
-
-    // AUTO-LIN GENERATION: 2 Letters School + 1 Letter Name + 4 Digits
-    function generateLIN(name) {
-        const schPart = "PM"; // From Progressive Mother's
-        const namePart = name.charAt(0).toUpperCase();
-        const randPart = Math.floor(1000 + Math.random() * 9000);
-        return `${schPart}${namePart}${randPart}`;
-    }
-
-    function handlePhoto(input) {
-        const reader = new FileReader();
-        reader.onload = (e) => document.getElementById('reg_photo_data').value = e.target.result;
-        reader.readAsDataURL(input.files[0]);
-    }
-
-    async function commit() {
-        const name = document.getElementById('reg_name').value.toUpperCase();
-        if(!name) return alert("Name is required");
-
-        const student = {
-            sch_id: _schID,
-            name: name,
-            class: document.getElementById('reg_class').value,
-            contact: document.getElementById('reg_phone').value,
-            fees_expected: parseInt(document.getElementById('reg_exp').value) || 0,
-            photo_url: document.getElementById('reg_photo_data').value,
-            is_absent: false
-        };
-
-        if(_editingId) {
-            await _db.from('Students').update(student).eq('id', _editingId);
-            _editingId = null;
-            document.getElementById('save_btn').innerText = "Register & Generate LIN";
-        } else {
-            student.lin = generateLIN(name);
-            await _db.from('Students').insert([student]);
-        }
-
-        forceSync();
-        show('rec');
-        alert("Record Saved Successfully!");
-    }
-
-    function editStud(id) {
-        const s = _data.find(x => x.id === id);
-        _editingId = id;
-        document.getElementById('reg_name').value = s.name;
-        document.getElementById('reg_class').value = s.class;
-        document.getElementById('reg_phone').value = s.contact;
-        document.getElementById('reg_exp').value = s.fees_expected;
-        document.getElementById('save_btn').innerText = "UPDATE RECORD";
-        show('adm');
-    }
-
-    async function delStud(id) {
-        if(confirm("Permanently delete this student?")) {
-            await _db.from('Students').delete().eq('id', id);
-            forceSync();
-        }
-    }
-
-    async function markAbs(id, val) {
-        await _db.from('Students').update({ is_absent: val }).eq('id', id);
-        forceSync();
-    }
-
-    function show(id) {
-        ['dir','rec','adm','roll'].forEach(x => {
-            document.getElementById('v-'+x).classList.add('hidden');
-            document.getElementById('tab-'+x).classList.remove('active');
-        });
-        document.getElementById('v-'+id).classList.remove('hidden');
-        document.getElementById('tab-'+id).classList.add('active');
-    }
-
-    forceSync();
-</script>
-</body>
-</html>
+            const balance = (s.fees_expected || 0) - (s.fees_paid || 0);
+            finHtml += `
+                <div class="card" style="flex-direction:column; align-items:start; gap:5px;">
+                    <b style="color:var(--blue)">${s.name} (${s.class})</b>
+                    <div class="fin-row" style="width:100%"><span>Expected:</span>
