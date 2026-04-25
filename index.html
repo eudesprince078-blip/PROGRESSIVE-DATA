@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Final Sync</title>
+    <title>Eudes Media | Progressive Mother's Sync</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -21,15 +21,13 @@
         .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); display: block; }
 
         .nav-tabs { display: flex; background: var(--blue); position: sticky; top: 65px; z-index: 999; }
-        .tab { flex: 1; text-align: center; padding: 18px 5px; font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.4); cursor: pointer; display: none; text-transform: uppercase; }
+        .tab { flex: 1; text-align: center; padding: 18px 5px; font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.4); cursor: pointer; text-transform: uppercase; }
         .tab.active { color: var(--gold); border-bottom: 4px solid var(--gold); background: rgba(0,0,0,0.2); }
-        .visible-tab { display: block !important; }
 
         .card { background: white; border-radius: 15px; padding: 20px; margin: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-left: 8px solid var(--blue); }
-        input, select { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 15px; font-weight: 700; box-sizing: border-box; }
-        label { font-size: 10px; font-weight: 800; color: var(--blue); display: block; margin-bottom: 5px; text-transform: uppercase; }
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 16px; }
         .hidden { display: none !important; }
+        input { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -37,8 +35,8 @@
 <div id="gate">
     <div class="login-box">
         <h2 style="color:var(--blue); margin:0;">EUDES MEDIA</h2>
-        <p style="font-size:10px; font-weight:900; color:#aaa; margin-bottom:25px; letter-spacing:1px;">SCHOOL CONTROL PANEL</p>
-        <input id="login_id" type="text" placeholder="SCHOOL ID (PM001)" style="text-align:center;">
+        <p style="font-size:10px; font-weight:900; color:#aaa; margin-bottom:25px;">PROGRESSIVE MOTHER'S PORTAL</p>
+        <input id="login_id" type="text" placeholder="SCHOOL ID" value="PM001" style="text-align:center;">
         <input id="login_key" type="password" placeholder="ACCESS KEY" style="text-align:center;">
         <button onclick="startApp()" class="btn-main">AUTHENTICATE</button>
     </div>
@@ -46,61 +44,44 @@
 
 <div id="app" class="hidden">
     <div class="header">
-        <div><b id="txt_sch_name">...</b><br><span id="txt_portal" style="font-size:9px; color:var(--gold);">PORTAL ACTIVE</span></div>
-        <button onclick="forceSync()" style="background:var(--green); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; margin-right:5px;">SYNC</button>
-        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900;">LOGOUT</button>
+        <div><b id="sch_display_name">PROGRESSIVE MOTHER'S</b><br><span id="db_status" style="font-size:9px; color:var(--gold);">CONNECTING...</span></div>
+        <button onclick="forceSync()" style="background:var(--green); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900;">SYNC DATA</button>
     </div>
 
     <div class="hero">
         <div id="clock">00:00:00</div>
-        <div style="font-size:10px; font-weight:900; margin-top:5px; color:var(--gold);">● DATABASE CONNECTED: <span id="db_status">LIVE</span></div>
+        <div style="font-size:10px; font-weight:900; margin-top:5px; color:var(--gold);">● SYSTEM ONLINE</div>
     </div>
 
     <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="stat_total">0</span><span style="font-size:9px; font-weight:800;">ENROLLED</span></div>
+        <div class="stat-card"><span class="stat-val" id="stat_total">0</span><span style="font-size:9px; font-weight:800;">PUPILS</span></div>
         <div class="stat-card"><span class="stat-val" id="stat_present" style="color:var(--green)">0</span><span style="font-size:9px; font-weight:800;">PRESENT</span></div>
         <div class="stat-card"><span class="stat-val" id="stat_absent" style="color:var(--red)">0</span><span style="font-size:9px; font-weight:800;">ABSENT</span></div>
     </div>
 
     <div class="nav-tabs">
-        <div class="tab" id="t-sum" onclick="show('sum')">Director</div>
-        <div class="tab" id="t-rec" onclick="show('rec')">Records</div>
-        <div class="tab" id="t-adm" onclick="show('adm')">Admission</div>
-        <div class="tab" id="t-roll" onclick="show('roll')">Roll-Call</div>
+        <div class="tab active" id="tab-rec" onclick="show('rec')">Records</div>
+        <div class="tab" id="tab-adm" onclick="show('adm')">Admission</div>
     </div>
 
-    <div id="v-sum" class="hidden">
-        <div class="card" style="background:var(--blue); color:white;"><h4 style="color:var(--gold); margin-top:0;">FINANCIAL SUMMARY</h4><div id="fin_view">Loading...</div></div>
-    </div>
-
-    <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="search_in" placeholder="Search Pupils..." oninput="draw()"></div>
+    <div id="v-rec">
+        <div style="padding:15px;"><input id="search_in" placeholder="Search by name..." oninput="draw()"></div>
         <div id="list_view"></div>
     </div>
 
     <div id="v-adm" class="hidden">
         <div class="card">
-            <h3 style="margin-top:0;">NEW ADMISSION</h3>
-            <label>Full Name</label><input id="reg_name">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label>Age</label><input id="reg_age" type="number"></div>
-                <div><label>Date of Birth</label><input id="reg_dob" type="date"></div>
-            </div>
-            <label>Class</label>
-            <select id="reg_class"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Physical Location</label><input id="reg_loc">
-            <label>Health Status</label><input id="reg_health" value="Normal">
-            <label>Parent Contact</label><input id="reg_phone">
-            <label>Fees Expected (UGX)</label><input id="reg_exp" type="number">
+            <h3>NEW REGISTRATION</h3>
+            <p style="font-size:12px; color:#666;">Each new entry will automatically link to <b>PM001</b>.</p>
+            <input id="reg_name" placeholder="Full Student Name">
+            <input id="reg_class" placeholder="Class">
             <button onclick="commit()" class="btn-main">SAVE RECORD</button>
         </div>
     </div>
 
-    <div id="v-roll" class="hidden">
-        <div id="roll_view"></div>
+    <div style="text-align:center; padding:30px; font-size:10px; font-weight:900; color:#bbb;">
+        EUDES MEDIA | +256762992440
     </div>
-
-    <div style="text-align:center; padding:30px; font-size:10px; font-weight:900; color:#bbb;">EUDES MEDIA | +256762992440</div>
 </div>
 
 <script>
@@ -109,85 +90,69 @@
     const _db = supabase.createClient(S_URL, S_KEY);
 
     let _data = [];
-    let _sch = "";
+    let _activeSch = "PM001";
 
     function startApp() {
-        _sch = document.getElementById('login_id').value.trim().toUpperCase();
-        const key = document.getElementById('login_key').value.trim().toUpperCase();
-
-        if(_sch === "PM001" && key === "PM2026") {
-            document.getElementById('txt_sch_name').innerText = "PROGRESSIVE MOTHER'S SCHOOL";
-            ['sum','rec','adm','roll'].forEach(t => document.getElementById('t-'+t).classList.add('visible-tab'));
+        const key = document.getElementById('login_key').value;
+        if(key) {
             document.getElementById('gate').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
-            show('sum');
             setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
             forceSync();
-        } else { alert("INVALID CREDENTIALS"); }
-    }
-
-    async function forceSync() {
-        // FIXED: Using 'sch_id' as per your database structure
-        let { data, error } = await _db.from('students').select('*').eq('sch_id', _sch).order('name');
-        
-        if(error) {
-            document.getElementById('db_status').innerText = "DB ERROR: " + error.message;
-        } else {
-            _data = data || [];
-            draw(); stats();
         }
     }
 
-    function stats() {
-        let e = 0, p = 0;
-        _data.forEach(s => { e += (s.fees_expected || 0); p += (s.fees_paid || 0); });
-        document.getElementById('stat_total').innerText = _data.length;
-        document.getElementById('stat_present').innerText = _data.filter(s => !s.is_absent).length;
-        document.getElementById('stat_absent').innerText = _data.filter(s => s.is_absent).length;
-        document.getElementById('fin_view').innerHTML = `Expected: UGX ${e.toLocaleString()}<br>Paid: UGX ${p.toLocaleString()}<br>Balance: UGX ${(e-p).toLocaleString()}`;
+    async function forceSync() {
+        document.getElementById('db_status').innerText = "FETCHING...";
+        
+        // CRITICAL FIX: Using 'sch_id' as verified in your screenshot
+        let { data, error } = await _db
+            .from('students')
+            .select('*')
+            .eq('sch_id', _activeSch);
+        
+        if(error) {
+            document.getElementById('db_status').innerText = "SYNC ERROR";
+            alert("Database Error: " + error.message);
+        } else {
+            _data = data || [];
+            document.getElementById('db_status').innerText = "CONNECTED";
+            document.getElementById('stat_total').innerText = _data.length;
+            draw();
+        }
     }
 
     function draw() {
         const q = document.getElementById('search_in').value.toLowerCase();
-        document.getElementById('list_view').innerHTML = _data.filter(s => s.name.toLowerCase().includes(q)).map(s => `
-            <div class="card"><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin || 'N/A'}</small></div>
-        `).join('');
+        const filtered = _data.filter(s => s.name && s.name.toLowerCase().includes(q));
 
-        document.getElementById('roll_view').innerHTML = _data.map(s => `
-            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                <b>${s.name}</b>
-                <button onclick="toggle('${s.id}', ${!s.is_absent})" style="background:${s.is_absent?'var(--red)':'var(--green)'}; color:white; border:none; padding:12px; border-radius:10px; font-weight:900;">${s.is_absent?'ABSENT':'PRESENT'}</button>
+        document.getElementById('list_view').innerHTML = filtered.length ? filtered.map(s => `
+            <div class="card">
+                <b>${s.name}</b><br>
+                <small>${s.class} | ID: ${s.sch_id}</small>
             </div>
-        `).join('');
+        `).join('') : '<div style="text-align:center; padding:30px; color:#888;">No records found for this School ID.</div>';
     }
 
     async function commit() {
         const student = {
-            sch_id: _sch, // FIXED: Saving to 'sch_id'
+            sch_id: _activeSch,
             name: document.getElementById('reg_name').value.toUpperCase(),
-            lin: "PM-" + Math.floor(1000+Math.random()*9000),
-            age: document.getElementById('reg_age').value,
-            dob: document.getElementById('reg_dob').value,
             class: document.getElementById('reg_class').value,
-            location: document.getElementById('reg_loc').value,
-            health_status: document.getElementById('reg_health').value,
-            contact: document.getElementById('reg_phone').value,
-            fees_expected: parseInt(document.getElementById('reg_exp').value) || 0
+            lin: "PMA-" + Math.floor(1000 + Math.random() * 9000)
         };
-        const { error } = await _db.from('students').insert([student]);
-        if(!error) { alert("STUDENT SAVED"); forceSync(); }
-        else { alert("ERROR: " + error.message); }
-    }
 
-    async function toggle(id, st) {
-        await _db.from('students').update({ is_absent: st }).eq('id', id);
-        forceSync();
+        const { error } = await _db.from('students').insert([student]);
+        if(!error) { alert("Record Saved Successfully!"); forceSync(); show('rec'); }
+        else { alert("Insert Error: " + error.message); }
     }
 
     function show(id) {
-        ['v-sum','v-rec','v-adm','v-roll'].forEach(x => document.getElementById(x).classList.add('hidden'));
+        ['rec','adm'].forEach(x => {
+            document.getElementById('v-'+x).classList.add('hidden');
+            document.getElementById('tab-'+x).classList.remove('active');
+        });
         document.getElementById('v-'+id).classList.remove('hidden');
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById('tab-'+id).classList.add('active');
     }
 </script>
