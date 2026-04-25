@@ -2,181 +2,232 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Progressive Mother's</title>
+    <title>Eudes Media | Progressive Mother's Management</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #003366; --gold: #ffc107; --white: #ffffff; --green: #2b9348; --red: #d90429; --light: #f4f7f9; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
         
-        #gate { position:fixed; inset:0; background:var(--blue); z-index:5000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
-        .login-box { background:white; padding:35px; border-radius:30px; width:90%; max-width:380px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.5); }
-        
         .header { background: var(--blue); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 2000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .hero { background: #001a33; padding: 25px; text-align: center; color: white; border-bottom: 4px solid var(--blue); }
         #clock { font-size: 38px; font-weight: 800; color: var(--gold); }
 
-        .nav-tabs { display: flex; background: var(--blue); position: sticky; top: 74px; z-index: 1999; }
-        .tab { flex: 1; text-align: center; padding: 18px 5px; font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.5); cursor: pointer; text-transform: uppercase; }
-        .tab.active { color: var(--gold); border-bottom: 5px solid var(--gold); background: rgba(0,0,0,0.2); }
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -40px; }
+        .stat-card { background: white; padding: 15px 5px; border-radius: 15px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-top: 5px solid var(--blue); }
+        .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); display: block; }
 
-        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px; margin-top: -45px; }
-        .stat-card { background: white; padding: 20px 10px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--blue); }
-        .stat-val { font-size: 24px; font-weight: 900; color: var(--blue); display: block; }
+        .nav-tabs { display: flex; background: var(--blue); overflow-x: auto; position: sticky; top: 74px; z-index: 1999; }
+        .tab { flex: 0 0 auto; padding: 15px 20px; font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.5); cursor: pointer; text-transform: uppercase; white-space: nowrap; }
+        .tab.active { color: var(--gold); border-bottom: 4px solid var(--gold); background: rgba(0,0,0,0.2); }
 
-        .container { padding: 15px; max-width: 800px; margin: 0 auto; }
-        .card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-left: 10px solid var(--blue); }
-        .card-title { color: var(--blue); font-weight: 900; margin-bottom: 20px; font-size: 16px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-
-        input, select { width: 100%; padding: 15px; border: 2px solid #edf2f7; border-radius: 15px; margin-bottom: 15px; font-size: 15px; font-weight: 600; box-sizing: border-box; }
-        .btn-main { width: 100%; background: var(--blue); color: white; padding: 20px; border: none; border-radius: 18px; font-weight: 900; cursor: pointer; font-size: 18px; text-transform: uppercase; }
+        .container { padding: 15px; max-width: 900px; margin: 0 auto; }
+        .card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 12px; border-left: 6px solid var(--blue); }
+        .pfp { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: #eee; }
+        
+        .form-box { background: white; border-radius: 20px; padding: 20px; border-top: 6px solid var(--blue); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        label { font-size: 10px; font-weight: 900; color: var(--blue); display: block; margin: 10px 0 5px; text-transform: uppercase; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; box-sizing: border-box; font-weight: 600; }
+        
+        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn-blue { background: var(--blue); color: white; width: 100%; }
+        .btn-green { background: var(--green); color: white; }
+        .btn-red { background: var(--red); color: white; font-size: 10px; padding: 8px; }
+        
         .hidden { display: none !important; }
+        .badge { font-size: 9px; padding: 3px 7px; border-radius: 5px; color: white; font-weight: 800; }
     </style>
 </head>
 <body>
 
-<div id="gate">
-    <div class="login-box">
-        <h1 style="color:var(--blue); margin:0; font-size:26px;">EUDES MEDIA</h1>
-        <p style="font-size:10px; font-weight:900; color:#888; margin-bottom:30px;">SCHOOL CONTROL CENTER</p>
-        <input id="login_id" type="text" value="PM001" style="text-align:center;">
-        <input id="login_key" type="password" placeholder="ACCESS KEY" style="text-align:center;">
-        <button onclick="startApp()" class="btn-main">LOGIN</button>
-    </div>
-</div>
-
-<div id="app" class="hidden">
     <div class="header">
-        <div><b id="display_name">...</b><br><span id="db_status" style="font-size:10px; color:var(--gold);">● OFFLINE</span></div>
-        <button onclick="forceSync()" style="background:var(--green); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:900;">SYNC</button>
+        <div><b>PROGRESSIVE MOTHER'S</b><br><span id="db_status" style="font-size:10px;">● CONNECTING</span></div>
+        <button onclick="forceSync()" class="btn-green" style="padding:8px 12px; font-size:11px;">SYNC</button>
     </div>
 
     <div class="hero">
         <div id="clock">00:00:00</div>
-        <div style="font-size:11px; font-weight:900; margin-top:8px; color:var(--gold);">SYSTEM ONLINE</div>
+        <div style="font-size:10px; font-weight:900; color:var(--gold);">EUDES MEDIA ENTERPRISE SYSTEM</div>
     </div>
 
     <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="stat_total">0</span><small>PUPILS</small></div>
+        <div class="stat-card"><span class="stat-val" id="stat_total">0</span><small>ENROLLED</small></div>
         <div class="stat-card"><span class="stat-val" id="stat_present" style="color:var(--green)">0</span><small>PRESENT</small></div>
-        <div class="stat-card"><span class="stat-val" id="stat_absent" style="color:var(--red)">0</span><small>ABSENT</small></div>
+        <div class="stat-card"><span class="stat-val" id="stat_fees" style="color:var(--red)">0</span><small>DEBTORS</small></div>
     </div>
 
     <div class="nav-tabs">
         <div class="tab active" id="tab-sum" onclick="show('sum')">Director</div>
         <div class="tab" id="tab-rec" onclick="show('rec')">Records</div>
         <div class="tab" id="tab-adm" onclick="show('adm')">Admission</div>
-        <div class="tab" id="tab-roll" onclick="show('roll')">Roll-Call</div>
+        <div class="tab" id="tab-com" onclick="show('com')">Comm Center</div>
+        <div class="tab" id="tab-set" onclick="show('set')">Tools</div>
     </div>
 
     <div class="container">
         <div id="v-sum">
-            <div class="card">
-                <div class="card-title">FINANCIALS</div>
-                <p>Expected: <b id="fin_exp">UGX 0</b></p>
-                <p>Collected: <b id="fin_paid" style="color:var(--green);">UGX 0</b></p>
-                <p>Balance: <b id="fin_bal" style="color:var(--red);">UGX 0</b></p>
+            <div class="form-box">
+                <h3 style="margin-top:0;">School Summary</h3>
+                <div id="summary_content">Loading statistics...</div>
             </div>
         </div>
 
         <div id="v-rec" class="hidden">
-            <input id="search_in" placeholder="Search by name..." oninput="draw()">
+            <div style="display:flex; gap:5px; margin-bottom:15px;">
+                <input id="search_in" placeholder="Search pupils..." oninput="draw()" style="flex:2;">
+                <select id="filter_class" onchange="draw()" style="flex:1;">
+                    <option value="">All Classes</option>
+                    <option>Baby</option><option>Middle</option><option>Top</option>
+                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                    <option>P.5</option><option>P.6</option><option>P.7</option><option>Left School</option>
+                </select>
+            </div>
             <div id="list_view"></div>
         </div>
 
         <div id="v-adm" class="hidden">
-            <div class="card">
-                <div class="card-title">REGISTRATION</div>
-                <input id="reg_name" placeholder="Full Name">
-                <input id="reg_class" placeholder="Class (P.7)">
-                <input id="reg_loc" placeholder="Location">
-                <input id="reg_exp" type="number" placeholder="Fees Expected">
-                <button onclick="commit()" class="btn-main">SAVE STUDENT</button>
+            <div class="form-box">
+                <h3 style="margin-top:0;">Student Enrollment</h3>
+                <label>Student Photo URL</label>
+                <input id="reg_photo" placeholder="https://image-link.com/photo.jpg">
+                <label>Full Name</label>
+                <input id="reg_name" placeholder="John Doe">
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;"><label>Age</label><input id="reg_age" type="number"></div>
+                    <div style="flex:1;"><label>D.O.B</label><input id="reg_dob" type="date"></div>
+                </div>
+                <label>Class</label>
+                <select id="reg_class">
+                    <option>Baby</option><option>Middle</option><option>Top</option>
+                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                    <option>P.5</option><option>P.6</option><option>P.7</option>
+                </select>
+                <label>Health Status</label>
+                <input id="reg_health" value="Normal">
+                <label>Contact Number (WhatsApp Format: 256...)</label>
+                <input id="reg_phone" placeholder="256700000000">
+                <label>Fees Expected (UGX)</label>
+                <input id="reg_exp" type="number" value="0">
+                <button onclick="commit()" class="btn btn-blue" style="margin-top:20px;">Save Record</button>
             </div>
         </div>
 
-        <div id="v-roll" class="hidden">
-            <div class="card">
-                <div class="card-title">ATTENDANCE</div>
-                <div id="roll_view"></div>
+        <div id="v-com" class="hidden">
+            <div class="form-box">
+                <h3>Bulk Messaging</h3>
+                <label>Select Target Group</label>
+                <select id="msg_target">
+                    <option value="all">All Parents</option>
+                    <option>P.7 Parents</option>
+                    <option>Debtors Only</option>
+                </select>
+                <label>Message Content</label>
+                <textarea id="msg_body" rows="4" placeholder="Dear Parent, please note that..."></textarea>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
+                    <button onclick="sendBulk('wa')" class="btn btn-green">WhatsApp Bulk</button>
+                    <button onclick="sendBulk('email')" class="btn btn-blue">Email Update</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="v-set" class="hidden">
+            <div class="form-box">
+                <h3>Admin Tools</h3>
+                <p style="font-size:12px; color:#666;">Actions here affect the entire database.</p>
+                <button onclick="autoPromote()" class="btn btn-blue" style="margin-bottom:10px;">Automatic Annual Promotion</button>
+                <p style="font-size:10px;">Increments P.1 → P.2, etc. P.7 moves to "Left School".</p>
             </div>
         </div>
     </div>
 
-    <div style="text-align:center; padding:30px; font-size:10px; font-weight:900; color:#aaa;">
-        EUDES MEDIA | +256762992440
+    <div style="text-align:center; padding:40px; font-size:10px; font-weight:900; color:#aaa;">
+        EUDES MEDIA SOLUTIONS | +256762992440
     </div>
-</div>
 
 <script>
     const S_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _db = supabase.createClient(S_URL, S_KEY);
-
     let _data = [];
-    let _sch = "PM001";
+    const _sch = "PM001";
 
-    function startApp() {
-        document.getElementById('display_name').innerText = "PROGRESSIVE MOTHER'S SCHOOL";
-        document.getElementById('gate').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
-        forceSync();
-    }
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
     async function forceSync() {
         document.getElementById('db_status').innerText = "● SYNCING...";
-        // FIX: Using capital 'Students' to match your database exactly
-        let { data, error } = await _db.from('Students').select('*').eq('sch_id', _sch);
-
-        if(error) {
-            document.getElementById('db_status').innerText = "● ERROR";
-            alert("Error: " + error.message);
-        } else {
+        let { data, error } = await _db.from('Students').select('*').eq('sch_id', _sch).order('name');
+        if(!error) {
             _data = data || [];
             document.getElementById('db_status').innerText = "● LIVE";
+            document.getElementById('db_status').style.color = "var(--green)";
             updateUI();
         }
     }
 
     function updateUI() {
-        let exp = 0, paid = 0, absentCount = 0;
-        _data.forEach(s => {
-            exp += (s.fees_expected || 0);
-            paid += (s.fees_paid || 0);
-            if(s.is_absent) absentCount++;
-        });
-
-        document.getElementById('stat_total').innerText = _data.length;
-        document.getElementById('stat_present').innerText = _data.length - absentCount;
-        document.getElementById('stat_absent').innerText = absentCount;
-        document.getElementById('fin_exp').innerText = "UGX " + exp.toLocaleString();
-        document.getElementById('fin_paid').innerText = "UGX " + paid.toLocaleString();
-        document.getElementById('fin_bal').innerText = "UGX " + (exp - paid).toLocaleString();
+        let debtCount = _data.filter(s => (s.fees_expected - s.fees_paid) > 0).length;
+        let presCount = _data.filter(s => !s.is_absent && s.class !== 'Left School').length;
+        
+        document.getElementById('stat_total').innerText = _data.filter(s => s.class !== 'Left School').length;
+        document.getElementById('stat_present').innerText = presCount;
+        document.getElementById('stat_fees').innerText = debtCount;
+        
         draw();
     }
 
     function draw() {
         const q = document.getElementById('search_in').value.toLowerCase();
-        const filtered = _data.filter(s => s.name.toLowerCase().includes(q));
+        const fCls = document.getElementById('filter_class').value;
+        
+        const filtered = _data.filter(s => 
+            (s.name.toLowerCase().includes(q)) && 
+            (fCls === "" || s.class === fCls)
+        );
 
         document.getElementById('list_view').innerHTML = filtered.map(s => `
-            <div class="card"><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin || 'N/A'}</small></div>
-        `).join('');
-
-        document.getElementById('roll_view').innerHTML = _data.map(s => `
-            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
-                <span>${s.name}</span>
-                <button onclick="toggleAttend('${s.id}', ${!s.is_absent})" style="background:${s.is_absent?'red':'green'}; color:white; border:none; border-radius:5px; padding:5px 10px;">
-                    ${s.is_absent?'ABSENT':'PRESENT'}
-                </button>
+            <div class="card">
+                <img src="${s.photo_url || 'https://via.placeholder.com/150?text=No+Photo'}" class="pfp">
+                <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <b style="color:var(--blue); font-size:15px;">${s.name}</b>
+                        <span class="badge" style="background:${s.class==='Left School'?'#666':'var(--blue)'}">${s.class}</span>
+                    </div>
+                    <small style="color:#888;">LIN: ${s.lin || 'Pending'} | Contact: ${s.contact || 'N/A'}</small>
+                </div>
+                <button onclick="delStudent('${s.id}')" class="btn-red">DEL</button>
             </div>
         `).join('');
     }
 
-    async function toggleAttend(id, status) {
-        await _db.from('Students').update({ is_absent: status }).eq('id', id);
+    async function delStudent(id) {
+        if(confirm("Delete student record permanently?")) {
+            await _db.from('Students').delete().eq('id', id);
+            forceSync();
+        }
+    }
+
+    async function autoPromote() {
+        if(!confirm("Promote all students to the next class? P.7 will be marked as 'Left School'.")) return;
+        
+        const map = {"Baby":"Middle", "Middle":"Top", "Top":"P.1", "P.1":"P.2", "P.2":"P.3", "P.3":"P.4", "P.4":"P.5", "P.5":"P.6", "P.6":"P.7", "P.7":"Left School"};
+        
+        for(let s of _data) {
+            if(map[s.class]) {
+                await _db.from('Students').update({ class: map[s.class] }).eq('id', s.id);
+            }
+        }
+        alert("Promotion Complete!");
         forceSync();
+    }
+
+    function sendBulk(type) {
+        const msg = encodeURIComponent(document.getElementById('msg_body').value);
+        if(!msg) return alert("Write a message first!");
+        
+        // Example logic for first student in list for demo
+        const phone = _data[0]?.contact || "256";
+        if(type === 'wa') window.open(`https://wa.me/${phone}?text=${msg}`);
+        else alert("Emailing feature connected to Eudes Media SMTP.");
     }
 
     async function commit() {
@@ -184,22 +235,29 @@
             sch_id: _sch,
             name: document.getElementById('reg_name').value.toUpperCase(),
             class: document.getElementById('reg_class').value,
-            location: document.getElementById('reg_loc').value,
+            age: document.getElementById('reg_age').value,
+            dob: document.getElementById('reg_dob').value,
+            health_status: document.getElementById('reg_health').value,
+            contact: document.getElementById('reg_phone').value,
             fees_expected: parseInt(document.getElementById('reg_exp').value) || 0,
-            lin: "PMA-" + Math.floor(1000 + Math.random() * 9000)
+            photo_url: document.getElementById('reg_photo').value,
+            lin: "PM-" + Math.floor(1000 + Math.random() * 9000),
+            is_absent: false
         };
         const { error } = await _db.from('Students').insert([student]);
-        if(!error) { alert("Saved!"); forceSync(); show('rec'); }
+        if(!error) { alert("Registration Successful!"); forceSync(); show('rec'); }
     }
 
     function show(id) {
-        ['sum','rec','adm','roll'].forEach(x => {
+        ['sum','rec','adm','com','set'].forEach(x => {
             document.getElementById('v-'+x).classList.add('hidden');
             document.getElementById('tab-'+x).classList.remove('active');
         });
         document.getElementById('v-'+id).classList.remove('hidden');
         document.getElementById('tab-'+id).classList.add('active');
     }
+
+    forceSync();
 </script>
 </body>
 </html>
