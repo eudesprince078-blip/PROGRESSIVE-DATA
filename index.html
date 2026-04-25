@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | School Management</title>
+    <title>Eudes Media | Progressive Mother's School</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -41,14 +41,14 @@
 
 <div id="loginGate">
     <h1 style="color:white; margin-bottom:0;">EUDES MEDIA</h1>
-    <p style="color:var(--gold); margin-top:5px; font-weight:800; letter-spacing:1px;">MULTI-TENANT SYSTEM</p>
-    <input id="key" type="password" placeholder="ENTER ACCESS KEY" style="text-align:center; max-width:300px; border:3px solid var(--gold);">
-    <button onclick="secureLogin()" class="btn-main" style="max-width:300px; background:var(--gold); color:var(--blue);">AUTHENTICATE</button>
+    <p style="color:var(--gold); margin-top:5px; font-weight:800; letter-spacing:1px;">SCHOOL PORTAL LOGIN</p>
+    <input id="key" type="text" placeholder="ENTER ACCESS KEY" style="text-align:center; max-width:300px; border:3px solid var(--gold);">
+    <button onclick="secureLogin()" class="btn-main" style="max-width:300px; background:var(--gold); color:var(--blue);">LOGIN NOW</button>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="header">
-        <div><b id="displaySchoolName" style="font-size:14px;">SCHOOL NAME</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">LEVEL</span></div>
+        <div><b id="displaySchoolName" style="font-size:14px;">PROGRESSIVE MOTHER'S SCHOOL</b><br><span id="userRoleBadge" style="font-size:9px; color:var(--gold);">LEVEL</span></div>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:900;">LOGOUT</button>
     </div>
 
@@ -79,45 +79,44 @@
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="searchBar" placeholder="Search LIN, Name, Class or Contact..." oninput="renderUI()"></div>
+        <div style="padding:15px;"><input id="searchBar" placeholder="Search LIN, Name, or Class..." oninput="renderUI()"></div>
         <div id="dataList"></div>
     </div>
 
     <div id="v-adm" class="hidden">
         <div class="card">
-            <h3 id="admTitle">STUDENT ADMISSION</h3>
+            <h3 id="admTitle">ADMISSION</h3>
             <input type="hidden" id="editId">
-            <label>Photo URL</label><input id="p_url" placeholder="Paste image link here">
+            <label>Photo URL</label><input id="p_url" placeholder="Image Link">
             <label>Full Name</label><input id="name">
-            <label>LIN</label><input id="lin_field" placeholder="Auto-generated if left empty">
+            <label>LIN</label><input id="lin_field">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label>Age</label><input id="age" type="number"></div>
                 <div><label>Academic Year</label><input id="acad_year" value="2026"></div>
             </div>
             <label>Date of Birth</label><input id="dob" type="date">
-            <label>Class</label><select id="cls"><option>Baby Class</option><option>Middle Class</option><option>Top Class</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <label>Class</label><select id="cls"><option>Baby</option><option>Middle</option><option>Top</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
             <label>Parent Contact</label><input id="contact">
-            <label>Physical Location</label><input id="loc">
+            <label>Location</label><input id="loc">
             <label>Health Status</label><input id="health">
             
-            <div id="financeBox" style="background:#f4f4f4; padding:15px; border-radius:10px; margin-top:10px; border:1px solid #ddd;">
+            <div id="financeBox" style="background:#f4f4f4; padding:15px; border-radius:10px;">
                 <label>Fees Expected (UGX)</label><input id="f_exp" type="number">
-                <label>Add New Payment</label>
-                <div style="display:flex; gap:5px;"><input id="p_amt" type="number" placeholder="Amount"><input id="p_date" type="date"></div>
+                <label>New Payment</label>
+                <div style="display:flex; gap:5px;"><input id="p_amt" type="number" placeholder="Amt"><input id="p_date" type="date"></div>
                 <div id="historyContainer"></div>
             </div>
-            <button onclick="saveStudent()" class="btn-main" style="margin-top:15px;">SAVE STUDENT DATA</button>
+            <button onclick="saveStudent()" class="btn-main" style="margin-top:15px;">SAVE STUDENT</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
         <div style="padding:15px;">
-            <select id="rollClassSelect" onchange="renderUI()"><option value="">-- Choose Class for Rollcall --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <select id="rollClassSelect" onchange="renderUI()"><option value="">-- Select Class --</option><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
         </div>
         <div id="rollData"></div>
     </div>
 
-    <div style="text-align:center; padding:30px; font-size:10px; font-weight:800; color:#ccc;">DESIGNED BY EUDES MEDIA | +256762992440</div>
 </div>
 
 <script>
@@ -127,36 +126,28 @@
 
     let cachedData = [];
     let currentRole = "";
-    let currentSchool = "";
-    let schoolID = ""; // This isolates the data
+    let schoolID = "PMS-256"; // Fixed for Progressive Mother's
 
     async function secureLogin() {
-        const inputKey = document.getElementById('key').value.trim();
+        const inputKey = document.getElementById('key').value.trim().toUpperCase();
         
-        // Define School and Keys
-        const schools = [
-            { name: "Progressive Mother's School", id: "PMS-256", admin: "PM2026", finance: "FINANCE256", teacher: "TEACHER2026" }
-        ];
+        // HARDCODED KEYS AS PER YOUR REQUEST
+        const adminKey = "PM2026";
+        const financeKey = "FINANCE256";
+        const teacherKey = "TEACHER2026";
 
-        const target = schools.find(s => s.admin === inputKey || s.finance === inputKey || s.teacher === inputKey);
+        if (inputKey === adminKey) currentRole = "Admin";
+        else if (inputKey === financeKey) currentRole = "Finance";
+        else if (inputKey === teacherKey) currentRole = "Teacher";
+        else { alert("WRONG ACCESS KEY"); return; }
 
-        if (target) {
-            currentSchool = target.name;
-            schoolID = target.id;
-            currentRole = (inputKey === target.admin) ? "Admin" : (inputKey === target.finance ? "Finance" : "Teacher");
-            
-            document.getElementById('displaySchoolName').innerText = currentSchool.toUpperCase();
-            document.getElementById('userRoleBadge').innerText = currentRole.toUpperCase();
-            
-            setupAccess();
-            await loadData();
-            
-            document.getElementById('loginGate').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            startClock();
-        } else {
-            alert("ACCESS DENIED: KEY NOT RECOGNIZED");
-        }
+        document.getElementById('userRoleBadge').innerText = currentRole.toUpperCase();
+        setupAccess();
+        await loadData();
+        
+        document.getElementById('loginGate').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        startClock();
     }
 
     function setupAccess() {
@@ -167,58 +158,36 @@
     }
 
     async function loadData() {
-        // TENANT FILTER: Only load data belonging to this school's ID
         const { data, error } = await _client.from('students').select('*').eq('school_id', schoolID).order('name');
         if(!error) { cachedData = data; renderUI(); updateStats(); }
+        else { console.log("Data Load Error:", error); }
     }
 
     function updateStats() {
         let tExp = 0, tPaid = 0;
         cachedData.forEach(s => { tExp += (s.fees_expected || 0); tPaid += (s.fees_paid || 0); });
-        
         document.getElementById('c-tot').innerText = cachedData.length;
         document.getElementById('c-pres').innerText = cachedData.filter(s => !s.is_absent).length;
         document.getElementById('c-abs').innerText = cachedData.filter(s => s.is_absent).length;
-        
-        document.getElementById('finSummary').innerHTML = `
-            <div style="display:flex; justify-content:space-between;"><span>Total Expected:</span> <b>${tExp.toLocaleString()}</b></div>
-            <div style="display:flex; justify-content:space-between;"><span>Total Collected:</span> <b style="color:var(--green)">${tPaid.toLocaleString()}</b></div>
-            <div style="display:flex; justify-content:space-between; margin-top:5px; border-top:1px solid #555;"><span>Balance Due:</span> <b style="color:var(--gold)">${(tExp-tPaid).toLocaleString()}</b></div>
-        `;
+        document.getElementById('finSummary').innerHTML = `<p>Expected: ${tExp.toLocaleString()}</p><p>Paid: ${tPaid.toLocaleString()}</p><p>Balance: ${(tExp-tPaid).toLocaleString()}</p>`;
     }
 
     function renderUI() {
         const query = document.getElementById('searchBar').value.toLowerCase();
-        const list = document.getElementById('dataList');
-        
-        list.innerHTML = cachedData.filter(s => 
-            s.name.toLowerCase().includes(query) || 
-            s.lin?.includes(query) || 
-            s.class.toLowerCase().includes(query) ||
-            s.contact?.includes(query)
-        ).map(s => `
+        document.getElementById('dataList').innerHTML = cachedData.filter(s => s.name.toLowerCase().includes(query)).map(s => `
             <div class="card" onclick="editMode('${s.id}')">
-                <div style="display:flex; align-items:center;">
+                <div style="display:flex;">
                     <img src="${s.photo_url || 'https://via.placeholder.com/60'}" class="p-img">
-                    <div>
-                        <b style="font-size:14px;">${s.name.toUpperCase()}</b><br>
-                        <small>LIN: ${s.lin || 'Pending'} | ${s.class}</small>
-                    </div>
-                </div>
-                <div style="margin-top:10px; font-size:11px;">
-                    <b>Parent:</b> ${s.contact || 'No Contact'} | <b>Loc:</b> ${s.location || 'N/A'}<br>
-                    <b style="color:var(--red)">BAL: UGX ${((s.fees_expected||0)-(s.fees_paid||0)).toLocaleString()}</b>
+                    <div><b>${s.name}</b><br><small>${s.class} | ${s.lin || 'N/A'}</small></div>
                 </div>
             </div>
         `).join('');
 
         const rCls = document.getElementById('rollClassSelect').value;
         document.getElementById('rollData').innerHTML = cachedData.filter(s => s.class === rCls).map(s => `
-            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="card" style="display:flex; justify-content:space-between;">
                 <b>${s.name}</b>
-                <button onclick="markAtt('${s.id}', ${!s.is_absent})" style="border:none; padding:10px; border-radius:8px; color:white; font-weight:900; background:${s.is_absent?'var(--red)':'var(--green)'}">
-                    ${s.is_absent ? 'ABSENT' : 'PRESENT'}
-                </button>
+                <button onclick="markAtt('${s.id}', ${!s.is_absent})" style="color:white; background:${s.is_absent?'var(--red)':'var(--green)'}">${s.is_absent?'ABSENT':'PRESENT'}</button>
             </div>
         `).join('');
     }
@@ -226,62 +195,24 @@
     function editMode(id) {
         const s = cachedData.find(x => x.id == id);
         document.getElementById('editId').value = s.id;
-        document.getElementById('admTitle').innerText = "UPDATE STUDENT";
         document.getElementById('name').value = s.name;
         document.getElementById('lin_field').value = s.lin || "";
-        document.getElementById('age').value = s.age;
-        document.getElementById('dob').value = s.dob;
         document.getElementById('cls').value = s.class;
-        document.getElementById('loc').value = s.location;
-        document.getElementById('health').value = s.health_status;
-        document.getElementById('contact').value = s.contact;
         document.getElementById('f_exp').value = s.fees_expected;
-        document.getElementById('p_url').value = s.photo_url || "";
-        document.getElementById('acad_year').value = s.academic_year || "2026";
-        
-        const hist = s.payment_history ? JSON.parse(s.payment_history) : [];
-        document.getElementById('historyContainer').innerHTML = `
-            <table class="history-table"><tr><th>Date</th><th>Paid</th></tr>
-            ${hist.map(h => `<tr><td>${h.date}</td><td>${h.amount.toLocaleString()}</td></tr>`).join('')}
-            </table>`;
         tab('adm');
     }
 
     async function saveStudent() {
         const id = document.getElementById('editId').value;
-        const name = document.getElementById('name').value;
-        const pAmt = parseInt(document.getElementById('p_amt').value) || 0;
-        const pDate = document.getElementById('p_date').value;
-        
-        let hist = []; let paid = 0;
-        if(id) {
-            const s = cachedData.find(x => x.id == id);
-            hist = s.payment_history ? JSON.parse(s.payment_history) : [];
-            paid = s.fees_paid || 0;
-        }
-
-        if(pAmt > 0 && pDate) { hist.push({date: pDate, amount: pAmt}); paid += pAmt; }
-
         const payload = {
             school_id: schoolID,
-            name: name.toUpperCase(),
-            lin: document.getElementById('lin_field').value || "LIN-"+Math.floor(10000+Math.random()*90000),
-            age: document.getElementById('age').value,
-            dob: document.getElementById('dob').value,
+            name: document.getElementById('name').value.toUpperCase(),
+            lin: document.getElementById('lin_field').value || "LIN-"+Math.random(),
             class: document.getElementById('cls').value,
-            location: document.getElementById('loc').value,
-            health_status: document.getElementById('health').value,
-            contact: document.getElementById('contact').value,
-            fees_expected: parseInt(document.getElementById('f_exp').value) || 0,
-            fees_paid: paid,
-            payment_history: JSON.stringify(hist),
-            photo_url: document.getElementById('p_url').value,
-            academic_year: document.getElementById('acad_year').value
+            fees_expected: parseInt(document.getElementById('f_exp').value) || 0
         };
-
         const { error } = id ? await _client.from('students').update(payload).eq('id', id) : await _client.from('students').insert([payload]);
-        if(!error) { alert("SUCCESSFULLY SAVED"); await loadData(); tab('rec'); }
-        else { alert("DATABASE ERROR: " + error.message); }
+        if(!error) { alert("SAVED"); await loadData(); tab('rec'); }
     }
 
     async function markAtt(id, stat) {
@@ -292,17 +223,9 @@
     function tab(t) {
         ['v-sum','v-rec','v-adm','v-roll'].forEach(v => document.getElementById(v).classList.add('hidden'));
         document.getElementById('v-'+t).classList.remove('hidden');
-        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-'+t).classList.add('active');
     }
 
-    function startClock() {
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-            document.getElementById('status').innerText = (now.getHours() >= 8 && now.getHours() < 17) ? "● SCHOOL IN SESSION" : "○ SCHOOL CLOSED";
-        }, 1000);
-    }
+    function startClock() { setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000); }
 </script>
 </body>
 </html>
