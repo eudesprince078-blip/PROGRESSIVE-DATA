@@ -2,214 +2,213 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | School Management</title>
+    <title>Eudes Media | Live Control</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #003366; --gold: #ffc107; --white: #ffffff; --green: #2b9348; --red: #d90429; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; padding: 0; }
         
-        #gate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:25px; }
-        .login-card { background:white; padding:30px; border-radius:20px; width:100%; max-width:350px; box-shadow:0 10px 30px rgba(0,0,0,0.3); text-align:center; }
+        /* LOGIN BOX */
+        #gate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
+        .login-box { background:white; padding:40px 30px; border-radius:25px; width:90%; max-width:360px; text-align:center; box-shadow:0 15px 35px rgba(0,0,0,0.4); }
         
         .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .hero { background: #001a33; padding: 20px; text-align: center; color: white; border-bottom: 4px solid var(--blue); }
-        #clock { font-size: 32px; font-weight: 800; color: var(--gold); }
+        .hero { background: #001a33; padding: 25px; text-align: center; color: white; border-bottom: 4px solid var(--blue); }
+        #clock { font-size: 34px; font-weight: 800; color: var(--gold); }
 
-        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
-        .stat-card { background: white; padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 4px solid var(--blue); }
-        .stat-val { font-size: 18px; font-weight: 900; color: var(--blue); display: block; }
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -35px; }
+        .stat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-top: 5px solid var(--blue); }
+        .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); display: block; }
 
         .nav-tabs { display: flex; background: var(--blue); position: sticky; top: 65px; z-index: 999; }
-        .tab { flex: 1; text-align: center; padding: 15px; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.5); cursor: pointer; display: none; }
+        .tab { flex: 1; text-align: center; padding: 18px 5px; font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.4); cursor: pointer; display: none; text-transform: uppercase; }
         .tab.active { color: var(--gold); border-bottom: 4px solid var(--gold); background: rgba(0,0,0,0.2); }
         .visible-tab { display: block !important; }
 
-        .card { background: white; border-radius: 12px; padding: 15px; margin: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-left: 6px solid var(--blue); }
+        .card { background: white; border-radius: 15px; padding: 20px; margin: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-left: 8px solid var(--blue); }
         
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 12px; font-weight: 600; box-sizing: border-box; }
-        label { font-size: 10px; font-weight: 800; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 4px; padding-left: 5px; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 15px; font-weight: 700; box-sizing: border-box; font-size: 14px; }
+        label { font-size: 11px; font-weight: 900; color: var(--blue); text-transform: uppercase; display: block; margin-bottom: 5px; padding-left: 5px; letter-spacing: 1px; }
         
-        .btn-main { width: 100%; background: var(--blue); color: white; padding: 15px; border: none; border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.3s; }
-        .btn-main:active { transform: scale(0.98); }
+        .btn-main { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 16px; letter-spacing: 1px; }
+        .btn-main:active { background: var(--gold); color: var(--blue); }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div id="gate">
-    <div class="login-card">
-        <img src="https://via.placeholder.com/60" style="margin-bottom:10px;">
-        <h2 style="color:var(--blue); margin:0;">EUDES MEDIA</h2>
-        <p style="font-size:11px; font-weight:800; color:#888; margin-bottom:20px;">SYSTEM CONTROL CENTER</p>
+    <div class="login-box">
+        <h2 style="color:var(--blue); margin:0; font-size:28px;">EUDES MEDIA</h2>
+        <p style="font-size:10px; font-weight:900; color:#aaa; margin-bottom:30px; letter-spacing:2px;">CONTROL CENTER</p>
         
-        <label>School ID</label>
-        <input id="in_sch" type="text" placeholder="e.g. PM001" style="text-align:center;">
+        <label>SCHOOL ID</label>
+        <input id="login_id" type="text" placeholder="PM001" style="text-align:center;">
         
-        <label>Access Key</label>
-        <input id="in_key" type="password" placeholder="••••••••" style="text-align:center;">
+        <label>ACCESS KEY</label>
+        <input id="login_key" type="password" placeholder="••••••" style="text-align:center;">
         
-        <button onclick="portalLogin()" class="btn-main">AUTHENTICATE</button>
+        <button onclick="startSystem()" class="btn-main">AUTHENTICATE</button>
     </div>
 </div>
 
-<div id="main" class="hidden">
+<div id="app" class="hidden">
     <div class="header">
-        <div><b id="txt_sch">SCHOOL NAME</b><br><span id="txt_role" style="font-size:9px; color:var(--gold);">LEVEL</span></div>
-        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:900;">LOGOUT</button>
+        <div><b id="txt_sch_name">...</b><br><span id="txt_portal" style="font-size:9px; color:var(--gold);">...</span></div>
+        <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 15px; border-radius:10px; font-weight:900;">LOGOUT</button>
     </div>
 
     <div class="hero">
         <div id="clock">00:00:00</div>
-        <div style="font-size:10px; font-weight:900; margin-top:5px; letter-spacing:1px;">● SCHOOL IN SESSION</div>
+        <div style="font-size:10px; font-weight:900; margin-top:5px; color:var(--gold);">● SYSTEM ONLINE</div>
     </div>
 
     <div class="dashboard">
-        <div class="stat-card"><span class="stat-val" id="st_tot">0</span><span style="font-size:8px; font-weight:800;">ENROLLED</span></div>
-        <div class="stat-card"><span class="stat-val" id="st_pres" style="color:var(--green)">0</span><span style="font-size:8px; font-weight:800;">PRESENT</span></div>
-        <div class="stat-card"><span class="stat-val" id="st_abs" style="color:var(--red)">0</span><span style="font-size:8px; font-weight:800;">ABSENT</span></div>
+        <div class="stat-card"><span class="stat-val" id="stat_total">0</span><span style="font-size:9px; font-weight:800;">ENROLLED</span></div>
+        <div class="stat-card"><span class="stat-val" id="stat_present" style="color:var(--green)">0</span><span style="font-size:9px; font-weight:800;">PRESENT</span></div>
+        <div class="stat-card"><span class="stat-val" id="stat_absent" style="color:var(--red)">0</span><span style="font-size:9px; font-weight:800;">ABSENT</span></div>
     </div>
 
     <div class="nav-tabs">
-        <div class="tab" id="tab-sum" onclick="v('sum')">Director</div>
-        <div class="tab" id="tab-rec" onclick="v('rec')">Records</div>
-        <div class="tab" id="tab-adm" onclick="v('adm')">Admission</div>
-        <div class="tab" id="tab-roll" onclick="v('roll')">Roll-Call</div>
+        <div class="tab" id="t-sum" onclick="show('sum')">Director</div>
+        <div class="tab" id="t-rec" onclick="show('rec')">Records</div>
+        <div class="tab" id="t-adm" onclick="show('adm')">Admission</div>
+        <div class="tab" id="t-roll" onclick="show('roll')">Roll-Call</div>
     </div>
 
     <div id="v-sum" class="hidden">
         <div class="card" style="background:var(--blue); color:white;">
             <h4 style="color:var(--gold); margin-top:0;">FINANCIAL STANDING</h4>
-            <div id="fin_data">Syncing...</div>
+            <div id="fin_view" style="font-size:15px; line-height:1.6;">Syncing Records...</div>
         </div>
         <div class="card">
-            <h4 style="margin-top:0;">DAILY ABSENTEE REPORT</h4>
-            <div id="abs_data" style="font-weight:600; font-size:13px;">None reported.</div>
+            <h4 style="margin-top:0;">TODAY'S ABSENTEES</h4>
+            <div id="abs_view" style="font-weight:700;">No data.</div>
         </div>
     </div>
 
     <div id="v-rec" class="hidden">
-        <div style="padding:15px;"><input id="srch" placeholder="Search LIN or Name..." oninput="render()"></div>
-        <div id="list_data"></div>
+        <div style="padding:15px;"><input id="search_in" placeholder="Search LIN or Name..." oninput="draw()"></div>
+        <div id="list_view"></div>
     </div>
 
     <div id="v-adm" class="hidden">
         <div class="card">
-            <h3>STUDENT REGISTRATION</h3>
-            <label>Full Name</label><input id="f_name">
+            <h3 style="margin-top:0;">NEW REGISTRATION</h3>
+            <label>Name</label><input id="reg_name">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label>Age</label><input id="f_age" type="number"></div>
-                <div><label>DOB</label><input id="f_dob" type="date"></div>
+                <div><label>Age</label><input id="reg_age" type="number"></div>
+                <div><label>DOB</label><input id="reg_dob" type="date"></div>
             </div>
             <label>Class</label>
-            <select id="f_class"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <label>Physical Location</label><input id="f_loc">
-            <label>Health Status</label><input id="f_health" value="Normal">
-            <label>Parent Contact</label><input id="f_phone">
-            <label>Fees Expected (UGX)</label><input id="f_exp" type="number">
-            <button onclick="save()" class="btn-main">COMMIT RECORD</button>
+            <select id="reg_class"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
+            <label>Location</label><input id="reg_loc">
+            <label>Health</label><input id="reg_health" value="Normal">
+            <label>Contact</label><input id="reg_phone">
+            <label>Fees Expected</label><input id="reg_exp" type="number">
+            <button onclick="commit()" class="btn-main">SAVE TO CLOUD</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
-        <div id="roll_data" style="padding-top:10px;"></div>
+        <div id="roll_view" style="padding-top:10px;"></div>
     </div>
 
-    <div style="text-align:center; padding:30px; font-size:10px; font-weight:800; color:#bbb;">EUDES MEDIA | +256762992440</div>
+    <div style="text-align:center; padding:40px; font-size:10px; font-weight:900; color:#bbb;">EUDES MEDIA | +256762992440</div>
 </div>
 
 <script>
-    const URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
-    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
-    const _db = supabase.createClient(URL, KEY);
+    const S_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
+    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
+    const _db = supabase.createClient(S_URL, S_KEY);
 
-    let store = [];
-    let curSch = "";
-    let curRole = "";
+    let _data = [];
+    let _sch = "";
+    let _role = "";
 
-    async function portalLogin() {
-        const sch = document.getElementById('in_sch').value.trim().toUpperCase();
-        const key = document.getElementById('in_key').value.trim().toUpperCase();
+    async function startSystem() {
+        const id = document.getElementById('login_id').value.trim().toUpperCase();
+        const key = document.getElementById('login_key').value.trim().toUpperCase();
 
-        // Validating PM001 specifically
-        if(sch === "PM001") {
-            if(key === "PM2026") curRole = "Admin";
-            else if(key === "FINANCE256") curRole = "Finance";
-            else if(key === "TEACHER2026") curRole = "Teacher";
-            else { alert("WRONG ACCESS KEY"); return; }
+        if(id === "PM001") {
+            if(key === "PM2026") _role = "Admin";
+            else if(key === "FINANCE256") _role = "Finance";
+            else if(key === "TEACHER2026") _role = "Teacher";
+            else { alert("INVALID ACCESS KEY"); return; }
             
-            curSch = sch;
-            document.getElementById('txt_sch').innerText = "PROGRESSIVE MOTHER'S SCHOOL";
-            document.getElementById('txt_role').innerText = curRole.toUpperCase() + " PORTAL";
+            _sch = id;
+            document.getElementById('txt_sch_name').innerText = "PROGRESSIVE MOTHER'S SCHOOL";
+            document.getElementById('txt_portal').innerText = _role.toUpperCase() + " PORTAL";
             
-            const access = { Admin:['sum','rec','adm','roll'], Finance:['rec','adm'], Teacher:['roll','adm'] };
-            access[curRole].forEach(t => document.getElementById('tab-'+t).classList.add('visible-tab'));
+            const map = { Admin:['sum','rec','adm','roll'], Finance:['rec','adm'], Teacher:['roll','adm'] };
+            map[_role].forEach(t => document.getElementById('t-'+t).classList.add('visible-tab'));
             
-            await sync();
+            await forceSync();
             document.getElementById('gate').classList.add('hidden');
-            document.getElementById('main').classList.remove('hidden');
-            v(access[curRole][0]);
+            document.getElementById('app').classList.remove('hidden');
+            show(map[_role][0]);
             setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
         } else {
-            alert("UNKNOWN SCHOOL ID");
+            alert("SCHOOL ID NOT FOUND");
         }
     }
 
-    async function sync() {
-        const { data, error } = await _db.from('students').select('*').eq('school_id', curSch).order('name');
-        if(!error) { store = data; render(); stats(); }
+    async function forceSync() {
+        // This is the fix: It clears old data and forces a fresh download using PM001
+        const { data, error } = await _db.from('students').select('*').eq('school_id', _sch).order('name');
+        if(!error) { _data = data; draw(); stats(); }
     }
 
     function stats() {
         let e = 0, p = 0;
-        store.forEach(s => { e += (s.fees_expected || 0); p += (s.fees_paid || 0); });
-        document.getElementById('st_tot').innerText = store.length;
-        document.getElementById('st_pres').innerText = store.filter(s => !s.is_absent).length;
-        document.getElementById('st_abs').innerText = store.filter(s => s.is_absent).length;
-        document.getElementById('fin_data').innerHTML = `Expected: ${e.toLocaleString()}<br>Paid: ${p.toLocaleString()}<br>Balance: ${(e-p).toLocaleString()}`;
+        _data.forEach(s => { e += (s.fees_expected || 0); p += (s.fees_paid || 0); });
+        document.getElementById('stat_total').innerText = _data.length;
+        document.getElementById('stat_present').innerText = _data.filter(s => !s.is_absent).length;
+        document.getElementById('stat_absent').innerText = _data.filter(s => s.is_absent).length;
+        document.getElementById('fin_view').innerHTML = `<b>Expected:</b> UGX ${e.toLocaleString()}<br><b>Collected:</b> UGX ${p.toLocaleString()}<br><b>Balance:</b> <span style="color:var(--gold)">UGX ${(e-p).toLocaleString()}</span>`;
         
-        const abs = store.filter(s => s.is_absent).map(s => `• ${s.name} (${s.class})`).join('<br>');
-        document.getElementById('abs_data').innerHTML = abs || "All students present.";
+        const abList = _data.filter(s => s.is_absent).map(s => `• ${s.name} (${s.class})`).join('<br>');
+        document.getElementById('abs_view').innerHTML = abList || "All pupils are present.";
     }
 
-    function render() {
-        const q = document.getElementById('srch').value.toLowerCase();
-        document.getElementById('list_data').innerHTML = store.filter(s => s.name.toLowerCase().includes(q)).map(s => `
-            <div class="card"><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin || 'Pending'}</small></div>
+    function draw() {
+        const q = document.getElementById('search_in').value.toLowerCase();
+        document.getElementById('list_view').innerHTML = _data.filter(s => s.name.toLowerCase().includes(q)).map(s => `
+            <div class="card"><b>${s.name}</b><br><small>${s.class} | LIN: ${s.lin || 'N/A'}</small></div>
         `).join('');
 
-        document.getElementById('roll_data').innerHTML = store.map(s => `
+        document.getElementById('roll_view').innerHTML = _data.map(s => `
             <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
                 <b>${s.name}</b>
-                <button onclick="mark('${s.id}', ${!s.is_absent})" style="background:${s.is_absent?'var(--red)':'var(--green)'}; color:white; border:none; padding:10px; border-radius:8px; font-weight:800;">${s.is_absent?'ABSENT':'PRESENT'}</button>
+                <button onclick="toggle('${s.id}', ${!s.is_absent})" style="background:${s.is_absent?'var(--red)':'var(--green)'}; color:white; border:none; padding:12px; border-radius:10px; font-weight:900;">${s.is_absent?'ABSENT':'PRESENT'}</button>
             </div>
         `).join('');
     }
 
-    async function save() {
-        const payload = {
-            school_id: curSch,
-            name: document.getElementById('f_name').value.toUpperCase(),
+    async function commit() {
+        const student = {
+            school_id: _sch,
+            name: document.getElementById('reg_name').value.toUpperCase(),
             lin: "PM-" + Math.floor(1000+Math.random()*9000),
-            age: document.getElementById('f_age').value,
-            dob: document.getElementById('f_dob').value,
-            class: document.getElementById('f_class').value,
-            location: document.getElementById('f_loc').value,
-            health_status: document.getElementById('f_health').value,
-            contact: document.getElementById('f_phone').value,
-            fees_expected: parseInt(document.getElementById('f_exp').value) || 0
+            age: document.getElementById('reg_age').value,
+            dob: document.getElementById('reg_dob').value,
+            class: document.getElementById('reg_class').value,
+            location: document.getElementById('reg_loc').value,
+            health_status: document.getElementById('reg_health').value,
+            contact: document.getElementById('reg_phone').value,
+            fees_expected: parseInt(document.getElementById('reg_exp').value) || 0
         };
-        await _db.from('students').insert([payload]);
-        alert("SUCCESS: Record Created");
-        sync();
+        const { error } = await _db.from('students').insert([student]);
+        if(!error) { alert("SAVED SUCCESSFULLY"); forceSync(); }
     }
 
-    async function mark(id, state) {
-        await _db.from('students').update({ is_absent: state }).eq('id', id);
-        sync();
+    async function toggle(id, st) {
+        await _db.from('students').update({ is_absent: st }).eq('id', id);
+        forceSync();
     }
 
-    function v(id) {
+    function show(id) {
         ['v-sum','v-rec','v-adm','v-roll'].forEach(x => document.getElementById(x).classList.add('hidden'));
         document.getElementById('v-'+id).classList.remove('hidden');
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
