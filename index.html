@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Eudes Media | Cloud-Force</title>
+    <title>Eudes Media | Final Sync</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #003366; --gold: #ffc107; --white: #ffffff; --green: #2b9348; --red: #d90429; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; padding: 0; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; padding: 0; }
         
         #gate { position:fixed; inset:0; background:var(--blue); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
-        .login-box { background:white; padding:30px; border-radius:25px; width:90%; max-width:360px; text-align:center; box-shadow:0 15px 35px rgba(0,0,0,0.4); }
+        .login-box { background:white; padding:30px; border-radius:25px; width:90%; max-width:360px; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.4); }
         
         .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .hero { background: #001a33; padding: 25px; text-align: center; color: white; border-bottom: 4px solid var(--blue); }
@@ -27,6 +27,7 @@
 
         .card { background: white; border-radius: 15px; padding: 20px; margin: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-left: 8px solid var(--blue); }
         input, select { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 15px; font-weight: 700; box-sizing: border-box; }
+        label { font-size: 10px; font-weight: 800; color: var(--blue); display: block; margin-bottom: 5px; text-transform: uppercase; }
         .btn-main { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 16px; }
         .hidden { display: none !important; }
     </style>
@@ -36,23 +37,23 @@
 <div id="gate">
     <div class="login-box">
         <h2 style="color:var(--blue); margin:0;">EUDES MEDIA</h2>
-        <p style="font-size:10px; font-weight:900; color:#aaa; margin-bottom:20px;">DIAGNOSTIC CONSOLE</p>
-        <input id="login_id" type="text" placeholder="SCHOOL ID" style="text-align:center;" value="PM001">
+        <p style="font-size:10px; font-weight:900; color:#aaa; margin-bottom:25px; letter-spacing:1px;">SCHOOL CONTROL PANEL</p>
+        <input id="login_id" type="text" placeholder="SCHOOL ID (PM001)" style="text-align:center;">
         <input id="login_key" type="password" placeholder="ACCESS KEY" style="text-align:center;">
-        <button onclick="startApp()" class="btn-main">AUTHENTICATE & FORCE SYNC</button>
+        <button onclick="startApp()" class="btn-main">AUTHENTICATE</button>
     </div>
 </div>
 
 <div id="app" class="hidden">
     <div class="header">
-        <div><b id="txt_sch_name">...</b><br><span id="txt_portal" style="font-size:9px; color:var(--gold);">...</span></div>
-        <button onclick="forceSync()" style="background:var(--green); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; margin-right:5px;">RE-SYNC</button>
+        <div><b id="txt_sch_name">...</b><br><span id="txt_portal" style="font-size:9px; color:var(--gold);">PORTAL ACTIVE</span></div>
+        <button onclick="forceSync()" style="background:var(--green); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900; margin-right:5px;">SYNC</button>
         <button onclick="location.reload()" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:900;">LOGOUT</button>
     </div>
 
     <div class="hero">
         <div id="clock">00:00:00</div>
-        <div style="font-size:10px; font-weight:900; margin-top:5px; color:var(--gold);">● CONNECTION STATUS: <span id="db_status">WAITING...</span></div>
+        <div style="font-size:10px; font-weight:900; margin-top:5px; color:var(--gold);">● DATABASE CONNECTED: <span id="db_status">LIVE</span></div>
     </div>
 
     <div class="dashboard">
@@ -69,7 +70,7 @@
     </div>
 
     <div id="v-sum" class="hidden">
-        <div class="card" style="background:var(--blue); color:white;"><h4 style="color:var(--gold); margin-top:0;">FINANCE</h4><div id="fin_view">Waiting for data...</div></div>
+        <div class="card" style="background:var(--blue); color:white;"><h4 style="color:var(--gold); margin-top:0;">FINANCIAL SUMMARY</h4><div id="fin_view">Loading...</div></div>
     </div>
 
     <div id="v-rec" class="hidden">
@@ -79,22 +80,26 @@
 
     <div id="v-adm" class="hidden">
         <div class="card">
-            <h3>NEW ADMISSION</h3>
-            <input id="reg_name" placeholder="Full Name">
-            <input id="reg_age" type="number" placeholder="Age">
-            <input id="reg_dob" type="date">
+            <h3 style="margin-top:0;">NEW ADMISSION</h3>
+            <label>Full Name</label><input id="reg_name">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label>Age</label><input id="reg_age" type="number"></div>
+                <div><label>Date of Birth</label><input id="reg_dob" type="date"></div>
+            </div>
+            <label>Class</label>
             <select id="reg_class"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select>
-            <input id="reg_loc" placeholder="Physical Location">
-            <input id="reg_phone" placeholder="Parent Contact">
-            <input id="reg_exp" type="number" placeholder="Fees Expected">
+            <label>Physical Location</label><input id="reg_loc">
+            <label>Health Status</label><input id="reg_health" value="Normal">
+            <label>Parent Contact</label><input id="reg_phone">
+            <label>Fees Expected (UGX)</label><input id="reg_exp" type="number">
             <button onclick="commit()" class="btn-main">SAVE RECORD</button>
         </div>
     </div>
 
     <div id="v-roll" class="hidden">
-        <div id="roll_view" style="padding-top:10px;"></div>
+        <div id="roll_view"></div>
     </div>
-    
+
     <div style="text-align:center; padding:30px; font-size:10px; font-weight:900; color:#bbb;">EUDES MEDIA | +256762992440</div>
 </div>
 
@@ -116,31 +121,20 @@
             document.getElementById('gate').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
             show('sum');
-            
-            // Force Clock & Sync
             setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
             forceSync();
-        } else {
-            alert("WRONG ID OR KEY");
-        }
+        } else { alert("INVALID CREDENTIALS"); }
     }
 
     async function forceSync() {
-        document.getElementById('db_status').innerText = "SYNCING...";
-        document.getElementById('db_status').style.color = "var(--gold)";
+        // FIXED: Using 'sch_id' as per your database structure
+        let { data, error } = await _db.from('students').select('*').eq('sch_id', _sch).order('name');
         
-        try {
-            const { data, error } = await _db.from('students').select('*').eq('school_id', _sch).order('name');
-            if(error) throw error;
-
+        if(error) {
+            document.getElementById('db_status').innerText = "DB ERROR: " + error.message;
+        } else {
             _data = data || [];
-            document.getElementById('db_status').innerText = "LIVE";
-            document.getElementById('db_status').style.color = "var(--green)";
-            draw();
-            stats();
-        } catch (e) {
-            document.getElementById('db_status').innerText = "ERROR: " + e.message;
-            document.getElementById('db_status').style.color = "var(--red)";
+            draw(); stats();
         }
     }
 
@@ -150,7 +144,7 @@
         document.getElementById('stat_total').innerText = _data.length;
         document.getElementById('stat_present').innerText = _data.filter(s => !s.is_absent).length;
         document.getElementById('stat_absent').innerText = _data.filter(s => s.is_absent).length;
-        document.getElementById('fin_view').innerHTML = `<b>Expected:</b> UGX ${e.toLocaleString()}<br><b>Collected:</b> UGX ${p.toLocaleString()}<br><b>Balance:</b> UGX ${(e-p).toLocaleString()}`;
+        document.getElementById('fin_view').innerHTML = `Expected: UGX ${e.toLocaleString()}<br>Paid: UGX ${p.toLocaleString()}<br>Balance: UGX ${(e-p).toLocaleString()}`;
     }
 
     function draw() {
@@ -169,18 +163,20 @@
 
     async function commit() {
         const student = {
-            school_id: _sch,
+            sch_id: _sch, // FIXED: Saving to 'sch_id'
             name: document.getElementById('reg_name').value.toUpperCase(),
             lin: "PM-" + Math.floor(1000+Math.random()*9000),
             age: document.getElementById('reg_age').value,
             dob: document.getElementById('reg_dob').value,
             class: document.getElementById('reg_class').value,
             location: document.getElementById('reg_loc').value,
+            health_status: document.getElementById('reg_health').value,
             contact: document.getElementById('reg_phone').value,
             fees_expected: parseInt(document.getElementById('reg_exp').value) || 0
         };
         const { error } = await _db.from('students').insert([student]);
-        if(!error) { alert("SUCCESS: RECORD SAVED"); forceSync(); }
+        if(!error) { alert("STUDENT SAVED"); forceSync(); }
+        else { alert("ERROR: " + error.message); }
     }
 
     async function toggle(id, st) {
