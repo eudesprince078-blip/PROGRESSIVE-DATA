@@ -2,53 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Progressive Mother's | Eudes Media</title>
+    <title>Eudes Media | Progressive Mother's Management</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root { --blue: #003366; --gold: #ffc107; --white: #ffffff; --green: #2b9348; --red: #d90429; --light: #f4f7f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 0; }
         
-        .header { background: var(--blue); color: white; padding: 15px; position: sticky; top: 0; z-index: 3000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .hero { background: #001a33; padding: 20px; text-align: center; color: white; border-bottom: 2px solid var(--gold); }
-        
-        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; margin-top: -30px; }
-        .stat-card { background: white; padding: 15px 5px; border-radius: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 5px solid var(--blue); }
-        .stat-val { font-size: 20px; font-weight: 900; color: var(--blue); display: block; }
+        /* Header & Hero */
+        .header { background: var(--blue); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 2000; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .hero { background: #001a33; padding: 25px; text-align: center; color: white; }
+        #clock { font-size: 38px; font-weight: 800; color: var(--gold); }
 
-        .nav-tabs { display: flex; background: var(--blue); overflow-x: auto; position: sticky; top: 70px; z-index: 2999; }
-        .tab { flex: 1; text-align: center; padding: 15px 5px; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.4); cursor: pointer; text-transform: uppercase; }
-        .tab.active { color: var(--gold); border-bottom: 4px solid var(--gold); background: rgba(0,0,0,0.2); }
+        /* Dashboard */
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px; margin-top: -45px; }
+        .stat-card { background: white; padding: 20px 10px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--blue); }
+        .stat-val { font-size: 24px; font-weight: 900; color: var(--blue); display: block; }
 
-        .container { padding: 15px; max-width: 900px; margin: 0 auto; }
-        .card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 12px; border-left: 6px solid var(--blue); }
-        .pfp { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: #eee; border: 1px solid #ddd; }
+        /* Navigation */
+        .nav-tabs { display: flex; background: var(--blue); overflow-x: auto; position: sticky; top: 74px; z-index: 1999; }
+        .tab { flex: 1; text-align: center; padding: 18px 5px; font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.4); cursor: pointer; text-transform: uppercase; }
+        .tab.active { color: var(--gold); border-bottom: 5px solid var(--gold); background: rgba(0,0,0,0.2); }
+
+        /* Content Cards */
+        .container { padding: 15px; max-width: 800px; margin: 0 auto; }
+        .card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-left: 10px solid var(--blue); display: flex; align-items: center; gap: 15px; }
+        .student-photo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #eee; border: 2px solid var(--blue); }
         
-        .form-box { background: white; border-radius: 20px; padding: 20px; border-top: 6px solid var(--blue); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; box-sizing: border-box; margin-bottom: 10px; font-weight: 600; }
-        label { font-size: 10px; font-weight: 900; color: var(--blue); display: block; margin-bottom: 5px; text-transform: uppercase; }
+        /* Absentee Marker */
+        .absent-card { border-left-color: var(--red) !important; opacity: 0.9; }
         
-        .btn { padding: 12px; border-radius: 10px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        .btn:active { transform: scale(0.95); }
-        .btn-blue { background: var(--blue); color: white; width: 100%; }
-        .btn-edit { background: var(--gold); color: #000; font-size: 10px; padding: 8px 12px; }
-        .btn-del { background: var(--red); color: white; font-size: 10px; padding: 8px 12px; }
+        /* Form Styling */
+        .form-group { background: white; border-radius: 20px; padding: 25px; border-top: 5px solid var(--blue); }
+        label { font-size: 11px; font-weight: 900; color: var(--blue); display: block; margin-bottom: 5px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 15px; border: 2px solid #edf2f7; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; font-size: 15px; font-weight: 600; }
         
+        .btn-main { width: 100%; background: var(--blue); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-del { background: var(--red) !important; padding: 10px 15px !important; font-size: 10px !important; }
+        .btn-edit { background: var(--gold) !important; color: black !important; padding: 10px 15px !important; font-size: 10px !important; }
         .hidden { display: none !important; }
-        .fin-row { display: flex; justify-content: space-between; font-size: 11px; padding: 5px 0; border-bottom: 1px dashed #eee; width: 100%; }
-        #db_status { font-size: 10px; transition: 0.3s; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div><b>PROGRESSIVE MOTHER'S</b><br><span id="db_status">● CHECKING CONNECTION...</span></div>
-        <button onclick="forceSync()" class="btn" style="background:var(--green); color:white; padding:5px 12px; font-size:10px;">SYNC DATA</button>
+        <div><b>PROGRESSIVE MOTHER'S</b><br><span id="db_status" style="font-size:10px; color:var(--green);">● LIVE</span></div>
+        <button onclick="forceSync()" style="background:var(--green); color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:900;">SYNC DATA</button>
     </div>
 
     <div class="hero">
-        <h2 id="clock" style="margin:0; font-size:32px; color:var(--gold);">00:00:00</h2>
-        <div style="font-size:10px; font-weight:900; letter-spacing:1px;">EUDES MEDIA ENTERPRISE SYSTEM</div>
+        <div id="clock">00:00:00</div>
+        <div style="font-size:11px; font-weight:900; color:var(--gold);">EUDES MEDIA SOLUTIONS</div>
     </div>
 
     <div class="dashboard">
@@ -58,36 +62,41 @@
     </div>
 
     <div class="nav-tabs">
-        <div class="tab active" id="tab-dir" onclick="show('dir')">Director</div>
+        <div class="tab active" id="tab-abs" onclick="show('abs')">Absentees</div>
         <div class="tab" id="tab-rec" onclick="show('rec')">Records</div>
         <div class="tab" id="tab-adm" onclick="show('adm')">Admission</div>
         <div class="tab" id="tab-roll" onclick="show('roll')">Roll-Call</div>
     </div>
 
     <div class="container">
-        <div id="v-dir">
-            <div class="form-box">
-                <h3 style="margin:0 0 15px 0; color:var(--blue);">Financial History</h3>
-                <input id="fin_search" placeholder="Search pupil by name for balance..." oninput="updateFinance()">
-                <div id="finance_list">Waiting for data sync...</div>
+        
+        <div id="v-abs">
+            <div class="form-group" style="margin-bottom:15px;">
+                <label>View Absentees by Class</label>
+                <select id="abs_class_select" onchange="drawAbsent()">
+                    <option value="all">View All Absentees</option>
+                    <option>Baby</option><option>Middle</option><option>Top</option>
+                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
+                    <option>P.5</option><option>P.6</option><option>P.7</option>
+                </select>
             </div>
+            <div id="absent_list_view">Loading absentee list...</div>
         </div>
 
         <div id="v-rec" class="hidden">
-            <input id="search_in" placeholder="Search Name, Class, or LIN..." oninput="draw()">
+            <input id="search_in" placeholder="Search Pupils..." oninput="draw()" style="margin-bottom:15px;">
             <div id="list_view"></div>
         </div>
 
         <div id="v-adm" class="hidden">
-            <div class="form-box">
-                <h3 id="form_title" style="margin-top:0; color:var(--blue);">Student Admission</h3>
+            <div class="form-group">
+                <h3 id="form_title" style="color:var(--blue); margin-top:0;">Admission</h3>
                 
-                <label>Student Photo (Camera/Gallery)</label>
-                <input type="file" id="reg_file" accept="image/*" onchange="handleFile(this)" style="padding:8px; font-size:12px;">
-                <input type="hidden" id="reg_photo_data">
+                <label>Photo URL (Required)</label>
+                <input id="reg_photo" placeholder="https://image-link.com/photo.jpg">
                 
                 <label>Full Name</label>
-                <input id="reg_name" placeholder="Enter Full Name">
+                <input id="reg_name">
                 
                 <label>Class</label>
                 <select id="reg_class">
@@ -96,141 +105,109 @@
                     <option>P.5</option><option>P.6</option><option>P.7</option>
                 </select>
 
-                <label>Parent/Guardian Contact</label>
-                <input id="reg_phone" placeholder="2567...">
+                <label>Parent Contact</label>
+                <input id="reg_phone" placeholder="+256...">
 
-                <div style="display:flex; gap:10px;">
-                    <div style="flex:1;"><label>Fees Expected</label><input id="reg_exp" type="number" value="0"></div>
-                    <div style="flex:1;"><label>Amount Paid</label><input id="reg_paid" type="number" value="0"></div>
-                </div>
+                <label>Physical Location</label>
+                <input id="reg_loc" placeholder="Where they stay">
 
-                <button onclick="commit()" id="save_btn" class="btn btn-blue" style="margin-top:10px;">Save Student Record</button>
-                <button onclick="resetForm(); show('rec');" class="btn" style="width:100%; margin-top:8px; font-size:10px; background:#f0f0f0;">Cancel / Clear</button>
+                <button onclick="commit()" id="save_btn" class="btn-main">SAVE RECORD</button>
+                <button onclick="cancelEdit()" class="btn-main hidden" id="cancel_btn" style="background:#eee; color:#333; margin-top:5px; font-size:10px;">CANCEL EDIT</button>
             </div>
         </div>
 
         <div id="v-roll" class="hidden">
-            <div class="form-box" style="margin-bottom:15px;">
-                <label>Filter Roll-Call by Class</label>
-                <select id="roll_class_select" onchange="drawRoll()">
-                    <option value="all">View All Classes</option>
-                    <option>Baby</option><option>Middle</option><option>Top</option>
-                    <option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option>
-                    <option>P.5</option><option>P.6</option><option>P.7</option>
-                </select>
-            </div>
             <div id="roll_view"></div>
         </div>
     </div>
 
-    <div style="text-align:center; padding:30px; font-size:10px; font-weight:900; color:#bbb; letter-spacing:1px;">
-        POWERED BY EUDES MEDIA | +256762992440
+    <div style="text-align:center; padding:30px; font-size:10px; font-weight:900; color:#aaa;">
+        EUDES MEDIA | +256762992440
     </div>
 
 <script>
     const S_URL = 'https://kjftrwuucjdnhfwesrup.supabase.co';
     const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZnRyd3V1Y2pkbmhmd2VzcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njc0OTksImV4cCI6MjA4NzM0MzQ5OX0.YAIdcBo2MXs86CrunR2CBM4Uh6RjNbGxIG-E260NfCM';
     const _db = supabase.createClient(S_URL, S_KEY);
-    const _sch = "PM001";
+
     let _data = [];
+    const _schName = "PROGRESSIVE MOTHER'S"; 
+    const _schID = "PM001";
     let _editingId = null;
 
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
     async function forceSync() {
-        document.getElementById('db_status').innerText = "● SYNCING...";
-        document.getElementById('db_status').style.color = "orange";
-        
-        // Use a broader select to avoid schema cache issues
-        let { data, error } = await _db.from('Students').select('*').eq('sch_id', _sch).order('name', { ascending: true });
-        
+        // FIXED: Explicitly order by name to wake up schema cache
+        let { data, error } = await _db.from('Students').select('*').eq('sch_id', _schID).order('name', { ascending: true });
         if(!error) {
             _data = data || [];
-            document.getElementById('db_status').innerText = "● DATABASE CONNECTED: LIVE";
+            document.getElementById('db_status').innerText = "● LIVE";
             document.getElementById('db_status').style.color = "var(--green)";
-            updateFinance();
-            draw();
-            drawRoll();
-            updateStats();
+            updateUI();
         } else {
             console.error(error);
-            document.getElementById('db_status').innerText = "● ERROR: CONNECTION FAILED";
+            document.getElementById('db_status').innerText = "● ERROR";
             document.getElementById('db_status').style.color = "var(--red)";
-            alert("Sync Error: Table not found. Please refresh or check Supabase.");
         }
     }
 
-    function updateStats() {
-        const abs = _data.filter(s => s.is_absent).length;
-        document.getElementById('stat_total').innerText = _data.length;
-        document.getElementById('stat_present').innerText = _data.length - abs;
-        document.getElementById('stat_absent').innerText = abs;
+    function updateUI() {
+        const enrolled = _data.length;
+        const absent = _data.filter(s => s.is_absent).length;
+        document.getElementById('stat_total').innerText = enrolled;
+        document.getElementById('stat_present').innerText = enrolled - absent;
+        document.getElementById('stat_absent').innerText = absent;
+        drawAbsent();
+        drawRecords();
+        drawRoll();
     }
 
-    function updateFinance() {
-        const q = document.getElementById('fin_search').value.toLowerCase();
-        const filtered = _data.filter(s => s.name.toLowerCase().includes(q));
+    // NEW & FIXED: ABSENTEE SECTION WITH CLASS SELECT
+    function drawAbsent() {
+        const cls = document.getElementById('abs_class_select').value;
+        const absents = _data.filter(s => s.is_absent && (cls === 'all' || s.class === cls));
         
-        if(filtered.length === 0) {
-            document.getElementById('finance_list').innerHTML = "<center><small>No matching records found.</small></center>";
-            return;
-        }
-
-        document.getElementById('finance_list').innerHTML = filtered.map(s => {
-            const debt = (s.fees_expected || 0) - (s.fees_paid || 0);
-            return `
-            <div class="card" style="flex-direction:column; align-items:start;">
-                <div style="display:flex; justify-content:space-between; width:100%; border-bottom:1px solid #eee; padding-bottom:5px;">
-                    <b>${s.name}</b> <span style="font-size:10px; background:var(--blue); color:white; padding:2px 6px; border-radius:4px;">${s.class}</span>
-                </div>
-                <div class="fin-row"><span>Fees Expected:</span> <b>UGX ${(s.fees_expected || 0).toLocaleString()}</b></div>
-                <div class="fin-row"><span>Amount Paid:</span> <b style="color:var(--green)">UGX ${(s.fees_paid || 0).toLocaleString()}</b></div>
-                <div class="fin-row"><span>Balance Due:</span> <b style="color:var(--red)">UGX ${debt.toLocaleString()}</b></div>
-                <div style="font-size:9px; color:#aaa; margin-top:8px; width:100%; text-align:right;">
-                    Updated: ${s.updated_at ? new Date(s.updated_at).toLocaleString('en-GB') : 'No record'}
-                </div>
-            </div>`;
-        }).join('');
-    }
-
-    function draw() {
-        const q = document.getElementById('search_in').value.toLowerCase();
-        const filtered = _data.filter(s => 
-            s.name.toLowerCase().includes(q) || 
-            s.class.toLowerCase().includes(q) || 
-            (s.lin && s.lin.toLowerCase().includes(q))
-        );
-        
-        document.getElementById('list_view').innerHTML = filtered.map(s => `
-            <div class="card">
-                <img src="${s.photo_url || 'https://via.placeholder.com/55?text=No+Photo'}" class="pfp">
+        document.getElementById('absent_list_view').innerHTML = absents.length ? absents.map(s => `
+            <div class="card absent-card">
+                <img src="${s.photo_url || 'https://via.placeholder.com/50'}" class="student-photo">
                 <div style="flex:1;">
                     <b style="color:var(--blue)">${s.name}</b><br>
-                    <small>LIN: ${s.lin || 'N/A'} | ${s.class}</small>
+                    <small>Class: ${s.class} | Contact: ${s.contact || 'N/A'}</small><br>
+                    <small>LIN: ${s.lin || 'Pending'} | Loc: ${s.location || 'N/A'}</small>
+                </div>
+            </div>
+        `).join('') : "<div style='text-align:center; padding:30px; color:#999; font-size:12px;'>All pupils in this selection are present.</div>";
+    }
+
+    function drawRecords() {
+        const q = document.getElementById('search_in').value.toLowerCase();
+        const filtered = _data.filter(s => s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q) || (s.lin && s.lin.toLowerCase().includes(q)));
+
+        document.getElementById('list_view').innerHTML = filtered.map(s => `
+            <div class="card ${s.is_absent ? 'absent-card' : ''}">
+                <img src="${s.photo_url || 'https://via.placeholder.com/50'}" class="student-photo">
+                <div style="flex:1;">
+                    <b style="color:var(--blue)">${s.name}</b><br>
+                    <small>LIN: ${s.lin || 'Pending'} | ${s.class}</small>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:5px;">
-                    <button onclick="editStud('${s.id}')" class="btn btn-edit">EDIT</button>
-                    <button onclick="delStud('${s.id}')" class="btn btn-del">DEL</button>
+                    <button onclick="launchEdit('${s.id}')" class="btn btn-main btn-edit">EDIT</button>
+                    <button onclick="delStud('${s.id}')" class="btn btn-main btn-del">DEL</button>
                 </div>
             </div>
         `).join('');
     }
 
     function drawRoll() {
-        const cls = document.getElementById('roll_class_select').value;
-        const filtered = _data.filter(s => cls === 'all' || s.class === cls);
-        
-        document.getElementById('roll_view').innerHTML = filtered.length ? filtered.map(s => `
+        document.getElementById('roll_view').innerHTML = _data.map(s => `
             <div class="card" style="justify-content:space-between;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="width:10px; height:10px; border-radius:50%; background:${s.is_absent?'var(--red)':'var(--green)'}"></div>
-                    <div><b>${s.name}</b><br><small>${s.class}</small></div>
-                </div>
-                <button onclick="toggleAbs('${s.id}', ${!s.is_absent})" class="btn" style="background:${s.is_absent?'var(--red)':'var(--green)'}; color:white; min-width:85px; font-size:10px;">
-                    ${s.is_absent ? 'MARK PRESENT' : 'MARK ABSENT'}
+                <div><b>${s.name}</b><br><small>${s.class}</small></div>
+                <button onclick="toggleAbs('${s.id}', ${!s.is_absent})" class="btn-main" style="background:${s.is_absent?'var(--red)':'var(--green)'}; color:white; width:90px; padding:10px 0; font-size:10px;">
+                    ${s.is_absent ? 'ABSENT' : 'PRESENT'}
                 </button>
             </div>
-        `).join('') : "<center><small>No pupils in this class.</small></center>";
+        `).join('');
     }
 
     async function toggleAbs(id, val) {
@@ -238,86 +215,74 @@
         forceSync();
     }
 
-    function handleFile(input) {
-        if (!input.files || !input.files[0]) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            document.getElementById('reg_photo_data').value = e.target.result;
-            alert("Photo Ready for Saving!");
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-
-    function editStud(id) {
+    // FIXED: EDIT BUTTON LOGIC
+    function launchEdit(id) {
         const s = _data.find(x => x.id === id);
-        if(!s) return;
+        if(!s) return alert("ERROR: Could not find student record with ID " + id);
+        
         _editingId = id;
         document.getElementById('form_title').innerText = "Update: " + s.name;
         document.getElementById('reg_name').value = s.name;
         document.getElementById('reg_class').value = s.class;
         document.getElementById('reg_phone').value = s.contact;
-        document.getElementById('reg_exp').value = s.fees_expected;
-        document.getElementById('reg_paid').value = s.fees_paid;
-        document.getElementById('reg_photo_data').value = s.photo_url || "";
+        document.getElementById('reg_photo').value = s.photo_url || "";
+        document.getElementById('reg_loc').value = s.location || "";
         document.getElementById('save_btn').innerText = "Confirm Update";
+        document.getElementById('cancel_btn').classList.remove('hidden');
         show('adm');
+    }
+
+    function cancelEdit() {
+        _editingId = null;
+        document.getElementById('form_title').innerText = "Admission";
+        document.getElementById('reg_name').value = "";
+        document.getElementById('reg_photo').value = "";
+        document.getElementById('reg_loc').value = "";
+        document.getElementById('save_btn').innerText = "SAVE RECORD";
+        document.getElementById('cancel_btn').classList.add('hidden');
     }
 
     async function commit() {
         const name = document.getElementById('reg_name').value.toUpperCase().trim();
-        if(!name) return alert("Error: Pupil Name is required!");
+        if(!name) return alert("Please enter Student Name");
 
-        const payload = {
-            sch_id: _sch,
+        const student = {
+            sch_id: _schID,
             name: name,
             class: document.getElementById('reg_class').value,
             contact: document.getElementById('reg_phone').value,
-            fees_expected: parseInt(document.getElementById('reg_exp').value) || 0,
-            fees_paid: parseInt(document.getElementById('reg_paid').value) || 0,
-            photo_url: document.getElementById('reg_photo_data').value,
-            updated_at: new Date().toISOString()
+            location: document.getElementById('reg_loc').value,
+            photo_url: document.getElementById('reg_photo').value,
         };
 
-        let result;
         if(_editingId) {
-            result = await _db.from('Students').update(payload).eq('id', _editingId);
+            // Update mode
+            const { error } = await _db.from('Students').update(student).eq('id', _editingId);
+            if(error) alert("Update Failed: " + error.message);
+            else { alert("Success: Record Updated"); _editingId = null; }
         } else {
-            payload.lin = "PM-" + name.charAt(0) + Math.floor(1000 + Math.random() * 8999);
-            payload.is_absent = false;
-            result = await _db.from('Students').insert([payload]);
+            // Insert mode
+            student.lin = "PM-" + name.charAt(0) + Math.floor(1000 + Math.random() * 9000);
+            student.is_absent = false;
+            const { error } = await _db.from('Students').insert([student]);
+            if(error) alert("Registration Failed: " + error.message);
+            else alert("Success: " + name + " Registered");
         }
         
-        if(!result.error) {
-            alert("Success: Record Saved!");
-            resetForm();
-            forceSync();
-            show('rec');
-        } else {
-            alert("Database Error: " + result.error.message);
-        }
-    }
-
-    function resetForm() {
-        _editingId = null;
-        document.getElementById('form_title').innerText = "Student Admission";
-        document.getElementById('reg_name').value = "";
-        document.getElementById('reg_phone').value = "";
-        document.getElementById('reg_exp').value = 0;
-        document.getElementById('reg_paid').value = 0;
-        document.getElementById('reg_photo_data').value = "";
-        document.getElementById('reg_file').value = "";
-        document.getElementById('save_btn').innerText = "Save Student Record";
+        cancelEdit();
+        forceSync();
+        show('rec');
     }
 
     async function delStud(id) {
-        if(confirm("Are you sure you want to delete this pupil? This cannot be undone.")) {
-            const { error } = await _db.from('Students').delete().eq('id', id);
-            if(!error) forceSync();
+        if(confirm("Delete student permanently?")) {
+            await _db.from('Students').delete().eq('id', id);
+            forceSync();
         }
     }
 
     function show(id) {
-        ['dir','rec','adm','roll'].forEach(x => {
+        ['abs','rec','adm','roll'].forEach(x => {
             document.getElementById('v-'+x).classList.add('hidden');
             document.getElementById('tab-'+x).classList.remove('active');
         });
