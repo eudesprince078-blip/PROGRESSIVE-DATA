@@ -2,35 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Shield Health Uganda</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Inter', -apple-system, sans-serif; }
         body { background: #eef2f7; display: flex; justify-content: center; padding: 20px; }
         .app { max-width: 500px; width: 100%; background: white; border-radius: 32px; overflow: hidden; box-shadow: 0 20px 35px -10px rgba(0,0,0,0.1); }
-        .header { background: #0a2b5e; color: white; padding: 24px 20px; }
+        .header { background: linear-gradient(135deg, #0a2b5e, #0d3b78); color: white; padding: 24px 20px; }
         .header h1 { font-size: 1.6rem; }
         .header h1 span { color: #F5B042; }
-        .content { padding: 20px; }
+        .content { padding: 20px; max-height: 600px; overflow-y: auto; }
         .card { background: #f9fafc; border-radius: 24px; padding: 16px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        button { background: #0a2b5e; color: white; border: none; padding: 12px 16px; border-radius: 40px; width: 100%; font-weight: 600; cursor: pointer; margin-top: 8px; }
-        input, select, textarea { width: 100%; padding: 12px; border-radius: 40px; border: 1px solid #cbd5e1; margin: 8px 0; }
+        .card h3 { margin-bottom: 12px; color: #0a2b5e; }
+        button { background: #0a2b5e; color: white; border: none; padding: 12px 16px; border-radius: 40px; width: 100%; font-weight: 600; cursor: pointer; margin-top: 8px; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: scale(0.98); }
+        .btn-gold { background: #F5B042; color: #0a2b5e; }
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 40px; border: 1px solid #cbd5e1; margin: 8px 0; font-size: 1rem; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
         .badge { background: #e2e8f0; padding: 4px 12px; border-radius: 40px; font-size: 0.75rem; }
         .gold-text { color: #F5B042; font-weight: bold; }
         .nav { display: flex; justify-content: space-around; border-top: 1px solid #e2e8f0; padding: 12px; background: white; }
-        .nav-item { text-align: center; flex: 1; cursor: pointer; color: #64748b; }
+        .nav-item { text-align: center; flex: 1; cursor: pointer; color: #64748b; font-size: 0.8rem; }
         .nav-item.active { color: #0a2b5e; font-weight: bold; }
+        .nav-item i { display: block; font-size: 1.4rem; margin-bottom: 4px; }
         .hidden { display: none; }
+        .status-pending { color: #f59e0b; }
+        .status-approved { color: #10b981; }
+        .status-rejected { color: #ef4444; }
+        .loading { text-align: center; padding: 20px; }
+        hr { margin: 12px 0; }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 <div class="app" id="app">
     <div class="header">
         <h1>Shield<span>Health</span> Uganda</h1>
-        <div id="userStatus">Securing your health</div>
+        <div id="userStatus" style="font-size: 0.8rem; opacity: 0.9;">Securing your health</div>
     </div>
+    
+    <!-- Auth Section -->
     <div id="authSection" class="content">
         <div class="card">
             <h3>Welcome to Shield Health</h3>
@@ -39,56 +51,47 @@
             <input type="password" id="password" placeholder="Password (min 6 chars)">
             <button id="signUpBtn">Sign Up</button>
             <button id="signInBtn" style="background: #2c3e66;">Log In</button>
-            <div id="authMessage" style="margin-top: 12px; font-size: 0.8rem;"></div>
+            <div id="authMessage" style="margin-top: 12px; font-size: 0.8rem; text-align: center;"></div>
         </div>
     </div>
 
+    <!-- Main App Section (after login) -->
     <div id="appSection" class="hidden">
-        <div class="content" id="mainContent"></div>
+        <div class="content" id="mainContent">
+            <div class="loading">Loading...</div>
+        </div>
         <div class="nav" id="bottomNav">
-            <div class="nav-item active" data-tab="dashboard">🏠 Dashboard</div>
-            <div class="nav-item" data-tab="buy">🛡️ Buy Policy</div>
-            <div class="nav-item" data-tab="claims">📋 Claims</div>
-            <div class="nav-item" data-tab="profile">👤 Profile</div>
+            <div class="nav-item active" data-tab="dashboard"><i class="fas fa-home"></i> Home</div>
+            <div class="nav-item" data-tab="buy"><i class="fas fa-shopping-cart"></i> Buy</div>
+            <div class="nav-item" data-tab="claims"><i class="fas fa-file-alt"></i> Claims</div>
+            <div class="nav-item" data-tab="profile"><i class="fas fa-user"></i> Profile</div>
         </div>
     </div>
 </div>
 
 <script>
-    // SUPABASE CONFIGURATION - REPLACE WITH YOUR VALUES
-    const SUPABASE_URL = "https://your-project.supabase.co";
-    const SUPABASE_ANON_KEY = "your-anon-key-here";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ============================================
+    // 🔑 REPLACE THESE WITH YOUR SUPABASE CREDENTIALS
+    // ============================================
+    const SUPABASE_URL = "https://your-project.supabase.co";     // <-- PASTE YOUR PROJECT URL
+    const SUPABASE_ANON_KEY = "your-anon-key-here";              // <-- PASTE YOUR ANON KEY
+    // ============================================
 
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
     let currentUser = null;
     let currentTab = "dashboard";
 
-    // UI elements
+    // DOM elements
     const authSection = document.getElementById("authSection");
     const appSection = document.getElementById("appSection");
     const mainContent = document.getElementById("mainContent");
-    const userStatus = document.getElementById("userStatus");
+    const userStatusSpan = document.getElementById("userStatus");
 
-    // Auth functions
-    async function handleSignUp() {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) showAuthMessage(error.message);
-        else showAuthMessage("Check your email (including spam) to confirm your account.", "green");
-    }
-
-    async function handleSignIn() {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) showAuthMessage(error.message);
-        else onLogin(data.user);
-    }
-
-    function showAuthMessage(msg, color = "red") {
+    // Helper functions
+    function showAuthMessage(msg, isError = true) {
         const div = document.getElementById("authMessage");
-        div.style.color = color;
+        div.style.color = isError ? "#ef4444" : "#10b981";
         div.innerText = msg;
     }
 
@@ -96,11 +99,17 @@
         currentUser = user;
         authSection.classList.add("hidden");
         appSection.classList.remove("hidden");
-        userStatus.innerText = `Hello, ${user.email}`;
-        // ensure profile exists
-        const { data: profile } = await supabase.from("profiles").select().eq("id", user.id).single();
+        userStatusSpan.innerText = `Hello, ${user.email.split('@')[0]}`;
+        
+        // Ensure profile exists
+        const { data: profile } = await supabase.from("profiles").select("id").eq("id", user.id).single();
         if (!profile) {
-            await supabase.from("profiles").insert({ id: user.id, full_name: user.email.split("@")[0] });
+            await supabase.from("profiles").insert({ 
+                id: user.id, 
+                full_name: user.email.split('@')[0],
+                phone: "",
+                date_of_birth: null
+            });
         }
         renderCurrentTab();
     }
@@ -114,106 +123,281 @@
         document.getElementById("password").value = "";
     }
 
-    // Rendering different tabs (simplified for demo)
-    async function renderCurrentTab() {
-        if (!currentUser) return;
-        if (currentTab === "dashboard") await renderDashboard();
-        if (currentTab === "buy") await renderBuyPolicy();
-        if (currentTab === "claims") await renderClaims();
-        if (currentTab === "profile") await renderProfile();
-    }
-
+    // Render functions for each tab
     async function renderDashboard() {
-        const { data: policies } = await supabase.from("policies").select("*").eq("user_id", currentUser.id);
-        const { data: claims } = await supabase.from("claims").select("*").eq("user_id", currentUser.id);
+        // Fetch user's policies and claims
+        const { data: policies, error: polError } = await supabase
+            .from("policies")
+            .select("*, health_plans(name, monthly_premium)")
+            .eq("user_id", currentUser.id);
+        
+        const { data: claims, error: clError } = await supabase
+            .from("claims")
+            .select("*")
+            .eq("user_id", currentUser.id);
+        
+        const activePolicies = policies?.filter(p => p.status === 'active') || [];
+        const pendingClaims = claims?.filter(c => c.status === 'pending') || [];
+        
         mainContent.innerHTML = `
             <div class="card">
-                <div class="flex-between"><strong>Active Policies</strong> <span class="badge">${policies?.length || 0}</span></div>
-                <div class="flex-between"><strong>Pending Claims</strong> <span class="badge">${claims?.filter(c => c.status === 'pending').length || 0}</span></div>
-                <button id="newClaimBtn">➕ Submit a Claim</button>
+                <div class="flex-between">
+                    <span><i class="fas fa-file-contract"></i> <strong>Active Policies</strong></span>
+                    <span class="badge">${activePolicies.length}</span>
+                </div>
+                <div class="flex-between" style="margin-top: 12px;">
+                    <span><i class="fas fa-clock"></i> <strong>Pending Claims</strong></span>
+                    <span class="badge">${pendingClaims.length}</span>
+                </div>
+                <button id="newClaimBtn" class="btn-gold"><i class="fas fa-plus"></i> Submit a Claim</button>
             </div>
             <div class="card">
-                <strong>Recent Notifications</strong><br>
-                <p>✅ Welcome to Shield Health Uganda – secure your future today.</p>
-                <p>📧 All emails are sent via Brevo (free & reliable).</p>
+                <strong><i class="fas fa-bell"></i> Notifications</strong>
+                <div style="margin-top: 12px;">
+                    <p>✅ Welcome to Shield Health Uganda – secure your future.</p>
+                    <p>📧 All emails are sent via Brevo (reliable & free).</p>
+                </div>
             </div>
-        `;
-        document.getElementById("newClaimBtn")?.addEventListener("click", () => { currentTab = "claims"; renderCurrentTab(); });
-    }
-
-    async function renderBuyPolicy() {
-        mainContent.innerHTML = `
+            ${activePolicies.length > 0 ? `
             <div class="card">
-                <h3>Health Plans</h3>
-                <select id="planSelect">
-                    <option value="Individual">Individual – UGX 120,000/year</option>
-                    <option value="Family">Family (up to 5) – UGX 350,000/year</option>
-                    <option value="Senior">Senior (60+) – UGX 280,000/year</option>
-                </select>
-                <button id="purchaseBtn">Purchase Policy</button>
+                <strong>Your Active Policies</strong>
+                ${activePolicies.map(p => `
+                    <div style="border-bottom:1px solid #e2e8f0; padding: 8px 0;">
+                        ${p.health_plans?.name || 'Health Plan'} - UGX ${(p.premium_paid || 0).toLocaleString()}<br>
+                        <small>Expires: ${new Date(p.end_date).toLocaleDateString()}</small>
+                    </div>
+                `).join('')}
             </div>
+            ` : ''}
         `;
-        document.getElementById("purchaseBtn")?.addEventListener("click", async () => {
-            const plan = document.getElementById("planSelect").value.split(" – ")[0];
-            const premium = { Individual: 120000, Family: 350000, Senior: 280000 }[plan];
-            await supabase.from("policies").insert({
-                user_id: currentUser.id,
-                plan_type: plan,
-                premium,
-                start_date: new Date().toISOString().slice(0,10),
-                end_date: new Date(new Date().setFullYear(new Date().getFullYear()+1)).toISOString().slice(0,10),
-                status: "active"
-            });
-            alert("Policy purchased! Check your dashboard.");
-            currentTab = "dashboard";
+        document.getElementById("newClaimBtn")?.addEventListener("click", () => {
+            currentTab = "claims";
+            document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+            document.querySelector(".nav-item[data-tab='claims']").classList.add("active");
             renderCurrentTab();
         });
     }
 
-    async function renderClaims() {
-        const { data: claims } = await supabase.from("claims").select("*").eq("user_id", currentUser.id);
+    async function renderBuyPolicy() {
+        // Fetch available health plans
+        const { data: plans, error } = await supabase
+            .from("health_plans")
+            .select("*")
+            .eq("is_active", true);
+        
+        if (error) {
+            mainContent.innerHTML = `<div class="card">Error loading plans: ${error.message}</div>`;
+            return;
+        }
+        
         mainContent.innerHTML = `
             <div class="card">
-                <h3>Submit a Claim</h3>
-                <textarea id="claimDesc" placeholder="Describe your medical expense or accident"></textarea>
-                <input type="file" id="claimFile" accept="image/*,application/pdf">
-                <button id="submitClaimBtn">Submit Claim</button>
-            </div>
-            <div class="card">
-                <h3>Your Claims</h3>
-                ${claims?.map(c => `<div style="border-bottom:1px solid #ccc; padding:8px 0;"><strong>${c.id}</strong> – ${c.status} <br> ${c.description?.slice(0,50)}</div>`).join("") || "<p>No claims yet</p>"}
+                <h3><i class="fas fa-shield-alt"></i> Choose Your Health Plan</h3>
+                ${plans.map(plan => `
+                    <div style="border: 1px solid #e2e8f0; border-radius: 20px; padding: 16px; margin-bottom: 16px;">
+                        <div class="flex-between">
+                            <strong>${plan.name}</strong>
+                            <span class="badge">UGX ${plan.monthly_premium.toLocaleString()}/month</span>
+                        </div>
+                        <p style="font-size: 0.8rem; margin: 8px 0;">${plan.description || ''}</p>
+                        <div style="font-size: 0.75rem; color: #64748b;">
+                            <span>🏥 Inpatient: ${plan.inpatient_cover ? '✅' : '❌'}</span>&nbsp;&nbsp;
+                            <span>🚑 Ambulance: ${plan.ambulance_cover ? '✅' : '❌'}</span>&nbsp;&nbsp;
+                            <span>💊 Pharmacy: ${plan.pharmacy_cover ? '✅' : '❌'}</span>
+                        </div>
+                        <button class="selectPlanBtn" data-plan='${JSON.stringify(plan)}' style="margin-top: 12px; background: #F5B042; color:#0a2b5e;">Select Plan</button>
+                    </div>
+                `).join('')}
             </div>
         `;
+        
+        document.querySelectorAll('.selectPlanBtn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const plan = JSON.parse(btn.dataset.plan);
+                const startDate = new Date().toISOString().slice(0,10);
+                const endDate = new Date(new Date().setFullYear(new Date().getFullYear()+1)).toISOString().slice(0,10);
+                const policyNumber = `POL-${Date.now()}-${Math.floor(Math.random()*1000)}`;
+                
+                const { data, error } = await supabase.from("policies").insert({
+                    user_id: currentUser.id,
+                    plan_id: plan.id,
+                    policy_number: policyNumber,
+                    start_date: startDate,
+                    end_date: endDate,
+                    premium_paid: plan.annual_premium,
+                    payment_frequency: "annual",
+                    status: "active"
+                }).select();
+                
+                if (error) {
+                    alert("Error purchasing policy: " + error.message);
+                } else {
+                    alert(`Policy purchased! Policy number: ${policyNumber}\nCover: ${plan.name}\nValid until: ${endDate}`);
+                    currentTab = "dashboard";
+                    renderCurrentTab();
+                }
+            });
+        });
+    }
+
+    async function renderClaims() {
+        const { data: policies } = await supabase
+            .from("policies")
+            .select("id, policy_number, health_plans(name)")
+            .eq("user_id", currentUser.id)
+            .eq("status", "active");
+        
+        const { data: existingClaims } = await supabase
+            .from("claims")
+            .select("*")
+            .eq("user_id", currentUser.id)
+            .order("created_at", { ascending: false });
+        
+        mainContent.innerHTML = `
+            <div class="card">
+                <h3><i class="fas fa-file-medical"></i> Submit New Claim</h3>
+                <label>Select Policy</label>
+                <select id="claimPolicySelect">
+                    <option value="">-- Choose a policy --</option>
+                    ${policies?.map(p => `<option value="${p.id}">${p.health_plans?.name || 'Policy'} (${p.policy_number})</option>`).join('')}
+                </select>
+                <label>Incident Date</label>
+                <input type="date" id="incidentDate">
+                <label>Hospital Name</label>
+                <input type="text" id="hospitalName" placeholder="Hospital or clinic name">
+                <label>Treatment Details</label>
+                <textarea id="treatmentDetails" rows="3" placeholder="Describe your treatment or expenses..."></textarea>
+                <label>Upload Documents (receipts, prescriptions)</label>
+                <input type="file" id="claimFile" accept="image/*,application/pdf">
+                <button id="submitClaimBtn" class="btn-gold">Submit Claim</button>
+            </div>
+            <div class="card">
+                <h3>Your Claims History</h3>
+                ${existingClaims?.length === 0 ? '<p>No claims submitted yet.</p>' : 
+                    existingClaims.map(c => `
+                        <div style="border-bottom:1px solid #e2e8f0; padding: 12px 0;">
+                            <div class="flex-between">
+                                <strong>Claim #${c.claim_number || c.id.slice(0,8)}</strong>
+                                <span class="status-${c.status}">${c.status.toUpperCase()}</span>
+                            </div>
+                            <div style="font-size:0.8rem;">${c.treatment_details?.slice(0,80)}</div>
+                            <div style="font-size:0.7rem; color:#64748b;">Filed: ${new Date(c.created_at).toLocaleDateString()}</div>
+                            ${c.admin_notes ? `<div style="font-size:0.75rem; margin-top:4px;">📝 Note: ${c.admin_notes}</div>` : ''}
+                        </div>
+                    `).join('')
+                }
+            </div>
+        `;
+        
         document.getElementById("submitClaimBtn")?.addEventListener("click", async () => {
-            const description = document.getElementById("claimDesc").value;
-            if (!description) return alert("Please describe your claim");
-            await supabase.from("claims").insert({
+            const policyId = document.getElementById("claimPolicySelect").value;
+            const incidentDate = document.getElementById("incidentDate").value;
+            const hospitalName = document.getElementById("hospitalName").value;
+            const treatmentDetails = document.getElementById("treatmentDetails").value;
+            const fileInput = document.getElementById("claimFile");
+            
+            if (!policyId || !incidentDate || !treatmentDetails) {
+                alert("Please fill in policy, incident date, and treatment details.");
+                return;
+            }
+            
+            let fileUrl = null;
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('claim_docs')
+                    .upload(fileName, file);
+                if (uploadError) {
+                    console.error("Upload error:", uploadError);
+                    alert("Error uploading file. You can submit without it.");
+                } else {
+                    const { data: publicUrl } = supabase.storage.from('claim_docs').getPublicUrl(fileName);
+                    fileUrl = publicUrl.publicUrl;
+                }
+            }
+            
+            const claimNumber = `CLM-${Date.now()}`;
+            const { error } = await supabase.from("claims").insert({
                 user_id: currentUser.id,
-                description,
+                policy_id: policyId,
+                claim_number: claimNumber,
+                incident_date: incidentDate,
+                hospital_name: hospitalName,
+                treatment_details: treatmentDetails,
+                documents_urls: fileUrl ? [fileUrl] : [],
                 status: "pending"
             });
-            alert("Claim submitted. Admin will review.");
-            renderClaims();
+            
+            if (error) {
+                alert("Error submitting claim: " + error.message);
+            } else {
+                alert("Claim submitted! Admin will review and notify you via email.");
+                renderClaims(); // refresh
+            }
         });
     }
 
     async function renderProfile() {
-        const { data: profile } = await supabase.from("profiles").select().eq("id", currentUser.id).single();
+        const { data: profile, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", currentUser.id)
+            .single();
+        
         mainContent.innerHTML = `
             <div class="card">
-                <h3>Your Profile</h3>
-                <p>Email: ${currentUser.email}</p>
-                <p>Name: ${profile?.full_name || "Not set"}</p>
-                <button id="logoutBtn">Sign Out</button>
+                <h3><i class="fas fa-user-circle"></i> Your Profile</h3>
+                <label>Full Name</label>
+                <input type="text" id="fullName" value="${profile?.full_name || ''}" placeholder="Full name">
+                <label>Phone Number</label>
+                <input type="tel" id="phone" value="${profile?.phone || ''}" placeholder="07XX XXX XXX">
+                <label>Date of Birth</label>
+                <input type="date" id="dob" value="${profile?.date_of_birth || ''}">
+                <label>National ID (optional)</label>
+                <input type="text" id="nationalId" value="${profile?.national_id || ''}">
+                <label>Emergency Contact</label>
+                <input type="text" id="emergency" value="${profile?.emergency_contact || ''}" placeholder="Name and phone">
+                <button id="updateProfileBtn">Update Profile</button>
+                <hr>
+                <button id="logoutBtn" style="background: #dc2626;">Sign Out</button>
             </div>
         `;
+        
+        document.getElementById("updateProfileBtn")?.addEventListener("click", async () => {
+            const updates = {
+                full_name: document.getElementById("fullName").value,
+                phone: document.getElementById("phone").value,
+                date_of_birth: document.getElementById("dob").value || null,
+                national_id: document.getElementById("nationalId").value,
+                emergency_contact: document.getElementById("emergency").value,
+                updated_at: new Date().toISOString()
+            };
+            const { error } = await supabase
+                .from("profiles")
+                .update(updates)
+                .eq("id", currentUser.id);
+            if (error) alert("Error: " + error.message);
+            else alert("Profile updated!");
+        });
+        
         document.getElementById("logoutBtn")?.addEventListener("click", logout);
+    }
+
+    async function renderCurrentTab() {
+        if (!currentUser) return;
+        mainContent.innerHTML = `<div class="loading">Loading...</div>`;
+        if (currentTab === "dashboard") await renderDashboard();
+        else if (currentTab === "buy") await renderBuyPolicy();
+        else if (currentTab === "claims") await renderClaims();
+        else if (currentTab === "profile") await renderProfile();
     }
 
     // Navigation
     document.getElementById("bottomNav")?.addEventListener("click", (e) => {
         const tab = e.target.closest(".nav-item")?.dataset.tab;
-        if (tab) {
+        if (tab && currentUser) {
             currentTab = tab;
             document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
             e.target.closest(".nav-item").classList.add("active");
@@ -221,8 +405,26 @@
         }
     });
 
-    document.getElementById("signUpBtn")?.addEventListener("click", handleSignUp);
-    document.getElementById("signInBtn")?.addEventListener("click", handleSignIn);
+    // Auth handlers
+    document.getElementById("signUpBtn")?.addEventListener("click", async () => {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        if (password.length < 6) {
+            showAuthMessage("Password must be at least 6 characters");
+            return;
+        }
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) showAuthMessage(error.message);
+        else showAuthMessage("Check your email (including spam) to confirm your account!", false);
+    });
+
+    document.getElementById("signInBtn")?.addEventListener("click", async () => {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) showAuthMessage(error.message);
+        else onLogin(data.user);
+    });
 
     // Check existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
